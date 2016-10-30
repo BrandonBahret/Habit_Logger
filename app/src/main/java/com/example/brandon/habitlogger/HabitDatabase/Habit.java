@@ -1,8 +1,8 @@
 package com.example.brandon.habitlogger.HabitDatabase;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -14,42 +14,38 @@ public class Habit {
 
     private String name;
     @Nullable private String description;
-
-    @Nullable private HabitCategory category;
-
-    @Nullable private ArrayList<SessionEntry> entries;
+    private HabitCategory category;
+    @Nullable private SessionEntry[] entries;
     @Nullable private String iconResId;
 
-    @Nullable private Long databaseId = null;
+    private long databaseId = -1;
 
-    public Habit(String name, @Nullable String description, @Nullable HabitCategory category,
-          @Nullable ArrayList<SessionEntry> entries, @Nullable String iconResId){
+    public Habit(String name, @Nullable String description, HabitCategory category,
+          @Nullable SessionEntry[] entries, @Nullable String iconResId){
 
-        setName(name);
-        setDescription(description);
-        setCategory(category);
-        setEntries(entries);
-        setIconResId(iconResId);
+        this.name        = name;
+        this.description = description;
+        this.category    = category;
+        this.entries     = entries;
+        this.iconResId   = iconResId;
     }
 
     public String toString(){
         int entriesLength = 0;
         if(getEntries() != null) {
-            entriesLength = getEntries().size();
+            entriesLength = getEntries().length;
         }
-        if(this.hasCategory()) {
+
+        HabitCategory category = getCategory();
+        if(category != null) {
             String format = "%s{\n\tDescription: %s\n\tCategory: {\n\t\tName: %s,\n\t\tColor: %s\n\t}\n\tIconResId: %d\n\tNumber of entries: %d\n}\n";
-            return String.format(Locale.US, format, getName(), getDescription(), getCategory().getName(),
+            return String.format(Locale.US, format, getName(), getDescription(), category.getName(),
                     getCategory().getColor(), getIconResId(), entriesLength);
         }
-        else{
+        else {
             String format = "%s{\n\tDescription: %s\n\tIconResId: %d\n\tNumber of entries: %d\n}\n";
             return String.format(Locale.US, format, getName(), getDescription(), getIconResId(), entriesLength);
         }
-    }
-
-    public boolean hasCategory(){
-        return getCategory() != null;
     }
 
     /**
@@ -61,10 +57,10 @@ public class Habit {
     }
 
     /**
-     * @param iconResId a strinstringifiedgified version of an resource id for a drawable.
+     * @param iconResId a stringified version of an resource id for a drawable.
      *                  Ex: R.id.ic_launcher becomes "ic_launcher"
      */
-    public void setIconResId(String iconResId) {
+    public void setIconResId(@NonNull String iconResId) {
         this.iconResId = iconResId;
     }
 
@@ -82,7 +78,6 @@ public class Habit {
         this.name = name;
     }
 
-
     /**
      * @return the habit description
      */
@@ -92,16 +87,15 @@ public class Habit {
     }
 
     /**
-     * @param description The habit description
+     * @param newDescription The habit description
      */
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescription(@NonNull String newDescription) {
+        this.description = newDescription;
     }
 
     /**
      * @return The category object associated with this habit.
      */
-    @Nullable
     public HabitCategory getCategory() {
         return category;
     }
@@ -117,41 +111,29 @@ public class Habit {
      * @return all of the entries associated with the habit.
      */
     @Nullable
-    public ArrayList<SessionEntry> getEntries() {
+    public SessionEntry[] getEntries() {
         return entries;
     }
 
     /**
-     * @param entries The entry array to replace the old entries.
+     * @param newEntries The new entry array to replace the old entries.
      */
-    public void setEntries(ArrayList<SessionEntry> entries) {
-        this.entries = entries;
+    public void setEntries(@NonNull SessionEntry[] newEntries) {
+        this.entries = newEntries;
     }
 
-    @Nullable
-    public Long getDatabaseId() {
+    /**
+     * @return The row id of the Habit in the database, -1 when not available.
+     */
+    public long getDatabaseId() {
         return databaseId;
     }
 
-    public void setDatabaseId(@Nullable Long databaseId) {
+    /**
+     * @param databaseId The row id of the Habit in the database, -1 when not available.
+     */
+    protected void setDatabaseId(long databaseId) {
         this.databaseId = databaseId;
     }
 
-
-    @Nullable
-    public Long getCategoryDatabaseId(){
-        HabitCategory category = getCategory();
-        if(category != null){
-            return getCategory().getDatabaseId();
-        }
-
-        return  null;
-    }
-
-    public void setCategoryDatabaseId(@Nullable Long databaseId){
-        HabitCategory category = getCategory();
-        if(category != null){
-            getCategory().setDatabaseId(databaseId);
-        }
-    }
 }

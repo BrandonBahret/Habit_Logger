@@ -1,6 +1,7 @@
 package com.example.brandon.habitlogger;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -9,6 +10,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,7 +22,7 @@ import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 
-import java.util.ArrayList;
+import static com.example.brandon.habitlogger.R.menu.main;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -51,66 +53,56 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        
+
         habitDatabase = new HabitDatabase(MainActivity.this);
 
-        habitDatabase.resetDatabase();
-
-        HabitCategory work = new HabitCategory("#ffffff", "Work");
-        HabitCategory hobbies = new HabitCategory("#ffffff", "hobbies");
-        HabitCategory freelance = new HabitCategory("#ffffff", "freelance");
-
-        habitDatabase.addCategory(work);
-        habitDatabase.addCategory(hobbies);
-        habitDatabase.addCategory(freelance);
-
-        long programmingId = habitDatabase.addHabit(
-                new Habit("programming", "The time spent programming other languages", hobbies, null, null)
-        );
-
-        habitDatabase.addHabit(new Habit("Freelance work", null, freelance, null, null));
-        long freelanceId = habitDatabase.addHabit(new Habit("Freelance Search", null, freelance, null, null));
-        habitDatabase.addHabit(new Habit("clean kitchen", null, work, null, null));
-        habitDatabase.addHabit(new Habit("clean bathroom", null, work, null, null));
-
-        long entryId = habitDatabase.addEntry(programmingId, new SessionEntry(0,0,"Hello"));
-        habitDatabase.addEntry(freelanceId, new SessionEntry(0,0,"Hello"));
-        habitDatabase.addEntry(programmingId, new SessionEntry(0,0,"Hello"));
-        habitDatabase.addEntry(freelanceId, new SessionEntry(0,0,"Hello"));
-        habitDatabase.addEntry(freelanceId, new SessionEntry(0,0,"Hello"));
-        habitDatabase.addEntry(freelanceId, new SessionEntry(0,0,"Hello"));
-        habitDatabase.addEntry(freelanceId, new SessionEntry(0,0,"Hello"));
-        habitDatabase.addEntry(programmingId, new SessionEntry(0,0,"Hello"));
-        habitDatabase.addEntry(programmingId, new SessionEntry(0,0,"Hello"));
-        habitDatabase.addEntry(freelanceId, new SessionEntry(0,0,"Hello"));
+        HabitCategory cat = new HabitCategory("color", "ab cd ef gh");
+        habitDatabase.addCategory(cat);
+        habitDatabase.addCategory(new HabitCategory("color", "gh cd ab ef"));
+        habitDatabase.addCategory(new HabitCategory("color", "ef ef gh ab"));
 
 
-        habitDatabase.deleteEntry(habitDatabase.getEntryIdFromIndex(programmingId, 0));
-        habitDatabase.deleteEntry(habitDatabase.getEntryIdFromIndex(programmingId, 0));
+        long habitId = habitDatabase.addHabit(new Habit("AB CD EF", null, cat, null, null));
+        long habitId2 = habitDatabase.addHabit(new Habit("CD AB EF", null, cat, null, null));
+        habitDatabase.addHabit(new Habit("EF AB CD", null, cat, null, null));
 
-        habitDatabase.deleteHabit(programmingId);
+        SessionEntry entry1 = new SessionEntry(5000, 0, "This is a note");
+        SessionEntry entry2 = new SessionEntry(6000, 0, "Note this is");
+        SessionEntry entry3 = new SessionEntry(7000, 0, "a this is note");
+        SessionEntry entry4 = new SessionEntry(8000, 0, "herro");
 
-        if(entryId == -1){
-            Toast.makeText(this, "error add entry", Toast.LENGTH_SHORT).show();
-        }else{
-            SessionEntry entry = habitDatabase.getEntry(entryId);
-            if(entry != null){
-                Toast.makeText(this, entry.toString(), Toast.LENGTH_SHORT).show();
-            }
-        }
+        habitDatabase.addEntry(habitId, entry1);
+        habitDatabase.addEntry(habitId, entry2);
+        habitDatabase.addEntry(habitId, entry3);
+        habitDatabase.addEntry(habitId, entry4);
 
-        TextView main = (TextView)findViewById(R.id.text);
+        habitDatabase.addEntry(habitId2, entry1);
+        habitDatabase.addEntry(habitId2, entry2);
+        habitDatabase.deleteHabit(habitId2);
+        habitId2 = habitDatabase.addHabit(new Habit("CD AB EF", null, cat, null, null));
+        habitDatabase.addEntry(habitId2, entry3);
+        habitDatabase.addEntry(habitId2, entry4);
+
+        showDatabase();
+    }
+
+    public void showDatabase(){
         StringBuilder databaseString = new StringBuilder();
 
-        for(int i = 0; i<habitDatabase.getNumberOfCategories(); i++){
-            long categoryId = habitDatabase.getCategoryIdFromIndex(i);
-            ArrayList<Habit> habits = habitDatabase.getHabits(categoryId);
+        for(int categoryIndex = 0; categoryIndex < habitDatabase.getNumberOfCategories(); categoryIndex++){
+            long categoryId = habitDatabase.getCategoryIdFromIndex(categoryIndex);
 
-            for(Habit habit : habits){
-                databaseString.append(habit.toString());
+            Habit habits[] = habitDatabase.getHabits(categoryId);
+            for(Habit eachHabit : habits){
+                databaseString.append(eachHabit.toString());
             }
         }
 
+        long categoryIds[] = habitDatabase.searchCategoryIdsByName("ini");
+        Log.d("categories found", String.valueOf(categoryIds.length));
+
+        databaseString.append(habitDatabase.getNumberOfCategories());
+        TextView main = (TextView)findViewById(R.id.text);
         main.setText(databaseString.toString());
     }
 
@@ -127,7 +119,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(main, menu);
         return true;
     }
 
@@ -142,13 +134,21 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_settings) {
             return true;
         }
+        else if(id == R.id.reset_database){
+            habitDatabase.resetDatabase();
+            showDatabase();
+        }
+        else if(id == R.id.save_to_sd){
+            habitDatabase.copyDatabaseToPhoneStorage();
+            Toast.makeText(this, "Saved database", Toast.LENGTH_SHORT).show();
+        }
 
         return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 

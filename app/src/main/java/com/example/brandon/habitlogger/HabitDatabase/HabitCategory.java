@@ -1,7 +1,6 @@
 package com.example.brandon.habitlogger.HabitDatabase;
 
 import android.graphics.Color;
-import android.support.annotation.Nullable;
 
 import java.util.Locale;
 
@@ -12,18 +11,18 @@ import java.util.Locale;
  */
 
 public class HabitCategory {
-    private String hexColor;
-    private String categoryName;
+    private String color;
+    private String name;
 
-    private Long databaseId = null;
+    private long databaseId = -1;
 
     /**
      * @param color A color in hexadecimal format. Ex: "#ffffff"
      * @param name The name of the category
      */
     public HabitCategory(String color, String name){
-        setColor(color);
-        setName(name);
+        this.color = color;
+        this.name  = name;
     }
 
     /**
@@ -37,7 +36,7 @@ public class HabitCategory {
     }
 
     public String toString(){
-        String format = "Category {\n\tName: %s\n\tColor: %s\n}\n";
+        String format = "%s {\n\tColor: %s\n}\n";
         return String.format(Locale.US, format, getName(), getColor());
     }
 
@@ -45,21 +44,14 @@ public class HabitCategory {
      * @param color A color in hexadecimal form Ex: "#ffffff"
      */
     public void setColor(String color){
-        this.hexColor = color;
-    }
-
-    /**
-     * @param name The name of the category
-     */
-    public void setName(String name){
-        this.categoryName = name;
+        this.color = color;
     }
 
     /**
      * @return A color in hexadecimal form Ex: "#ffffff"
      */
     public String getColor(){
-        return this.hexColor;
+        return this.color;
     }
 
     /**
@@ -70,18 +62,30 @@ public class HabitCategory {
     }
 
     /**
+     * @param name The name of the category
+     */
+    public void setName(String name){
+        this.name = name;
+    }
+
+    /**
      * @return The name of the category
      */
     public String getName(){
-        return this.categoryName;
+        return this.name;
     }
 
-    @Nullable
-    public Long getDatabaseId() {
-        return databaseId;
-    }
-
-    public void setDatabaseId(@Nullable Long databaseId) {
+    /**
+     * @param databaseId The row id of the category in the database, -1 if not available.
+     */
+    protected void setDatabaseId(long databaseId) {
         this.databaseId = databaseId;
+    }
+
+    /**
+     * @return The row id of the category in the database, -1 if not available.
+     */
+    public long getDatabaseId() {
+        return databaseId;
     }
 }

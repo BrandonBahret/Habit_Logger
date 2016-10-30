@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.HabitDatabase;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.Locale;
@@ -13,10 +14,10 @@ import java.util.Locale;
 public class SessionEntry {
 
     private long startTime, duration;
-    private String note = null;
+    @Nullable private String note;
+    private long habitId = -1;
 
-    private @Nullable Long databaseId = null;
-    private @Nullable Long habitId = null;
+    private long databaseId = -1;
 
     /**
      * @param startTime a time in milliseconds for the time the session was started.
@@ -24,13 +25,13 @@ public class SessionEntry {
      * @param note an optional note to be associated with the session.
      */
     public SessionEntry(long startTime, long duration, @Nullable String note){
-        setStartTime(startTime);
-        setDuration(duration);
-        setNote(note);
+        this.startTime = startTime;
+        this.duration  = duration;
+        this.note      = note;
     }
 
     public String toString(){
-        String format = "{\n\tStarting Time: %d,\n\tDuration: %d\n\tNote: %s\n}";
+        String format = "{\n\tStarting Time: %d,\n\tDuration: %d\n\tNote: %s\n}\n";
         return String.format(Locale.US, format, getStartTime(), getDuration(), getNote());
     }
 
@@ -42,26 +43,17 @@ public class SessionEntry {
     }
 
     /**
-     * @param duration a time in milliseconds for the length of the session.
-     */
-    public void setDuration(long duration){
-        this.duration = duration;
-    }
-
-    /**
-     * @param note an optional note to be associated with the session.
-     */
-    public void setNote(String note){
-        if(note != null){
-            this.note = note;
-        }
-    }
-
-    /**
      * @return a time in milliseconds for the time the session was started.
      */
     public long getStartTime(){
         return this.startTime;
+    }
+
+    /**
+     * @param duration a time in milliseconds for the length of the session.
+     */
+    public void setDuration(long duration){
+        this.duration = duration;
     }
 
     /**
@@ -72,6 +64,13 @@ public class SessionEntry {
     }
 
     /**
+     * @param note an optional note to be associated with the session.
+     */
+    public void setNote(@NonNull String note){
+        this.note = note;
+    }
+
+    /**
      * @return Get the note for this entry, this can potentially be a null value.
      */
     @Nullable
@@ -79,21 +78,32 @@ public class SessionEntry {
         return this.note;
     }
 
-    @Nullable
-    public Long getDatabaseId() {
-        return databaseId;
+    /**
+     * @param habitId The row id of the habitd associated with this entry.
+     */
+    public void setHabitId(Long habitId) {
+        this.habitId = habitId;
     }
 
-    public void setDatabaseId(@Nullable Long databaseId) {
-        this.databaseId = databaseId;
-    }
-
-    @Nullable
+    /**
+     * @return The row id of the habitd associated with this entry.
+     */
     public Long getHabitId() {
         return habitId;
     }
 
-    public void setHabitId(@Nullable Long habitId) {
-        this.habitId = habitId;
+    /**
+     * @param databaseId The row id of the entry object in the database
+     */
+    protected void setDatabaseId(long databaseId) {
+        this.databaseId = databaseId;
     }
+
+    /**
+     * @return The row id of the entry object in the database
+     */
+    public long getDatabaseId() {
+        return databaseId;
+    }
+
 }

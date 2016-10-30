@@ -4,10 +4,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 
 /**
  * Created by Brandon on 10/26/2016.
@@ -17,49 +20,126 @@ import java.util.ArrayList;
 public class HabitDatabase {
 
     private DatabaseHelper databaseHelper;
+    private Context context;
 
     public HabitDatabase(Context context){
         databaseHelper = new DatabaseHelper(context);
+        this.context   = context;
     }
 
-    public long getNumberOfCategories(){
-        // TODO TEST
+    /**
+     * This will copy the database to the downloads folder. Purely for debug purposes, remove on release.
+     */
+    public void copyDatabaseToPhoneStorage(){
+        try {
+            File sd = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+            if (sd.canWrite()) {
+                String currentDBPath = context.getDatabasePath(DatabaseHelper.DATABASE_NAME).getPath();
+
+                String backupDBPath = "habit_database.db";
+                File currentDB = new File(currentDBPath);
+                File backupDB  = new File(sd, backupDBPath);
+
+                if (currentDB.exists()) {
+                    FileChannel src = new FileInputStream(currentDB).getChannel();
+                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                    dst.transferFrom(src, 0, src.size());
+                    src.close();
+                    dst.close();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void resetDatabase(){
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        databaseHelper.resetDatabase(db);
+    }
+
+    /**
+     * @param tableName The name of the table to search.
+     * @param columns The columns
+     * @param whereClause The where clause to filter the table
+     * @param selectionArgs The arguments to the where clause
+     * @return The number of rows found.
+     */
+    private int getNumberOfRows(String tableName, @Nullable String columns[],
+                                @Nullable String whereClause, @Nullable String selectionArgs[]){
+
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
-        Cursor c = db.query(DatabaseHelper.CATEGORIES_TABLE_NAME, null, null, null, null, null, null);
-        long count = c.getCount();
+        Cursor c = db.query(tableName, columns, whereClause, selectionArgs, null, null, null);
+
+        int count = c.getCount();
         c.close();
 
         return count;
     }
 
-    public long getNumberOfHabits(long categoryId){
-        // TODO TEST
+    /**
+     * @param index The index of the record to be looked up
+     * @param tableName The table name of the table to search
+     * @param rowIdColumnString The name of the row id
+     * @param whereClause The where clause used to filter the table
+     * @param selectionArgs The args to the where clause
+     * @return The found row id, -1 if found nothing.
+     */
+    private long getRowIdByIndex(int index, String tableName, String rowIdColumnString,
+                                 @Nullable String whereClause, @Nullable String selectionArgs[]){
+
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
-        String columns[] = {DatabaseHelper.HABIT_CATEGORY};
-        Cursor c = db.query(DatabaseHelper.HABITS_TABLE_NAME, columns, DatabaseHelper.HABIT_CATEGORY + "=?",
-                new String[]{String.valueOf(categoryId)}, null, null, null);
-        long count = c.getCount();
+        Cursor c = db.query(tableName, new String[]{rowIdColumnString}, whereClause, selectionArgs,
+                null, null, null);
+
+        long rowId = -1;
+        if(c.moveToPosition(index)){
+            int idInd = c.getColumnIndex(rowIdColumnString);
+            rowId = c.getLong(idInd);
+        }
+
         c.close();
 
-        return count;
+        return rowId;
     }
 
-    public long getNumberOfEntries(long habitId){
-        // TODO TEST
+    /**
+     * @param SQL The SQL string to be executed
+     * @param idColumnString The string id for the column that holds row ids.
+     * @return An array of row ids found by the sqlite query.
+     */
+    @Nullable
+    private long[] searchTableForIdsByName(String SQL, String idColumnString){
+
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
-        String columns[] = {DatabaseHelper.ENTRY_HABIT_ID};
-        Cursor c = db.query(DatabaseHelper.ENTRIES_TABLE_NAME, columns, DatabaseHelper.ENTRY_HABIT_ID + "=?",
-                new String[]{String.valueOf(habitId)}, null, null, null);
-        long count = c.getCount();
-        c.close();
+        Cursor c = db.rawQuery(SQL, null);
 
-        return count;
+        if(c != null) {
+            long ids[] = new long[c.getCount()];
+
+            int i = 0;
+            while (c.moveToNext()) {
+                int idInd = c.getColumnIndex(idColumnString);
+                ids[i++] = c.getLong(idInd);
+            }
+
+            c.close();
+            return ids;
+        }
+
+        return null;
     }
 
     // CRUD (Create, Read, Update, Destroy) categories
+
+    public int getNumberOfCategories(){
+        return getNumberOfRows(DatabaseHelper.CATEGORIES_TABLE_NAME,
+                new String[]{DatabaseHelper.CATEGORY_ID}, null, null);
+    }
 
     /**
      * @param category The category object to be added to the database
@@ -67,15 +147,19 @@ public class HabitDatabase {
      */
     public long addCategory(HabitCategory category){
         // TODO TEST
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        long id = getCategoryIdByObject(category);
 
-        ContentValues values = new ContentValues(2);
-        values.put(DatabaseHelper.CATEGORY_NAME, category.getName());
-        values.put(DatabaseHelper.CATEGORY_COLOR, category.getColor());
+        if(id == -1) { // Make sure this category doesn't exist in the database.
+            SQLiteDatabase db = databaseHelper.getWritableDatabase();
 
-        long id = db.insert(DatabaseHelper.CATEGORIES_TABLE_NAME, null, values);
+            ContentValues values = new ContentValues(2);
+            values.put(DatabaseHelper.CATEGORY_NAME, category.getName());
+            values.put(DatabaseHelper.CATEGORY_COLOR, category.getColor());
+
+            id = db.insert(DatabaseHelper.CATEGORIES_TABLE_NAME, null, values);
+        }
+
         category.setDatabaseId(id);
-
         return id;
     }
 
@@ -84,21 +168,39 @@ public class HabitDatabase {
      * @return The unique category id of the row
      */
     public long getCategoryIdFromIndex(int index){
-        // TODO TEST
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        return getRowIdByIndex(index, DatabaseHelper.CATEGORIES_TABLE_NAME, DatabaseHelper.CATEGORY_ID, null, null);
+    }
 
-        String columns[] = {DatabaseHelper.CATEGORY_ID};
-        Cursor c = db.query(DatabaseHelper.CATEGORIES_TABLE_NAME, columns, null, null, null, null, null);
+    /**
+     * @param category The category object to look for in the database
+     * @return The row id of the category found, -1 if it failed to locate a category
+     */
+    public long getCategoryIdByObject(HabitCategory category){
+        // Todo test
+        String whereClause = DatabaseHelper.CATEGORY_NAME + " =? AND " +
+                DatabaseHelper.CATEGORY_COLOR + " =?";
 
-        long rowId = -1;
-        if(c.moveToPosition(index)){
-            int idInd = c.getColumnIndex(DatabaseHelper.CATEGORY_ID);
-            rowId = c.getLong(idInd);
-        }
+        String selectionArgs[] = {category.getName(), category.getColor()};
 
-        c.close();
+        long rowId = getRowIdByIndex(0, DatabaseHelper.CATEGORIES_TABLE_NAME,
+                DatabaseHelper.CATEGORY_ID, whereClause, selectionArgs);
 
+        category.setDatabaseId(rowId);
         return rowId;
+    }
+
+    /**
+     * @param name The name of the category to look up
+     * @return The found category ids as an array
+     */
+    public long[] searchCategoryIdsByName(String name){
+        return searchTableForIdsByName(
+                "SELECT "+DatabaseHelper.CATEGORY_ID+" FROM " +
+                        DatabaseHelper.CATEGORIES_TABLE_NAME + " WHERE " +
+                        DatabaseHelper.CATEGORY_NAME + " LIKE  '%" + name + "%'",
+
+                DatabaseHelper.CATEGORY_ID
+        );
     }
 
     /**
@@ -139,13 +241,13 @@ public class HabitDatabase {
      */
     public long updateCategoryName(long categoryId, String name){
         // TODO TEST
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.CATEGORY_NAME, name);
+
         String whereClause = DatabaseHelper.CATEGORY_ID + "=?";
         String whereArgs[] = {String.valueOf(categoryId)};
 
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
         return db.update(DatabaseHelper.CATEGORIES_TABLE_NAME, values, whereClause, whereArgs);
     }
 
@@ -156,13 +258,13 @@ public class HabitDatabase {
      */
     public long updateCategoryColor(long categoryId, String color){
         // TODO TEST
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.CATEGORY_COLOR, color);
+
         String whereClause = DatabaseHelper.CATEGORY_ID + "=?";
         String whereArgs[] = {String.valueOf(categoryId)};
 
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
         return db.update(DatabaseHelper.CATEGORIES_TABLE_NAME, values, whereClause, whereArgs);
     }
 
@@ -173,12 +275,13 @@ public class HabitDatabase {
      */
     public long updateCategory(long categoryId, HabitCategory category){
         // TODO TEST
-        long count = updateCategoryName(categoryId, category.getName());
-        if(count != -1){
+        if(getCategory(categoryId) != null){
+            updateCategoryName(categoryId, category.getName());
             updateCategoryColor(categoryId, category.getColor());
+            return 1;
         }
 
-        return count;
+        return -1;
     }
 
     /**
@@ -187,12 +290,10 @@ public class HabitDatabase {
      */
     public long deleteCategory(long categoryId){
         // TODO TEST
-
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
         String whereClause = DatabaseHelper.CATEGORY_ID + "=?";
         String whereArgs[] = {String.valueOf(categoryId)};
 
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
         return db.delete(DatabaseHelper.CATEGORIES_TABLE_NAME, whereClause, whereArgs);
     }
 
@@ -205,18 +306,17 @@ public class HabitDatabase {
      */
     public long addEntry(long habitId, SessionEntry entry){
         // TODO TEST
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
         ContentValues values = new ContentValues(4);
         values.put(DatabaseHelper.ENTRY_START_TIME, entry.getStartTime());
         values.put(DatabaseHelper.ENTRY_DURATION, entry.getDuration());
         values.put(DatabaseHelper.ENTRY_NOTE, entry.getNote());
         values.put(DatabaseHelper.ENTRY_HABIT_ID, habitId);
 
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
         long id = db.insert(DatabaseHelper.ENTRIES_TABLE_NAME, null, values);
+
         entry.setDatabaseId(id);
         entry.setHabitId(habitId);
-
         return id;
     }
 
@@ -227,18 +327,107 @@ public class HabitDatabase {
      */
     public long getEntryIdFromIndex(long habitId, int index){
         // TODO TEST
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
-        Cursor c = db.query(DatabaseHelper.ENTRIES_TABLE_NAME, null, DatabaseHelper.ENTRY_HABIT_ID + "=?",
-                new String[]{String.valueOf(habitId)}, null, null, null);
+        return getRowIdByIndex(index, DatabaseHelper.ENTRIES_TABLE_NAME, DatabaseHelper.ENTRY_ID,
+                DatabaseHelper.ENTRY_HABIT_ID + "=?", new String[]{String.valueOf(habitId)});
+    }
 
-        long entryId = -1;
-        if(c.moveToPosition(index)){
-            int idInd = c.getColumnIndex(DatabaseHelper.ENTRY_ID);
-            entryId = c.getLong(idInd);
+    /**
+     * @param entry The entry object to look for in the database
+     * @return The row id of the entry found, -1 if it failed to locate a category
+     */
+    public long getEntryIdByObject(SessionEntry entry){
+        // TODO TEST
+        String whereClause = DatabaseHelper.ENTRY_START_TIME + " =? AND " +
+                DatabaseHelper.ENTRY_DURATION + " =? AND " +
+                DatabaseHelper.ENTRY_NOTE + "=?";
+
+        String selectionArgs[] = {String.valueOf(entry.getStartTime()),
+                String.valueOf(entry.getDuration()), entry.getNote()};
+
+        long rowId = getRowIdByIndex(0, DatabaseHelper.ENTRIES_TABLE_NAME, DatabaseHelper.ENTRY_ID,
+                whereClause, selectionArgs);
+
+        entry.setDatabaseId(rowId);
+        return rowId;
+    }
+
+    /**
+     * @param habitId The row id for the habit to query
+     * @param query The search query
+     * @return An array of entry ids found by the search, null if results were empty.
+     */
+    @Nullable
+    public long[] searchEntryIdsByComment(long habitId, String query){
+        return searchTableForIdsByName(
+                "SELECT "+DatabaseHelper.ENTRY_ID+" FROM " +
+                DatabaseHelper.ENTRIES_TABLE_NAME + " WHERE " +
+                DatabaseHelper.ENTRY_NOTE + " LIKE  '%" + query + "%' AND " +
+                DatabaseHelper.ENTRY_HABIT_ID + "=" + String.valueOf(habitId),
+
+                DatabaseHelper.ENTRY_ID
+        );
+    }
+
+    /**
+     * @param habitId The row id for the habit to search entries for
+     * @param beginTime The starting time for the query
+     * @param endTime The ending time for the query
+     * @return An array of entry ids found by the search, null if results were empty.
+     */
+    @Nullable
+    public long[] searchEntriesWithTimeRangeForAHabit(long habitId, long beginTime, long endTime){
+        // TODO TEST
+        // SELECT ENTRY_ID FROM ENTRIES_TABLE WHERE HABIT_ID=habitId AND START_TIME >= BEGIN AND START_TIME <= END
+        String SQL = "SELECT " + DatabaseHelper.ENTRY_ID + " FROM " + DatabaseHelper.ENTRIES_TABLE_NAME +
+                " WHERE " + DatabaseHelper.ENTRY_HABIT_ID + "=" + String.valueOf(habitId) + " AND " +
+                DatabaseHelper.ENTRY_START_TIME + ">=" + String.valueOf(beginTime) + " AND " +
+                DatabaseHelper.ENTRY_START_TIME + "<=" + String.valueOf(endTime);
+
+
+        return searchTableForIdsByName(SQL, DatabaseHelper.ENTRY_ID);
+    }
+
+    /**
+     * @param beginTime The starting time for the query
+     * @param endTime The ending time for the query
+     * @return An array of entry ids found by the search, null if results were empty.
+     */
+    public long[] searchAllEntriesWithTimeRange(long beginTime, long endTime){
+        // TODO TEST
+        // SELECT ENTRY_ID FROM ENTRIES_TABLE WHERE START_TIME >= BEGIN AND START_TIME <= END
+        String SQL = "SELECT " + DatabaseHelper.ENTRY_ID + " FROM " + DatabaseHelper.ENTRIES_TABLE_NAME +
+                " WHERE " + DatabaseHelper.ENTRY_START_TIME + ">=" + String.valueOf(beginTime) + " AND " +
+                DatabaseHelper.ENTRY_START_TIME + "<=" + String.valueOf(endTime);
+
+        return searchTableForIdsByName(SQL, DatabaseHelper.ENTRY_ID);
+    }
+
+    @Nullable
+    private SessionEntry getEntryFromCursor(Cursor c){
+        // TODO TEST
+        SessionEntry entry = null;
+
+        if(c != null){
+            if(c.moveToFirst()){
+                int startTimeInd = c.getColumnIndex(DatabaseHelper.ENTRY_START_TIME);
+                int durationInd  = c.getColumnIndex(DatabaseHelper.ENTRY_DURATION);
+                int habitIdInd   = c.getColumnIndex(DatabaseHelper.ENTRY_HABIT_ID);
+                int noteInd      = c.getColumnIndex(DatabaseHelper.ENTRY_NOTE);
+                int idInd        = c.getColumnIndex(DatabaseHelper.ENTRY_ID);
+
+                long entryHabitId = c.getLong(habitIdInd);
+                long databaseId   = c.getLong(idInd);
+                long startTime    = c.getLong(startTimeInd);
+                long duration     = c.getLong(durationInd);
+                String note       = c.getString(noteInd);
+
+                entry = new SessionEntry(startTime, duration, note);
+                entry.setHabitId(entryHabitId);
+                entry.setDatabaseId(databaseId);
+            }
         }
 
-        c.close();
-        return entryId;
+        return entry;
     }
 
     /**
@@ -247,7 +436,7 @@ public class HabitDatabase {
      * @return The found session entry
      */
     @Nullable
-    public SessionEntry getEntry(long habitId, long entryIndex){
+    public SessionEntry getEntry(long habitId, int entryIndex){
         // TODO TEST
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
@@ -258,7 +447,7 @@ public class HabitDatabase {
 
         SessionEntry entry = null;
 
-        if(c.moveToPosition((int)entryIndex)){
+        if(c.moveToPosition(entryIndex)){
             entry = getEntryFromCursor(c);
         }
 
@@ -292,26 +481,6 @@ public class HabitDatabase {
         return entry;
     }
 
-    private SessionEntry getEntryFromCursor(Cursor c){
-        int startTimeInd = c.getColumnIndex(DatabaseHelper.ENTRY_START_TIME);
-        int durationInd  = c.getColumnIndex(DatabaseHelper.ENTRY_DURATION);
-        int noteInd  = c.getColumnIndex(DatabaseHelper.ENTRY_NOTE);
-        int habitIdInd  = c.getColumnIndex(DatabaseHelper.ENTRY_HABIT_ID);
-        int idInd  = c.getColumnIndex(DatabaseHelper.ENTRY_ID);
-
-        long startTime = c.getLong(startTimeInd);
-        long duration = c.getLong(durationInd);
-        String note  = c.getString(noteInd);
-        long entryHabitId  = c.getLong(habitIdInd);
-        long databaseId  = c.getLong(idInd);
-
-        SessionEntry entry = new SessionEntry(startTime, duration, note);
-        entry.setHabitId(entryHabitId);
-        entry.setDatabaseId(databaseId);
-
-        return entry;
-    }
-
     /**
      * @param habitId The id of the habit which to edit an entry
      * @param entryIndex The index of the entry to edit
@@ -320,14 +489,13 @@ public class HabitDatabase {
      */
     public long updateEntryStartTime(long habitId, long entryIndex, long startTime){
         // TODO TEST
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.ENTRY_START_TIME, startTime);
 
         String whereClause = DatabaseHelper.ENTRY_HABIT_ID + " =? AND " + DatabaseHelper.ENTRY_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId), String.valueOf(entryIndex)};
 
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
         return db.update(DatabaseHelper.ENTRIES_TABLE_NAME, values, whereClause, whereArgs);
     }
 
@@ -339,14 +507,13 @@ public class HabitDatabase {
      */
     public long updateEntryDuration(long habitId, long entryIndex, long duration){
         // TODO TEST
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.ENTRY_DURATION, duration);
 
         String whereClause = DatabaseHelper.ENTRY_HABIT_ID + " =? AND " + DatabaseHelper.ENTRY_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId), String.valueOf(entryIndex)};
 
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
         return db.update(DatabaseHelper.ENTRIES_TABLE_NAME, values, whereClause, whereArgs);
     }
 
@@ -358,14 +525,13 @@ public class HabitDatabase {
      */
     public long updateEntryNote(long habitId, long entryIndex, String note){
         // TODO TEST
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.ENTRY_NOTE, note);
 
         String whereClause = DatabaseHelper.ENTRY_HABIT_ID + " =? AND " + DatabaseHelper.ENTRY_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId), String.valueOf(entryIndex)};
 
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
         return db.update(DatabaseHelper.ENTRIES_TABLE_NAME, values, whereClause, whereArgs);
     }
 
@@ -377,15 +543,14 @@ public class HabitDatabase {
      */
     public long updateEntry(long habitId, int entryIndex, SessionEntry entry){
         // TODO TEST
-
-        long count = -1;
         if(getEntry(habitId, entryIndex) != null){
-            count = updateEntryStartTime(habitId, entryIndex, entry.getStartTime());
+            updateEntryStartTime(habitId, entryIndex, entry.getStartTime());
             updateEntryDuration(habitId, entryIndex, entry.getDuration());
             updateEntryNote(habitId, entryIndex, entry.getNote());
+            return 1;
         }
 
-        return count;
+        return -1;
     }
 
     /**
@@ -394,12 +559,23 @@ public class HabitDatabase {
      */
     public long deleteEntry(long entryId){
         // TODO TEST
-
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
         String whereClause = DatabaseHelper.ENTRY_ID + " =?";
         String whereArgs[] = {String.valueOf(entryId)};
 
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        return db.delete(DatabaseHelper.ENTRIES_TABLE_NAME, whereClause, whereArgs);
+    }
+
+    /**
+     * @param habitId The habit which to delete it's entries
+     * @return The number of rows removed, -1 if error
+     */
+    public long deleteEntriesForHabit(long habitId){
+        // TODO TEST
+        String whereClause = DatabaseHelper.ENTRY_HABIT_ID + " =?";
+        String whereArgs[] = {String.valueOf(habitId)};
+
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
         return db.delete(DatabaseHelper.ENTRIES_TABLE_NAME, whereClause, whereArgs);
     }
 
@@ -411,39 +587,42 @@ public class HabitDatabase {
      */
     public long addHabit(Habit habit){
         // TODO TEST
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        long habitId = getHabitIdFromObject(habit);
 
-        ContentValues values = new ContentValues();
+        if(habitId == -1) {
+            SQLiteDatabase db = databaseHelper.getWritableDatabase();
 
-        values.put(DatabaseHelper.HABIT_NAME, habit.getName());
-        values.put(DatabaseHelper.HABIT_DESCRIPTION, habit.getDescription());
-        values.put(DatabaseHelper.HABIT_ICON_RES_ID, habit.getIconResId());
+            ContentValues values = new ContentValues(4);
+            long categoryId = getCategoryIdByObject(habit.getCategory());
 
-        HabitCategory category = habit.getCategory();
-        Long categoryId = null;
+            values.put(DatabaseHelper.HABIT_NAME, habit.getName());
+            values.put(DatabaseHelper.HABIT_DESCRIPTION, habit.getDescription());
+            values.put(DatabaseHelper.HABIT_ICON_RES_ID, habit.getIconResId());
+            values.put(DatabaseHelper.HABIT_CATEGORY, categoryId);
 
-        if(category != null) {
-            categoryId = category.getDatabaseId();
-            if (categoryId == null) {
-                categoryId = addCategory(category);
-                habit.setCategoryDatabaseId(categoryId);
-            }
-        }
-        values.put(DatabaseHelper.HABIT_CATEGORY, categoryId);
+            habitId = db.insert(DatabaseHelper.HABITS_TABLE_NAME, null, values);
 
-        long habitId = db.insert(DatabaseHelper.HABITS_TABLE_NAME, null, values);
-
-        // Add entries to the new habit
-        ArrayList<SessionEntry> entries = habit.getEntries();
-        if(entries != null) {
-            for (SessionEntry entry : entries) {
-                addEntry(habitId, entry);
+            // Add entries to the new habit
+            SessionEntry entries[] = habit.getEntries();
+            if (entries != null) {
+                for (SessionEntry entry : entries) {
+                    addEntry(habitId, entry);
+                }
             }
         }
 
         habit.setDatabaseId(habitId);
-
         return habitId;
+    }
+
+    public int getNumberOfHabits(long categoryId){
+        return getNumberOfRows(DatabaseHelper.HABITS_TABLE_NAME, new String[]{DatabaseHelper.HABIT_ID},
+                DatabaseHelper.HABIT_CATEGORY + "=?", new String[]{String.valueOf(categoryId)});
+    }
+
+    public int getNumberOfEntries(long habitId){
+        return getNumberOfRows(DatabaseHelper.ENTRIES_TABLE_NAME, new String[]{DatabaseHelper.ENTRY_HABIT_ID},
+                DatabaseHelper.ENTRY_HABIT_ID + "=?", new String[]{String.valueOf(habitId)});
     }
 
     /**
@@ -452,22 +631,75 @@ public class HabitDatabase {
      */
     public long getHabitIdFromIndex(long categoryId, int index){
         // TODO TEST
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        return getRowIdByIndex(index, DatabaseHelper.HABITS_TABLE_NAME, DatabaseHelper.HABIT_ID,
+                DatabaseHelper.HABIT_CATEGORY + "=?", new String[]{String.valueOf(categoryId)});
+    }
 
-        String columns[] = {DatabaseHelper.HABIT_ID};
-        Cursor c = db.query(DatabaseHelper.HABITS_TABLE_NAME, columns,
-                DatabaseHelper.HABIT_CATEGORY + "=?", new String[]{String.valueOf(categoryId)},
-                null, null, null);
+    /**
+     * @param habit The object to look up in the database
+     * @return The row id of the object in the database if found, else -1.
+     */
+    public long getHabitIdFromObject(Habit habit){
+        long habitId = habit.getDatabaseId();
 
-        long rowId = -1;
-        if(c.moveToPosition(index)){
-            int idInd = c.getColumnIndex(DatabaseHelper.HABIT_ID);
-            rowId = c.getLong(idInd);
+        if(habitId == -1) {
+            long categoryId = getCategoryIdByObject(habit.getCategory());
+
+            String whereClause = DatabaseHelper.HABIT_NAME + "=? AND " +
+                    DatabaseHelper.HABIT_CATEGORY + "=?";
+
+            String selectionArgs[] = {habit.getName(), String.valueOf(categoryId)};
+
+            habitId = getRowIdByIndex(0, DatabaseHelper.HABITS_TABLE_NAME, DatabaseHelper.HABIT_ID,
+                    whereClause, selectionArgs);
         }
 
-        c.close();
+        return habitId;
+    }
 
-        return rowId;
+    /**
+     * @param name The name of the habit to look up
+     * @return The found habit ids
+     */
+    public long[] searchHabitIdsByName(String name, long categoryId){
+        // Todo test
+        return searchTableForIdsByName("SELECT "+DatabaseHelper.HABIT_ID+" FROM " +
+                DatabaseHelper.HABITS_TABLE_NAME + " WHERE " +
+                DatabaseHelper.HABIT_NAME + " LIKE  '%" + name + "%' AND " +
+                DatabaseHelper.HABIT_CATEGORY + "=" +String.valueOf(categoryId),
+
+                DatabaseHelper.HABIT_ID);
+    }
+
+    private Habit getHabitFromCursor(Cursor c){
+        Habit habit = null;
+
+        if(c != null) {
+            if(c.moveToFirst()) {
+                int descriptionInd = c.getColumnIndex(DatabaseHelper.HABIT_DESCRIPTION);
+                int iconResIdInd = c.getColumnIndex(DatabaseHelper.HABIT_ICON_RES_ID);
+                int categoryInd = c.getColumnIndex(DatabaseHelper.HABIT_CATEGORY);
+                int habitIdInd = c.getColumnIndex(DatabaseHelper.HABIT_ID);
+                int nameInd = c.getColumnIndex(DatabaseHelper.HABIT_NAME);
+
+                long categoryId = c.getLong(categoryInd);
+                HabitCategory category = getCategory(categoryId);
+                String description = c.getString(descriptionInd);
+                String iconResId = c.getString(iconResIdInd);
+                long habitId = c.getLong(habitIdInd);
+                String name = c.getString(nameInd);
+
+                SessionEntry entries[] = new SessionEntry[getNumberOfEntries(habitId)];
+                for (int i = 0; i < getNumberOfEntries(habitId); i++) {
+                    entries[i] = getEntry(habitId, i);
+                }
+
+                habit = new Habit(name, description, category, entries, iconResId);
+                habit.setDatabaseId(habitId);
+            }
+        }
+
+        return habit;
     }
 
     /**
@@ -477,37 +709,13 @@ public class HabitDatabase {
     @Nullable
     public Habit getHabit(long habitId){
         // TODO TEST
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
-
-        String columns[] = {DatabaseHelper.HABIT_NAME, DatabaseHelper.HABIT_DESCRIPTION,
-                DatabaseHelper.HABIT_CATEGORY, DatabaseHelper.HABIT_ICON_RES_ID};
-
         String selectionArgs[] = {String.valueOf(habitId)};
-        Cursor c = db.query(DatabaseHelper.HABITS_TABLE_NAME, columns, DatabaseHelper.HABIT_ID + "=?",
+
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        Cursor c = db.query(DatabaseHelper.HABITS_TABLE_NAME, null, DatabaseHelper.HABIT_ID + "=?",
                 selectionArgs, null, null, null);
 
-        Habit habit = null;
-
-        if(c.moveToFirst()){
-            int nameInd = c.getColumnIndex(DatabaseHelper.HABIT_NAME);
-            int descriptionInd  = c.getColumnIndex(DatabaseHelper.HABIT_DESCRIPTION);
-            int categoryInd  = c.getColumnIndex(DatabaseHelper.HABIT_CATEGORY);
-            int iconResIdInd  = c.getColumnIndex(DatabaseHelper.HABIT_ICON_RES_ID);
-
-            String name  = c.getString(nameInd);
-            String description  = c.getString(descriptionInd);
-            long categoryId  = c.getInt(categoryInd);
-            HabitCategory category = getCategory(categoryId);
-            String iconResId  = c.getString(iconResIdInd);
-
-            ArrayList<SessionEntry> entries = new ArrayList<>();
-            for(int i = 0; i < getNumberOfEntries(habitId); i++){
-                entries.add(getEntry(habitId, i));
-            }
-
-            habit = new Habit(name, description, category, entries, iconResId);
-            habit.setDatabaseId(habitId);
-        }
+        Habit habit = getHabitFromCursor(c);
 
         c.close();
 
@@ -518,11 +726,11 @@ public class HabitDatabase {
      * @param categoryId The category to fetch habits from
      * @return an array list containing the habits
      */
-    public ArrayList<Habit> getHabits(long categoryId){
-        ArrayList<Habit> habits = new ArrayList<>((int)getNumberOfHabits(categoryId));
+    public Habit[] getHabits(long categoryId){
+        Habit[] habits = new Habit[getNumberOfHabits(categoryId)];
 
         for(int i = 0; i < getNumberOfHabits(categoryId); i++){
-            habits.add(getHabit(getHabitIdFromIndex(categoryId, i)));
+            habits[i] = getHabit(getHabitIdFromIndex(categoryId, i));
         }
 
         return habits;
@@ -535,14 +743,13 @@ public class HabitDatabase {
      */
     public long updateHabitName(long habitId, String name){
         // TODO TEST
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.HABIT_NAME, name);
 
         String whereClause = DatabaseHelper.HABIT_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId)};
 
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
         return db.update(DatabaseHelper.HABITS_TABLE_NAME, values, whereClause, whereArgs);
     }
 
@@ -553,14 +760,13 @@ public class HabitDatabase {
      */
     public long updateHabitDescription(long habitId, String description){
         // TODO TEST
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.HABIT_DESCRIPTION, description);
 
         String whereClause = DatabaseHelper.HABIT_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId)};
 
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
         return db.update(DatabaseHelper.HABITS_TABLE_NAME, values, whereClause, whereArgs);
     }
 
@@ -571,14 +777,13 @@ public class HabitDatabase {
      */
     public long updateHabitCategory(long habitId, @Nullable Long categoryId){
         // TODO TEST
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.HABIT_CATEGORY, categoryId);
 
         String whereClause = DatabaseHelper.HABIT_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId)};
 
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
         return db.update(DatabaseHelper.HABITS_TABLE_NAME, values, whereClause, whereArgs);
     }
 
@@ -589,14 +794,13 @@ public class HabitDatabase {
      */
     public long updateHabitIconResId(long habitId, String iconResId){
         // TODO TEST
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.HABIT_ICON_RES_ID, iconResId);
 
         String whereClause = DatabaseHelper.HABIT_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId)};
 
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
         return db.update(DatabaseHelper.HABITS_TABLE_NAME, values, whereClause, whereArgs);
     }
 
@@ -606,19 +810,15 @@ public class HabitDatabase {
      * @return The number of rows removed, -1 if error
      */
     public long updateHabit(long habitId, Habit habit){
-        long count = -1;
-
         if(getHabit(habitId) != null){
-            count = updateHabitName(habitId, habit.getName());
+            updateHabitName(habitId, habit.getName());
             updateHabitDescription(habitId, habit.getDescription());
-            HabitCategory category = habit.getCategory();
-            if(category != null){
-                updateHabitCategory(habitId, category.getDatabaseId());
-            }
+            updateHabitCategory(habitId, getCategoryIdByObject(habit.getCategory()));
             updateHabitIconResId(habitId, habit.getIconResId());
+            return 1;
         }
 
-        return count;
+        return -1;
     }
 
     /**
@@ -627,114 +827,14 @@ public class HabitDatabase {
      */
     public long deleteHabit(long habitId){
         // TODO TEST
-
         // Delete all of the habit's entries
-        for(int i = 0; i < getNumberOfEntries(habitId); i++){
-            SessionEntry entry = getEntry(habitId, i);
-            if(entry != null) {
-                Long entryId = entry.getDatabaseId();
-                if(entryId != null) {
-                    deleteEntry(entryId);
-                }
-            }
-        }
+        deleteEntriesForHabit(habitId);
 
         // Delete the habit itself
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
         String whereClause = DatabaseHelper.HABIT_ID + "=?";
         String whereArgs[] = {String.valueOf(habitId)};
 
-        return db.delete(DatabaseHelper.HABITS_TABLE_NAME, whereClause, whereArgs);
-    }
-
-    public void resetDatabase(){
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
-        databaseHelper.resetDatabase(db);
-    }
-
-    private static class DatabaseHelper extends SQLiteOpenHelper{
-
-        DatabaseHelper(Context context){
-            super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase sqLiteDatabase) {
-            sqLiteDatabase.execSQL(CREATE_HABITS_TABLE);
-            sqLiteDatabase.execSQL(CREATE_CATEGORIES_TABLE);
-            sqLiteDatabase.execSQL(CREATE_ENTRIES_TABLE);
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-            resetDatabase(sqLiteDatabase);
-        }
-
-        public void resetDatabase(SQLiteDatabase sqLiteDatabase){
-            sqLiteDatabase.execSQL(DROP_HABITS_TABLE);
-            sqLiteDatabase.execSQL(DROP_CATEGORIES_TABLE);
-            sqLiteDatabase.execSQL(DROP_ENTRIES_TABLE);
-            this.onCreate(sqLiteDatabase);
-        }
-
-        private static final String DATABASE_NAME = "habit_logger_database";
-        private static final int DATABASE_VERSION = 2;
-
-        // CREATE TABLE HABITS_TABLE (ID INTEGER PRIMARY KEY, NAME TEXT, DESCRIPTION TEXT, CATEGORY LONG, ICON_RES_ID TEXT)
-        private static final String HABITS_TABLE_NAME = "HABITS_TABLE";
-        private static final String HABIT_ID          = "ID";
-        private static final String HABIT_NAME        = "NAME";
-        private static final String HABIT_DESCRIPTION = "DESCRIPTION";
-        private static final String HABIT_CATEGORY    = "CATEGORY";
-        private static final String HABIT_ICON_RES_ID = "ICON_RES_ID";
-
-        private static final String CREATE_HABITS_TABLE =
-                "CREATE TABLE " + HABITS_TABLE_NAME + " (" +
-                HABIT_ID          + " INTEGER PRIMARY KEY, " +
-                HABIT_NAME        + " TEXT,"    +
-                HABIT_DESCRIPTION + " TEXT,"    +
-                HABIT_CATEGORY    + " LONG," +
-                HABIT_ICON_RES_ID + " TEXT" +
-                ");";
-
-        // DROP TABLE IF EXISTS HABITS_TABLE
-        private static final String DROP_HABITS_TABLE = "DROP TABLE IF EXISTS " + HABITS_TABLE_NAME;
-
-        // CREATE TABLE CATEGORIES_TABLE (ID INTEGER PRIMARY KEY, NAME TEXT, COLOR TEXT);
-        private static final String CATEGORIES_TABLE_NAME = "CATEGORIES_TABLE";
-        private static final String CATEGORY_ID    = "ID";
-        private static final String CATEGORY_NAME  = "NAME";
-        private static final String CATEGORY_COLOR = "COLOR";
-
-        private static final String CREATE_CATEGORIES_TABLE =
-                "CREATE TABLE " + CATEGORIES_TABLE_NAME + " (" +
-                CATEGORY_ID    + " INTEGER PRIMARY KEY," +
-                CATEGORY_NAME  + " TEXT,"  +
-                CATEGORY_COLOR + " TEXT"  +
-                ");";
-
-        // DROP TABLE IF EXISTS CATEGORIES_TABLE
-        private static final String DROP_CATEGORIES_TABLE = "DROP TABLE IF EXISTS " + CATEGORIES_TABLE_NAME;
-
-        // CREATE TABLE ENTRIES_TABLE (ID INTEGER PRIMARY KEY, HABIT_ID LONG, START_TIME LONG, DURATION LONG, NOTE TEXT)
-        private static final String ENTRIES_TABLE_NAME = "ENTRIES_TABLE";
-        private static final String ENTRY_ID         = "ID";
-        private static final String ENTRY_HABIT_ID   = "HABIT_ID";
-        private static final String ENTRY_START_TIME = "START_TIME";
-        private static final String ENTRY_DURATION   = "DURATION";
-        private static final String ENTRY_NOTE       = "NOTE";
-
-        private static final String CREATE_ENTRIES_TABLE =
-                "CREATE TABLE " + ENTRIES_TABLE_NAME + " (" +
-                ENTRY_ID          + " INTEGER PRIMARY KEY," +
-                ENTRY_HABIT_ID    + " LONG," +
-                ENTRY_START_TIME  + " LONG,"  +
-                ENTRY_DURATION    + " LONG,"  +
-                ENTRY_NOTE        + " TEXT"    +
-                ");";
-
-        // DROP TABLE IF EXISTS ENTRIES_TABLE
-        private static final String DROP_ENTRIES_TABLE = "DROP TABLE IF EXISTS " + ENTRIES_TABLE_NAME;
+        return db.delete(DatabaseHelper.HABITS_TABLE_NAME, whereClause, whereArgs);
     }
 }

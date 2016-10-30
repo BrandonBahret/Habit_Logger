@@ -6,4 +6,17 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/reset_database"
+        android:orderInCategory="200"
+        android:title="Reset Database"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/save_to_sd"
+        android:orderInCategory="300"
+        android:title="save to SD"
+        app:showAsAction="ifRoom"/>
+
 </menu>
