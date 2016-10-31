@@ -12,22 +12,37 @@ import java.util.Locale;
 
 public class Habit {
 
-    private String name;
-    @Nullable private String description;
-    private HabitCategory category;
+    @NonNull private String name;
+    @NonNull private String description;
+    @NonNull private HabitCategory category;
     @Nullable private SessionEntry[] entries;
-    @Nullable private String iconResId;
+    @NonNull private String iconResId;
 
     private long databaseId = -1;
 
-    public Habit(String name, @Nullable String description, HabitCategory category,
-          @Nullable SessionEntry[] entries, @Nullable String iconResId){
+    public Habit(@NonNull String name, @NonNull String description, @NonNull HabitCategory category,
+          @Nullable SessionEntry[] entries, @NonNull String iconResId){
 
         this.name        = name;
         this.description = description;
         this.category    = category;
         this.entries     = entries;
         this.iconResId   = iconResId;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Habit){
+            Habit compare = (Habit)obj;
+
+            return compare.getName().equals(getName()) &&
+                    String.valueOf(compare.getDescription()).equals(String.valueOf(getDescription())) &&
+                    compare.getCategory().equals(getCategory()) &&
+                    String.valueOf(compare.getIconResId()).equals(String.valueOf(getIconResId()));
+        }
+        else {
+            return false;
+        }
     }
 
     public String toString(){
@@ -37,21 +52,16 @@ public class Habit {
         }
 
         HabitCategory category = getCategory();
-        if(category != null) {
-            String format = "%s{\n\tDescription: %s\n\tCategory: {\n\t\tName: %s,\n\t\tColor: %s\n\t}\n\tIconResId: %d\n\tNumber of entries: %d\n}\n";
-            return String.format(Locale.US, format, getName(), getDescription(), category.getName(),
-                    getCategory().getColor(), getIconResId(), entriesLength);
-        }
-        else {
-            String format = "%s{\n\tDescription: %s\n\tIconResId: %d\n\tNumber of entries: %d\n}\n";
-            return String.format(Locale.US, format, getName(), getDescription(), getIconResId(), entriesLength);
-        }
+
+        String format = "%s{\n\tDescription: %s\n\tCategory: {\n\t\tName: %s,\n\t\tColor: %s\n\t}\n\tIconResId: %s\n\tNumber of entries: %d\n}\n";
+        return String.format(Locale.US, format, getName(), getDescription(), category.getName(),
+                getCategory().getColor(), getIconResId(), entriesLength);
     }
 
     /**
      * @return the resource id for a drawable as a string. Ex: R.id.ic_launcher becomes "ic_launcher"
      */
-    @Nullable
+    @NonNull
     public String getIconResId() {
         return iconResId;
     }
@@ -67,6 +77,7 @@ public class Habit {
     /**
      * @return The habit name
      */
+    @NonNull
     public String getName() {
         return name;
     }
@@ -74,14 +85,14 @@ public class Habit {
     /**
      * @param name the new habit name
      */
-    public void setName(String name) {
+    public void setName(@NonNull String name) {
         this.name = name;
     }
 
     /**
      * @return the habit description
      */
-    @Nullable
+    @NonNull
     public String getDescription() {
         return description;
     }
@@ -96,6 +107,7 @@ public class Habit {
     /**
      * @return The category object associated with this habit.
      */
+    @NonNull
     public HabitCategory getCategory() {
         return category;
     }
@@ -103,7 +115,7 @@ public class Habit {
     /**
      * @param category The category object associated with this habit.
      */
-    public void setCategory(HabitCategory category) {
+    public void setCategory(@NonNull HabitCategory category) {
         this.category = category;
     }
 

@@ -1,7 +1,6 @@
 package com.example.brandon.habitlogger.HabitDatabase;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.util.Locale;
 
@@ -14,7 +13,7 @@ import java.util.Locale;
 public class SessionEntry {
 
     private long startTime, duration;
-    @Nullable private String note;
+    @NonNull private String note;
     private long habitId = -1;
 
     private long databaseId = -1;
@@ -24,10 +23,25 @@ public class SessionEntry {
      * @param duration a time in milliseconds for the length of the session.
      * @param note an optional note to be associated with the session.
      */
-    public SessionEntry(long startTime, long duration, @Nullable String note){
+    public SessionEntry(long startTime, long duration, @NonNull String note){
         this.startTime = startTime;
         this.duration  = duration;
         this.note      = note;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof SessionEntry) {
+            SessionEntry compare = (SessionEntry) obj;
+
+            return compare.getHabitId().equals(getHabitId()) &&
+                    String.valueOf(compare.getNote()).equals(String.valueOf(getNote())) &&
+                    compare.getDuration() == getDuration() &&
+                    compare.getStartTime() == getStartTime();
+        }
+        else{
+            return false;
+        }
     }
 
     public String toString(){
@@ -73,7 +87,7 @@ public class SessionEntry {
     /**
      * @return Get the note for this entry, this can potentially be a null value.
      */
-    @Nullable
+    @NonNull
     public String getNote(){
         return this.note;
     }

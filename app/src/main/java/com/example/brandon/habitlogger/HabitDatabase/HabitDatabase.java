@@ -146,7 +146,6 @@ public class HabitDatabase {
      * @return The row id for the new row, -1 if error
      */
     public long addCategory(HabitCategory category){
-        // TODO TEST
         long id = getCategoryIdByObject(category);
 
         if(id == -1) { // Make sure this category doesn't exist in the database.
@@ -176,7 +175,6 @@ public class HabitDatabase {
      * @return The row id of the category found, -1 if it failed to locate a category
      */
     public long getCategoryIdByObject(HabitCategory category){
-        // Todo test
         String whereClause = DatabaseHelper.CATEGORY_NAME + " =? AND " +
                 DatabaseHelper.CATEGORY_COLOR + " =?";
 
@@ -209,7 +207,6 @@ public class HabitDatabase {
      */
     @Nullable
     public HabitCategory getCategory (long categoryId){
-        // TODO TEST
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
         String columns[] = {DatabaseHelper.CATEGORY_NAME, DatabaseHelper.CATEGORY_COLOR};
@@ -240,7 +237,6 @@ public class HabitDatabase {
      * @return The number of rows changed, -1 if fail.
      */
     public long updateCategoryName(long categoryId, String name){
-        // TODO TEST
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.CATEGORY_NAME, name);
 
@@ -257,7 +253,6 @@ public class HabitDatabase {
      * @return The number of rows changed, -1 if fail.
      */
     public long updateCategoryColor(long categoryId, String color){
-        // TODO TEST
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.CATEGORY_COLOR, color);
 
@@ -274,7 +269,6 @@ public class HabitDatabase {
      * @return Returns the number of rows changed, -1 if failed.
      */
     public long updateCategory(long categoryId, HabitCategory category){
-        // TODO TEST
         if(getCategory(categoryId) != null){
             updateCategoryName(categoryId, category.getName());
             updateCategoryColor(categoryId, category.getColor());
@@ -289,7 +283,6 @@ public class HabitDatabase {
      * @return Returns the number of rows removed, -1 if failed.
      */
     public long deleteCategory(long categoryId){
-        // TODO TEST
         String whereClause = DatabaseHelper.CATEGORY_ID + "=?";
         String whereArgs[] = {String.valueOf(categoryId)};
 
@@ -305,7 +298,6 @@ public class HabitDatabase {
      * @return Row id of the new row, -1 if error
      */
     public long addEntry(long habitId, SessionEntry entry){
-        // TODO TEST
         ContentValues values = new ContentValues(4);
         values.put(DatabaseHelper.ENTRY_START_TIME, entry.getStartTime());
         values.put(DatabaseHelper.ENTRY_DURATION, entry.getDuration());
@@ -326,7 +318,6 @@ public class HabitDatabase {
      * @return The id of the entry
      */
     public long getEntryIdFromIndex(long habitId, int index){
-        // TODO TEST
         return getRowIdByIndex(index, DatabaseHelper.ENTRIES_TABLE_NAME, DatabaseHelper.ENTRY_ID,
                 DatabaseHelper.ENTRY_HABIT_ID + "=?", new String[]{String.valueOf(habitId)});
     }
@@ -336,12 +327,14 @@ public class HabitDatabase {
      * @return The row id of the entry found, -1 if it failed to locate a category
      */
     public long getEntryIdByObject(SessionEntry entry){
-        // TODO TEST
-        String whereClause = DatabaseHelper.ENTRY_START_TIME + " =? AND " +
+        String whereClause = null;
+        String selectionArgs[] = null;
+
+        whereClause = DatabaseHelper.ENTRY_START_TIME + " =? AND " +
                 DatabaseHelper.ENTRY_DURATION + " =? AND " +
                 DatabaseHelper.ENTRY_NOTE + "=?";
 
-        String selectionArgs[] = {String.valueOf(entry.getStartTime()),
+        selectionArgs = new String[]{String.valueOf(entry.getStartTime()),
                 String.valueOf(entry.getDuration()), entry.getNote()};
 
         long rowId = getRowIdByIndex(0, DatabaseHelper.ENTRIES_TABLE_NAME, DatabaseHelper.ENTRY_ID,
@@ -393,7 +386,6 @@ public class HabitDatabase {
      * @return An array of entry ids found by the search, null if results were empty.
      */
     public long[] searchAllEntriesWithTimeRange(long beginTime, long endTime){
-        // TODO TEST
         // SELECT ENTRY_ID FROM ENTRIES_TABLE WHERE START_TIME >= BEGIN AND START_TIME <= END
         String SQL = "SELECT " + DatabaseHelper.ENTRY_ID + " FROM " + DatabaseHelper.ENTRIES_TABLE_NAME +
                 " WHERE " + DatabaseHelper.ENTRY_START_TIME + ">=" + String.valueOf(beginTime) + " AND " +
@@ -404,7 +396,6 @@ public class HabitDatabase {
 
     @Nullable
     private SessionEntry getEntryFromCursor(Cursor c){
-        // TODO TEST
         SessionEntry entry = null;
 
         if(c != null){
@@ -437,7 +428,6 @@ public class HabitDatabase {
      */
     @Nullable
     public SessionEntry getEntry(long habitId, int entryIndex){
-        // TODO TEST
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
         String selection = DatabaseHelper.ENTRY_HABIT_ID + "=?";
@@ -462,7 +452,6 @@ public class HabitDatabase {
      */
     @Nullable
     public SessionEntry getEntry(long entryId){
-        // TODO TEST
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
         String selection = DatabaseHelper.ENTRY_ID + "=?";
@@ -482,71 +471,63 @@ public class HabitDatabase {
     }
 
     /**
-     * @param habitId The id of the habit which to edit an entry
-     * @param entryIndex The index of the entry to edit
+     * @param entryId The id of the entry to edit
      * @param startTime The new start time to replace the old one.
      * @return The number of rows changed, -1 if error
      */
-    public long updateEntryStartTime(long habitId, long entryIndex, long startTime){
-        // TODO TEST
+    public long updateEntryStartTime(long entryId, long startTime){
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.ENTRY_START_TIME, startTime);
 
-        String whereClause = DatabaseHelper.ENTRY_HABIT_ID + " =? AND " + DatabaseHelper.ENTRY_ID + " =?";
-        String whereArgs[] = {String.valueOf(habitId), String.valueOf(entryIndex)};
+        String whereClause = DatabaseHelper.ENTRY_ID + " =?";
+        String whereArgs[] = {String.valueOf(entryId)};
 
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         return db.update(DatabaseHelper.ENTRIES_TABLE_NAME, values, whereClause, whereArgs);
     }
 
     /**
-     * @param habitId The id of the habit which to edit an entry
-     * @param entryIndex The index of the entry to edit
+     * @param entryId The id of the entry to edit
      * @param duration The new duration to replace the old one.
      * @return The number of rows changed, -1 if error
      */
-    public long updateEntryDuration(long habitId, long entryIndex, long duration){
-        // TODO TEST
+    public long updateEntryDuration(long entryId, long duration){
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.ENTRY_DURATION, duration);
 
-        String whereClause = DatabaseHelper.ENTRY_HABIT_ID + " =? AND " + DatabaseHelper.ENTRY_ID + " =?";
-        String whereArgs[] = {String.valueOf(habitId), String.valueOf(entryIndex)};
+        String whereClause = DatabaseHelper.ENTRY_ID + " =?";
+        String whereArgs[] = {String.valueOf(entryId)};
 
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         return db.update(DatabaseHelper.ENTRIES_TABLE_NAME, values, whereClause, whereArgs);
     }
 
     /**
-     * @param habitId The id of the habit which to edit an entry
-     * @param entryIndex The index of the entry to edit
+     * @param entryId The id of the entry to edit
      * @param note The new note to replace the old one.
      * @return The number of rows changed, -1 if error
      */
-    public long updateEntryNote(long habitId, long entryIndex, String note){
-        // TODO TEST
+    public long updateEntryNote(long entryId, String note){
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.ENTRY_NOTE, note);
 
-        String whereClause = DatabaseHelper.ENTRY_HABIT_ID + " =? AND " + DatabaseHelper.ENTRY_ID + " =?";
-        String whereArgs[] = {String.valueOf(habitId), String.valueOf(entryIndex)};
+        String whereClause = DatabaseHelper.ENTRY_ID + " =?";
+        String whereArgs[] = {String.valueOf(entryId)};
 
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         return db.update(DatabaseHelper.ENTRIES_TABLE_NAME, values, whereClause, whereArgs);
     }
 
     /**
-     * @param habitId The id of the habit which to edit an entry
-     * @param entryIndex The index of the entry to edit
+     * @param entryId The id of the entry to edit
      * @param entry The new session entry to replace the old one
      * @return The number of rows changed, -1 if error
      */
-    public long updateEntry(long habitId, int entryIndex, SessionEntry entry){
-        // TODO TEST
-        if(getEntry(habitId, entryIndex) != null){
-            updateEntryStartTime(habitId, entryIndex, entry.getStartTime());
-            updateEntryDuration(habitId, entryIndex, entry.getDuration());
-            updateEntryNote(habitId, entryIndex, entry.getNote());
+    public long updateEntry(long entryId, SessionEntry entry){
+        if(getEntry(entryId) != null){
+            updateEntryStartTime(entryId, entry.getStartTime());
+            updateEntryDuration(entryId, entry.getDuration());
+            updateEntryNote(entryId, entry.getNote());
             return 1;
         }
 
@@ -558,7 +539,6 @@ public class HabitDatabase {
      * @return The number of rows removed, -1 if error
      */
     public long deleteEntry(long entryId){
-        // TODO TEST
         String whereClause = DatabaseHelper.ENTRY_ID + " =?";
         String whereArgs[] = {String.valueOf(entryId)};
 
@@ -571,7 +551,6 @@ public class HabitDatabase {
      * @return The number of rows removed, -1 if error
      */
     public long deleteEntriesForHabit(long habitId){
-        // TODO TEST
         String whereClause = DatabaseHelper.ENTRY_HABIT_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId)};
 
@@ -586,7 +565,6 @@ public class HabitDatabase {
      * @return The row id of the new habit
      */
     public long addHabit(Habit habit){
-        // TODO TEST
         long habitId = getHabitIdFromObject(habit);
 
         if(habitId == -1) {
@@ -594,6 +572,9 @@ public class HabitDatabase {
 
             ContentValues values = new ContentValues(4);
             long categoryId = getCategoryIdByObject(habit.getCategory());
+            if(categoryId == -1){
+                categoryId = addCategory(habit.getCategory());
+            }
 
             values.put(DatabaseHelper.HABIT_NAME, habit.getName());
             values.put(DatabaseHelper.HABIT_DESCRIPTION, habit.getDescription());
@@ -630,7 +611,6 @@ public class HabitDatabase {
      * @return The unique habit id of the row
      */
     public long getHabitIdFromIndex(long categoryId, int index){
-        // TODO TEST
         return getRowIdByIndex(index, DatabaseHelper.HABITS_TABLE_NAME, DatabaseHelper.HABIT_ID,
                 DatabaseHelper.HABIT_CATEGORY + "=?", new String[]{String.valueOf(categoryId)});
     }
@@ -662,7 +642,6 @@ public class HabitDatabase {
      * @return The found habit ids
      */
     public long[] searchHabitIdsByName(String name, long categoryId){
-        // Todo test
         return searchTableForIdsByName("SELECT "+DatabaseHelper.HABIT_ID+" FROM " +
                 DatabaseHelper.HABITS_TABLE_NAME + " WHERE " +
                 DatabaseHelper.HABIT_NAME + " LIKE  '%" + name + "%' AND " +
@@ -694,8 +673,10 @@ public class HabitDatabase {
                     entries[i] = getEntry(habitId, i);
                 }
 
-                habit = new Habit(name, description, category, entries, iconResId);
-                habit.setDatabaseId(habitId);
+                if(category != null) {
+                    habit = new Habit(name, description, category, entries, iconResId);
+                    habit.setDatabaseId(habitId);
+                }
             }
         }
 
@@ -708,7 +689,6 @@ public class HabitDatabase {
      */
     @Nullable
     public Habit getHabit(long habitId){
-        // TODO TEST
         String selectionArgs[] = {String.valueOf(habitId)};
 
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
@@ -742,7 +722,6 @@ public class HabitDatabase {
      * @return The number of rows changed, -1 if error
      */
     public long updateHabitName(long habitId, String name){
-        // TODO TEST
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.HABIT_NAME, name);
 
@@ -759,7 +738,6 @@ public class HabitDatabase {
      * @return The number of rows changed, -1 if error
      */
     public long updateHabitDescription(long habitId, String description){
-        // TODO TEST
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.HABIT_DESCRIPTION, description);
 
@@ -776,7 +754,6 @@ public class HabitDatabase {
      * @return The number of rows changed, -1 if error
      */
     public long updateHabitCategory(long habitId, @Nullable Long categoryId){
-        // TODO TEST
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.HABIT_CATEGORY, categoryId);
 
@@ -793,7 +770,6 @@ public class HabitDatabase {
      * @return The number of rows changed, -1 if error
      */
     public long updateHabitIconResId(long habitId, String iconResId){
-        // TODO TEST
         ContentValues values = new ContentValues(1);
         values.put(DatabaseHelper.HABIT_ICON_RES_ID, iconResId);
 
@@ -826,7 +802,6 @@ public class HabitDatabase {
      * @return The number of rows removed, -1 if error
      */
     public long deleteHabit(long habitId){
-        // TODO TEST
         // Delete all of the habit's entries
         deleteEntriesForHabit(habitId);
 

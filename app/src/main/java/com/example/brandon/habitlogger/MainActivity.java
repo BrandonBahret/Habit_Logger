@@ -20,7 +20,6 @@ import android.widget.Toast;
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 
 import static com.example.brandon.habitlogger.R.menu.main;
 
@@ -56,32 +55,16 @@ public class MainActivity extends AppCompatActivity
 
         habitDatabase = new HabitDatabase(MainActivity.this);
 
-        HabitCategory cat = new HabitCategory("color", "ab cd ef gh");
-        habitDatabase.addCategory(cat);
-        habitDatabase.addCategory(new HabitCategory("color", "gh cd ab ef"));
-        habitDatabase.addCategory(new HabitCategory("color", "ef ef gh ab"));
+        // Add some junk data to the database
+        HabitCategory categories[] = new HabitCategory[10];
+        for(int i=0;i<10;i++){
+            categories[i] = new HabitCategory("color", String.valueOf(i));
+            habitDatabase.addCategory(categories[i]);
+        }
 
-
-        long habitId = habitDatabase.addHabit(new Habit("AB CD EF", null, cat, null, null));
-        long habitId2 = habitDatabase.addHabit(new Habit("CD AB EF", null, cat, null, null));
-        habitDatabase.addHabit(new Habit("EF AB CD", null, cat, null, null));
-
-        SessionEntry entry1 = new SessionEntry(5000, 0, "This is a note");
-        SessionEntry entry2 = new SessionEntry(6000, 0, "Note this is");
-        SessionEntry entry3 = new SessionEntry(7000, 0, "a this is note");
-        SessionEntry entry4 = new SessionEntry(8000, 0, "herro");
-
-        habitDatabase.addEntry(habitId, entry1);
-        habitDatabase.addEntry(habitId, entry2);
-        habitDatabase.addEntry(habitId, entry3);
-        habitDatabase.addEntry(habitId, entry4);
-
-        habitDatabase.addEntry(habitId2, entry1);
-        habitDatabase.addEntry(habitId2, entry2);
-        habitDatabase.deleteHabit(habitId2);
-        habitId2 = habitDatabase.addHabit(new Habit("CD AB EF", null, cat, null, null));
-        habitDatabase.addEntry(habitId2, entry3);
-        habitDatabase.addEntry(habitId2, entry4);
+        for(int i=0;i<100;i++){
+            habitDatabase.addHabit(new Habit(String.valueOf(i), "", categories[i%10], null, ""));
+        }
 
         showDatabase();
     }
