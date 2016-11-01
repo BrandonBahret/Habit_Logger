@@ -3,16 +3,23 @@ package com.example.brandon.habitlogger.HabitDatabase;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 
 class DatabaseHelper extends SQLiteOpenHelper {
 
     protected static final String DATABASE_NAME = "habit_logger_database";
-    protected static final int DATABASE_VERSION = 3;
+    protected static final int DATABASE_VERSION = 4;
 
-    // CREATE TABLE HABITS_TABLE (ID INTEGER PRIMARY KEY, NAME TEXT NOT NULL, DESCRIPTION TEXT NOT NULL,
+    // CREATE TABLE HABITS_TABLE (ID INTEGER PRIMARY KEY, ARCHIVED INTEGER, NAME TEXT NOT NULL, DESCRIPTION TEXT NOT NULL,
     // CATEGORY INTEGER NOT NULL, ICON_RES_ID TEXT NOT NULL)
     protected static final String HABITS_TABLE_NAME = "HABITS_TABLE";
     protected static final String HABIT_ID          = "ID";
+    protected static final String HABIT_IS_ARCHIVED = "ARCHIVED";
     protected static final String HABIT_NAME        = "NAME";
     protected static final String HABIT_DESCRIPTION = "DESCRIPTION";
     protected static final String HABIT_CATEGORY    = "CATEGORY";
@@ -21,6 +28,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_HABITS_TABLE =
             "CREATE TABLE " + HABITS_TABLE_NAME + " (" +
                     HABIT_ID          + " INTEGER PRIMARY KEY, " +
+                    HABIT_IS_ARCHIVED + " INTEGER, " +
                     HABIT_NAME        + " TEXT NOT NULL,"    +
                     HABIT_DESCRIPTION + " TEXT NOT NULL,"    +
                     HABIT_CATEGORY    + " INTEGER NOT NULL," +
@@ -67,8 +75,10 @@ class DatabaseHelper extends SQLiteOpenHelper {
     // DROP TABLE IF EXISTS ENTRIES_TABLE
     private static final String DROP_ENTRIES_TABLE = "DROP TABLE IF EXISTS " + ENTRIES_TABLE_NAME;
 
+    private  Context context;
     DatabaseHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     @Override
@@ -93,5 +103,29 @@ class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         resetDatabase(db);
+    }
+
+    public void copyDatabaseToPhoneStorage(){
+        try {
+            File sd = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+            if (sd.canWrite()) {
+                String currentDBPath = context.getDatabasePath(DatabaseHelper.DATABASE_NAME).getPath();
+
+                String backupDBPath = "habit_database.db";
+                File currentDB = new File(currentDBPath);
+                File backupDB  = new File(sd, backupDBPath);
+
+                if (currentDB.exists()) {
+                    FileChannel src = new FileInputStream(currentDB).getChannel();
+                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                    dst.transferFrom(src, 0, src.size());
+                    src.close();
+                    dst.close();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

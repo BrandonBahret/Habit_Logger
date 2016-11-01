@@ -10,7 +10,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +19,7 @@ import android.widget.Toast;
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
+import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 
 import static com.example.brandon.habitlogger.R.menu.main;
 
@@ -56,15 +56,15 @@ public class MainActivity extends AppCompatActivity
         habitDatabase = new HabitDatabase(MainActivity.this);
 
         // Add some junk data to the database
-        HabitCategory categories[] = new HabitCategory[10];
-        for(int i=0;i<10;i++){
-            categories[i] = new HabitCategory("color", String.valueOf(i));
-            habitDatabase.addCategory(categories[i]);
+        HabitCategory mainCategory = new HabitCategory("color", "name");
+        SessionEntry entries[] = new SessionEntry[100];
+
+        for(int i = 0; i < entries.length; i++){
+            entries[i] = new SessionEntry(0, 0, "note");
         }
 
-        for(int i=0;i<100;i++){
-            habitDatabase.addHabit(new Habit(String.valueOf(i), "", categories[i%10], null, ""));
-        }
+        Habit mainHabit = new Habit("name", "description", mainCategory, entries, "none");
+        habitDatabase.addHabit(mainHabit);
 
         showDatabase();
     }
@@ -81,10 +81,8 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        long categoryIds[] = habitDatabase.searchCategoryIdsByName("ini");
-        Log.d("categories found", String.valueOf(categoryIds.length));
-
         databaseString.append(habitDatabase.getNumberOfCategories());
+
         TextView main = (TextView)findViewById(R.id.text);
         main.setText(databaseString.toString());
     }

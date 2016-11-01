@@ -35,12 +35,14 @@ public class HabitDatabaseCategoryMethodsTest extends AndroidTestCase {
     }
 
     public void testAddCategory(){
-        HabitCategory category = new HabitCategory("color", "name");
+        HabitCategory expectedCategory = new HabitCategory("color", "name");
+        long id = db.addCategory(expectedCategory);
 
-        long id = db.addCategory(category);
-        HabitCategory testCategory = db.getCategory(id);
+        HabitCategory actualCategory = db.getCategory(id);
 
-        assertEquals(category, testCategory);
+        assertNotNull(actualCategory);
+        assertEquals(expectedCategory, actualCategory);
+        assertEquals(expectedCategory.getDatabaseId(), actualCategory.getDatabaseId());
     }
 
     public void testGetCategoryIdFromIndex(){
@@ -80,7 +82,9 @@ public class HabitDatabaseCategoryMethodsTest extends AndroidTestCase {
 
         HabitCategory actualCategory = db.getCategory(targetId);
 
+        assertNotNull(actualCategory);
         assertEquals(expectedCategory, actualCategory);
+        assertEquals(expectedCategory.getDatabaseId(), actualCategory.getDatabaseId());
     }
 
     public void testUpdateCategoryName(){

@@ -92,7 +92,7 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
         db.addHabit(new Habit("one", "", getDummyHabit().getCategory(), null, ""));
         expectedIds[0] = db.addHabit(new Habit("two", "", getDummyHabit().getCategory(), null, ""));
         expectedIds[1] = db.addHabit(new Habit("three", "", getDummyHabit().getCategory(), null, ""));
-        db.addHabit(new Habit("four", null, getDummyHabit().getCategory(), null, ""));
+        db.addHabit(new Habit("four", "", getDummyHabit().getCategory(), null, ""));
 
         assertTrue(Arrays.equals(expectedIds, db.searchHabitIdsByName("t", 1)));
     }
@@ -118,6 +118,19 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
         Habit actualHabits[] = db.getHabits(expectedHabits[0].getCategory().getDatabaseId());
 
         assertTrue(Arrays.equals(expectedHabits, actualHabits));
+    }
+
+    public void testUpdateHabitIsArchived(){
+        Habit origHabit = getDummyHabit();
+        long id = db.addHabit(origHabit);
+
+        Habit expectedHabit = getDummyHabit();
+        expectedHabit.setIsArchived(true);
+
+        long actualId = db.updateHabitIsArchived(id, true);
+        Habit actualHabit = db.getHabit(actualId);
+
+        assertEquals(expectedHabit, actualHabit);
     }
 
     public void testUpdateHabitName(){
@@ -185,7 +198,6 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
         long id = db.addHabit(origHabit);
 
         Habit expectedHabit = getDummyHabit2();
-
         db.updateHabit(id, getDummyHabit2());
 
         Habit actualHabit = db.getHabit(id);

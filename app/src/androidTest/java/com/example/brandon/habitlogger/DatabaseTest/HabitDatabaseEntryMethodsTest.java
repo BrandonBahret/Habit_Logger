@@ -27,7 +27,7 @@ public class HabitDatabaseEntryMethodsTest extends AndroidTestCase {
         db = new HabitDatabase(context);
 
         HabitCategory mainCategory = new HabitCategory("color", "name");
-        Habit mainHabit = new Habit("name", null, mainCategory, null, null);
+        Habit mainHabit = new Habit("name", "", mainCategory, null, "");
         mainHabitId = db.addHabit(mainHabit);
     }
 
@@ -49,7 +49,7 @@ public class HabitDatabaseEntryMethodsTest extends AndroidTestCase {
     }
 
     public void testGetEntryIdFromIndex(){
-        SessionEntry expectedEntry = new SessionEntry(0, 0, null);
+        SessionEntry expectedEntry = new SessionEntry(0, 0, "");
 
         long expectedId = db.addEntry(mainHabitId, expectedEntry);
         long actualId   = db.getEntryIdFromIndex(mainHabitId, 0);
@@ -78,15 +78,11 @@ public class HabitDatabaseEntryMethodsTest extends AndroidTestCase {
     }
 
     public void testSearchEntriesWithTimeRangeForAHabit(){
-        long expectedIds[] = new long[4];
-        int idInd = 0;
+        long expectedIds[] = new long[2];
 
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "1"));
-        db.addEntry(mainHabitId, new SessionEntry(0, 0, "2"));
-        expectedIds[idInd++] = db.addEntry(mainHabitId, new SessionEntry(600, 0, "3"));
-        expectedIds[idInd++] = db.addEntry(mainHabitId, new SessionEntry(600, 0, "4"));
-        expectedIds[idInd++] = db.addEntry(mainHabitId, new SessionEntry(600, 0, "5"));
-        expectedIds[idInd] = db.addEntry(mainHabitId, new SessionEntry(600, 0, "6"));
+        expectedIds[0] = db.addEntry(mainHabitId, new SessionEntry(600, 0, "4"));
+        expectedIds[1] = db.addEntry(mainHabitId, new SessionEntry(600, 0, "5"));
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "7"));
 
         long actualIds[] = db.searchEntriesWithTimeRangeForAHabit(mainHabitId, 500, 1000);
@@ -100,7 +96,7 @@ public class HabitDatabaseEntryMethodsTest extends AndroidTestCase {
         long expectedIds[] = new long[4];
         int idInd = 0;
 
-        long newHabitId = db.addHabit(new Habit("new habit", null, new HabitCategory("color", "name"), null, null));
+        long newHabitId = db.addHabit(new Habit("new habit", "", new HabitCategory("color", "name"), null, ""));
 
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "1"));
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "2"));
@@ -117,15 +113,13 @@ public class HabitDatabaseEntryMethodsTest extends AndroidTestCase {
         assertTrue(Arrays.equals(expectedIds, actualIds));
     }
 
-    public void testGetEntry(){
+    public void testGetEntryId(){
         SessionEntry expectedEntry = new SessionEntry(0, 0, "");
-        db.addEntry(mainHabitId, expectedEntry);
 
-        SessionEntry actualEntry = db.getEntry(mainHabitId, 0);
+        long expectedId = db.addEntry(mainHabitId, expectedEntry);
+        long actualId   = db.getEntryId(mainHabitId, 0);
 
-        assertNotNull(actualEntry);
-        assertEquals(expectedEntry, actualEntry);
-        assertEquals(expectedEntry.getDatabaseId(), actualEntry.getDatabaseId());
+        assertEquals(expectedId, actualId);
     }
 
     public void testGetEntryOnId(){
@@ -209,13 +203,10 @@ public class HabitDatabaseEntryMethodsTest extends AndroidTestCase {
     }
 
     public void testDeleteEntriesForHabit(){
-        long expectedIds[] = new long[4];
-        int i = 0;
+        long expectedIds[] = new long[2];
 
-        expectedIds[i++] = db.addEntry(mainHabitId, new SessionEntry(0, 0, "1"));
-        expectedIds[i++] = db.addEntry(mainHabitId, new SessionEntry(0, 0, "2"));
-        expectedIds[i++] = db.addEntry(mainHabitId, new SessionEntry(0, 0, "3"));
-        expectedIds[i]   = db.addEntry(mainHabitId, new SessionEntry(0, 0, "4"));
+        expectedIds[0] = db.addEntry(mainHabitId, new SessionEntry(0, 0, "3"));
+        expectedIds[1] = db.addEntry(mainHabitId, new SessionEntry(0, 0, "4"));
 
         for(long id : expectedIds){
             assertNotNull(db.getEntry(id));
