@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -16,10 +17,13 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.brandon.habitlogger.HabitDatabase.DataExportManager;
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
-import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
+import com.nbsp.materialfilepicker.MaterialFilePicker;
+import com.nbsp.materialfilepicker.ui.FilePickerActivity;
+
+import java.util.regex.Pattern;
 
 import static com.example.brandon.habitlogger.R.menu.main;
 
@@ -27,6 +31,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     
     HabitDatabase habitDatabase;
+    DataExportManager exportManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,15 +61,36 @@ public class MainActivity extends AppCompatActivity
         habitDatabase = new HabitDatabase(MainActivity.this);
 
         // Add some junk data to the database
-        HabitCategory mainCategory = new HabitCategory("color", "name");
-        SessionEntry entries[] = new SessionEntry[100];
+//        HabitCategory mainCategory = new HabitCategory("color", "name");
+//
+//        SessionEntry entries[] = new SessionEntry[10];
+//
+//        for(int i = 0; i < entries.length; i++){
+//            entries[i] = new SessionEntry(0, 0, "note");
+//        }
+//
+//        for(int i = 0; i < 10; i++){
+//            habitDatabase.addHabit(new Habit("name " + i, "description", mainCategory, entries, "none"));
+//        }
 
-        for(int i = 0; i < entries.length; i++){
-            entries[i] = new SessionEntry(0, 0, "note");
-        }
+        exportManager = new DataExportManager(MainActivity.this);
+//        exportManager.exportDatabase(false);
+//
+//
+//        for(Habit eachEntry : habitDatabase.getHabits(habitDatabase.getCategoryIdFromIndex(0))){
+//            exportManager.exportHabit(eachEntry, false);
+//        }
 
-        Habit mainHabit = new Habit("name", "description", mainCategory, entries, "none");
-        habitDatabase.addHabit(mainHabit);
+//        Habit fromStore = exportManager.getHabitByName(mainCategory.getName(), "name 6", true);
+
+//        for(Habit eachEntry : habitDatabase.getHabits(1)){
+//            exportManager.deleteHabit(eachEntry.getCategory().getName(), eachEntry.getName(), false);
+//        }
+
+//        if(fromStore != null) {
+//            Log.d("from_store", fromStore.toString());
+//            Toast.makeText(this, "restored", Toast.LENGTH_SHORT).show();
+//        }
 
         showDatabase();
     }
@@ -120,7 +146,7 @@ public class MainActivity extends AppCompatActivity
             showDatabase();
         }
         else if(id == R.id.save_to_sd){
-            habitDatabase.copyDatabaseToPhoneStorage();
+            exportManager.exportDatabase(false);
             Toast.makeText(this, "Saved database", Toast.LENGTH_SHORT).show();
         }
 
@@ -143,12 +169,51 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_share) {
 
-        } else if (id == R.id.nav_send) {
+            new MaterialFilePicker()
+                    .withActivity(this)
+                    .withRequestCode(1)
+                    .withRootPath(DataExportManager.backupPathPublic)
+                    .withFilter(Pattern.compile(".*\\.db$")) // Filtering files and directories by file name using regexp
+                    .withFilterDirectories(true) // Set directories filterable (false by default)
+                    .withHiddenFiles(true) // Show hidden files and folders
+                    .start();
 
+        } else if (id == R.id.nav_send) {
+            new MaterialFilePicker()
+                    .withActivity(this)
+                    .withRequestCode(2)
+                    .withRootPath(DataExportManager.dataPathPublic)
+//                    .withFilter(Pattern.compile(".*\\.csv$")) // Filtering files and directories by file name using regexp
+//                    .withFilterDirectories(false) // Set directories filterable (false by default)
+//                    .withHiddenFiles(true) // Show hidden files and folders
+                    .start();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
+            Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
+            exportManager.importDatabase(true);
+            showDatabase();
+            // Do anything with file
+        }
+
+        if (requestCode == 2 && resultCode == RESULT_OK) {
+            String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
+
+            Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
+
+            exportManager.importHabit(filePath, true);
+            showDatabase();
+            // Do anything with file
+        }
     }
 }

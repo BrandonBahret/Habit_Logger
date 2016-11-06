@@ -19,6 +19,7 @@ public class HabitDatabaseCategoryMethodsTest extends AndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
         RenamingDelegatingContext context = new RenamingDelegatingContext(getContext(), "test_");
+
         db = new HabitDatabase(context);
     }
 

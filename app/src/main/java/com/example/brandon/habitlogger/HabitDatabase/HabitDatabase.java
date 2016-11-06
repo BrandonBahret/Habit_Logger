@@ -22,14 +22,6 @@ public class HabitDatabase {
     }
 
     /**
-     * This will copy the database to the downloads folder.
-     * Purely for debug purposes, remove on release.
-     */
-    public void copyDatabaseToPhoneStorage(){
-        databaseHelper.copyDatabaseToPhoneStorage();
-    }
-
-    /**
      * Delete everything from the database.
      */
     public void resetDatabase(){

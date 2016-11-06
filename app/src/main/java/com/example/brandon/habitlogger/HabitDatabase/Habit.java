@@ -78,16 +78,16 @@ public class Habit {
 
         String habitFormat = "ARCHIVED,NAME,DESCRIPTION,CATEGORY_NAME,CATEGORY_COLOR,ICON_ID,NUMBER_OF_ENTRIES\n" +
                 "%b,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d\n" +
-                ",,,,,,\n";
+                "\n";
 
         String habit = String.format(Locale.US, habitFormat,
                 getIsArchived(), getName(), getDescription(), getCategory().getName(),
                 getCategory().getColor(), getIconResId(), getEntriesLength());
 
         csv.append(habit);
-        csv.append("START_TIME,DURATION,COMMENT,,,,\n");
+        csv.append("START_TIME,DURATION,COMMENT\n");
 
-        String entryFormat = "%d,%d,\"%s\",,,,\n";
+        String entryFormat = "%d,%d,\"%s\"\n";
 
         SessionEntry entries[] = getEntries();
         if(entries != null) {

@@ -3,12 +3,6 @@ package com.example.brandon.habitlogger.HabitDatabase;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Environment;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.nio.channels.FileChannel;
 
 class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -103,29 +97,5 @@ class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         resetDatabase(db);
-    }
-
-    public void copyDatabaseToPhoneStorage(){
-        try {
-            File sd = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-
-            if (sd.canWrite()) {
-                String currentDBPath = context.getDatabasePath(DatabaseHelper.DATABASE_NAME).getPath();
-
-                String backupDBPath = "habit_database.db";
-                File currentDB = new File(currentDBPath);
-                File backupDB  = new File(sd, backupDBPath);
-
-                if (currentDB.exists()) {
-                    FileChannel src = new FileInputStream(currentDB).getChannel();
-                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
-                    dst.transferFrom(src, 0, src.size());
-                    src.close();
-                    dst.close();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }
