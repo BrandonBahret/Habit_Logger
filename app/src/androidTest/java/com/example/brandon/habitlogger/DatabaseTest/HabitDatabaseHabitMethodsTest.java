@@ -43,7 +43,7 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
     public void testAddHabit(){
         Habit dummyHabit = getDummyHabit();
 
-        long id = db.addHabit(dummyHabit);
+        long id = db.addHabitAndCategory(dummyHabit);
         Habit actualHabit = db.getHabit(id);
 
         assertNotNull(actualHabit);
@@ -53,13 +53,13 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
 
     public void testGetNumberOfHabits(){
         Habit dummyHabit = getDummyHabit();
-        db.addHabit(dummyHabit);
+        db.addHabitAndCategory(dummyHabit);
 
         assertEquals(1, db.getNumberOfHabits(dummyHabit.getCategory().getDatabaseId()));
     }
 
     public void testGetNumberOfEntries(){
-        long id = db.addHabit(getDummyHabit());
+        long id = db.addHabitAndCategory(getDummyHabit());
 
         db.addEntry(id, new SessionEntry(0, 0, ""));
         db.addEntry(id, new SessionEntry(0, 0, ""));
@@ -72,7 +72,7 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
     public void testGetHabitIdFromIndex(){
         Habit dummyHabit = getDummyHabit();
 
-        long expectedId = db.addHabit(dummyHabit);
+        long expectedId = db.addHabitAndCategory(dummyHabit);
 
         assertEquals(expectedId, db.getHabitIdFromIndex(dummyHabit.getCategory().getDatabaseId(), 0));
     }
@@ -80,7 +80,7 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
     public void testGetHabitIdFromObject(){
         Habit dummyHabit = getDummyHabit();
 
-        long expectedId = db.addHabit(dummyHabit);
+        long expectedId = db.addHabitAndCategory(dummyHabit);
 
         assertEquals(expectedId, db.getHabitIdFromObject(dummyHabit));
     }
@@ -89,10 +89,10 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
 
         long expectedIds[] = new long[2];
 
-        db.addHabit(new Habit("one", "", getDummyHabit().getCategory(), null, ""));
-        expectedIds[0] = db.addHabit(new Habit("two", "", getDummyHabit().getCategory(), null, ""));
-        expectedIds[1] = db.addHabit(new Habit("three", "", getDummyHabit().getCategory(), null, ""));
-        db.addHabit(new Habit("four", "", getDummyHabit().getCategory(), null, ""));
+        db.addHabitAndCategory(new Habit("one", "", getDummyHabit().getCategory(), null, ""));
+        expectedIds[0] = db.addHabitAndCategory(new Habit("two", "", getDummyHabit().getCategory(), null, ""));
+        expectedIds[1] = db.addHabitAndCategory(new Habit("three", "", getDummyHabit().getCategory(), null, ""));
+        db.addHabitAndCategory(new Habit("four", "", getDummyHabit().getCategory(), null, ""));
 
         assertTrue(Arrays.equals(expectedIds, db.searchHabitIdsByName("t", 1)));
     }
@@ -101,7 +101,7 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
 
         Habit expectedHabit = getDummyHabit();
 
-        long id = db.addHabit(expectedHabit);
+        long id = db.addHabitAndCategory(expectedHabit);
         Habit actualHabit = db.getHabit(id);
 
         assertNotNull(actualHabit);
@@ -112,8 +112,8 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
     public void testGetHabits(){
         Habit expectedHabits[] = {getDummyHabit(), getDummyHabit2()};
 
-        db.addHabit(expectedHabits[0]);
-        db.addHabit(expectedHabits[1]);
+        db.addHabitAndCategory(expectedHabits[0]);
+        db.addHabitAndCategory(expectedHabits[1]);
 
         Habit actualHabits[] = db.getHabits(expectedHabits[0].getCategory().getDatabaseId());
 
@@ -122,7 +122,7 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
 
     public void testUpdateHabitIsArchived(){
         Habit origHabit = getDummyHabit();
-        long id = db.addHabit(origHabit);
+        long id = db.addHabitAndCategory(origHabit);
 
         Habit expectedHabit = getDummyHabit();
         expectedHabit.setIsArchived(true);
@@ -136,7 +136,7 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
     public void testUpdateHabitName(){
         Habit origHabit = getDummyHabit();
 
-        long id = db.addHabit(origHabit);
+        long id = db.addHabitAndCategory(origHabit);
 
         Habit expectedHabit = getDummyHabit();
         expectedHabit.setName("New Name");
@@ -151,7 +151,7 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
     public void testUpdateHabitDescription(){
         Habit origHabit = getDummyHabit();
 
-        long id = db.addHabit(origHabit);
+        long id = db.addHabitAndCategory(origHabit);
 
         Habit expectedHabit = getDummyHabit();
         expectedHabit.setDescription("New Description");
@@ -165,7 +165,7 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
 
     public void testUpdateHabitCategory(){
         Habit origHabit = getDummyHabit();
-        long id = db.addHabit(origHabit);
+        long id = db.addHabitAndCategory(origHabit);
 
         Habit expectedHabit = getDummyHabit();
         expectedHabit.setCategory(new HabitCategory("color", "New Category"));
@@ -181,7 +181,7 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
     public void testUpdateHabitIconResId(){
         Habit origHabit = getDummyHabit();
 
-        long id = db.addHabit(origHabit);
+        long id = db.addHabitAndCategory(origHabit);
 
         Habit expectedHabit = getDummyHabit();
         expectedHabit.setIconResId("New Icon");
@@ -195,7 +195,7 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
 
     public void testUpdateHabit(){
         Habit origHabit = getDummyHabit();
-        long id = db.addHabit(origHabit);
+        long id = db.addHabitAndCategory(origHabit);
 
         Habit expectedHabit = getDummyHabit2();
         db.updateHabit(id, getDummyHabit2());
@@ -207,7 +207,7 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
 
     public void testDeleteHabit(){
         Habit origHabit = getDummyHabit();
-        long id = db.addHabit(origHabit);
+        long id = db.addHabitAndCategory(origHabit);
 
         assertNotNull(db.getHabit(id));
 

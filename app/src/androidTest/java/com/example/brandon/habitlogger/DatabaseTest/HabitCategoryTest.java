@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.DatabaseTest;
 
+import android.graphics.Color;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
@@ -30,14 +31,8 @@ public class HabitCategoryTest {
     @Test
     public void testConstructorWithIntColor() throws Exception{
         HabitCategory test = new HabitCategory(0xFFEF9A9A, "name");
-
-        assertEquals("#FFEF9A9A", test.getColor());
-    }
-
-    @Test
-    public void testGetColorAsInt() throws Exception{
-        HabitCategory test = new HabitCategory(0xFFEF9A9A, "name");
-
-        assertEquals(0xFFEF9A9A, test.getColorAsInt());
+        int expected = Color.parseColor("#FFEF9A9A");
+        int actual   = test.getColorAsInt();
+        assertEquals(expected, actual);
     }
 }

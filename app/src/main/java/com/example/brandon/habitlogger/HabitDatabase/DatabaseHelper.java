@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.File;
+
 class DatabaseHelper extends SQLiteOpenHelper {
 
     protected static final String DATABASE_NAME = "habit_logger_database";
@@ -83,10 +85,18 @@ class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void resetDatabase(SQLiteDatabase sqLiteDatabase){
-        sqLiteDatabase.execSQL(DROP_HABITS_TABLE);
-        sqLiteDatabase.execSQL(DROP_CATEGORIES_TABLE);
-        sqLiteDatabase.execSQL(DROP_ENTRIES_TABLE);
-        this.onCreate(sqLiteDatabase);
+//        sqLiteDatabase.execSQL(DROP_HABITS_TABLE);
+//        sqLiteDatabase.execSQL(DROP_CATEGORIES_TABLE);
+//        sqLiteDatabase.execSQL(DROP_ENTRIES_TABLE);
+        sqLiteDatabase.delete(HABITS_TABLE_NAME, null, null);
+        sqLiteDatabase.delete(CATEGORIES_TABLE_NAME, null, null);
+        sqLiteDatabase.delete(ENTRIES_TABLE_NAME, null, null);
+
+//        this.onCreate(sqLiteDatabase);
+    }
+
+    public File getDatabasePath(){
+        return context.getDatabasePath(getDatabaseName());
     }
 
     @Override

@@ -1,9 +1,9 @@
-package com.example.brandon.habitlogger.DatabaseTest;
+package com.example.brandon.habitlogger.DatabaseExportHelpersTest;
 
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 
-import com.example.brandon.habitlogger.HabitDatabase.DataExportManager;
+import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
@@ -18,14 +18,15 @@ import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 public class DatabaseExportLocalTest extends AndroidTestCase{
 
     private HabitDatabase db;
-    private DataExportManager dataExportManager;
+    private LocalDataExportManager dataExportManager;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
         RenamingDelegatingContext context = new RenamingDelegatingContext(getContext(), "test_");
+
         db = new HabitDatabase(context);
-        dataExportManager = new DataExportManager(context);
+        dataExportManager = new LocalDataExportManager(context);
 
         // Add some junk data to the database
         HabitCategory mainCategory = new HabitCategory("color", "name");
@@ -37,7 +38,7 @@ public class DatabaseExportLocalTest extends AndroidTestCase{
         }
 
         for(int i = 0; i < 10; i++){
-            db.addHabit(new Habit("name " + i, "description", mainCategory, entries, "none"));
+            db.addHabitAndCategory(new Habit("name " + i, "description", mainCategory, entries, "none"));
         }
     }
 
@@ -56,14 +57,33 @@ public class DatabaseExportLocalTest extends AndroidTestCase{
 
         dataExportManager.importDatabase(true);
         assertEquals(numberOfCategories, db.getNumberOfCategories());
+
+        numberOfCategories = db.getNumberOfCategories();
+        dataExportManager.exportDatabase(false);
+
+        db.resetDatabase();
+        assertEquals(0, db.getNumberOfCategories());
+
+        dataExportManager.importDatabase(false);
+        assertEquals(numberOfCategories, db.getNumberOfCategories());
     }
 
     public void testRestoreDatabase(){
+        // Public storage
         dataExportManager.exportDatabase(true);
 
         db.resetDatabase();
         assertEquals(0, db.getNumberOfCategories());
         dataExportManager.importDatabase(true);
+
+        assertNotSame(0, db.getNumberOfCategories());
+
+        // Private storage
+        dataExportManager.exportDatabase(false);
+
+        db.resetDatabase();
+        assertEquals(0, db.getNumberOfCategories());
+        dataExportManager.importDatabase(false);
 
         assertNotSame(0, db.getNumberOfCategories());
     }
@@ -72,13 +92,28 @@ public class DatabaseExportLocalTest extends AndroidTestCase{
         Habit expectedHabit = db.getHabit(
                 db.getHabitIdFromIndex(
                         db.getCategoryIdFromIndex(0), 0
-                ));
+                )
+        );
+
         assertNotNull(expectedHabit);
 
-        boolean result = dataExportManager.importHabit(dataExportManager.getFilePathFromHabit(expectedHabit, true), true);
+        // Private storage
+        boolean result = dataExportManager.exportHabit(expectedHabit, false);
         assertEquals(true , result);
 
         Habit actualHabit = dataExportManager.getHabit(
+                dataExportManager.getFilePathFromHabit(expectedHabit, false),
+                false
+        );
+
+        assertEquals(expectedHabit.toString(), actualHabit.toString());
+
+        // Public storage
+
+        result = dataExportManager.exportHabit(expectedHabit, true);
+        assertEquals(true , result);
+
+        actualHabit = dataExportManager.getHabit(
                 dataExportManager.getFilePathFromHabit(expectedHabit, true),
                 true
         );
@@ -90,8 +125,10 @@ public class DatabaseExportLocalTest extends AndroidTestCase{
         Habit habit = db.getHabit(
                 db.getHabitIdFromIndex(
                         db.getCategoryIdFromIndex(0), 0
-                ));
+                )
+        );
 
+        // Public storage
         dataExportManager.exportHabit(habit, true);
 
         String filepath = dataExportManager.getFilePathFromHabit(habit, true);
@@ -99,5 +136,15 @@ public class DatabaseExportLocalTest extends AndroidTestCase{
 
         dataExportManager.deleteHabit(habit.getCategory().getName(), habit.getName(), true);
         assertEquals(null, dataExportManager.getHabit(filepath, true));
+
+        // Private storage
+
+        dataExportManager.exportHabit(habit, false);
+
+        filepath = dataExportManager.getFilePathFromHabit(habit, false);
+        assertNotNull(dataExportManager.getHabit(filepath, false));
+
+        dataExportManager.deleteHabit(habit.getCategory().getName(), habit.getName(), false);
+        assertEquals(null, dataExportManager.getHabit(filepath, false));
     }
 }

@@ -17,9 +17,13 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.brandon.habitlogger.HabitDatabase.DataExportManager;
+import com.example.brandon.habitlogger.DataExportHelpers.GoogleDriveDataExportManager;
+import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
+import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.nbsp.materialfilepicker.MaterialFilePicker;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
@@ -31,7 +35,8 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     
     HabitDatabase habitDatabase;
-    DataExportManager exportManager;
+    LocalDataExportManager exportManager;
+    GoogleDriveDataExportManager googleDrive;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,58 +64,48 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         habitDatabase = new HabitDatabase(MainActivity.this);
+        habitDatabase.setOnDatabaseChangeListener(new HabitDatabase.OnDatabaseChange() {
+            @Override
+            public void onDatabaseChanged() {
+                showDatabase();
+                Toast.makeText(MainActivity.this, "restored database", Toast.LENGTH_SHORT).show();
+            }
+        });
 
-        // Add some junk data to the database
-//        HabitCategory mainCategory = new HabitCategory("color", "name");
-//
-//        SessionEntry entries[] = new SessionEntry[10];
-//
-//        for(int i = 0; i < entries.length; i++){
-//            entries[i] = new SessionEntry(0, 0, "note");
-//        }
-//
-//        for(int i = 0; i < 10; i++){
-//            habitDatabase.addHabit(new Habit("name " + i, "description", mainCategory, entries, "none"));
-//        }
-
-        exportManager = new DataExportManager(MainActivity.this);
-//        exportManager.exportDatabase(false);
-//
-//
-//        for(Habit eachEntry : habitDatabase.getHabits(habitDatabase.getCategoryIdFromIndex(0))){
-//            exportManager.exportHabit(eachEntry, false);
-//        }
-
-//        Habit fromStore = exportManager.getHabitByName(mainCategory.getName(), "name 6", true);
-
-//        for(Habit eachEntry : habitDatabase.getHabits(1)){
-//            exportManager.deleteHabit(eachEntry.getCategory().getName(), eachEntry.getName(), false);
-//        }
-
-//        if(fromStore != null) {
-//            Log.d("from_store", fromStore.toString());
-//            Toast.makeText(this, "restored", Toast.LENGTH_SHORT).show();
-//        }
+        exportManager = new LocalDataExportManager(MainActivity.this);
+        googleDrive   = new GoogleDriveDataExportManager(MainActivity.this);
+        googleDrive.connect();
 
         showDatabase();
     }
 
-    public void showDatabase(){
-        StringBuilder databaseString = new StringBuilder();
+    public void addJunkData(int numberOfCategories, int numberOfEntries, int numberOfHabits){
+        HabitCategory categories[] = new HabitCategory[numberOfCategories];
+        SessionEntry  entries[]    = new SessionEntry[numberOfEntries];
+        Habit         habits[]     = new Habit[numberOfHabits];
 
-        for(int categoryIndex = 0; categoryIndex < habitDatabase.getNumberOfCategories(); categoryIndex++){
-            long categoryId = habitDatabase.getCategoryIdFromIndex(categoryIndex);
+        for(Integer i = 0; i < categories.length; i++){
+            categories[i] = new HabitCategory(i, i.toString());
+//            habitDatabase.addCategory(categories[i]);
+        }
+        habitDatabase.addCategories(categories);
 
-            Habit habits[] = habitDatabase.getHabits(categoryId);
-            for(Habit eachHabit : habits){
-                databaseString.append(eachHabit.toString());
-            }
+        SessionEntry entry = new SessionEntry(0, 0, "note");
+        for(int i = 0; i < entries.length; i++){
+            entries[i] = entry;
         }
 
-        databaseString.append(habitDatabase.getNumberOfCategories());
+        for(int i = 0; i < habits.length; i++){
+            habits[i] = new Habit(String.valueOf(i), String.valueOf(i),
+                    categories[i % numberOfCategories], entries, "");
+            habitDatabase.addHabit(habits[i]);
+        }
+    }
 
+    public void showDatabase(){
         TextView main = (TextView)findViewById(R.id.text);
-        main.setText(databaseString.toString());
+        String dataString = habitDatabase.toString2();
+        main.setText(dataString);
     }
 
     @Override
@@ -132,22 +127,57 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        else if(id == R.id.reset_database){
-            habitDatabase.resetDatabase();
-            showDatabase();
-        }
-        else if(id == R.id.save_to_sd){
-            exportManager.exportDatabase(false);
-            Toast.makeText(this, "Saved database", Toast.LENGTH_SHORT).show();
+        final int id = item.getItemId();
+        switch(id){
+            case(R.id.auth_google_drive):
+            {
+                googleDrive.connect();
+            }break;
+
+            case(R.id.show_license):
+            {
+                String license = GoogleApiAvailability.getInstance()
+                        .getOpenSourceSoftwareLicenseInfo(MainActivity.this);
+
+                TextView mainText = (TextView)findViewById(R.id.text);
+                mainText.setText(license);
+            }break;
+
+            case(R.id.reset_database):
+            {
+                habitDatabase.resetDatabase();
+            }break;
+
+            case(R.id.save_to_sd):
+            {
+                exportManager.exportDatabase(true);
+                Toast.makeText(this, "Saved database", Toast.LENGTH_SHORT).show();
+            }break;
+
+            case(R.id.backup_to_drive):
+            {
+                googleDrive.backupDatabase();
+            }break;
+
+            case(R.id.restore_from_drive):
+            {
+                googleDrive.restoreDatabase();
+            }break;
+
+            case(R.id.add_junk):
+            {
+//                addJunkData(7, 365, 25);
+                addJunkData(2, 20, 5);
+                showDatabase();
+
+            }break;
+
+            case(R.id.add_ton_junk):
+            {
+                addJunkData(7, 365, 25);
+                showDatabase();
+            }break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -159,34 +189,32 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        switch(id){
+            case(R.id.nav_import_database):
+            {
+                new MaterialFilePicker()
+                        .withActivity(this)
+                        .withRequestCode(1)
+                        .withRootPath(LocalDataExportManager.backupPathPublic)
+                        .withFilter(Pattern.compile(".*\\.db$")) // Filtering files and directories by file name using regexp
+                        .withFilterDirectories(true) // Set directories filterable (false by default)
+                        .withHiddenFiles(true) // Show hidden files and folders
+                        .start();
+            }break;
 
-        } else if (id == R.id.nav_slideshow) {
+            case(R.id.nav_import_habit):
+            {
+                new MaterialFilePicker()
+                        .withActivity(this)
+                        .withRequestCode(2)
+                        .withRootPath(LocalDataExportManager.dataPathPublic)
+                        .start();
+            }break;
 
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-            new MaterialFilePicker()
-                    .withActivity(this)
-                    .withRequestCode(1)
-                    .withRootPath(DataExportManager.backupPathPublic)
-                    .withFilter(Pattern.compile(".*\\.db$")) // Filtering files and directories by file name using regexp
-                    .withFilterDirectories(true) // Set directories filterable (false by default)
-                    .withHiddenFiles(true) // Show hidden files and folders
-                    .start();
-
-        } else if (id == R.id.nav_send) {
-            new MaterialFilePicker()
-                    .withActivity(this)
-                    .withRequestCode(2)
-                    .withRootPath(DataExportManager.dataPathPublic)
-//                    .withFilter(Pattern.compile(".*\\.csv$")) // Filtering files and directories by file name using regexp
-//                    .withFilterDirectories(false) // Set directories filterable (false by default)
-//                    .withHiddenFiles(true) // Show hidden files and folders
-                    .start();
+            case(R.id.nav_display_database):
+            {
+                showDatabase();
+            }break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -198,22 +226,25 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 1 && resultCode == RESULT_OK) {
-            String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
-            Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
-            exportManager.importDatabase(true);
-            showDatabase();
-            // Do anything with file
-        }
+        if(resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case 1: {
+                    String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
+                    Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
+                    exportManager.importDatabase(true);
+                    showDatabase();
+                }break;
 
-        if (requestCode == 2 && resultCode == RESULT_OK) {
-            String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
+                case 2:{
+                    String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
+                    exportManager.importHabit(filePath, true);
+                    showDatabase();
+                }break;
 
-            Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
-
-            exportManager.importHabit(filePath, true);
-            showDatabase();
-            // Do anything with file
+                case GoogleDriveDataExportManager.REQUEST_CODE_RESOLUTION:{
+                    googleDrive.connect();
+                }break;
+            }
         }
     }
 }

@@ -28,7 +28,7 @@ public class HabitDatabaseEntryMethodsTest extends AndroidTestCase {
 
         HabitCategory mainCategory = new HabitCategory("color", "name");
         Habit mainHabit = new Habit("name", "", mainCategory, null, "");
-        mainHabitId = db.addHabit(mainHabit);
+        mainHabitId = db.addHabitAndCategory(mainHabit);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class HabitDatabaseEntryMethodsTest extends AndroidTestCase {
         long expectedIds[] = new long[4];
         int idInd = 0;
 
-        long newHabitId = db.addHabit(new Habit("new habit", "", new HabitCategory("color", "name"), null, ""));
+        long newHabitId = db.addHabitAndCategory(new Habit("new habit", "", new HabitCategory("color", "name"), null, ""));
 
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "1"));
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "2"));

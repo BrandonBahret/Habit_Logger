@@ -4,7 +4,16 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 
 import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.CATEGORY_ID;
 
@@ -16,17 +25,128 @@ import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.CATEG
 public class HabitDatabase {
 
     private DatabaseHelper databaseHelper;
+    private SQLiteDatabase writableDatabase;
+    private SQLiteDatabase readableDatabase;
+
+    private SQLiteStatement insertHabitStatement;
+    private SQLiteStatement insertEntryStatement;
+    private SQLiteStatement insertCategoryStatement;
 
     public HabitDatabase(Context context){
         databaseHelper = new DatabaseHelper(context);
+        writableDatabase = databaseHelper.getWritableDatabase();
+        readableDatabase = databaseHelper.getReadableDatabase();
+
+        insertHabitStatement = getHabitInsertStatement();
+        insertEntryStatement = getEntryInsertStatement();
+        insertCategoryStatement = getCategoryInsertStatement();
+    }
+
+    private static ArrayList<OnDatabaseChange> onDatabaseChangeListeners = new ArrayList<>();
+    public OnDatabaseChange changeListener = null;
+
+    public void setOnDatabaseChangeListener(OnDatabaseChange listener){
+//        onDatabaseChangeListeners.add(listener);
+        changeListener = listener;
+    }
+
+    public interface OnDatabaseChange {
+        void onDatabaseChanged();
+    }
+
+    private void notifyChange(){
+//        for(OnDatabaseChange listener : onDatabaseChangeListeners){
+//            listener.onDatabaseChanged();
+//        }
+        if(changeListener != null) {
+            changeListener.onDatabaseChanged();
+        }
     }
 
     /**
      * Delete everything from the database.
      */
     public void resetDatabase(){
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-        databaseHelper.resetDatabase(db);
+        databaseHelper.resetDatabase(writableDatabase);
+        notifyChange();
+    }
+
+    public String getDatabaseName(){
+        return DatabaseHelper.DATABASE_NAME;
+    }
+
+    public byte[] getBytes(){
+        try {
+            File currentDB = databaseHelper.getDatabasePath();
+            FileChannel src = new FileInputStream(currentDB).getChannel();
+
+            ByteBuffer buffer = ByteBuffer.allocate((int)src.size());
+            src.read(buffer);
+            return buffer.array();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String toString(){
+        StringBuilder databaseString = new StringBuilder();
+
+        for(int categoryIndex = 0; categoryIndex < getNumberOfCategories(); categoryIndex++){
+            long categoryId = getCategoryIdFromIndex(categoryIndex);
+
+            Habit habits[] = getHabits(categoryId);
+            for(Habit eachHabit : habits){
+                databaseString.append(eachHabit.toString());
+            }
+        }
+
+        databaseString.append(getNumberOfCategories());
+
+        return databaseString.toString();
+    }
+
+    public String toString2(){
+        StringBuilder databaseString = new StringBuilder();
+
+        for(int categoryIndex = 0; categoryIndex < getNumberOfCategories(); categoryIndex++){
+            long categoryId = getCategoryIdFromIndex(categoryIndex);
+
+//            Habit habits[] = getHabits(categoryId);
+            long ids[] = getHabitIds(categoryId);
+            for(long id : ids){
+                String name = getHabitName(id);
+                databaseString.append(name);
+                databaseString.append("\n");
+            }
+//            for(Habit eachHabit : habits){
+//                databaseString.append(eachHabit.getName());
+//                databaseString.append("\n");
+//            }
+        }
+
+        return databaseString.toString();
+    }
+
+    public boolean restoreDatabase(ByteBuffer bytes){
+        try {
+            File currentDB = databaseHelper.getDatabasePath();
+            FileChannel dst = new FileOutputStream(currentDB).getChannel();
+
+            dst.write(bytes);
+            dst.close();
+
+            for(OnDatabaseChange listener : onDatabaseChangeListeners){
+                listener.onDatabaseChanged();
+            }
+
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
@@ -62,14 +182,37 @@ public class HabitDatabase {
     private long getRowIdByIndex(int index, String tableName, String rowIdColumnString,
                                  @Nullable String whereClause, @Nullable String selectionArgs[]){
 
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
-        Cursor c = db.query(tableName, new String[]{rowIdColumnString}, whereClause, selectionArgs,
-                null, null, null);
+        Cursor c = readableDatabase.query(tableName, new String[]{rowIdColumnString}, whereClause,
+                selectionArgs, null, null, null);
 
         long rowId = -1;
         if(c.moveToPosition(index)){
-            int idInd = c.getColumnIndex(rowIdColumnString);
-            rowId = c.getLong(idInd);
+            rowId = c.getLong(0);
+        }
+
+        c.close();
+
+        return rowId;
+    }
+
+    /**
+     * @param index The index of the record to be looked up.
+     * @param tableName The table name of the table to search.
+     * @param rowIdColumnString The name of the row id.
+     * @param whereClause The where clause used to filter the table.
+     * @param selectionArgs The args to the where clause.
+     * @return The found row id, -1 if found nothing.
+     */
+    private long getRowIdByIndex(int index, String tableName, String rowIdColumnString,
+                                 @Nullable String whereClause, @Nullable String selectionArgs[],
+                                 String limit){
+
+        Cursor c = readableDatabase.query(tableName, new String[]{rowIdColumnString}, whereClause,
+                selectionArgs, null, null, null, limit);
+
+        long rowId = -1;
+        if(c.moveToPosition(index)){
+            rowId = c.getLong(0);
         }
 
         c.close();
@@ -85,9 +228,7 @@ public class HabitDatabase {
     @Nullable
     private long[] searchTableForIdsByName(String SQL, String idColumnString){
 
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
-
-        Cursor c = db.rawQuery(SQL, null);
+        Cursor c = readableDatabase.rawQuery(SQL, null);
 
         if(c != null) {
             long ids[] = new long[c.getCount()];
@@ -106,6 +247,15 @@ public class HabitDatabase {
 
     // ---- categories methods ----
 
+    private SQLiteStatement getCategoryInsertStatement(){
+        String sql = "INSERT INTO "+DatabaseHelper.CATEGORIES_TABLE_NAME+
+                " ("+DatabaseHelper.CATEGORY_NAME+
+                ", "+DatabaseHelper.CATEGORY_COLOR+
+                ") VALUES(?, ?)";
+
+        return writableDatabase.compileStatement(sql);
+    }
+
     /**
      * @return The total number of categories stored in the database.
      */
@@ -114,21 +264,61 @@ public class HabitDatabase {
                 new String[]{CATEGORY_ID}, null, null);
     }
 
+    public void addCategories(HabitCategory categories[]){
+        writableDatabase.beginTransaction();
+
+        for(HabitCategory category : categories){
+            addCategory(category);
+        }
+
+        writableDatabase.setTransactionSuccessful();
+        writableDatabase.endTransaction();
+    }
+
+    public void addCategoriesWhenNotExists(HabitCategory categories[]){
+        writableDatabase.beginTransaction();
+
+        for(HabitCategory category : categories){
+            addCategoryIfNotExists(category);
+        }
+
+        writableDatabase.setTransactionSuccessful();
+        writableDatabase.endTransaction();
+    }
+
     /**
      * @param category The category object to be added to the database.
      * @return The row id for the new row, -1 if error.
      */
     public long addCategory(HabitCategory category){
+//        ContentValues values = new ContentValues(2);
+//        values.put(DatabaseHelper.CATEGORY_NAME, category.getName());
+//        values.put(DatabaseHelper.CATEGORY_COLOR, category.getColor());
+//
+//        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+//        long id = db.insert(DatabaseHelper.CATEGORIES_TABLE_NAME, null, values);
+//        category.setDatabaseId(id);
+//
+//        return id;
+
+        insertCategoryStatement.bindString(1, category.getName());
+        insertCategoryStatement.bindString(2, category.getColor());
+
+        long id = insertCategoryStatement.executeInsert();
+        category.setDatabaseId(id);
+
+        return id;
+    }
+
+    /**
+     * @param category The category object to be added to the database.
+     * @return The row id for the new row, -1 if error.
+     */
+    public long addCategoryIfNotExists(HabitCategory category){
         long id = getCategoryIdByObject(category);
 
         if(id == -1) { // Make sure this category doesn't exist in the database.
-            ContentValues values = new ContentValues(2);
-            values.put(DatabaseHelper.CATEGORY_NAME, category.getName());
-            values.put(DatabaseHelper.CATEGORY_COLOR, category.getColor());
-
-            SQLiteDatabase db = databaseHelper.getWritableDatabase();
-            id = db.insert(DatabaseHelper.CATEGORIES_TABLE_NAME, null, values);
-            category.setDatabaseId(id);
+            id = addCategory(category);
         }
 
         return id;
@@ -183,7 +373,7 @@ public class HabitDatabase {
      * @return The category object from the database.
      */
     @Nullable
-    public HabitCategory getCategory (long categoryId){
+    public HabitCategory getCategory(long categoryId){
         String columns[]       = {DatabaseHelper.CATEGORY_NAME, DatabaseHelper.CATEGORY_COLOR};
         String selectionArgs[] = {String.valueOf(categoryId)};
 
@@ -270,17 +460,29 @@ public class HabitDatabase {
 
     // ---- Entries methods ----
 
+    private SQLiteStatement getEntryInsertStatement(){
+        return null;
+    }
+
+    private ContentValues getContentValuesFromEntryObject(long habitId, SessionEntry entry){
+        ContentValues values = new ContentValues(4);
+
+        values.put(DatabaseHelper.ENTRY_HABIT_ID,   habitId);
+        values.put(DatabaseHelper.ENTRY_START_TIME, entry.getStartTime());
+        values.put(DatabaseHelper.ENTRY_DURATION,   entry.getDuration());
+        values.put(DatabaseHelper.ENTRY_NOTE,       entry.getNote());
+
+        return values;
+    }
+
     /**
      * @param habitId The id of the habit in the database to associate this entry with.
      * @param entry The entry to be inserted.
      * @return Row id of the new row, -1 if error.
      */
     public long addEntry(long habitId, SessionEntry entry){
-        ContentValues values = new ContentValues(4);
-        values.put(DatabaseHelper.ENTRY_START_TIME, entry.getStartTime());
-        values.put(DatabaseHelper.ENTRY_DURATION,   entry.getDuration());
-        values.put(DatabaseHelper.ENTRY_NOTE,       entry.getNote());
-        values.put(DatabaseHelper.ENTRY_HABIT_ID,   habitId);
+
+        ContentValues values = getContentValuesFromEntryObject(habitId, entry);
 
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         long id = db.insert(DatabaseHelper.ENTRIES_TABLE_NAME, null, values);
@@ -288,6 +490,27 @@ public class HabitDatabase {
         entry.setDatabaseId(id);
         entry.setHabitId(habitId);
         return id;
+    }
+
+    public void addEntries(long habitId, @NonNull SessionEntry entries[]){
+
+        SQLiteStatement statement = writableDatabase.compileStatement("INSERT INTO ENTRIES_TABLE " +
+                "(HABIT_ID, START_TIME, DURATION, NOTE) VALUES(?, ?, ?, ?);");
+
+        writableDatabase.beginTransaction();
+
+        for (SessionEntry entry : entries) {
+            statement.bindLong(1, habitId);
+            statement.bindLong(2, entry.getStartTime());
+            statement.bindLong(3, entry.getDuration());
+            statement.bindString(4, entry.getNote());
+            statement.execute();
+
+            entry.setHabitId(habitId);
+        }
+
+        writableDatabase.setTransactionSuccessful();
+        writableDatabase.endTransaction();
     }
 
     /**
@@ -540,42 +763,69 @@ public class HabitDatabase {
 
     // ---- habits methods ----
 
+    private SQLiteStatement getHabitInsertStatement(){
+        String sql = "INSERT INTO "+DatabaseHelper.HABITS_TABLE_NAME+
+                " ("+DatabaseHelper.HABIT_IS_ARCHIVED+
+                ", "+DatabaseHelper.HABIT_NAME+
+                ", "+DatabaseHelper.HABIT_DESCRIPTION+
+                ", "+DatabaseHelper.HABIT_ICON_RES_ID+
+                ", "+DatabaseHelper.HABIT_CATEGORY+") VALUES(?, ?, ?, ?, ?)";
+
+        return writableDatabase.compileStatement(sql);
+    }
+
+    /**
+     * @param habit The habit to be added to the database.
+     * @return The row id of the new habit.
+     */
+    public long addHabitIfNotExists(Habit habit){
+        long habitId = getHabitIdFromObject(habit);
+
+        if(habitId == -1) {
+            addHabit(habit);
+        }
+
+        return habitId;
+    }
+
     /**
      * @param habit The habit to be added to the database.
      * @return The row id of the new habit.
      */
     public long addHabit(Habit habit){
-        long habitId = getHabitIdFromObject(habit);
+        HabitCategory category = habit.getCategory();
+        long categoryId = category.getDatabaseId();
 
-        if(habitId == -1) {
-            SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        if(categoryId == -1){
+            throw new IllegalArgumentException("Category database id is -1.");
+        }
 
-            ContentValues values = new ContentValues(5);
-            long categoryId = getCategoryIdByObject(habit.getCategory());
-            if(categoryId == -1){
-                categoryId = addCategory(habit.getCategory());
-            }
+        insertHabitStatement.bindLong  (1, habit.getIsArchived()?1:0);
+        insertHabitStatement.bindString(2, habit.getName());
+        insertHabitStatement.bindString(3, habit.getDescription());
+        insertHabitStatement.bindString(4, habit.getIconResId());
+        insertHabitStatement.bindLong  (5, categoryId);
 
-            values.put(DatabaseHelper.HABIT_IS_ARCHIVED, habit.getIsArchived());
-            values.put(DatabaseHelper.HABIT_NAME,        habit.getName());
-            values.put(DatabaseHelper.HABIT_DESCRIPTION, habit.getDescription());
-            values.put(DatabaseHelper.HABIT_ICON_RES_ID, habit.getIconResId());
-            values.put(DatabaseHelper.HABIT_CATEGORY,    categoryId);
+        long habitId = insertHabitStatement.executeInsert();
+        habit.setDatabaseId(habitId);
 
-            habitId = db.insert(DatabaseHelper.HABITS_TABLE_NAME, null, values);
-
-            // Add entries to the new habit
-            SessionEntry entries[] = habit.getEntries();
-            if (entries != null) {
-                for (SessionEntry entry : entries) {
-                    addEntry(habitId, entry);
-                }
-            }
-
-            habit.setDatabaseId(habitId);
+        // Add entries to the new habit
+        SessionEntry entries[] = habit.getEntries();
+        if(entries != null) {
+            addEntries(habitId, entries);
         }
 
         return habitId;
+    }
+
+    /**
+     * @param habit The habit to be added to the database.
+     * @return The row id of the new habit.
+     */
+    public long addHabitAndCategory(Habit habit){
+        HabitCategory category = habit.getCategory();
+        addCategoryIfNotExists(category);
+        return addHabit(habit);
     }
 
     public int getNumberOfHabits(long categoryId){
@@ -618,6 +868,8 @@ public class HabitDatabase {
 
             habitId = getRowIdByIndex(0, DatabaseHelper.HABITS_TABLE_NAME, DatabaseHelper.HABIT_ID,
                     whereClause, selectionArgs);
+
+            habit.setDatabaseId(habitId);
         }
 
         return habitId;
@@ -637,11 +889,28 @@ public class HabitDatabase {
                 DatabaseHelper.HABIT_ID);
     }
 
+    private String getHabitName(long id){
+        Cursor c = readableDatabase.query(DatabaseHelper.HABITS_TABLE_NAME, new String[]{DatabaseHelper.HABIT_NAME},
+                DatabaseHelper.HABIT_ID + "=?", new String[]{String.valueOf(id)}, null, null, null);
+
+        String name = null;
+
+        if(c != null){
+            if(c.moveToFirst()){
+                int nameInd = c.getColumnIndex(DatabaseHelper.HABIT_NAME);
+                name = c.getString(nameInd);
+                c.close();
+            }
+        }
+
+        return name;
+    }
+
     private Habit getHabitFromCursor(Cursor c){
         Habit habit = null;
 
-        if(c != null) {
-            if(c.moveToFirst()) {
+//        if(c != null) {
+//            if(c.moveToFirst()) {
                 int descriptionInd = c.getColumnIndex(DatabaseHelper.HABIT_DESCRIPTION);
                 int isArchivedInd  = c.getColumnIndex(DatabaseHelper.HABIT_IS_ARCHIVED);
                 int iconResIdInd   = c.getColumnIndex(DatabaseHelper.HABIT_ICON_RES_ID);
@@ -667,8 +936,8 @@ public class HabitDatabase {
                     habit.setDatabaseId(habitId);
                     habit.setIsArchived(isArchived);
                 }
-            }
-        }
+//            }
+//        }
 
         return habit;
     }
@@ -685,11 +954,22 @@ public class HabitDatabase {
         Cursor c = db.query(DatabaseHelper.HABITS_TABLE_NAME, null, DatabaseHelper.HABIT_ID + "=?",
                 selectionArgs, null, null, null);
 
-        Habit habit = getHabitFromCursor(c);
-
-        c.close();
+        Habit habit = null;
+        if(c != null) {
+            if(c.moveToFirst()) {
+                habit = getHabitFromCursor(c);
+                c.close();
+            }
+        }
 
         return habit;
+    }
+
+    public long[] getHabitIds(long categoryId){
+        return searchTableForIdsByName("SELECT "+DatabaseHelper.HABIT_ID+" FROM "+
+                        DatabaseHelper.HABITS_TABLE_NAME+" WHERE " +
+                        DatabaseHelper.HABIT_CATEGORY +" = "+String.valueOf(categoryId),
+                DatabaseHelper.HABIT_ID);
     }
 
     /**
@@ -697,13 +977,23 @@ public class HabitDatabase {
      * @return an array list containing the habits.
      */
     public Habit[] getHabits(long categoryId){
-        Habit[] habits = new Habit[getNumberOfHabits(categoryId)];
+        int numberOfHabits = getNumberOfHabits(categoryId);
+        Habit[] habits = new Habit[numberOfHabits];
 
-        long ids[] = searchTableForIdsByName("SELECT "+DatabaseHelper.HABIT_ID+" FROM "+
-                DatabaseHelper.HABITS_TABLE_NAME+" WHERE " +
-                DatabaseHelper.HABIT_CATEGORY +" = "+String.valueOf(categoryId),
 
-                DatabaseHelper.HABIT_ID);
+
+//        int habitIndex = 0;
+//
+        Cursor c = readableDatabase.query(DatabaseHelper.HABITS_TABLE_NAME, null,
+                DatabaseHelper.HABIT_CATEGORY +" =?", new String[]{String.valueOf(categoryId)},
+                null, null, null);
+
+        int habitIndex = 0;
+        while(c.moveToNext()){
+            habits[habitIndex++] = getHabitFromCursor(c);
+        }
+
+        long ids[] = getHabitIds(categoryId);
 
         if(ids != null) {
             for (int i = 0; i < ids.length; i++) {

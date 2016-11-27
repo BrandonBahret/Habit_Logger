@@ -1,8 +1,10 @@
-package com.example.brandon.habitlogger.HabitDatabase;
+package com.example.brandon.habitlogger.DataExportHelpers;
 
 import android.content.Context;
 import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
+
+import com.example.brandon.habitlogger.HabitDatabase.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,7 +20,7 @@ import java.util.Locale;
  * This class is used to manage local data back-ups
  */
 
-public class DataExportManager extends AppCompatActivity {
+public class LocalDataExportManager {
 
     static public String backupPathPublic = Environment.getExternalStorageDirectory() + File.separator + "Habit_Logger_Export_Data";
     static public String backupPathPrivate;
@@ -27,10 +29,10 @@ public class DataExportManager extends AppCompatActivity {
     static public String dbBackupFilename = "habit_database_backup.db";
     static public String categoryFolderFormatString = "Category - %s";
 
-    private Context context;
-    HabitDatabase habitDatabase;
+    private Context context = null;
+    private HabitDatabase habitDatabase;
 
-    public DataExportManager(Context context){
+    public LocalDataExportManager(Context context){
         this.context = context;
         habitDatabase = new HabitDatabase(context);
         backupPathPrivate = context.getFilesDir().toString();
@@ -82,7 +84,7 @@ public class DataExportManager extends AppCompatActivity {
                 File sd = new File(exportPath);
 
                 if (sd.canWrite()) {
-                    String currentDBPath = context.getDatabasePath(DatabaseHelper.DATABASE_NAME).getPath();
+                    String currentDBPath = context.getDatabasePath(habitDatabase.getDatabaseName()).getPath();
 
                     File currentDB = new File(currentDBPath);
                     File backupDB  = new File(sd, dbBackupFilename);
@@ -117,7 +119,7 @@ public class DataExportManager extends AppCompatActivity {
                 File backupDB = new File(databasePath);
 
                 if (backupDB.canRead()) {
-                    String currentDBPath = context.getDatabasePath(DatabaseHelper.DATABASE_NAME).getPath();
+                    String currentDBPath = context.getDatabasePath(habitDatabase.getDatabaseName()).getPath();
 
                     File currentDB = new File(currentDBPath);
 
@@ -137,7 +139,6 @@ public class DataExportManager extends AppCompatActivity {
             e.printStackTrace();
             return false;
         }
-
         return true;
     }
 
@@ -220,9 +221,10 @@ public class DataExportManager extends AppCompatActivity {
     }
 
     public String getFilePathFromHabit(Habit habit, boolean isPublic){
+        String rootPath = isPublic ? dataPathPublic : dataPathPrivate;
         String habitFolderPath = String.format(Locale.US, categoryFolderFormatString, habit.getCategory().getName());
         String filename = habit.getName() + ".csv";
-        return dataPathPublic + File.separator + habitFolderPath + File.separator + filename;
+        return rootPath + File.separator + habitFolderPath + File.separator + filename;
     }
 
     /**
@@ -268,17 +270,18 @@ public class DataExportManager extends AppCompatActivity {
     }
 
     public boolean importHabit(String filePath, boolean isPublic){
+        boolean result = false;
+
         Habit newHabit = getHabit(filePath, isPublic);
 
-        long habitId = habitDatabase.getHabitIdFromObject(newHabit);
+        if(newHabit != null) {
+            long habitId = habitDatabase.getHabitIdFromObject(newHabit);
 
-        boolean result;
-
-        if(habitId == -1) {
-            result = (habitDatabase.addHabit(newHabit) != -1);
-        }
-        else {
-            result = (habitDatabase.updateHabit(habitId, newHabit) != -1);
+            if (habitId == -1) {
+                result = (habitDatabase.addHabit(newHabit) != -1);
+            } else {
+                result = (habitDatabase.updateHabit(habitId, newHabit) != -1);
+            }
         }
 
         return result;

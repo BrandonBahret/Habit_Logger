@@ -2,21 +2,52 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/auth_google_drive"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="Auth Google Drive"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/reset_database"
         android:orderInCategory="200"
         android:title="Reset Database"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/save_to_sd"
         android:orderInCategory="300"
         android:title="save to SD"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/backup_to_drive"
+        android:orderInCategory="400"
+        android:title="Backup To Drive"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/restore_from_drive"
+        android:orderInCategory="400"
+        android:title="restore_from_drive"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/show_license"
+        android:orderInCategory="500"
+        android:title="show license"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/add_junk"
+        android:orderInCategory="500"
+        android:title="add junk"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/add_ton_junk"
+        android:orderInCategory="500"
+        android:title="add ton of junk"
+        app:showAsAction="never"/>
 
 </menu>
+

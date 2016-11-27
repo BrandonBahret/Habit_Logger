@@ -31,9 +31,8 @@ public class HabitCategory {
      * @param name The name of the category
      */
     public HabitCategory(int color, @NonNull String name){
-        // Todo test this function
-        setColor("#" + Integer.toHexString(color).toUpperCase());
-        setName(name);
+        this.color = "#" + Integer.toHexString(color);
+        this.name  = name;
     }
 
     @Override
