@@ -16,7 +16,7 @@ import java.util.Arrays;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 
-public class HabitDatabaseEntryMethodsTest extends AndroidTestCase {
+public class HabitDatabaseNonAsyncEntryMethodsTest extends AndroidTestCase {
     private HabitDatabase db;
     private long mainHabitId;
 
@@ -24,7 +24,7 @@ public class HabitDatabaseEntryMethodsTest extends AndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
         RenamingDelegatingContext context = new RenamingDelegatingContext(getContext(), "test_");
-        db = new HabitDatabase(context);
+        db = new HabitDatabase(context, null, false);
 
         HabitCategory mainCategory = new HabitCategory("color", "name");
         Habit mainHabit = new Habit("name", "", mainCategory, null, "");

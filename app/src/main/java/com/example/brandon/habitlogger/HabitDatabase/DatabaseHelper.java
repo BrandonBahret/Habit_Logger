@@ -5,6 +5,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 
 class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -85,18 +88,39 @@ class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void resetDatabase(SQLiteDatabase sqLiteDatabase){
-//        sqLiteDatabase.execSQL(DROP_HABITS_TABLE);
-//        sqLiteDatabase.execSQL(DROP_CATEGORIES_TABLE);
-//        sqLiteDatabase.execSQL(DROP_ENTRIES_TABLE);
         sqLiteDatabase.delete(HABITS_TABLE_NAME, null, null);
         sqLiteDatabase.delete(CATEGORIES_TABLE_NAME, null, null);
         sqLiteDatabase.delete(ENTRIES_TABLE_NAME, null, null);
-
-//        this.onCreate(sqLiteDatabase);
     }
 
     public File getDatabasePath(){
         return context.getDatabasePath(getDatabaseName());
+    }
+
+    private FileChannel getChannel(boolean isInput){
+        File currentDB = getDatabasePath();
+
+        FileChannel channel = null;
+
+        try{
+            if(isInput){
+                channel = new FileInputStream(currentDB).getChannel();
+            } else {
+                channel = new FileOutputStream(currentDB).getChannel();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return channel;
+    }
+
+    public FileChannel getOutputChannel(){
+        return getChannel(false);
+    }
+
+    public FileChannel getInputChannel(){
+        return getChannel(true);
     }
 
     @Override

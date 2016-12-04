@@ -2,6 +2,7 @@ package com.example.brandon.habitlogger.HabitDatabase;
 
 import android.support.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Locale;
  * This object is used to store the session data for the habits.
  */
 
-public class SessionEntry {
+public class SessionEntry implements Serializable{
 
     private long startTime, duration;
     @NonNull private String note;

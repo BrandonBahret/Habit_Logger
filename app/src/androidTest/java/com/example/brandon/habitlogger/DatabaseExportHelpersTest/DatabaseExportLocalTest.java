@@ -25,7 +25,7 @@ public class DatabaseExportLocalTest extends AndroidTestCase{
         super.setUp();
         RenamingDelegatingContext context = new RenamingDelegatingContext(getContext(), "test_");
 
-        db = new HabitDatabase(context);
+        db = new HabitDatabase(context, null, false);
         dataExportManager = new LocalDataExportManager(context);
 
         // Add some junk data to the database

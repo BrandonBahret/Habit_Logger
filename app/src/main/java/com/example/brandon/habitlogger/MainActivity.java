@@ -1,6 +1,7 @@
 package com.example.brandon.habitlogger;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.brandon.habitlogger.DataExportHelpers.GoogleDriveDataExportManager;
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
+import com.example.brandon.habitlogger.HabitDatabase.DatabaseCache;
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
@@ -27,6 +29,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.nbsp.materialfilepicker.MaterialFilePicker;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
+import java.io.Serializable;
 import java.util.regex.Pattern;
 
 import static com.example.brandon.habitlogger.R.menu.main;
@@ -63,7 +66,12 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        habitDatabase = new HabitDatabase(MainActivity.this);
+        Serializable cache = null;
+        if (savedInstanceState != null) {
+            cache = savedInstanceState.getSerializable("dataCache");
+        }
+
+        habitDatabase = new HabitDatabase(MainActivity.this, cache, true);
         habitDatabase.setOnDatabaseChangeListener(new HabitDatabase.OnDatabaseChange() {
             @Override
             public void onDatabaseChanged() {
@@ -73,38 +81,60 @@ public class MainActivity extends AppCompatActivity
         });
 
         exportManager = new LocalDataExportManager(MainActivity.this);
-        googleDrive   = new GoogleDriveDataExportManager(MainActivity.this);
+        googleDrive = new GoogleDriveDataExportManager(MainActivity.this);
         googleDrive.connect();
 
         showDatabase();
     }
 
+    private class addJunkData extends AsyncTask<Void, Void, Void>{
+        int numberOfCategories, numberOfEntries, numberOfHabits;
+
+        addJunkData(int numberOfCategories, int numberOfEntries, int numberOfHabits){
+            this.numberOfCategories = numberOfCategories;
+            this.numberOfEntries = numberOfEntries;
+            this.numberOfHabits = numberOfHabits;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            HabitCategory categories[] = new HabitCategory[numberOfCategories];
+            SessionEntry  entries[]    = new SessionEntry[numberOfEntries];
+            Habit         habits[]     = new Habit[numberOfHabits];
+
+            for(Integer i = 0; i < categories.length; i++){
+                categories[i] = new HabitCategory(i, i.toString());
+            }
+            habitDatabase.addCategories(categories);
+
+            SessionEntry entry = new SessionEntry(0, 0, "note");
+            for(int i = 0; i < entries.length; i++){
+                entries[i] = entry;
+            }
+
+            for(int i = 0; i < habits.length; i++){
+                habits[i] = new Habit(String.valueOf(i), String.valueOf(i),
+                        categories[i % numberOfCategories], entries, "");
+                habitDatabase.addHabit(habits[i]);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            habitDatabase.loadAllContents();
+            habitDatabase.notifyChange();
+        }
+    }
+
     public void addJunkData(int numberOfCategories, int numberOfEntries, int numberOfHabits){
-        HabitCategory categories[] = new HabitCategory[numberOfCategories];
-        SessionEntry  entries[]    = new SessionEntry[numberOfEntries];
-        Habit         habits[]     = new Habit[numberOfHabits];
-
-        for(Integer i = 0; i < categories.length; i++){
-            categories[i] = new HabitCategory(i, i.toString());
-//            habitDatabase.addCategory(categories[i]);
-        }
-        habitDatabase.addCategories(categories);
-
-        SessionEntry entry = new SessionEntry(0, 0, "note");
-        for(int i = 0; i < entries.length; i++){
-            entries[i] = entry;
-        }
-
-        for(int i = 0; i < habits.length; i++){
-            habits[i] = new Habit(String.valueOf(i), String.valueOf(i),
-                    categories[i % numberOfCategories], entries, "");
-            habitDatabase.addHabit(habits[i]);
-        }
+        new addJunkData(numberOfCategories, numberOfEntries, numberOfHabits).execute();
     }
 
     public void showDatabase(){
         TextView main = (TextView)findViewById(R.id.text);
-        String dataString = habitDatabase.toString2();
+        String dataString = habitDatabase.toString3();
         main.setText(dataString);
     }
 
@@ -167,10 +197,14 @@ public class MainActivity extends AppCompatActivity
 
             case(R.id.add_junk):
             {
-//                addJunkData(7, 365, 25);
-                addJunkData(2, 20, 5);
+                addJunkData(1000, 20, 5);
                 showDatabase();
+            }break;
 
+            case(R.id.add_mound_junk):
+            {
+                addJunkData(4, 50, 15);
+                showDatabase();
             }break;
 
             case(R.id.add_ton_junk):
@@ -246,5 +280,18 @@ public class MainActivity extends AppCompatActivity
                 }break;
             }
         }
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("dataCache", habitDatabase.dataCache);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        habitDatabase.dataCache = (DatabaseCache)savedInstanceState.getSerializable("dataCache");
     }
 }

@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import com.opencsv.CSVReader;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Locale;
@@ -15,7 +16,7 @@ import java.util.Locale;
  * This is a class that defines the habit object.
  */
 
-public class Habit {
+public class Habit implements Serializable{
 
     @NonNull private String name;
     @NonNull private String description;

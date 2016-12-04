@@ -12,7 +12,7 @@ import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 
-public class HabitDatabaseCategoryMethodsTest extends AndroidTestCase {
+public class HabitDatabaseNonAsyncCategoryMethodsTest extends AndroidTestCase {
     private HabitDatabase db;
 
     @Override
@@ -20,7 +20,7 @@ public class HabitDatabaseCategoryMethodsTest extends AndroidTestCase {
         super.setUp();
         RenamingDelegatingContext context = new RenamingDelegatingContext(getContext(), "test_");
 
-        db = new HabitDatabase(context);
+        db = new HabitDatabase(context, null, false);
     }
 
     @Override

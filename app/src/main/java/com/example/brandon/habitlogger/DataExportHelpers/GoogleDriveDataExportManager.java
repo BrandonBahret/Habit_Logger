@@ -62,7 +62,7 @@ public class GoogleDriveDataExportManager implements GoogleApiClient.ConnectionC
     public GoogleDriveDataExportManager(Activity activity){
         this.activity = activity;
 
-        habitDatabase = new HabitDatabase(activity);
+        habitDatabase = new HabitDatabase(activity, null, false);
 
         googleApiClient = new GoogleApiClient.Builder(this.activity)
                 .addApi(Drive.API)
@@ -156,7 +156,7 @@ public class GoogleDriveDataExportManager implements GoogleApiClient.ConnectionC
                                 read += inputStream.read(bytes.array());
                             }
 
-                            habitDatabase.restoreDatabase(bytes);
+                            habitDatabase.setBytes(bytes);
                         }
                         catch (Exception e){
                             e.printStackTrace();

@@ -21,22 +21,20 @@ import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.CATEG
  * This is the class for managing the habit database
  */
 
-public class HabitDatabase {
+public class HabitDatabaseNonAsync {
 
     private DatabaseHelper databaseHelper;
     private SQLiteDatabase writableDatabase;
     private SQLiteDatabase readableDatabase;
     public  DatabaseCache dataCache;
-    boolean useCache = false;
     private Context context;
 
     private SQLiteStatement insertHabitStatement;
     private SQLiteStatement insertEntryStatement;
     private SQLiteStatement insertCategoryStatement;
 
-    public HabitDatabase(Context context, @Nullable Serializable cache, boolean useCache){
+    public HabitDatabaseNonAsync(Context context, @Nullable Serializable cache, boolean useCache){
         databaseHelper = new DatabaseHelper(context);
-        this.useCache = useCache;
         this.context = context;
 
         writableDatabase = databaseHelper.getWritableDatabase();
@@ -71,31 +69,17 @@ public class HabitDatabase {
         if(changeListener != null) {
             changeListener.onDatabaseChanged();
         }
+        dataCache.clearCache();
+        loadAllContents();
     }
 
-    private class loadAllContents extends AsyncTask<Void, Void, Void>{
-        @Override
-        protected Void doInBackground(Void... voids) {
-            for(int categoryIndex = 0; categoryIndex < getNumberOfCategories(); categoryIndex++) {
-                long categoryId = getCategoryIdFromIndex(categoryIndex);
+    private void loadAllContents(){
+        for(int categoryIndex = 0; categoryIndex < getNumberOfCategories(); categoryIndex++) {
+            long categoryId = getCategoryIdFromIndex(categoryIndex);
 
-                Habit loadHabits[] = getHabits(categoryId);
-                dataCache.cacheHabits(loadHabits);
-            }
-            return null;
+            Habit loadHabits[] = getHabits(categoryId);
+            dataCache.cacheHabits(loadHabits);
         }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            notifyChange();
-        }
-
-    }
-
-
-    public void loadAllContents(){
-        new loadAllContents().execute();
     }
 
     /**
@@ -103,9 +87,7 @@ public class HabitDatabase {
      */
     public void resetDatabase(){
         databaseHelper.resetDatabase(writableDatabase);
-        if(useCache) {
-            dataCache.clearCache();
-        }
+        dataCache.clearCache();
         notifyChange();
     }
 
@@ -230,6 +212,25 @@ public class HabitDatabase {
         return count;
     }
 
+    public class test extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            for(int i = 0; i < 400; i++){
+                String text = String.valueOf(i);
+                HabitCategory category = new HabitCategory(text, text);
+                addCategory(category);
+            }
+            return null;
+        }
+
+
+    }
+
+    public void runTest(){
+        new test().execute();
+    }
+
     /**
      * @param index The index of the record to be looked up.
      * @param tableName The table name of the table to search.
@@ -313,7 +314,7 @@ public class HabitDatabase {
                 new String[]{CATEGORY_ID}, null, null);
     }
 
-   private void addCategories(HabitCategory categories[], boolean whenExists){
+    private void addCategories(HabitCategory categories[], boolean whenExists){
         writableDatabase.beginTransaction();
 
         if(whenExists) {
@@ -996,8 +997,6 @@ public class HabitDatabase {
         while(c.moveToNext()){
             habits[habitIndex++] = getHabitFromCursor(c);
         }
-
-        c.close();
 
         return habits;
     }

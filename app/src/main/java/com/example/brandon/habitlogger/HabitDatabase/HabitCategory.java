@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.HabitDatabase;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Locale;
  * This object is used to give habits categorical organization.
  */
 
-public class HabitCategory {
+public class HabitCategory implements Serializable{
     @NonNull private String color = "";
     @NonNull private String name  = "";
 

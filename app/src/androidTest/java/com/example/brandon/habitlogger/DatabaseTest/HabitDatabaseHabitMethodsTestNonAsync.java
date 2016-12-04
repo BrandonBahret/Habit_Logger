@@ -16,7 +16,7 @@ import java.util.Arrays;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 
-public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
+public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
     private HabitDatabase db;
 
     public Habit getDummyHabit(){
@@ -32,7 +32,7 @@ public class HabitDatabaseHabitMethodsTest extends AndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
         RenamingDelegatingContext context = new RenamingDelegatingContext(getContext(), "test_");
-        db = new HabitDatabase(context);
+        db = new HabitDatabase(context, null, false);
     }
 
     @Override

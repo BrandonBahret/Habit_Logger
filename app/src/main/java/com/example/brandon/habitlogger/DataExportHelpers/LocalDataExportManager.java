@@ -34,7 +34,7 @@ public class LocalDataExportManager {
 
     public LocalDataExportManager(Context context){
         this.context = context;
-        habitDatabase = new HabitDatabase(context);
+        habitDatabase = new HabitDatabase(context, null, false);
         backupPathPrivate = context.getFilesDir().toString();
         dataPathPrivate = backupPathPrivate + File.separator + "Data";
     }

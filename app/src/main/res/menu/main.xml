@@ -39,13 +39,19 @@
 
     <item
         android:id="@+id/add_junk"
-        android:orderInCategory="500"
+        android:orderInCategory="600"
         android:title="add junk"
         app:showAsAction="never"/>
 
     <item
+        android:id="@+id/add_mound_junk"
+        android:orderInCategory="700"
+        android:title="add mound of junk"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/add_ton_junk"
-        android:orderInCategory="500"
+        android:orderInCategory="800"
         android:title="add ton of junk"
         app:showAsAction="never"/>
 
