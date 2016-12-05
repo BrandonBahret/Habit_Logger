@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity
 
             case(R.id.add_junk):
             {
-                addJunkData(1000, 20, 5);
+                addJunkData(10, 20, 5);
                 showDatabase();
             }break;
 
