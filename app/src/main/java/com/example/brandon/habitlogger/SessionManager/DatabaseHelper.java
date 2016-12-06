@@ -6,11 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.nio.channels.FileChannel;
-
 /**
  * Created by Brandon on 12/4/2016.
  */
@@ -20,6 +15,9 @@ class DatabaseHelper extends SQLiteOpenHelper {
     protected static final String DATABASE_NAME = "habit_session_database";
     protected static final int DATABASE_VERSION = 1;
 
+    public SQLiteDatabase writableDatabase;
+    public SQLiteDatabase readableDatabase;
+
     protected static final String SESSIONS_TABLE = "SESSIONS_TABLE";
     protected static final String HABIT_ID          = "HABIT_ID";
     protected static final String STARTING_TIME     = "STARTING_TIME";
@@ -27,17 +25,6 @@ class DatabaseHelper extends SQLiteOpenHelper {
     protected static final String TOTAL_PAUSE_TIME  = "TOTAL_PAUSE_TIME";
     protected static final String IS_PAUSED         = "IS_PAUSED";
     protected static final String NOTE              = "NOTE";
-
-    /*
-    CREATE TABLE `SESSIONS_TABLE` (
-        `HABIT_ID`	INTEGER UNIQUE,
-        `STARTING_TIME`	INTEGER,
-        `LAST_TIME_PAUSED`	INTEGER,
-        `TOTAL_PAUSE_TIME`	INTEGER,
-        `IS_PAUSED`	INTEGER,
-        `NOTE`	TEXT
-    );
-     */
 
     private static final String CREATE_SESSIONS_TABLE =
             "CREATE TABLE " + SESSIONS_TABLE + " (" +
@@ -52,10 +39,11 @@ class DatabaseHelper extends SQLiteOpenHelper {
     // DROP TABLE IF EXISTS SESSIONS_TABLE
     private static final String DROP_HABITS_TABLE = "DROP TABLE IF EXISTS " + SESSIONS_TABLE;
 
-    private Context context;
     DatabaseHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.context = context;
+
+        writableDatabase = getWritableDatabase();
+        readableDatabase = getReadableDatabase();
     }
 
     @Override
@@ -67,41 +55,10 @@ class DatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.delete(SESSIONS_TABLE, null, null);
     }
 
-    public File getDatabasePath(){
-        return context.getDatabasePath(getDatabaseName());
-    }
-
-    private FileChannel getChannel(boolean isInput){
-        File currentDB = getDatabasePath();
-
-        FileChannel channel = null;
-
-        try{
-            if(isInput){
-                channel = new FileInputStream(currentDB).getChannel();
-            } else {
-                channel = new FileOutputStream(currentDB).getChannel();
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-
-        return channel;
-    }
-
-    public FileChannel getOutputChannel(){
-        return getChannel(false);
-    }
-
-    public FileChannel getInputChannel(){
-        return getChannel(true);
-    }
-
     /**
-     * @param habitId
-     * @param valueColumn
-     * @param value
-     * @param <Value>
+     * @param habitId The id of the habit for the session.
+     * @param valueColumn The column in the database to be set.
+     * @param value The value to be set at "valueColumn"
      * @return the number of rows affected
      */
     public <Value> int setAttribute(long habitId, String valueColumn, Value value){
@@ -113,25 +70,26 @@ class DatabaseHelper extends SQLiteOpenHelper {
             values.put(valueColumn, (Long)value);
         }
 
-        SQLiteDatabase writableDatabase = getWritableDatabase();
         return writableDatabase.update(DatabaseHelper.SESSIONS_TABLE, values,
                 DatabaseHelper.HABIT_ID + " =?", new String[]{String.valueOf(habitId)});
     }
 
     /**
-     * @param habitId
-     * @return total time paused
+     * @param habitId The id of the habit for the session.
+     * @return The result of the query as a cursor.
      */
     public Cursor getAttribute(long habitId, String column){
-        SQLiteDatabase readableDatabase = getReadableDatabase();
-
-        return readableDatabase.query(
+        Cursor c =  readableDatabase.query(
                 DatabaseHelper.SESSIONS_TABLE,
                 new String[]{column},
                 DatabaseHelper.HABIT_ID + " =?",
                 new String[]{String.valueOf(habitId)},
                 null, null, null
         );
+
+        c.moveToFirst();
+
+        return c;
     }
 
     @Override
