@@ -32,6 +32,18 @@
             </intent-filter>
 
         </activity>
+
+        <activity
+            android:name=".NewHabitActivity"
+            android:label="New Habit"
+            android:theme="@style/AppTheme">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+
+        </activity>
+
     </application>
 
 </manifest>

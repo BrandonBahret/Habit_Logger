@@ -25,4 +25,5 @@
             android:id="@+id/text"/>
 
     </ScrollView>
+
 </RelativeLayout>

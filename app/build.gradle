@@ -41,4 +41,5 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     compile files('libs/opencsv-3.8.jar')
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
 }

@@ -350,6 +350,10 @@ public class HabitDatabase {
         long id = insertCategoryStatement.executeInsert();
         category.setDatabaseId(id);
 
+        if(useCache){
+            dataCache.cacheCategory(category);
+        }
+
         return id;
     }
 
@@ -833,6 +837,10 @@ public class HabitDatabase {
             addEntries(habitId, entries);
         }
 
+        if(useCache){
+            dataCache.cacheHabit(habit);
+        }
+
         return habitId;
     }
 
@@ -843,6 +851,7 @@ public class HabitDatabase {
     public long addHabitAndCategory(Habit habit){
         HabitCategory category = habit.getCategory();
         addCategoryIfNotExists(category);
+
         return addHabit(habit);
     }
 
