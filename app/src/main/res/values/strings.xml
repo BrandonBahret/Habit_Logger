@@ -5,4 +5,9 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="home_nav_string">Home</string>
+    <string name="running_habits_nav_string">Running Habits</string>
+    <string name="overall_stats_nav_string">Overall Stats</string>
+    <string name="settings_nav_string">Settings</string>
+    <string name="about_nav_string">About</string>
 </resources>

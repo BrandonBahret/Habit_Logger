@@ -4,6 +4,8 @@
     <color name="colorPrimaryDark">#43d4ad</color>
     <color name="colorAccent">#4cefc3</color>
 
+    <color name = "f">#FF1DE9B6</color>
+
     <integer-array name="colors">
         <item>0xffd32f2f</item>
         <item>0xffe91e63</item>

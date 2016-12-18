@@ -25,11 +25,9 @@ import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.nbsp.materialfilepicker.MaterialFilePicker;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
 import java.io.Serializable;
-import java.util.regex.Pattern;
 
 import static com.example.brandon.habitlogger.R.menu.main;
 
@@ -223,30 +221,24 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         switch(id){
-            case(R.id.nav_import_database):
-            {
-                new MaterialFilePicker()
-                        .withActivity(this)
-                        .withRequestCode(1)
-                        .withRootPath(LocalDataExportManager.backupPathPublic)
-                        .withFilter(Pattern.compile(".*\\.db$")) // Filtering files and directories by file name using regexp
-                        .withFilterDirectories(true) // Set directories filterable (false by default)
-                        .withHiddenFiles(true) // Show hidden files and folders
-                        .start();
+            case(R.id.home_nav):{
+                Toast.makeText(this, "Home", Toast.LENGTH_SHORT).show();
             }break;
 
-            case(R.id.nav_import_habit):
-            {
-                new MaterialFilePicker()
-                        .withActivity(this)
-                        .withRequestCode(2)
-                        .withRootPath(LocalDataExportManager.dataPathPublic)
-                        .start();
+            case(R.id.running_habits_nav):{
+                Toast.makeText(this, "Running Habit", Toast.LENGTH_SHORT).show();
             }break;
 
-            case(R.id.nav_display_database):
-            {
-                showDatabase();
+            case(R.id.overall_stats_nav):{
+                Toast.makeText(this, "Overall stats", Toast.LENGTH_SHORT).show();
+            }break;
+
+            case(R.id.settings_nav):{
+                Toast.makeText(this, "settings", Toast.LENGTH_SHORT).show();
+            }break;
+
+            case(R.id.about_nav):{
+                Toast.makeText(this, "about", Toast.LENGTH_SHORT).show();
             }break;
         }
 

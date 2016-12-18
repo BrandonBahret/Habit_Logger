@@ -1,33 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
-        <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
-        <item
-            android:id="@+id/nav_display_database"
-            android:title="Display Database" />
-    </group>
+    <item android:id="@+id/home_nav"
+        android:title="@string/home_nav_string"
+        android:icon="@drawable/ic_home_black_24px"
+        />
 
-    <item android:title="Import Data">
-        <menu>
-            <item
-                android:id="@+id/nav_import_database"
-                android:title="Import Database" />
-            <item
-                android:id="@+id/nav_import_habit"
-                android:title="Import Habit" />
-        </menu>
-    </item>
+    <item android:id="@+id/running_habits_nav"
+        android:title="@string/running_habits_nav_string"
+        android:icon="@drawable/ic_timer_black_24px"
+        />
+
+    <item android:id="@+id/overall_stats_nav"
+        android:title="@string/overall_stats_nav_string"
+        android:icon="@drawable/ic_health_graph_1"
+        />
+
+    <item android:id="@+id/settings_nav"
+        android:title="@string/settings_nav_string"
+        android:icon="@drawable/ic_settings_black_24px"
+        />
+
+    <item android:id="@+id/about_nav"
+        android:title="@string/about_nav_string"
+        android:icon="@drawable/ic_info_outline_black_24px"
+        />
 
 </menu>
