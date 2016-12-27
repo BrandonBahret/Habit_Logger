@@ -182,6 +182,12 @@ public class Habit implements Serializable{
         this.iconResId = iconResId;
     }
 
+    public int calculateStreakCount(){
+        // TODO implement streak counter
+
+        return 0;
+    }
+
     /**
      * @return The habit name
      */

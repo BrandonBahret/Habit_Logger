@@ -62,6 +62,8 @@ public class HabitDatabase {
 
     public interface OnDatabaseChange {
         void onDatabaseChanged();
+
+        void onDatabaseClear();
     }
 
     /**
@@ -70,6 +72,15 @@ public class HabitDatabase {
     public void notifyChange(){
         if(changeListener != null) {
             changeListener.onDatabaseChanged();
+        }
+    }
+
+    /**
+     * Run the call back method set on the database.
+     */
+    public void notifyDatabaseClear(){
+        if(changeListener != null) {
+            changeListener.onDatabaseClear();
         }
     }
 
@@ -106,7 +117,7 @@ public class HabitDatabase {
         if(useCache) {
             dataCache.clearCache();
         }
-        notifyChange();
+        notifyDatabaseClear();
     }
 
     /**
