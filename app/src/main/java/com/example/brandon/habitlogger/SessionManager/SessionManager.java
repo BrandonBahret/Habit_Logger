@@ -15,8 +15,10 @@ public class SessionManager {
     DatabaseHelper dbHelper;
 
     private SQLiteStatement insertSessionStatement;
+    private Context context;
 
     public SessionManager(Context context){
+        this.context = context;
         dbHelper = new DatabaseHelper(context);
         insertSessionStatement = getInsertSessionStatement();
     }

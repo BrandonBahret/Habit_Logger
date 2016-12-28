@@ -280,6 +280,8 @@ public class MainActivity extends AppCompatActivity
 
             case(R.id.about_nav):{
                 Toast.makeText(this, "about", Toast.LENGTH_SHORT).show();
+                Intent launchActivity = new Intent(this, SessionActivity.class);
+                startActivity(launchActivity);
             }break;
         }
 

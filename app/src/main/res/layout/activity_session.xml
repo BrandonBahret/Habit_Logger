@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_session"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.brandon.habitlogger.SessionActivity">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/session_time_display_layout"
+        android:paddingBottom="10dp"
+
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:background="@drawable/underline_background"
+        >
+
+        <ImageButton
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:id="@+id/session_pause_play"
+
+            android:scaleType="centerCrop"
+            android:background="@color/transparent"
+            android:src="@drawable/ic_play_circle_outline_black_24dp"
+
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/session_pause_play_content_description"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:text="00"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:textSize="75sp"
+                android:fontFamily="sans-serif-condensed"
+                />
+
+            <TextView
+                android:text="H"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/session_time_display_content_description"
+                android:textAlignment="center"
+                />
+
+        </LinearLayout>
+
+        <TextView
+            android:text=":"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:textSize="75sp"
+            android:fontFamily="sans-serif-condensed"
+            />
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:text="00"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:textSize="75sp"
+                android:fontFamily="sans-serif-condensed"
+                />
+
+            <TextView
+                android:text="M"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/session_time_display_content_description"
+                android:textAlignment="center"
+                />
+
+        </LinearLayout>
+
+        <TextView
+            android:text=":"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:textSize="75sp"
+            android:fontFamily="sans-serif-condensed"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:text="00"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/session_time_display"
+
+                android:textSize="75sp"
+                android:fontFamily="sans-serif-condensed"
+                />
+
+            <TextView
+                android:text="S"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/session_time_display_content_description"
+                android:textAlignment="center"
+                />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <Button
+        android:text="Cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/session_cancel"
+        android:background="@color/colorPrimary"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/session_time_display_layout"
+
+        android:inputType="textMultiLine"
+
+        android:hint="@string/session_note_hint"
+        android:fadingEdgeLength="@dimen/activity_vertical_margin"
+        android:layout_margin="10dp"
+        android:layout_above="@+id/session_cancel" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+
+        android:id="@+id/session_note"
+        android:hint="@string/session_note_hint"
+        android:fontFamily="sans-serif"
+        android:textSize="18sp"
+
+        android:layout_margin="10dp"
+        android:layout_below="@+id/session_time_display_layout"
+        android:layout_above="@+id/session_cancel"
+
+        android:visibility="gone"
+        />
+
+
+</RelativeLayout>

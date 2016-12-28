@@ -20,5 +20,9 @@
     <string name="streak_count_value_content_description">Streak count value.</string>
     <string name="session_control_button_content_description">Session control button</string>
     <string name="card_view_accent_description">A color accent indicating the category type.</string>
+    <string name="session_time_display_content_description">Hours, Minutes, Seconds</string>
+    <string name="session_time_display_label">H                M                S</string>
+    <string name="session_note_hint">Note</string>
+    <string name="session_pause_play_content_description">Session pause, or play toggle button.</string>
 
 </resources>
