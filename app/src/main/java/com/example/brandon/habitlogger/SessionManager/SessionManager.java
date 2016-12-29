@@ -57,7 +57,7 @@ public class SessionManager {
         insertSessionStatement.bindLong(3, 0);                // LAST_TIME_PAUSED
         insertSessionStatement.bindLong(4, 0);                // TOTAL_PAUSE_TIME
         insertSessionStatement.bindLong(5, 0);                // IS_PAUSED
-        insertSessionStatement.bindString(6, "This Is A Note");            // NOTE
+        insertSessionStatement.bindString(6, "");            // NOTE
 
         return insertSessionStatement.executeInsert();
     }
@@ -106,7 +106,10 @@ public class SessionManager {
             playSession(habitId);
         }
 
-        return getSession(habitId);
+        SessionEntry entry = getSession(habitId);
+        cancelSession(habitId);
+
+        return entry;
     }
 
     /**
@@ -129,9 +132,14 @@ public class SessionManager {
     public SessionEntry getSession(long habitId){
         long startingTime = getStartingTime(habitId);
         long duration = (getCurrentTime() - startingTime) - getTotalPauseTime(habitId);
-        String note = getNote(habitId);
 
-        cancelSession(habitId);
+        if(getIsPaused(habitId)){
+            long lastPaused = getLastPauseTime(habitId);
+            long pausedTime = getCurrentTime() - lastPaused;
+            duration -= pausedTime;
+        }
+
+        String note = getNote(habitId);
 
         SessionEntry newEntry = new SessionEntry(startingTime, duration, note);
         newEntry.setHabitId(habitId);
@@ -176,6 +184,7 @@ public class SessionManager {
         Cursor c = dbHelper.getAttribute(habitId, DatabaseHelper.TOTAL_PAUSE_TIME);
         long totalPauseTime = c.getLong(0);
         c.close();
+
         return totalPauseTime;
     }
 

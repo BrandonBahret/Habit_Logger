@@ -29,6 +29,8 @@ import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.HabitViewAdapter;
+import com.example.brandon.habitlogger.RecyclerVIewAdapters.RecyclerTouchListener;
+import com.example.brandon.habitlogger.SessionManager.SessionManager;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     
     HabitDatabase habitDatabase;
+    SessionManager sessionManager;
     LocalDataExportManager exportManager;
     GoogleDriveDataExportManager googleDrive;
 
@@ -74,6 +77,8 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        sessionManager = new SessionManager(this);
+
         recyclerView = (RecyclerView)findViewById(R.id.habit_recycler_view);
         habitAdapter = new HabitViewAdapter(habitList);
 
@@ -81,6 +86,18 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(habitAdapter);
+
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(this, recyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                startSession(habitList.get(position));
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
 
         Serializable cache = null;
         if (savedInstanceState != null) {
@@ -107,6 +124,12 @@ public class MainActivity extends AppCompatActivity
         googleDrive.connect();
 
         showDatabase();
+    }
+
+    public void startSession(Habit habit){
+        Intent startSession = new Intent(this, SessionActivity.class);
+        startSession.putExtra("habit", habit);
+        startActivity(startSession);
     }
 
     private class addJunkData extends AsyncTask<Void, Void, Void>{
@@ -280,8 +303,6 @@ public class MainActivity extends AppCompatActivity
 
             case(R.id.about_nav):{
                 Toast.makeText(this, "about", Toast.LENGTH_SHORT).show();
-                Intent launchActivity = new Intent(this, SessionActivity.class);
-                startActivity(launchActivity);
             }break;
         }
 

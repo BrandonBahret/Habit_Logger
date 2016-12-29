@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     tools:context="com.example.brandon.habitlogger.SessionActivity">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -39,6 +38,7 @@
 
             <TextView
                 android:text="00"
+                android:id="@+id/session_hours_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
@@ -73,6 +73,7 @@
 
             <TextView
                 android:text="00"
+                android:id="@+id/session_minutes_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
@@ -106,9 +107,9 @@
 
             <TextView
                 android:text="00"
+                android:id="@+id/session_seconds_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/session_time_display"
 
                 android:textSize="75sp"
                 android:fontFamily="sans-serif-condensed"
@@ -129,6 +130,7 @@
 
     <Button
         android:text="Cancel"
+        android:textColor="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/session_cancel"
@@ -140,6 +142,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/session_note"
         android:layout_below="@+id/session_time_display_layout"
 
         android:inputType="textMultiLine"
@@ -149,22 +152,6 @@
         android:layout_margin="10dp"
         android:layout_above="@+id/session_cancel" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textMultiLine"
-
-        android:id="@+id/session_note"
-        android:hint="@string/session_note_hint"
-        android:fontFamily="sans-serif"
-        android:textSize="18sp"
-
-        android:layout_margin="10dp"
-        android:layout_below="@+id/session_time_display_layout"
-        android:layout_above="@+id/session_cancel"
-
-        android:visibility="gone"
-        />
 
 
 </RelativeLayout>
