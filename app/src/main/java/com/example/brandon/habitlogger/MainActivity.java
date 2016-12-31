@@ -145,6 +145,11 @@ public class MainActivity extends AppCompatActivity
         startActivity(startTargetActivity);
     }
 
+    public void startAboutActivity(){
+        Intent startAbout = new Intent(this, AboutActivity.class);
+        startActivity(startAbout);
+    }
+
     private class addJunkData extends AsyncTask<Void, Void, Void>{
         int numberOfCategories, numberOfEntries, numberOfHabits;
 
@@ -242,7 +247,7 @@ public class MainActivity extends AppCompatActivity
             }break;
 
             case (R.id.menu_about):{
-
+                startAboutActivity();
             }break;
         }
 
@@ -273,7 +278,7 @@ public class MainActivity extends AppCompatActivity
             }break;
 
             case(R.id.about_nav):{
-                Toast.makeText(this, "about", Toast.LENGTH_SHORT).show();
+                startAboutActivity();
             }break;
         }
 

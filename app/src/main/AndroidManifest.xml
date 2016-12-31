@@ -11,6 +11,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -31,6 +32,7 @@
                     android:scheme="http" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".NewHabitActivity"
             android:label="New Habit"
@@ -43,10 +45,16 @@
         <activity
             android:name=".SessionActivity"
             android:label="Habit Session"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
 
-        <activity android:name=".ActiveSessionsActivity"
+        <activity
+            android:name=".ActiveSessionsActivity"
             android:label="Active Habits"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".AboutActivity"
+            android:label="About"
             android:theme="@style/AppTheme" />
 
     </application>

@@ -6,5 +6,8 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+
+    <!-- Custom dimensions -->
     <dimen name="accent_strip_width">8dp</dimen>
+    <dimen name="link_buttion_size">40dp</dimen>
 </resources>
