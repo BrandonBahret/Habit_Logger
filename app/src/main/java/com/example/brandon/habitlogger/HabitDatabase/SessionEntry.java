@@ -14,6 +14,8 @@ import java.util.Locale;
 public class SessionEntry implements Serializable{
 
     private long startTime, duration;
+    private String name = "NAME_NOT_SET";
+    private boolean isPaused = false;
     @NonNull private String note;
     private long habitId = -1;
 
@@ -75,7 +77,7 @@ public class SessionEntry implements Serializable{
      * @return a time in milliseconds for the length of the session.
      */
     public long getDuration(){
-        return this.duration;
+        return this.duration / 1000;
     }
 
     /**
@@ -119,6 +121,22 @@ public class SessionEntry implements Serializable{
      */
     public long getDatabaseId() {
         return databaseId;
+    }
+
+    public void setName(String name){
+        this.name = name;
+    }
+
+    public String getName(){
+        return this.name;
+    }
+
+    public void setIsPaused(boolean isPaused){
+        this.isPaused = isPaused;
+    }
+
+    public boolean getIsPaused(){
+        return this.isPaused;
     }
 
 }

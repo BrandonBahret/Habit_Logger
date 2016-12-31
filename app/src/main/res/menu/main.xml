@@ -1,59 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
-        android:id="@+id/auth_google_drive"
+        android:id="@+id/menu_settings"
         android:orderInCategory="100"
-        android:title="Auth Google Drive"
+        android:title="@string/settings"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/reset_database"
+        android:id="@+id/menu_about"
         android:orderInCategory="200"
-        android:title="Reset Database"
-        app:showAsAction="never"/>
+        android:title="@string/about"
+        app:showAsAction="never" />
 
     <item
-        android:id="@+id/save_to_sd"
+        android:id="@+id/menu_database_export"
         android:orderInCategory="300"
-        android:title="save to SD"
-        app:showAsAction="never"/>
+        android:title="@string/export_database"
+        app:showAsAction="never" />
 
     <item
-        android:id="@+id/backup_to_drive"
+        android:id="@+id/menu_database_restore"
         android:orderInCategory="400"
-        android:title="Backup To Drive"
-        app:showAsAction="never"/>
-
-    <item
-        android:id="@+id/restore_from_drive"
-        android:orderInCategory="400"
-        android:title="restore_from_drive"
-        app:showAsAction="never"/>
-
-    <item
-        android:id="@+id/show_license"
-        android:orderInCategory="500"
-        android:title="show license"
-        app:showAsAction="never"/>
-
-    <item
-        android:id="@+id/add_junk"
-        android:orderInCategory="600"
-        android:title="add junk"
-        app:showAsAction="never"/>
-
-    <item
-        android:id="@+id/add_mound_junk"
-        android:orderInCategory="700"
-        android:title="add mound of junk"
-        app:showAsAction="never"/>
-
-    <item
-        android:id="@+id/add_ton_junk"
-        android:orderInCategory="800"
-        android:title="add ton of junk"
-        app:showAsAction="never"/>
+        android:title="@string/restore_database"
+        app:showAsAction="never" />
 
 </menu>
 

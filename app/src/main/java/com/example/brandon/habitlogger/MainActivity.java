@@ -11,6 +11,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,7 +19,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.brandon.habitlogger.DataExportHelpers.GoogleDriveDataExportManager;
@@ -31,7 +31,6 @@ import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.HabitViewAdapter;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.RecyclerTouchListener;
 import com.example.brandon.habitlogger.SessionManager.SessionManager;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
 import java.io.Serializable;
@@ -99,6 +98,15 @@ public class MainActivity extends AppCompatActivity
             }
         }));
 
+        CardView currentSession = (CardView)findViewById(R.id.current_sessions_card);
+        currentSession.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "Open 'Current Sessions' Activity", Toast.LENGTH_SHORT).show();
+                startActiveSessionsActivity();
+            }
+        });
+
         Serializable cache = null;
         if (savedInstanceState != null) {
             cache = savedInstanceState.getSerializable("dataCache");
@@ -129,7 +137,12 @@ public class MainActivity extends AppCompatActivity
     public void startSession(Habit habit){
         Intent startSession = new Intent(this, SessionActivity.class);
         startSession.putExtra("habit", habit);
-        startActivity(startSession);
+        startActivityForResult(startSession, SessionActivity.RESULT_SESSION_FINISH);
+    }
+
+    public void startActiveSessionsActivity() {
+        Intent startTargetActivity = new Intent(this, ActiveSessionsActivity.class);
+        startActivity(startTargetActivity);
     }
 
     private class addJunkData extends AsyncTask<Void, Void, Void>{
@@ -192,11 +205,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         habitAdapter.notifyDataSetChanged();
-
-
-//        TextView main = (TextView)findViewById(R.id.text);
-//        String dataString = habitDatabase.toString3();
-//        main.setText(dataString);
     }
 
     @Override
@@ -221,57 +229,20 @@ public class MainActivity extends AppCompatActivity
 
         final int id = item.getItemId();
         switch(id){
-            case(R.id.auth_google_drive):
-            {
-                googleDrive.connect();
+            case (R.id.menu_database_export):{
+
             }break;
 
-            case(R.id.show_license):
-            {
-                String license = GoogleApiAvailability.getInstance()
-                        .getOpenSourceSoftwareLicenseInfo(MainActivity.this);
+            case (R.id.menu_database_restore):{
 
-                TextView mainText = (TextView)findViewById(R.id.text);
-                mainText.setText(license);
             }break;
 
-            case(R.id.reset_database):
-            {
-                habitDatabase.resetDatabase();
+            case (R.id.menu_settings):{
+
             }break;
 
-            case(R.id.save_to_sd):
-            {
-                exportManager.exportDatabase(true);
-                Toast.makeText(this, "Saved database", Toast.LENGTH_SHORT).show();
-            }break;
+            case (R.id.menu_about):{
 
-            case(R.id.backup_to_drive):
-            {
-                googleDrive.backupDatabase();
-            }break;
-
-            case(R.id.restore_from_drive):
-            {
-                googleDrive.restoreDatabase();
-            }break;
-
-            case(R.id.add_junk):
-            {
-                addJunkData(10, 20, 5);
-                showDatabase();
-            }break;
-
-            case(R.id.add_mound_junk):
-            {
-                addJunkData(4, 50, 15);
-                showDatabase();
-            }break;
-
-            case(R.id.add_ton_junk):
-            {
-                addJunkData(7, 365, 25);
-                showDatabase();
             }break;
         }
 
@@ -290,7 +261,7 @@ public class MainActivity extends AppCompatActivity
             }break;
 
             case(R.id.running_habits_nav):{
-                Toast.makeText(this, "Running Habit", Toast.LENGTH_SHORT).show();
+                startActiveSessionsActivity();
             }break;
 
             case(R.id.overall_stats_nav):{
@@ -335,6 +306,12 @@ public class MainActivity extends AppCompatActivity
                     String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
                     exportManager.importHabit(filePath, true);
                     showDatabase();
+                }break;
+
+                case SessionActivity.RESULT_SESSION_FINISH : {
+                    SessionEntry entry = (SessionEntry) data.getSerializableExtra("entry");
+                    Toast.makeText(this, entry.toString(), Toast.LENGTH_SHORT).show();
+                    habitDatabase.addEntry(entry.getHabitId(), entry);
                 }break;
 
                 case GoogleDriveDataExportManager.REQUEST_CODE_RESOLUTION:{

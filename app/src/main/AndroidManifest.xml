@@ -43,9 +43,11 @@
         <activity
             android:name=".SessionActivity"
             android:label="Habit Session"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"/>
 
-        </activity>
+        <activity android:name=".ActiveSessionsActivity"
+            android:label="Active Habits"
+            android:theme="@style/AppTheme" />
 
     </application>
 

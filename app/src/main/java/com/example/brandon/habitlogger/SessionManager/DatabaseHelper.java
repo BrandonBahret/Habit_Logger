@@ -18,7 +18,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
     public SQLiteDatabase writableDatabase;
     public SQLiteDatabase readableDatabase;
 
-    protected static final String SESSIONS_TABLE = "SESSIONS_TABLE";
+    protected static final String SESSIONS_TABLE    = "SESSIONS_TABLE";
     protected static final String HABIT_ID          = "HABIT_ID";
     protected static final String STARTING_TIME     = "STARTING_TIME";
     protected static final String LAST_TIME_PAUSED  = "LAST_TIME_PAUSED";
@@ -53,6 +53,13 @@ class DatabaseHelper extends SQLiteOpenHelper {
 
     public void resetDatabase(SQLiteDatabase sqLiteDatabase){
         sqLiteDatabase.delete(SESSIONS_TABLE, null, null);
+    }
+
+    public int length(){
+        Cursor c = readableDatabase.query(SESSIONS_TABLE, new String[]{HABIT_ID}, null, null, null, null, null);
+        int length = c.getCount();
+        c.close();
+        return length;
     }
 
     /**

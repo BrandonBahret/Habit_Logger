@@ -5,6 +5,7 @@
     <color name="colorAccent">#4cefc3</color>
 
     <color name="habitCard">#fdfdfd</color>
+    <color name="cardBackgroundColor">#ecfffa</color>
 
     <integer-array name="colors">
         <item>0xffd32f2f</item>

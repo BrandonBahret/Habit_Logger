@@ -927,7 +927,7 @@ public class HabitDatabase {
                 DatabaseHelper.HABIT_ID);
     }
 
-    private String getHabitName(long id){
+    public String getHabitName(long id){
         Cursor c = readableDatabase.query(DatabaseHelper.HABITS_TABLE_NAME, new String[]{DatabaseHelper.HABIT_NAME},
                 DatabaseHelper.HABIT_ID + "=?", new String[]{String.valueOf(id)}, null, null, null);
 
@@ -991,6 +991,34 @@ public class HabitDatabase {
         }
 
         return habit;
+    }
+
+    public long getHabitCategoryId(long habitId){
+        Cursor c = readableDatabase.query(DatabaseHelper.HABITS_TABLE_NAME, new String[]{DatabaseHelper.HABIT_CATEGORY},
+                DatabaseHelper.HABIT_ID + "=?", new String[]{String.valueOf(habitId)}, null, null, null);
+
+        long categoryId = -1;
+
+        if(c != null){
+            if(c.moveToFirst()){
+                int categoryInd = c.getColumnIndex(DatabaseHelper.HABIT_CATEGORY);
+                categoryId = c.getLong(categoryInd);
+                c.close();
+            }
+        }
+
+        return categoryId;
+    }
+
+    public int getHabitColor(long habitId){
+        HabitCategory category = getCategory(getHabitCategoryId(habitId));
+
+        int color = -1;
+        if(category != null){
+            color = category.getColorAsInt();
+        }
+
+        return color;
     }
 
     public long[] getHabitIds(long categoryId){

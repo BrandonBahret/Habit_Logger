@@ -1,5 +1,7 @@
 package com.example.brandon.habitlogger;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
@@ -19,6 +21,8 @@ import com.example.brandon.habitlogger.SessionManager.SessionManager;
 import java.util.Locale;
 
 public class SessionActivity extends AppCompatActivity {
+
+    public static final int RESULT_SESSION_FINISH = 300;
 
     Runnable updateTimeDisplayRunnable;
     Handler handler;
@@ -90,20 +94,17 @@ public class SessionActivity extends AppCompatActivity {
         handler = new Handler();
     }
 
+
+
     public void updateTimeDisplay(){
         SessionEntry entry = sessionManager.getSession(habitId);
 
-        long time = entry.getDuration() / 1000;
+        long time = entry.getDuration();
+        SessionManager.TimeDisplay display = new SessionManager.TimeDisplay(time);
 
-        long hours = (time - (time % 3600) ) / 3600;
-        time -= hours * 3600;
-
-        long minutes = (time - (time % 60) ) / 60;
-        time -= minutes * 60;
-
-        hoursView.setText(String.format(Locale.US, "%02d", hours));
-        minutesView.setText(String.format(Locale.US, "%02d", minutes));
-        secondsView.setText(String.format(Locale.US, "%02d", time));
+        hoursView.setText(String.format(Locale.US, "%02d",   display.hours));
+        minutesView.setText(String.format(Locale.US, "%02d", display.minutes));
+        secondsView.setText(String.format(Locale.US, "%02d", display.seconds));
     }
 
     public void reloadNote(){
@@ -125,7 +126,14 @@ public class SessionActivity extends AppCompatActivity {
 
         switch (id) {
             case (R.id.finish_session_button): {
-                sessionManager.finishSession(habitId);
+                SessionEntry entry = sessionManager.finishSession(habitId);
+
+                String note = noteArea.getText().toString();
+                entry.setNote(note);
+
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("entry", entry);
+                setResult(Activity.RESULT_OK, resultIntent);
                 finish();
             }break;
         }

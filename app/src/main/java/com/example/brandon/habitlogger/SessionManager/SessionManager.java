@@ -4,7 +4,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
 
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.example.brandon.habitlogger.SessionManager.DatabaseHelper.HABIT_ID;
+import static com.example.brandon.habitlogger.SessionManager.DatabaseHelper.SESSIONS_TABLE;
 
 /**
  * Created by Brandon on 12/4/2016.
@@ -17,19 +24,23 @@ public class SessionManager {
     private SQLiteStatement insertSessionStatement;
     private Context context;
 
+    private HabitDatabase habitDatabase;
+
     public SessionManager(Context context){
         this.context = context;
         dbHelper = new DatabaseHelper(context);
         insertSessionStatement = getInsertSessionStatement();
+
+        this.habitDatabase = new HabitDatabase(context, null, false);
     }
 
     /**
      * Get a sqlite statement for creating new sessions.
      */
     public SQLiteStatement getInsertSessionStatement(){
-        String sql = "INSERT INTO "+ DatabaseHelper.SESSIONS_TABLE +
+        String sql = "INSERT INTO "+ SESSIONS_TABLE +
                 " ("+
-                DatabaseHelper.HABIT_ID +
+                HABIT_ID +
                 ", "+ DatabaseHelper.STARTING_TIME+
                 ", "+ DatabaseHelper.LAST_TIME_PAUSED+
                 ", "+ DatabaseHelper.TOTAL_PAUSE_TIME+
@@ -38,6 +49,26 @@ public class SessionManager {
                 ") VALUES(?, ?, ?, ?, ?, ?)";
 
         return dbHelper.writableDatabase.compileStatement(sql);
+    }
+
+    public List<SessionEntry> getActiveSessionList(){
+        List<SessionEntry> sessions = new ArrayList<>();
+
+        Cursor c = dbHelper.getReadableDatabase()
+                .query(DatabaseHelper.SESSIONS_TABLE, new String[]{DatabaseHelper.HABIT_ID},
+                        null, null, null, null, null);
+
+        if (c.moveToFirst()) {
+            do {
+                long habitId = c.getLong(0);
+                SessionEntry entry = getSession(habitId);
+                sessions.add(entry);
+            } while (c.moveToNext());
+        }
+
+        c.close();
+
+        return sessions;
     }
 
     /**
@@ -57,7 +88,7 @@ public class SessionManager {
         insertSessionStatement.bindLong(3, 0);                // LAST_TIME_PAUSED
         insertSessionStatement.bindLong(4, 0);                // TOTAL_PAUSE_TIME
         insertSessionStatement.bindLong(5, 0);                // IS_PAUSED
-        insertSessionStatement.bindString(6, "");            // NOTE
+        insertSessionStatement.bindString(6, "");             // NOTE
 
         return insertSessionStatement.executeInsert();
     }
@@ -90,8 +121,8 @@ public class SessionManager {
      */
     public long cancelSession(long habitId){
         return dbHelper.writableDatabase.delete(
-                DatabaseHelper.SESSIONS_TABLE,
-                DatabaseHelper.HABIT_ID + " =?",
+                SESSIONS_TABLE,
+                HABIT_ID + " =?",
                 new String[]{String.valueOf(habitId)}
         );
     }
@@ -107,6 +138,7 @@ public class SessionManager {
         }
 
         SessionEntry entry = getSession(habitId);
+
         cancelSession(habitId);
 
         return entry;
@@ -118,12 +150,16 @@ public class SessionManager {
      * @return True if active, otherwise false.
      */
     public boolean isSessionActive(long habitId){
-        Cursor c = dbHelper.getAttribute(habitId, DatabaseHelper.HABIT_ID);
+        Cursor c = dbHelper.getAttribute(habitId, HABIT_ID);
         return c.getCount() != 0;
     }
 
 
     // SETTERS AND GETTERS
+
+    public int getSessionCount(){
+        return dbHelper.length();
+    }
 
     /**
      * @param habitId The id of the habit for the session.
@@ -144,6 +180,7 @@ public class SessionManager {
         SessionEntry newEntry = new SessionEntry(startingTime, duration, note);
         newEntry.setHabitId(habitId);
 
+        newEntry.setName(habitDatabase.getHabitName(habitId));
         return newEntry;
     }
 
@@ -238,5 +275,23 @@ public class SessionManager {
         boolean isPaused = c.getLong(0) == 1;
         c.close();
         return isPaused;
+    }
+
+    public static class TimeDisplay{
+        public long hours, minutes, seconds;
+
+        public TimeDisplay(long time){
+            updateTime(time);
+        }
+
+        public void updateTime(long time){
+            this.hours = (time - (time % 3600) ) / 3600;
+            time -= this.hours * 3600;
+
+            this.minutes = (time - (time % 60) ) / 60;
+            time -= this.minutes * 60;
+
+            this.seconds = time;
+        }
     }
 }
