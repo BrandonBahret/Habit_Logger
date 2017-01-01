@@ -19,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.brandon.habitlogger.DataExportHelpers.GoogleDriveDataExportManager;
@@ -41,14 +42,16 @@ import static com.example.brandon.habitlogger.R.menu.main;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    
-    HabitDatabase habitDatabase;
+
     SessionManager sessionManager;
+    CardView currentSession;
+
+    HabitDatabase habitDatabase;
     LocalDataExportManager exportManager;
     GoogleDriveDataExportManager googleDrive;
 
     List<Habit> habitList = new ArrayList<>();;
-    RecyclerView recyclerView;
+    RecyclerView habitCardContainer;
     HabitViewAdapter habitAdapter;
 
     @Override
@@ -78,15 +81,15 @@ public class MainActivity extends AppCompatActivity
 
         sessionManager = new SessionManager(this);
 
-        recyclerView = (RecyclerView)findViewById(R.id.habit_recycler_view);
+        habitCardContainer = (RecyclerView)findViewById(R.id.habit_recycler_view);
         habitAdapter = new HabitViewAdapter(habitList);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(habitAdapter);
+        habitCardContainer.setLayoutManager(layoutManager);
+        habitCardContainer.setItemAnimator(new DefaultItemAnimator());
+        habitCardContainer.setAdapter(habitAdapter);
 
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(this, recyclerView, new RecyclerTouchListener.ClickListener() {
+        habitCardContainer.addOnItemTouchListener(new RecyclerTouchListener(this, habitCardContainer, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 startSession(habitList.get(position));
@@ -98,14 +101,14 @@ public class MainActivity extends AppCompatActivity
             }
         }));
 
-        CardView currentSession = (CardView)findViewById(R.id.current_sessions_card);
+        this.currentSession = (CardView)findViewById(R.id.current_sessions_card);
         currentSession.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Open 'Current Sessions' Activity", Toast.LENGTH_SHORT).show();
                 startActiveSessionsActivity();
             }
         });
+        updateCurrentSessionCard();
 
         Serializable cache = null;
         if (savedInstanceState != null) {
@@ -117,7 +120,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onDatabaseChanged() {
                 showDatabase();
-                Toast.makeText(MainActivity.this, "restored database", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -148,6 +150,29 @@ public class MainActivity extends AppCompatActivity
     public void startAboutActivity(){
         Intent startAbout = new Intent(this, AboutActivity.class);
         startActivity(startAbout);
+    }
+
+    public void updateCurrentSessionCard() {
+        TextView countText = (TextView) currentSession.findViewById(R.id.active_session_value_text);
+        TextView countLabelText = (TextView) currentSession.findViewById(R.id.active_session_description_text);
+
+        int count = sessionManager.getSessionCount();
+        switch(count){
+            case(0): {
+                countText.setText(R.string.no);
+                countLabelText.setText(R.string.active_sessions);
+            }break;
+
+            case(1):{
+                countText.setText(R.string.one);
+                countLabelText.setText(R.string.active_session);
+            }break;
+
+            default:{
+                countText.setText(String.valueOf(count));
+                countLabelText.setText(R.string.active_sessions);
+            }break;
+        }
     }
 
     private class addJunkData extends AsyncTask<Void, Void, Void>{
@@ -205,11 +230,23 @@ public class MainActivity extends AppCompatActivity
                 long habitId = habitDatabase.getHabitIdFromIndex(categoryId, habitInd);
                 Habit habit = habitDatabase.getHabit(habitId);
 
-                habitList.add(habit);
+                if (!checkListForHabitId(habitId)) {
+                    habitList.add(habit);
+                }
             }
         }
 
         habitAdapter.notifyDataSetChanged();
+    }
+
+    public boolean checkListForHabitId(long habitId){
+        for(Habit habit : habitList){
+            if(habit.getDatabaseId() == habitId){
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -324,7 +361,6 @@ public class MainActivity extends AppCompatActivity
                 }break;
             }
         }
-
     }
 
     @Override
@@ -337,5 +373,11 @@ public class MainActivity extends AppCompatActivity
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         habitDatabase.dataCache = (DatabaseCache)savedInstanceState.getSerializable("dataCache");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateCurrentSessionCard();
     }
 }

@@ -41,41 +41,15 @@ public class SessionManager {
         String sql = "INSERT INTO "+ SESSIONS_TABLE +
                 " ("+
                 HABIT_ID +
+                ", "+ DatabaseHelper.DURATION+
                 ", "+ DatabaseHelper.STARTING_TIME+
                 ", "+ DatabaseHelper.LAST_TIME_PAUSED+
                 ", "+ DatabaseHelper.TOTAL_PAUSE_TIME+
                 ", "+ DatabaseHelper.IS_PAUSED+
                 ", "+ DatabaseHelper.NOTE+
-                ") VALUES(?, ?, ?, ?, ?, ?)";
+                ") VALUES(?, ?, ?, ?, ?, ?, ?)";
 
         return dbHelper.writableDatabase.compileStatement(sql);
-    }
-
-    public List<SessionEntry> getActiveSessionList(){
-        List<SessionEntry> sessions = new ArrayList<>();
-
-        Cursor c = dbHelper.getReadableDatabase()
-                .query(DatabaseHelper.SESSIONS_TABLE, new String[]{DatabaseHelper.HABIT_ID},
-                        null, null, null, null, null);
-
-        if (c.moveToFirst()) {
-            do {
-                long habitId = c.getLong(0);
-                SessionEntry entry = getSession(habitId);
-                sessions.add(entry);
-            } while (c.moveToNext());
-        }
-
-        c.close();
-
-        return sessions;
-    }
-
-    /**
-     * @return The current time in ms.
-     */
-    public long getCurrentTime(){
-        return System.currentTimeMillis();
     }
 
     /**
@@ -84,11 +58,12 @@ public class SessionManager {
      */
     public long startSession(long habitId){
         insertSessionStatement.bindLong(1, habitId);          // HABIT_ID
-        insertSessionStatement.bindLong(2, getCurrentTime()); // STARTING_TIME
-        insertSessionStatement.bindLong(3, 0);                // LAST_TIME_PAUSED
-        insertSessionStatement.bindLong(4, 0);                // TOTAL_PAUSE_TIME
-        insertSessionStatement.bindLong(5, 0);                // IS_PAUSED
-        insertSessionStatement.bindString(6, "");             // NOTE
+        insertSessionStatement.bindLong(2, 0);                // DURATION
+        insertSessionStatement.bindLong(3, getCurrentTime()); // STARTING_TIME
+        insertSessionStatement.bindLong(4, 0);                // LAST_TIME_PAUSED
+        insertSessionStatement.bindLong(5, 0);                // TOTAL_PAUSE_TIME
+        insertSessionStatement.bindLong(6, 0);                // IS_PAUSED
+        insertSessionStatement.bindString(7, "");             // NOTE
 
         return insertSessionStatement.executeInsert();
     }
@@ -98,8 +73,9 @@ public class SessionManager {
      * @param habitId The id of the habit for the session.
      */
     public void pauseSession(long habitId){
-        setLastPauseTime(habitId, getCurrentTime());
         setIsPaused(habitId, true);
+        setLastPauseTime(habitId, getCurrentTime());
+        setDuration(habitId, calculateDuration(habitId));
     }
 
     /**
@@ -157,6 +133,33 @@ public class SessionManager {
 
     // SETTERS AND GETTERS
 
+    public List<SessionEntry> getActiveSessionList(){
+        List<SessionEntry> sessions = new ArrayList<>();
+
+        Cursor c = dbHelper.getReadableDatabase()
+                .query(DatabaseHelper.SESSIONS_TABLE, new String[]{DatabaseHelper.HABIT_ID},
+                        null, null, null, null, null);
+
+        if (c.moveToFirst()) {
+            do {
+                long habitId = c.getLong(0);
+                SessionEntry entry = getSession(habitId);
+                sessions.add(entry);
+            } while (c.moveToNext());
+        }
+
+        c.close();
+
+        return sessions;
+    }
+
+    /**
+     * @return The current time in ms.
+     */
+    public long getCurrentTime(){
+        return System.currentTimeMillis();
+    }
+
     public int getSessionCount(){
         return dbHelper.length();
     }
@@ -167,13 +170,8 @@ public class SessionManager {
      */
     public SessionEntry getSession(long habitId){
         long startingTime = getStartingTime(habitId);
-        long duration = (getCurrentTime() - startingTime) - getTotalPauseTime(habitId);
 
-        if(getIsPaused(habitId)){
-            long lastPaused = getLastPauseTime(habitId);
-            long pausedTime = getCurrentTime() - lastPaused;
-            duration -= pausedTime;
-        }
+        long duration = getIsPaused(habitId) ? getDuration(habitId) : calculateDuration(habitId);
 
         String note = getNote(habitId);
 
@@ -182,6 +180,40 @@ public class SessionManager {
 
         newEntry.setName(habitDatabase.getHabitName(habitId));
         return newEntry;
+    }
+
+    public long calculateDuration(long habitId){
+        long startingTime = getStartingTime(habitId);
+        long duration = (getCurrentTime() - startingTime) - getTotalPauseTime(habitId);
+
+        // Makes sure the displayed time doesn't change while paused.
+        if(getIsPaused(habitId)){
+            long lastPaused = getLastPauseTime(habitId);
+            long pausedTime = getCurrentTime() - lastPaused;
+            duration -= pausedTime;
+        }
+
+        return duration;
+    }
+
+    /**
+     * @param habitId The id of the habit for the session.
+     * @param duration The duration in ms to be set for the session.
+     * @return The number of rows affected.
+     */
+    public int setDuration(long habitId, Long duration){
+        return dbHelper.setAttribute(habitId, DatabaseHelper.DURATION, duration);
+    }
+
+    /**
+     * @param habitId The id of the habit for the session.
+     * @return The duration last set on the session.
+     */
+    public long getDuration(long habitId){
+        Cursor c = dbHelper.getAttribute(habitId, DatabaseHelper.DURATION);
+        long duration = c.getLong(0);
+        c.close();
+        return duration;
     }
 
     /**

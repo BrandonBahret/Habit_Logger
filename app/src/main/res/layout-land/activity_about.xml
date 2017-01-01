@@ -40,7 +40,7 @@
                 android:textAlignment="center" />
 
             <TextView
-                android:text="'App Version'"
+                android:text="@string/value_placeholder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/versionNumber"
@@ -51,7 +51,7 @@
         </LinearLayout>
 
         <TextView
-            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et tempor mi, quis congue turpis. Donec pretium ligula ipsum turpis duis."
+            android:text="@string/description_on_about_activity"
             android:layout_height="wrap_content"
             android:id="@+id/textView"
             android:textAlignment="center"
@@ -62,7 +62,7 @@
     </LinearLayout>
 
     <TextView
-        android:text="Links"
+        android:text="@string/links"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textView4"

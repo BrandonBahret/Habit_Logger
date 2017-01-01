@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorPrimaryLight">#98e7d1</color>
     <color name="colorPrimary">#46dfb6</color>
-    <color name="colorPrimaryDark">#43d4ad</color>
+    <color name="colorPrimaryDark">#37b493</color>
     <color name="colorAccent">#4cefc3</color>
 
     <color name="habitCard">#fdfdfd</color>

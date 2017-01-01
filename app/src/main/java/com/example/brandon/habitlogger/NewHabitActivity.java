@@ -23,7 +23,7 @@ import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 public class NewHabitActivity extends AppCompatActivity {
 
     public static final int NEW_HABIT_RESULT_CODE = 100;
-    public int color = 0xffffff;
+    public int color = 0xFF9E9E9E;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -31,12 +31,12 @@ public class NewHabitActivity extends AppCompatActivity {
         setContentView(R.layout.new_habit_activity);
 
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
-// Create an ArrayAdapter using the string array and a default spinner layout
+        // Create an ArrayAdapter using the string array and a default spinner layout
         CharSequence data[] = new CharSequence[]{"Name", "Foo", "Bar"};
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, data);
-// Specify the layout to use when the list of choices appears
+        // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
+        // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
 
         ImageButton colorPicker = (ImageButton)findViewById(R.id.colorPicker);

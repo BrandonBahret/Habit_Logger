@@ -14,10 +14,11 @@
         android:id="@+id/imageView"
         android:layout_height="175dp"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/app_icon_about_content_description" />
 
     <TextView
-        android:text="Links"
+        android:text="@string/links"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textView4"
@@ -52,7 +53,8 @@
             android:background="@color/transparent"
             android:layout_weight=".5"
             android:onClick="linkButtonClicked"
-            android:tag="Github"/>
+            android:tag="Github"
+            android:contentDescription="@string/github_link_content_description" />
 
         <Space
             android:layout_width="wrap_content"
@@ -68,7 +70,8 @@
             android:layout_weight=".5"
             android:onClick="linkButtonClicked"
             android:tag="LinkedIn"
-            android:tint="#0077B5" />
+            android:tint="#0077B5"
+            android:contentDescription="@string/linkedin_link_content_description" />
 
         <Space
             android:layout_width="wrap_content"
@@ -84,7 +87,8 @@
             android:layout_weight=".5"
             android:onClick="linkButtonClicked"
             android:tag="Freelancer"
-            android:tint="#6dc0e6" />
+            android:tint="#6dc0e6"
+            android:contentDescription="@string/freelancer_link_content_description" />
 
         <Space
             android:layout_width="wrap_content"
@@ -93,7 +97,7 @@
     </LinearLayout>
 
     <TextView
-        android:text="'App Version'"
+        android:text="@string/value_placeholder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/versionNumber"
@@ -112,7 +116,7 @@
         android:layout_centerHorizontal="true" />
 
     <TextView
-        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et tempor mi, quis congue turpis. Donec pretium ligula ipsum turpis duis."
+        android:text="@string/description_on_about_activity"
         android:layout_height="wrap_content"
         android:id="@+id/textView"
         android:textAlignment="center"

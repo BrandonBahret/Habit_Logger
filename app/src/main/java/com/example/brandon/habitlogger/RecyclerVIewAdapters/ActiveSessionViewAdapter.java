@@ -25,6 +25,7 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
 
     List<SessionEntry> sessionEntries;
     HabitDatabase habitDatabase;
+    SessionManager sessionManager;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView name, time;
@@ -43,6 +44,7 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
     public ActiveSessionViewAdapter(List<SessionEntry> sessionEntries, Context context){
         this.sessionEntries = sessionEntries;
         this.habitDatabase  = new HabitDatabase(context, null, false);
+        this.sessionManager = new SessionManager(context);
     }
 
     @Override
@@ -73,7 +75,7 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
         String timeDisplay = String.format(Locale.US, "%02d:%02d:%02d", time.hours, time.minutes, time.seconds);
         holder.time.setText(timeDisplay);
 
-        if (item.getIsPaused()) {
+        if (sessionManager.getIsPaused(item.getHabitId())) {
             holder.pauseButton.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
         } else {
             holder.pauseButton.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);

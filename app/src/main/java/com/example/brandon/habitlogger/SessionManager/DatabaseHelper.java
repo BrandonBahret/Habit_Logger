@@ -13,13 +13,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 class DatabaseHelper extends SQLiteOpenHelper {
 
     protected static final String DATABASE_NAME = "habit_session_database";
-    protected static final int DATABASE_VERSION = 1;
+    protected static final int DATABASE_VERSION = 2;
 
     public SQLiteDatabase writableDatabase;
     public SQLiteDatabase readableDatabase;
 
     protected static final String SESSIONS_TABLE    = "SESSIONS_TABLE";
     protected static final String HABIT_ID          = "HABIT_ID";
+    protected static final String DURATION          = "Duration";
     protected static final String STARTING_TIME     = "STARTING_TIME";
     protected static final String LAST_TIME_PAUSED  = "LAST_TIME_PAUSED";
     protected static final String TOTAL_PAUSE_TIME  = "TOTAL_PAUSE_TIME";
@@ -29,6 +30,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_SESSIONS_TABLE =
             "CREATE TABLE " + SESSIONS_TABLE + " (" +
                     HABIT_ID         + " INTEGER UNIQUE, " +
+                    DURATION         + " INTEGER, " +
                     STARTING_TIME    + " INTEGER, " +
                     LAST_TIME_PAUSED + " INTEGER,"    +
                     TOTAL_PAUSE_TIME + " INTEGER,"    +

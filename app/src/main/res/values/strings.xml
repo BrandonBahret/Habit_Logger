@@ -32,5 +32,15 @@
     <string name="hours_place">Hours place</string>
     <string name="minutes_place">Minutes place</string>
     <string name="seconds_place">Seconds place</string>
+    <string name="no">no</string>
+    <string name="active_sessions">active sessions</string>
+    <string name="one">one</string>
+    <string name="links">Links</string>
+    <string name="app_icon_about_content_description">Image of the app icon.</string>
+    <string name="github_link_content_description">Link to the author\'s GitHub.</string>
+    <string name="linkedin_link_content_description">Link to the author\'s LinkedIn.</string>
+    <string name="freelancer_link_content_description">Link to the author\'s freelancer page.</string>
+    <string name="description_on_about_activity">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et tempor mi, quis congue turpis. Donec pretium ligula ipsum turpis duis.</string>
+    <string name="active_session">active session</string>
 
 </resources>

@@ -25,10 +25,10 @@ public class SessionActivity extends AppCompatActivity {
     public static final int RESULT_SESSION_FINISH = 300;
 
     Runnable updateTimeDisplayRunnable;
-    Handler handler;
+    Handler handler = new Handler();
 
     private SessionManager sessionManager;
-    private Habit habit;
+    Habit habit;
     private long habitId;
 
     private ImageButton playButton;
@@ -40,12 +40,11 @@ public class SessionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session);
 
-        playButton = (ImageButton)findViewById(R.id.session_pause_play);
-
-        hoursView   = (TextView) findViewById(R.id.session_hours_view);
-        minutesView = (TextView) findViewById(R.id.session_minutes_view);
-        secondsView = (TextView) findViewById(R.id.session_seconds_view);
-        noteArea = (EditText) findViewById(R.id.session_note);
+        playButton  = (ImageButton) findViewById(R.id.session_pause_play);
+        hoursView   = (TextView)    findViewById(R.id.session_hours_view);
+        minutesView = (TextView)    findViewById(R.id.session_minutes_view);
+        secondsView = (TextView)    findViewById(R.id.session_seconds_view);
+        noteArea    = (EditText)    findViewById(R.id.session_note);
 
         habit = (Habit)getIntent().getSerializableExtra("habit");
         habitId = habit.getDatabaseId();
@@ -64,6 +63,7 @@ public class SessionActivity extends AppCompatActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                handler.removeCallbacks(updateTimeDisplayRunnable);
                 sessionManager.cancelSession(habitId);
                 finish();
             }
@@ -76,6 +76,7 @@ public class SessionActivity extends AppCompatActivity {
                     sessionManager.playSession(habitId);
                     playButton.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
                 }
+
                 else{
                     sessionManager.pauseSession(habitId);
                     playButton.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
@@ -87,14 +88,10 @@ public class SessionActivity extends AppCompatActivity {
             @Override
             public void run() {
                 updateTimeDisplay();
-                handler.postDelayed(updateTimeDisplayRunnable, 1000);
+                handler.postDelayed(updateTimeDisplayRunnable, 100);
             }
         };
-
-        handler = new Handler();
     }
-
-
 
     public void updateTimeDisplay(){
         SessionEntry entry = sessionManager.getSession(habitId);
@@ -102,7 +99,7 @@ public class SessionActivity extends AppCompatActivity {
         long time = entry.getDuration();
         SessionManager.TimeDisplay display = new SessionManager.TimeDisplay(time);
 
-        hoursView.setText(String.format(Locale.US, "%02d",   display.hours));
+        hoursView.setText  (String.format(Locale.US, "%02d", display.hours));
         minutesView.setText(String.format(Locale.US, "%02d", display.minutes));
         secondsView.setText(String.format(Locale.US, "%02d", display.seconds));
     }
@@ -126,6 +123,7 @@ public class SessionActivity extends AppCompatActivity {
 
         switch (id) {
             case (R.id.finish_session_button): {
+                handler.removeCallbacks(updateTimeDisplayRunnable);
                 SessionEntry entry = sessionManager.finishSession(habitId);
 
                 String note = noteArea.getText().toString();
@@ -141,28 +139,25 @@ public class SessionActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
+    public void prepareTimerDisplay(){
         if(sessionManager.getIsPaused(habitId)){
             playButton.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
         }
         updateTimeDisplay();
         reloadNote();
+        handler.post(updateTimeDisplayRunnable);
+    }
 
-        handler.postDelayed(updateTimeDisplayRunnable, 1000);
+    @Override
+    protected void onStart() {
+        super.onStart();
+        prepareTimerDisplay();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        if(sessionManager.getIsPaused(habitId)){
-            playButton.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
-        }
-        updateTimeDisplay();
-        reloadNote();
+        prepareTimerDisplay();
     }
 
     @Override
