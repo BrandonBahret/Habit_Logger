@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="Main Screen Settings">
+
+        <ListPreference
+            android:key="@string/preference_display_categories"
+            android:title="Categories"
+            android:summary="Set how the app displays habit categories."
+            android:defaultValue="Cards"
+            android:entries="@array/category_options"
+            android:entryValues="@array/category_options"
+            android:dialogTitle="Display categories as..." />
+
+        <SwitchPreference
+            android:key="@string/preference_display_current_sessions_card"
+            android:title="Current Sessions"
+            android:summary="Display the 'Current Sessions' card."
+            android:defaultValue="true"/>
+
+        <CheckBoxPreference
+            android:key="@string/preference_display_current_sessions_at_zero"
+            android:title="Display Always"
+            android:dependency="display_current_sessions_card"
+            android:summary="Display the 'Current Sessions' card even when zero sessions are active." />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Appearance">
+
+        <ListPreference
+            android:key="@string/preference_theme"
+            android:title="Theme"
+            android:summary="change the theme of the app"
+            android:defaultValue="Light"
+            android:entries="@array/theme_options"
+            android:entryValues="@array/theme_options"
+            android:dialogTitle="Select a theme" />
+
+        <ListPreference
+            android:key="@string/preference_date_format"
+            android:title="Date Format"
+            android:summary="Set the format used to display dates."
+            android:entries="@array/date_format_options"
+            android:entryValues="@array/date_format_options"
+            android:dialogTitle="Select a format"
+            android:defaultValue="DD-MM-YYYY"/>
+
+    </PreferenceCategory>
+
+
+
+</PreferenceScreen>

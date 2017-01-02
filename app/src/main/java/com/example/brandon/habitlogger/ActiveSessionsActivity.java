@@ -3,10 +3,12 @@ package com.example.brandon.habitlogger;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
@@ -34,6 +36,10 @@ public class ActiveSessionsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_sessions);
+
+        ActionBar toolbar = getSupportActionBar();
+        if(toolbar != null)
+            toolbar.setDisplayHomeAsUpEnabled(true);
 
         sessionManager = new SessionManager(this);
         habitDatabase  = new HabitDatabase(this, null, false);
@@ -83,6 +89,17 @@ public class ActiveSessionsActivity extends AppCompatActivity {
             }
         };
         handler.post(updateCards);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            finish();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void startSession(long habitId){

@@ -22,8 +22,8 @@
     <string name="card_view_accent_description">A color accent indicating the category type.</string>
     <string name="session_note_hint">Note</string>
     <string name="session_pause_play_content_description">Session pause, or play toggle button.</string>
-    <string name="export_database">Export Database</string>
-    <string name="restore_database">Restore Database</string>
+    <string name="export_database">Backup</string>
+    <string name="restore_database">Restore</string>
     <string name="settings">Settings</string>
     <string name="about">About</string>
     <string name="current_sessions">Current Sessions</string>
@@ -34,7 +34,7 @@
     <string name="seconds_place">Seconds place</string>
     <string name="no">no</string>
     <string name="active_sessions">active sessions</string>
-    <string name="one">one</string>
+    <string name="one">1</string>
     <string name="links">Links</string>
     <string name="app_icon_about_content_description">Image of the app icon.</string>
     <string name="github_link_content_description">Link to the author\'s GitHub.</string>
@@ -42,5 +42,11 @@
     <string name="freelancer_link_content_description">Link to the author\'s freelancer page.</string>
     <string name="description_on_about_activity">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et tempor mi, quis congue turpis. Donec pretium ligula ipsum turpis duis.</string>
     <string name="active_session">active session</string>
+    <string name="preference_checkbox_preference">checkbox_preference</string>
+    <string name="preference_display_current_sessions_card">display_current_sessions_card</string>
+    <string name="preference_display_current_sessions_at_zero">display_current_sessions_at_zero</string>
+    <string name="preference_theme">theme</string>
+    <string name="preference_date_format">date_format</string>
+    <string name="preference_display_categories">category_preference</string>
 
 </resources>

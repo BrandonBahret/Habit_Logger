@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="category_options">
+        <item>Cards</item>
+        <item>Sections</item>
+        <item>None</item>
+    </string-array>
+
+    <string-array name="theme_options">
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+
+    <string-array name="date_format_options">
+        <item>DD-MM-YYYY</item>
+        <item>MM-DD-YYYY</item>
+        <item>MM-YYYY</item>
+    </string-array>
+
+</resources>

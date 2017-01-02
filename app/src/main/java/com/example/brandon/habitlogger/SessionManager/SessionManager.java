@@ -127,7 +127,9 @@ public class SessionManager {
      */
     public boolean isSessionActive(long habitId){
         Cursor c = dbHelper.getAttribute(habitId, HABIT_ID);
-        return c.getCount() != 0;
+        boolean result = c.getCount() != 0;
+        c.close();
+        return result;
     }
 
 

@@ -6,7 +6,9 @@
 
     android:id="@+id/card_view"
     card_view:cardCornerRadius="4dp"
-    card_view:cardBackgroundColor="@color/habitCard">
+    card_view:cardBackgroundColor="@color/habitCard"
+    card_view:layout_collapseParallaxMultiplier="1.0"
+    card_view:cardElevation="3dp">
 
     <LinearLayout
         android:layout_width="wrap_content"

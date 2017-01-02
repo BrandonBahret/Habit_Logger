@@ -2,8 +2,10 @@ package com.example.brandon.habitlogger;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -43,6 +45,9 @@ import static com.example.brandon.habitlogger.R.menu.main;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    // Preferences
+    boolean showCurrentSessions, showCurrentSessionsAlways;
+
     SessionManager sessionManager;
     CardView currentSession;
 
@@ -79,11 +84,34 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        Serializable cache = null;
+        if (savedInstanceState != null) {
+            cache = savedInstanceState.getSerializable("dataCache");
+        }
+
+        habitDatabase  = new HabitDatabase(MainActivity.this, cache, true);
         sessionManager = new SessionManager(this);
+        exportManager  = new LocalDataExportManager(MainActivity.this);
+        googleDrive    = new GoogleDriveDataExportManager(MainActivity.this);
+        googleDrive.connect();
 
-        habitCardContainer = (RecyclerView)findViewById(R.id.habit_recycler_view);
+        habitDatabase.setOnDatabaseChangeListener(new HabitDatabase.OnDatabaseChange() {
+            @Override
+            public void onDatabaseChanged() {
+                showDatabase();
+            }
+
+            @Override
+            public void onDatabaseClear() {
+                habitList.clear();
+                habitAdapter.notifyDataSetChanged();
+            }
+        });
+
+        currentSession      = (CardView)findViewById(R.id.current_sessions_card);
+        habitCardContainer  = (RecyclerView)findViewById(R.id.habit_recycler_view);
+
         habitAdapter = new HabitViewAdapter(habitList);
-
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         habitCardContainer.setLayoutManager(layoutManager);
         habitCardContainer.setItemAnimator(new DefaultItemAnimator());
@@ -101,39 +129,22 @@ public class MainActivity extends AppCompatActivity
             }
         }));
 
-        this.currentSession = (CardView)findViewById(R.id.current_sessions_card);
         currentSession.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActiveSessionsActivity();
             }
         });
+
+        updatePreferences();
         updateCurrentSessionCard();
-
-        Serializable cache = null;
-        if (savedInstanceState != null) {
-            cache = savedInstanceState.getSerializable("dataCache");
-        }
-
-        habitDatabase = new HabitDatabase(MainActivity.this, cache, true);
-        habitDatabase.setOnDatabaseChangeListener(new HabitDatabase.OnDatabaseChange() {
-            @Override
-            public void onDatabaseChanged() {
-                showDatabase();
-            }
-
-            @Override
-            public void onDatabaseClear() {
-                habitList.clear();
-                habitAdapter.notifyDataSetChanged();
-            }
-        });
-
-        exportManager = new LocalDataExportManager(MainActivity.this);
-        googleDrive = new GoogleDriveDataExportManager(MainActivity.this);
-        googleDrive.connect();
-
         showDatabase();
+    }
+
+    private void updatePreferences() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        this.showCurrentSessions = preferences.getBoolean(getString(R.string.preference_display_current_sessions_card), true);
+        this.showCurrentSessionsAlways = preferences.getBoolean(getString(R.string.preference_display_current_sessions_at_zero), true);
     }
 
     public void startSession(Habit habit){
@@ -152,15 +163,33 @@ public class MainActivity extends AppCompatActivity
         startActivity(startAbout);
     }
 
+    public void startSettingsActivity(){
+        Intent startSettings = new Intent(this, SettingsActivity.class);
+        startActivity(startSettings);
+    }
+
     public void updateCurrentSessionCard() {
         TextView countText = (TextView) currentSession.findViewById(R.id.active_session_value_text);
         TextView countLabelText = (TextView) currentSession.findViewById(R.id.active_session_description_text);
 
         int count = sessionManager.getSessionCount();
+
+        if((count != 0 || showCurrentSessionsAlways) && showCurrentSessions
+                && (currentSession.getVisibility() == View.GONE)) {
+            currentSession.setVisibility(View.VISIBLE);
+        } else if (!showCurrentSessions) {
+            currentSession.setVisibility(View.GONE);
+        }
+
         switch(count){
             case(0): {
                 countText.setText(R.string.no);
                 countLabelText.setText(R.string.active_sessions);
+
+                if(!showCurrentSessionsAlways){
+                    currentSession.setVisibility(View.GONE);
+                }
+
             }break;
 
             case(1):{
@@ -280,7 +309,7 @@ public class MainActivity extends AppCompatActivity
             }break;
 
             case (R.id.menu_settings):{
-
+                startSettingsActivity();
             }break;
 
             case (R.id.menu_about):{
@@ -311,7 +340,7 @@ public class MainActivity extends AppCompatActivity
             }break;
 
             case(R.id.settings_nav):{
-                Toast.makeText(this, "settings", Toast.LENGTH_SHORT).show();
+                startSettingsActivity();
             }break;
 
             case(R.id.about_nav):{
@@ -378,6 +407,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        updatePreferences();
         updateCurrentSessionCard();
     }
 }

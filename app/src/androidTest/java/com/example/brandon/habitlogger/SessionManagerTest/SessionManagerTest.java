@@ -68,9 +68,9 @@ public class SessionManagerTest extends AndroidTestCase {
 
     public void testFinishSession(){
         mng.startSession(habitId);
-        SystemClock.sleep(100);
+        SystemClock.sleep(2000);
         SessionEntry entry = mng.finishSession(habitId);
 
-        assertTrue(entry.getDuration() >= 100);
+        assertTrue(entry.getDuration() >= 2);
     }
 }
