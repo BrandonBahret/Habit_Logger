@@ -6,7 +6,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/cardview_light_background">
+        android:background="@color/cardview_light_background"
+        android:clickable="false"
+        android:focusable="false">
 
         <ImageView
             android:layout_width="8dp"

@@ -1,6 +1,7 @@
 package com.example.brandon.habitlogger.RecyclerVIewAdapters;
 
 import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,10 +28,20 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
     HabitDatabase habitDatabase;
     SessionManager sessionManager;
 
+    OnClickListeners listener;
+    public interface OnClickListeners {
+        void onRootClick(long habitId);
+
+        void onPauseClick(ViewHolder holder, long habitId);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView name, time;
         public ImageView accent;
         public ImageButton pauseButton;
+        public CardView rootView;
+
+        public long habitId;
 
         public ViewHolder(View view) {
             super(view);
@@ -38,13 +49,16 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
             this.time = (TextView) view.findViewById(R.id.active_habit_time);
             this.pauseButton = (ImageButton) view.findViewById(R.id.session_pause_play);
             this.accent = (ImageView) view.findViewById(R.id.card_accent);
+            this.rootView = (CardView)view.getRootView();
         }
     }
 
-    public ActiveSessionViewAdapter(List<SessionEntry> sessionEntries, Context context){
+    public ActiveSessionViewAdapter(List<SessionEntry> sessionEntries, Context context, OnClickListeners listener){
         this.sessionEntries = sessionEntries;
         this.habitDatabase  = new HabitDatabase(context, null, false);
         this.sessionManager = new SessionManager(context);
+
+        this.listener = listener;
     }
 
     @Override
@@ -66,23 +80,43 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        SessionEntry item = sessionEntries.get(position);
+    public void onBindViewHolder(final ViewHolder holder, int position) {
+        final SessionEntry item = sessionEntries.get(position);
+        long habitId = item.getHabitId();
 
-        holder.name.setText(item.getName());
+        if (sessionManager.isSessionActive(habitId)) {
+            holder.habitId = habitId;
 
-        SessionManager.TimeDisplay time = new SessionManager.TimeDisplay(item.getDuration());
-        String timeDisplay = String.format(Locale.US, "%02d:%02d:%02d", time.hours, time.minutes, time.seconds);
-        holder.time.setText(timeDisplay);
+            holder.name.setText(item.getName());
 
-        if (sessionManager.getIsPaused(item.getHabitId())) {
-            holder.pauseButton.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
-        } else {
-            holder.pauseButton.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
+            SessionManager.TimeDisplay time = new SessionManager.TimeDisplay(item.getDuration());
+            String timeDisplay = String.format(Locale.US, "%02d:%02d:%02d", time.hours, time.minutes, time.seconds);
+            holder.time.setText(timeDisplay);
+
+            if (sessionManager.getIsPaused(habitId)) {
+                holder.pauseButton.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
+            } else {
+                holder.pauseButton.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
+            }
+
+            holder.accent.setColorFilter(habitDatabase.getHabitColor(habitId));
+
+            holder.rootView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.onRootClick(holder.habitId);
+                }
+            });
+
+            holder.pauseButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.onPauseClick(holder, holder.habitId);
+                }
+            });
         }
-
-        holder.accent.setColorFilter(habitDatabase.getHabitColor(item.getHabitId()));
     }
+
 
     @Override
     public int getItemCount() {

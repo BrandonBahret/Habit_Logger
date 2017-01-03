@@ -9,6 +9,7 @@ import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static com.example.brandon.habitlogger.SessionManager.DatabaseHelper.HABIT_ID;
 import static com.example.brandon.habitlogger.SessionManager.DatabaseHelper.SESSIONS_TABLE;
@@ -216,6 +217,13 @@ public class SessionManager {
         long duration = c.getLong(0);
         c.close();
         return duration;
+    }
+
+    public String getDurationAsString(long habitId) {
+        long duration = getDuration(habitId) / 1000;
+
+        SessionManager.TimeDisplay time = new SessionManager.TimeDisplay(duration);
+        return String.format(Locale.US, "%02d:%02d:%02d", time.hours, time.minutes, time.seconds);
     }
 
     /**
