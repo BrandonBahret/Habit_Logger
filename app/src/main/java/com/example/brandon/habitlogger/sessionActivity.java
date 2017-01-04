@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +31,7 @@ public class SessionActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     Habit habit;
     private long habitId;
+    private int position = RecyclerView.NO_POSITION;
 
     private ImageButton playButton;
     private TextView hoursView, minutesView, secondsView;
@@ -46,8 +48,12 @@ public class SessionActivity extends AppCompatActivity {
         secondsView = (TextView)    findViewById(R.id.session_seconds_view);
         noteArea    = (EditText)    findViewById(R.id.session_note);
 
-        habit = (Habit)getIntent().getSerializableExtra("habit");
+        Intent data = getIntent();
+        habit = (Habit)data.getSerializableExtra("habit");
         habitId = habit.getDatabaseId();
+
+        if(data.hasExtra("position"))
+            position = data.getIntExtra("position", RecyclerView.NO_POSITION);
 
         sessionManager = new SessionManager(this);
         if(!sessionManager.isSessionActive(habitId)){
@@ -65,6 +71,11 @@ public class SessionActivity extends AppCompatActivity {
             public void onClick(View view) {
                 handler.removeCallbacks(updateTimeDisplayRunnable);
                 sessionManager.cancelSession(habitId);
+
+
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("position", position);
+                setResult(Activity.RESULT_OK, resultIntent);
                 finish();
             }
         });

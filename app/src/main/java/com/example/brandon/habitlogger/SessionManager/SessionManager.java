@@ -3,7 +3,9 @@ package com.example.brandon.habitlogger.SessionManager;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
+import android.support.annotation.Nullable;
 
+import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 
@@ -39,16 +41,18 @@ public class SessionManager {
      * Get a sqlite statement for creating new sessions.
      */
     public SQLiteStatement getInsertSessionStatement(){
-        String sql = "INSERT INTO "+ SESSIONS_TABLE +
+        String sql = "INSERT INTO "+ DatabaseHelper.SESSIONS_TABLE +
                 " ("+
                 HABIT_ID +
+                ", "+ DatabaseHelper.HABIT_NAME+
+                ", "+ DatabaseHelper.HABIT_CATEGORY+
                 ", "+ DatabaseHelper.DURATION+
                 ", "+ DatabaseHelper.STARTING_TIME+
                 ", "+ DatabaseHelper.LAST_TIME_PAUSED+
                 ", "+ DatabaseHelper.TOTAL_PAUSE_TIME+
                 ", "+ DatabaseHelper.IS_PAUSED+
                 ", "+ DatabaseHelper.NOTE+
-                ") VALUES(?, ?, ?, ?, ?, ?, ?)";
+                ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         return dbHelper.writableDatabase.compileStatement(sql);
     }
@@ -58,15 +62,50 @@ public class SessionManager {
      * @return the row ID of the last row inserted, if this insert is successful. -1 otherwise.
      */
     public long startSession(long habitId){
+        String habitName = habitDatabase.getHabitName(habitId);
+        String habitCategoryName = "none";
+        HabitCategory category = habitDatabase.getCategory(habitId);
+
+        if(category != null){
+            habitCategoryName = category.getName();
+        }
+
         insertSessionStatement.bindLong(1, habitId);          // HABIT_ID
-        insertSessionStatement.bindLong(2, 0);                // DURATION
-        insertSessionStatement.bindLong(3, getCurrentTime()); // STARTING_TIME
-        insertSessionStatement.bindLong(4, 0);                // LAST_TIME_PAUSED
-        insertSessionStatement.bindLong(5, 0);                // TOTAL_PAUSE_TIME
-        insertSessionStatement.bindLong(6, 0);                // IS_PAUSED
-        insertSessionStatement.bindString(7, "");             // NOTE
+        insertSessionStatement.bindString(2, habitName);         // HABIT_NAME
+        insertSessionStatement.bindString(3, habitCategoryName); // HABIT_CATEGORY
+        insertSessionStatement.bindLong(4, 0);                // DURATION
+        insertSessionStatement.bindLong(5, getCurrentTime()); // STARTING_TIME
+        insertSessionStatement.bindLong(6, 0);                // LAST_TIME_PAUSED
+        insertSessionStatement.bindLong(7, 0);                // TOTAL_PAUSE_TIME
+        insertSessionStatement.bindLong(8, 0);                // IS_PAUSED
+        insertSessionStatement.bindString(9, "");             // NOTE
 
         return insertSessionStatement.executeInsert();
+    }
+
+    /**
+     * @param SQL The SQL string to be executed
+     * @param idColumnString The string id for the column that holds row ids.
+     * @return An array of row ids found by the sqlite query.
+     */
+    @Nullable
+    private long[] searchTableForIdsByName(String SQL, String idColumnString){
+
+        Cursor c = dbHelper.readableDatabase.rawQuery(SQL, null);
+
+        if(c != null) {
+            long ids[] = new long[c.getCount()];
+
+            while (c.moveToNext()) {
+                int idInd = c.getColumnIndex(idColumnString);
+                ids[c.getPosition()] = c.getLong(idInd);
+            }
+
+            c.close();
+            return ids;
+        }
+
+        return null;
     }
 
     /**
@@ -142,6 +181,32 @@ public class SessionManager {
         Cursor c = dbHelper.getReadableDatabase()
                 .query(DatabaseHelper.SESSIONS_TABLE, new String[]{DatabaseHelper.HABIT_ID},
                         null, null, null, null, null);
+
+        if (c.moveToFirst()) {
+            do {
+                long habitId = c.getLong(0);
+                SessionEntry entry = getSession(habitId);
+                sessions.add(entry);
+            } while (c.moveToNext());
+        }
+
+        c.close();
+
+        return sessions;
+    }
+
+    public List<SessionEntry> queryActiveSessionList(String query){
+
+        if(query.length() == 0){
+            return null;
+        }
+
+        List<SessionEntry> sessions = new ArrayList<>();
+
+        Cursor c = dbHelper.readableDatabase.rawQuery("SELECT "+DatabaseHelper.HABIT_ID+" FROM " +
+                DatabaseHelper.SESSIONS_TABLE + " WHERE " +
+                DatabaseHelper.HABIT_NAME + " LIKE  '%" + query + "%' OR " +
+                DatabaseHelper.HABIT_CATEGORY + " LIKE  '%" + query + "%'", null);
 
         if (c.moveToFirst()) {
             do {

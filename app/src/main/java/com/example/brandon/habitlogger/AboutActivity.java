@@ -10,7 +10,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class AboutActivity extends AppCompatActivity {
 
@@ -58,14 +57,23 @@ public class AboutActivity extends AppCompatActivity {
     }
 
     private void openLink(String url) {
-//        Toast.makeText(this, "Open " + url, Toast.LENGTH_SHORT).show();
-
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(browserIntent);
     }
 
     private void share() {
-        Toast.makeText(this, "Share the app", Toast.LENGTH_SHORT).show();
+        try {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Habit Logger");
+            String message = "\nCheck out this app, it helps you monitor how you spend time!\n\n" +
+                    "<A Link to the application on the play store> \n\n";
+            shareIntent.putExtra(Intent.EXTRA_TEXT, message);
+
+            startActivity(Intent.createChooser(shareIntent, "Share with..."));
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -80,7 +88,7 @@ public class AboutActivity extends AppCompatActivity {
 
         switch(id){
             case(R.id.share):{
-                Toast.makeText(this, "Share", Toast.LENGTH_SHORT).show();
+                share();
             }break;
 
             case(android.R.id.home):{

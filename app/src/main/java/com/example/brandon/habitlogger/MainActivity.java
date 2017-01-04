@@ -17,6 +17,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,6 +40,7 @@ import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static com.example.brandon.habitlogger.R.menu.main;
 
@@ -154,8 +156,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startActiveSessionsActivity() {
-        Intent startTargetActivity = new Intent(this, ActiveSessionsActivity.class);
-        startActivity(startTargetActivity);
+        int count = sessionManager.getSessionCount();
+        if (count != 0) {
+            Intent startTargetActivity = new Intent(this, ActiveSessionsActivity.class);
+            startActivity(startTargetActivity);
+        } else {
+            Toast.makeText(this, R.string.cannot_open_active_sessions_activity, Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void startAboutActivity(){
@@ -173,6 +180,7 @@ public class MainActivity extends AppCompatActivity
         TextView countLabelText = (TextView) currentSession.findViewById(R.id.active_session_description_text);
 
         int count = sessionManager.getSessionCount();
+        currentSession.setAlpha(count == 0? 0.5f : 1.0f);
 
         if((count != 0 || showCurrentSessionsAlways) && showCurrentSessions
                 && (currentSession.getVisibility() == View.GONE)) {
@@ -292,7 +300,40 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(main, menu);
+
+        SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
+        searchView.setOnQueryTextListener(
+                new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        processUserQuery(query);
+
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String query) {
+                        processUserQuery(query);
+
+                        return false;
+                    }
+                }
+        );
+
         return true;
+    }
+
+    public void processUserQuery(String query){
+        Set<Long> ids = habitDatabase.queryDatabaseByTheUser(query);
+
+        habitList.clear();
+
+        for (long id : ids) {
+            Habit habit = habitDatabase.getHabit(id);
+            habitList.add(habit);
+        }
+
+        habitAdapter.notifyDataSetChanged();
     }
 
     @Override

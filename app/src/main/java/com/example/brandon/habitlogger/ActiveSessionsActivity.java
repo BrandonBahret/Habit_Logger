@@ -9,14 +9,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.ActiveSessionViewAdapter;
+import com.example.brandon.habitlogger.RecyclerVIewAdapters.ActiveSessionViewAdapterWithSections;
 import com.example.brandon.habitlogger.SessionManager.SessionManager;
 
 import java.util.List;
@@ -28,7 +32,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
     SessionManager sessionManager;
     HabitDatabase habitDatabase;
 
-    ActiveSessionViewAdapter sessionViewAdapter;
+    ActiveSessionViewAdapterWithSections sessionViewAdapter;
     RecyclerView sessionViewContainer;
 
     Runnable updateCards;
@@ -48,15 +52,14 @@ public class ActiveSessionsActivity extends AppCompatActivity {
         sessionEntries = sessionManager.getActiveSessionList();
 
         sessionViewContainer = (RecyclerView) findViewById(R.id.session_view_container);
-        sessionViewAdapter = new ActiveSessionViewAdapter(sessionEntries, this,
-                new ActiveSessionViewAdapter.OnClickListeners() {
+        sessionViewAdapter = new ActiveSessionViewAdapterWithSections(sessionEntries, this, new ActiveSessionViewAdapterWithSections.OnClickListeners() {
             @Override
             public void onRootClick(long habitId) {
                 startSession(habitId);
             }
 
             @Override
-            public void onPauseClick(ActiveSessionViewAdapter.ViewHolder holder, long habitId) {
+            public void onPauseClick(ActiveSessionViewAdapterWithSections.ViewHolder holder, long habitId) {
                 boolean isPaused = sessionManager.getIsPaused(habitId);
 
                 if(isPaused){
@@ -96,6 +99,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
                         sessionEntries.set(i, entry);
 
                         View item = sessionViewContainer.getChildAt(i);
+
                         if(item != null) {
                             TextView timeTextView = (TextView) item.findViewById(R.id.active_habit_time);
 
@@ -107,10 +111,39 @@ public class ActiveSessionsActivity extends AppCompatActivity {
                     }
                 }
 
+                if(sessionManager.getSessionCount() == 0)
+                    finish();
+
                 handler.postDelayed(updateCards, 1000);
             }
         };
         handler.post(updateCards);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.active_sessions_menu, menu);
+
+        SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
+        searchView.setOnQueryTextListener(
+                new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        processUserQuery(query);
+
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String query) {
+                        processUserQuery(query);
+
+                        return false;
+                    }
+                }
+        );
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -137,6 +170,31 @@ public class ActiveSessionsActivity extends AppCompatActivity {
                 sessionViewAdapter.notifyDataSetChanged();
             }
         }
+    }
+
+    public void processUserQuery(String query) {
+        List<SessionEntry> entries = sessionManager.queryActiveSessionList(query);
+
+        if(entries == null){
+            entries = sessionManager.getActiveSessionList();
+        }
+
+        sessionEntries.clear();
+        for (SessionEntry entry : entries) {
+            sessionEntries.add(entry);
+        }
+        sessionViewAdapter.notifyDataSetChanged();
+    }
+
+    public TextView getCategoricalSectioningView(String categoryName){
+
+        TextView categorySection = new TextView(ActiveSessionsActivity.this);
+        categorySection.setBackgroundResource(R.drawable.underline_background);
+        categorySection.setText(categoryName);
+        ActiveSessionViewAdapter.setMargins(categorySection, 0, 15, 0, 10);
+        categorySection.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
+
+        return categorySection;
     }
 
     public void startSession(long habitId){

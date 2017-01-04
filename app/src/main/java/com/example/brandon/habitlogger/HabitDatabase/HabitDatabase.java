@@ -12,7 +12,9 @@ import android.support.annotation.Nullable;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.CATEGORY_ID;
 
@@ -193,7 +195,7 @@ public class HabitDatabase {
         for(int categoryIndex = 0; categoryIndex < getNumberOfCategories(); categoryIndex++){
             long categoryId = getCategoryIdFromIndex(categoryIndex);
 
-            long ids[] = getHabitIds(categoryId);
+            Set<Long> ids = getHabitIds(categoryId);
             for(long id : ids){
                 String name = getHabitName(id);
                 databaseString.append(name);
@@ -286,16 +288,16 @@ public class HabitDatabase {
      * @return An array of row ids found by the sqlite query.
      */
     @Nullable
-    private long[] searchTableForIdsByName(String SQL, String idColumnString){
+    private Set<Long> searchTableForIdsByName(String SQL, String idColumnString){
 
         Cursor c = readableDatabase.rawQuery(SQL, null);
 
         if(c != null) {
-            long ids[] = new long[c.getCount()];
+            Set<Long> ids = new HashSet<>(c.getCount());
 
             while (c.moveToNext()) {
                 int idInd = c.getColumnIndex(idColumnString);
-                ids[c.getPosition()] = c.getLong(idInd);
+                ids.add(c.getLong(idInd));
             }
 
             c.close();
@@ -416,7 +418,7 @@ public class HabitDatabase {
      * @param name The name of the category to look up.
      * @return The found category ids as an array.
      */
-    public long[] searchCategoryIdsByName(String name){
+    public Set<Long> searchCategoryIdsByName(String name){
         return searchTableForIdsByName(
                 "SELECT "+ CATEGORY_ID+" FROM " +
                         DatabaseHelper.CATEGORIES_TABLE_NAME + " WHERE " +
@@ -592,7 +594,7 @@ public class HabitDatabase {
      * @return An array of entry ids found by the search, null if results were empty.
      */
     @Nullable
-    public long[] searchEntryIdsByComment(long habitId, String query){
+    public Set<Long> searchEntryIdsByComment(long habitId, String query){
         return searchTableForIdsByName(
                 "SELECT "+DatabaseHelper.ENTRY_ID+" FROM " +
                 DatabaseHelper.ENTRIES_TABLE_NAME + " WHERE " +
@@ -610,7 +612,7 @@ public class HabitDatabase {
      * @return An array of entry ids found by the search, null if results were empty.
      */
     @Nullable
-    public long[] searchEntriesWithTimeRangeForAHabit(long habitId, long beginTime, long endTime){
+    public Set<Long> searchEntriesWithTimeRangeForAHabit(long habitId, long beginTime, long endTime){
         // SELECT ENTRY_ID FROM ENTRIES_TABLE WHERE HABIT_ID=habitId
         // AND START_TIME >= BEGIN AND START_TIME <= END
         String SQL = "SELECT " + DatabaseHelper.ENTRY_ID +
@@ -627,7 +629,7 @@ public class HabitDatabase {
      * @param endTime The ending time for the query.
      * @return An array of entry ids found by the search, null if results were empty.
      */
-    public long[] searchAllEntriesWithTimeRange(long beginTime, long endTime){
+    public Set<Long> searchAllEntriesWithTimeRange(long beginTime, long endTime){
         // SELECT ENTRY_ID FROM ENTRIES_TABLE WHERE START_TIME >= BEGIN AND START_TIME <= END
         String SQL = "SELECT " + DatabaseHelper.ENTRY_ID +
                 " FROM " + DatabaseHelper.ENTRIES_TABLE_NAME + " WHERE " +
@@ -915,16 +917,29 @@ public class HabitDatabase {
 
     /**
      * @param name The name of the habit to look up.
-     * @param categoryId The category id of the habits to search.
      * @return The found habit ids.
      */
-    public long[] searchHabitIdsByName(String name, long categoryId){
+    public Set<Long> searchHabitIdsByName(String name){
         return searchTableForIdsByName("SELECT "+DatabaseHelper.HABIT_ID+" FROM " +
-                DatabaseHelper.HABITS_TABLE_NAME + " WHERE " +
-                DatabaseHelper.HABIT_NAME + " LIKE  '%" + name + "%' AND " +
-                DatabaseHelper.HABIT_CATEGORY + "=" +String.valueOf(categoryId),
+                        DatabaseHelper.HABITS_TABLE_NAME + " WHERE " +
+                        DatabaseHelper.HABIT_NAME + " LIKE  '%" + name + "%'",
 
                 DatabaseHelper.HABIT_ID);
+    }
+
+    /**
+     * @param query The name of the habit to look up.
+     * @return The found habit ids.
+     */
+    public Set<Long> queryDatabaseByTheUser(String query){
+        Set<Long> habitIds = searchHabitIdsByName(query);
+        Set<Long> categoryIds = searchCategoryIdsByName(query);
+
+        Set<Long> ids = new HashSet<>(habitIds.size() + categoryIds.size());
+        ids.addAll(habitIds);
+        ids.addAll(categoryIds);
+
+        return ids;
     }
 
     public String getHabitName(long id){
@@ -1021,7 +1036,7 @@ public class HabitDatabase {
         return color;
     }
 
-    public long[] getHabitIds(long categoryId){
+    public Set<Long> getHabitIds(long categoryId){
         return searchTableForIdsByName("SELECT "+DatabaseHelper.HABIT_ID+" FROM "+
                         DatabaseHelper.HABITS_TABLE_NAME+" WHERE " +
                         DatabaseHelper.HABIT_CATEGORY +" = "+String.valueOf(categoryId),

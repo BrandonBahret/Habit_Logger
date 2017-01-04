@@ -22,7 +22,7 @@ import java.util.Locale;
  * Created by Brandon on 12/26/2016.
  */
 
-public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSessionViewAdapter.ViewHolder> {
+public class ActiveSessionViewAdapterWithSections extends RecyclerView.Adapter<ActiveSessionViewAdapterWithSections.ViewHolder> {
 
     List<SessionEntry> sessionEntries;
     HabitDatabase habitDatabase;
@@ -55,7 +55,7 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
         }
     }
 
-    public ActiveSessionViewAdapter(List<SessionEntry> sessionEntries, Context context, OnClickListeners listener){
+    public ActiveSessionViewAdapterWithSections(List<SessionEntry> sessionEntries, Context context, OnClickListeners listener){
         this.sessionEntries = sessionEntries;
         this.habitDatabase  = new HabitDatabase(context, null, false);
         this.sessionManager = new SessionManager(context);

@@ -40,7 +40,8 @@
     <string name="github_link_content_description">Link to the author\'s GitHub.</string>
     <string name="linkedin_link_content_description">Link to the author\'s LinkedIn.</string>
     <string name="freelancer_link_content_description">Link to the author\'s freelancer page.</string>
-    <string name="description_on_about_activity">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et tempor mi, quis congue turpis. Donec pretium ligula ipsum turpis duis.</string>
+    <string name="description_on_about_activity">Habit Logger is an application for people to monitor themselves, specifically when and how long they perform their activities.</string>
+
     <string name="active_session">active session</string>
     <string name="preference_checkbox_preference">checkbox_preference</string>
     <string name="preference_display_current_sessions_card">display_current_sessions_card</string>
@@ -48,5 +49,7 @@
     <string name="preference_theme">theme</string>
     <string name="preference_date_format">date_format</string>
     <string name="preference_display_categories">category_preference</string>
+    <string name="search">Search...</string>
+    <string name="cannot_open_active_sessions_activity">No active sessions</string>
 
 </resources>
