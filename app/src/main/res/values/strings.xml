@@ -51,5 +51,8 @@
     <string name="preference_display_categories">category_preference</string>
     <string name="search">Search...</string>
     <string name="cannot_open_active_sessions_activity">No active sessions</string>
+    <string name="habit_name">Habit Name</string>
+    <string name="habit_description">Habit Description</string>
+    <string name="habit_category">Habit Category</string>
 
 </resources>

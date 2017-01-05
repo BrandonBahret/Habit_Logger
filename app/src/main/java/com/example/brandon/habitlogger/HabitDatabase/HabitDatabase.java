@@ -288,9 +288,9 @@ public class HabitDatabase {
      * @return An array of row ids found by the sqlite query.
      */
     @Nullable
-    private Set<Long> searchTableForIdsByName(String SQL, String idColumnString){
+    private Set<Long> searchTableForIdsByName(String SQL, String[] values, String idColumnString){
 
-        Cursor c = readableDatabase.rawQuery(SQL, null);
+        Cursor c = readableDatabase.rawQuery(SQL, values);
 
         if(c != null) {
             Set<Long> ids = new HashSet<>(c.getCount());
@@ -412,20 +412,6 @@ public class HabitDatabase {
         }
 
         return rowId;
-    }
-
-    /**
-     * @param name The name of the category to look up.
-     * @return The found category ids as an array.
-     */
-    public Set<Long> searchCategoryIdsByName(String name){
-        return searchTableForIdsByName(
-                "SELECT "+ CATEGORY_ID+" FROM " +
-                        DatabaseHelper.CATEGORIES_TABLE_NAME + " WHERE " +
-                        DatabaseHelper.CATEGORY_NAME + " LIKE  '%" + name + "%'",
-
-                CATEGORY_ID
-        );
     }
 
     /**
@@ -599,9 +585,9 @@ public class HabitDatabase {
                 "SELECT "+DatabaseHelper.ENTRY_ID+" FROM " +
                 DatabaseHelper.ENTRIES_TABLE_NAME + " WHERE " +
                 DatabaseHelper.ENTRY_NOTE + " LIKE  '%" + query + "%' AND " +
-                DatabaseHelper.ENTRY_HABIT_ID + "=" + String.valueOf(habitId),
+                DatabaseHelper.ENTRY_HABIT_ID + "=?",
 
-                DatabaseHelper.ENTRY_ID
+                new String[]{"%" + query + "%", String.valueOf(habitId)}, DatabaseHelper.ENTRY_ID
         );
     }
 
@@ -617,11 +603,17 @@ public class HabitDatabase {
         // AND START_TIME >= BEGIN AND START_TIME <= END
         String SQL = "SELECT " + DatabaseHelper.ENTRY_ID +
                 " FROM " + DatabaseHelper.ENTRIES_TABLE_NAME + " WHERE " +
-                DatabaseHelper.ENTRY_HABIT_ID + "=" + String.valueOf(habitId) +
-                " AND " + DatabaseHelper.ENTRY_START_TIME + ">=" + String.valueOf(beginTime) +
-                " AND " + DatabaseHelper.ENTRY_START_TIME + "<=" + String.valueOf(endTime);
+                DatabaseHelper.ENTRY_HABIT_ID + "=? AND " +
+                DatabaseHelper.ENTRY_START_TIME + ">=? AND " +
+                DatabaseHelper.ENTRY_START_TIME + "<=?";
 
-        return searchTableForIdsByName(SQL, DatabaseHelper.ENTRY_ID);
+        String[] values = new String[]{
+                String.valueOf(habitId),
+                String.valueOf(beginTime),
+                String.valueOf(endTime)
+        };
+
+        return searchTableForIdsByName(SQL, values, DatabaseHelper.ENTRY_ID);
     }
 
     /**
@@ -633,10 +625,15 @@ public class HabitDatabase {
         // SELECT ENTRY_ID FROM ENTRIES_TABLE WHERE START_TIME >= BEGIN AND START_TIME <= END
         String SQL = "SELECT " + DatabaseHelper.ENTRY_ID +
                 " FROM " + DatabaseHelper.ENTRIES_TABLE_NAME + " WHERE " +
-                DatabaseHelper.ENTRY_START_TIME + ">=" + String.valueOf(beginTime) +
-                " AND " + DatabaseHelper.ENTRY_START_TIME + "<=" + String.valueOf(endTime);
+                DatabaseHelper.ENTRY_START_TIME + ">=? AND " +
+                DatabaseHelper.ENTRY_START_TIME + "<=?";
 
-        return searchTableForIdsByName(SQL, DatabaseHelper.ENTRY_ID);
+        String[] values = new String[]{
+                String.valueOf(beginTime),
+                String.valueOf(endTime)
+        };
+
+        return searchTableForIdsByName(SQL, values, DatabaseHelper.ENTRY_ID);
     }
 
     /**
@@ -922,9 +919,23 @@ public class HabitDatabase {
     public Set<Long> searchHabitIdsByName(String name){
         return searchTableForIdsByName("SELECT "+DatabaseHelper.HABIT_ID+" FROM " +
                         DatabaseHelper.HABITS_TABLE_NAME + " WHERE " +
-                        DatabaseHelper.HABIT_NAME + " LIKE  '%" + name + "%'",
+                        DatabaseHelper.HABIT_NAME + " LIKE  ?",
 
-                DatabaseHelper.HABIT_ID);
+                new String[]{"%" + name + "%"}, DatabaseHelper.HABIT_ID);
+    }
+
+    /**
+     * @param name The name of the category to look up.
+     * @return The found category ids as an array.
+     */
+    public Set<Long> searchCategoryIdsByName(String name){
+        return searchTableForIdsByName(
+                "SELECT "+ CATEGORY_ID+" FROM " +
+                        DatabaseHelper.CATEGORIES_TABLE_NAME + " WHERE " +
+                        DatabaseHelper.CATEGORY_NAME + " LIKE  ?",
+
+                new String[]{"%" + name + "%"}, CATEGORY_ID
+        );
     }
 
     /**
@@ -935,9 +946,14 @@ public class HabitDatabase {
         Set<Long> habitIds = searchHabitIdsByName(query);
         Set<Long> categoryIds = searchCategoryIdsByName(query);
 
-        Set<Long> ids = new HashSet<>(habitIds.size() + categoryIds.size());
+        Set<Long> habitIdsByCategory = new HashSet<>();
+        for(long id: categoryIds){
+            habitIdsByCategory.addAll(getHabitIds(id));
+        }
+
+        Set<Long> ids = new HashSet<>(habitIds.size() + habitIdsByCategory.size());
         ids.addAll(habitIds);
-        ids.addAll(categoryIds);
+        ids.addAll(habitIdsByCategory);
 
         return ids;
     }
@@ -1039,8 +1055,8 @@ public class HabitDatabase {
     public Set<Long> getHabitIds(long categoryId){
         return searchTableForIdsByName("SELECT "+DatabaseHelper.HABIT_ID+" FROM "+
                         DatabaseHelper.HABITS_TABLE_NAME+" WHERE " +
-                        DatabaseHelper.HABIT_CATEGORY +" = "+String.valueOf(categoryId),
-                DatabaseHelper.HABIT_ID);
+                        DatabaseHelper.HABIT_CATEGORY +" =?",
+                new String[]{String.valueOf(categoryId)}, DatabaseHelper.HABIT_ID);
     }
 
     /**

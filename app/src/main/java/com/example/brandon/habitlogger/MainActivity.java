@@ -33,7 +33,6 @@ import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.HabitViewAdapter;
-import com.example.brandon.habitlogger.RecyclerVIewAdapters.RecyclerTouchListener;
 import com.example.brandon.habitlogger.SessionManager.SessionManager;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
@@ -113,23 +112,71 @@ public class MainActivity extends AppCompatActivity
         currentSession      = (CardView)findViewById(R.id.current_sessions_card);
         habitCardContainer  = (RecyclerView)findViewById(R.id.habit_recycler_view);
 
-        habitAdapter = new HabitViewAdapter(habitList);
+        HabitViewAdapter.MenuItemClickListener menuItemClickListener = new HabitViewAdapter.MenuItemClickListener() {
+            @Override
+            public void onEditClick(long habitId) {
+
+            }
+
+            @Override
+            public void onDeleteClick(long habitId) {
+                if(sessionManager.isSessionActive(habitId)){
+                    sessionManager.cancelSession(habitId);
+                    updateCurrentSessionCard();
+                }
+
+                habitDatabase.deleteHabit(habitId);
+
+                for(int position = 0; position < habitList.size(); position++){
+                    Habit habit = habitList.get(position);
+                    if(habit.getDatabaseId() == habitId){
+                        habitList.remove(position);
+                        habitAdapter.notifyItemRemoved(position);
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onExportClick(long habitId) {
+
+            }
+
+            @Override
+            public void onArchiveClick(long habitId) {
+
+            }
+        };
+
+        HabitViewAdapter.ButtonClickListener buttonClickListener = new HabitViewAdapter.ButtonClickListener() {
+            @Override
+            public void onPlayButtonClicked(long habitId) {
+                startSession(habitDatabase.getHabit(habitId));
+            }
+
+            @Override
+            public void onCardClicked(long habitId) {
+
+            }
+        };
+
+        habitAdapter = new HabitViewAdapter(habitList, menuItemClickListener, buttonClickListener);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         habitCardContainer.setLayoutManager(layoutManager);
         habitCardContainer.setItemAnimator(new DefaultItemAnimator());
         habitCardContainer.setAdapter(habitAdapter);
 
-        habitCardContainer.addOnItemTouchListener(new RecyclerTouchListener(this, habitCardContainer, new RecyclerTouchListener.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                startSession(habitList.get(position));
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
-
-            }
-        }));
+//        habitCardContainer.addOnItemTouchListener(new RecyclerTouchListener(this, habitCardContainer, new RecyclerTouchListener.ClickListener() {
+//            @Override
+//            public void onClick(View view, int position) {
+//                startSession(habitList.get(position));
+//            }
+//
+//            @Override
+//            public void onLongClick(View view, int position) {
+//
+//            }
+//        }));
 
         currentSession.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,6 +188,180 @@ public class MainActivity extends AppCompatActivity
         updatePreferences();
         updateCurrentSessionCard();
         showDatabase();
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(main, menu);
+
+        SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
+        searchView.setOnQueryTextListener(
+                new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        processUserQuery(query);
+
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String query) {
+                        processUserQuery(query);
+
+                        return false;
+                    }
+                }
+        );
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        final int id = item.getItemId();
+        switch(id){
+            case (R.id.menu_database_export):{
+
+            }break;
+
+            case (R.id.menu_database_restore):{
+
+            }break;
+
+            case (R.id.menu_settings):{
+                startSettingsActivity();
+            }break;
+
+            case (R.id.menu_about):{
+                startAboutActivity();
+            }break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        switch(id){
+            case(R.id.home_nav):{
+                Toast.makeText(this, "Home", Toast.LENGTH_SHORT).show();
+            }break;
+
+            case(R.id.running_habits_nav):{
+                startActiveSessionsActivity();
+            }break;
+
+            case(R.id.overall_stats_nav):{
+                Toast.makeText(this, "Overall stats", Toast.LENGTH_SHORT).show();
+            }break;
+
+            case(R.id.settings_nav):{
+                startSettingsActivity();
+            }break;
+
+            case(R.id.about_nav):{
+                startAboutActivity();
+            }break;
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case NewHabitActivity.NEW_HABIT_RESULT_CODE:
+                {
+                    Habit newHabit = (Habit)data.getSerializableExtra("habit");
+                    habitDatabase.addHabitAndCategory(newHabit);
+                    showDatabase();
+                }break;
+
+                case 1: {
+                    String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
+                    Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
+                    exportManager.importDatabase(true);
+                    showDatabase();
+                }break;
+
+                case 2:{
+                    String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
+                    exportManager.importHabit(filePath, true);
+                    showDatabase();
+                }break;
+
+                case SessionActivity.RESULT_SESSION_FINISH : {
+                    if(data.hasExtra("entry")) {
+                        SessionEntry entry = (SessionEntry) data.getSerializableExtra("entry");
+                        Toast.makeText(this, entry.toString(), Toast.LENGTH_SHORT).show();
+                        habitDatabase.addEntry(entry.getHabitId(), entry);
+                    }
+                }break;
+
+                case GoogleDriveDataExportManager.REQUEST_CODE_RESOLUTION:{
+                    googleDrive.connect();
+                }break;
+            }
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("dataCache", habitDatabase.dataCache);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        habitDatabase.dataCache = (DatabaseCache)savedInstanceState.getSerializable("dataCache");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        updatePreferences();
+        updateCurrentSessionCard();
+    }
+
+    public void processUserQuery(String query){
+        if(query.length() != 0) {
+            Set<Long> ids = habitDatabase.queryDatabaseByTheUser(query);
+
+            habitList.clear();
+
+            for (long id : ids) {
+                Habit habit = habitDatabase.getHabit(id);
+                habitList.add(habit);
+            }
+
+            habitAdapter.notifyDataSetChanged();
+        }
+        else {
+            showDatabase();
+        }
     }
 
     private void updatePreferences() {
@@ -284,172 +505,5 @@ public class MainActivity extends AppCompatActivity
         }
 
         return false;
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(main, menu);
-
-        SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
-        searchView.setOnQueryTextListener(
-                new SearchView.OnQueryTextListener() {
-                    @Override
-                    public boolean onQueryTextSubmit(String query) {
-                        processUserQuery(query);
-
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onQueryTextChange(String query) {
-                        processUserQuery(query);
-
-                        return false;
-                    }
-                }
-        );
-
-        return true;
-    }
-
-    public void processUserQuery(String query){
-        Set<Long> ids = habitDatabase.queryDatabaseByTheUser(query);
-
-        habitList.clear();
-
-        for (long id : ids) {
-            Habit habit = habitDatabase.getHabit(id);
-            habitList.add(habit);
-        }
-
-        habitAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        final int id = item.getItemId();
-        switch(id){
-            case (R.id.menu_database_export):{
-
-            }break;
-
-            case (R.id.menu_database_restore):{
-
-            }break;
-
-            case (R.id.menu_settings):{
-                startSettingsActivity();
-            }break;
-
-            case (R.id.menu_about):{
-                startAboutActivity();
-            }break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        switch(id){
-            case(R.id.home_nav):{
-                Toast.makeText(this, "Home", Toast.LENGTH_SHORT).show();
-            }break;
-
-            case(R.id.running_habits_nav):{
-                startActiveSessionsActivity();
-            }break;
-
-            case(R.id.overall_stats_nav):{
-                Toast.makeText(this, "Overall stats", Toast.LENGTH_SHORT).show();
-            }break;
-
-            case(R.id.settings_nav):{
-                startSettingsActivity();
-            }break;
-
-            case(R.id.about_nav):{
-                startAboutActivity();
-            }break;
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if(resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case NewHabitActivity.NEW_HABIT_RESULT_CODE:
-                {
-                    Habit newHabit = (Habit)data.getSerializableExtra("habit");
-                    habitDatabase.addHabitAndCategory(newHabit);
-                    showDatabase();
-                }break;
-
-                case 1: {
-                    String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
-                    Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
-                    exportManager.importDatabase(true);
-                    showDatabase();
-                }break;
-
-                case 2:{
-                    String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
-                    exportManager.importHabit(filePath, true);
-                    showDatabase();
-                }break;
-
-                case SessionActivity.RESULT_SESSION_FINISH : {
-                    SessionEntry entry = (SessionEntry) data.getSerializableExtra("entry");
-                    Toast.makeText(this, entry.toString(), Toast.LENGTH_SHORT).show();
-                    habitDatabase.addEntry(entry.getHabitId(), entry);
-                }break;
-
-                case GoogleDriveDataExportManager.REQUEST_CODE_RESOLUTION:{
-                    googleDrive.connect();
-                }break;
-            }
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable("dataCache", habitDatabase.dataCache);
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        habitDatabase.dataCache = (DatabaseCache)savedInstanceState.getSerializable("dataCache");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        updatePreferences();
-        updateCurrentSessionCard();
     }
 }

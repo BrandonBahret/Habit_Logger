@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -52,12 +53,19 @@ public class ChangeColorDialogFragment extends DialogFragment {
         final ArrayAdapter<Integer> arrayAdapter = new ColorArrayAdapter(getContext(), colors);
         gridView.setAdapter(arrayAdapter);
 
+        gridView.setGravity(Gravity.CENTER);
+        gridView.setHorizontalSpacing(getDp(10));
+        gridView.setVerticalSpacing(getDp(10));
         gridView.setNumColumns(4);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // do something here
                 Integer color = arrayAdapter.getItem(position);
+                if(color == null){
+                    throw new Error("Failed to get color at line: 60 ChangeColorDialogFragment.java");
+                }
+
                 for(OnFinishedListener listener: onFinishedListeners){
                     listener.onFinishedWithResult(color);
                 }
@@ -68,6 +76,11 @@ public class ChangeColorDialogFragment extends DialogFragment {
         builder.setView(gridView);
 
         return builder.create();
+    }
+
+    public int getDp(int px){
+        float logicalDensity = getResources().getDisplayMetrics().density;
+        return (int)logicalDensity * px;
     }
 }
 
@@ -82,7 +95,8 @@ class ColorArrayAdapter extends ArrayAdapter<Integer> {
     public View getView(int position, View convertView, ViewGroup parent) {
         Integer color = getItem(position);
         ImageView view = new ImageView(context);
-        view.setImageResource(R.drawable.ic_image_box);
+
+        view.setImageResource(R.drawable.ic_simple_circle);
         view.setColorFilter(color);
         view.setScaleX(1.8f);
         view.setScaleY(1.8f);

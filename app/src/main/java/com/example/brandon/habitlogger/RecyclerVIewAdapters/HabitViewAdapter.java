@@ -1,9 +1,13 @@
 package com.example.brandon.habitlogger.RecyclerVIewAdapters;
 
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,26 +24,50 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewAdapter.View
 
     List<Habit> habitsList;
 
+    private MenuItemClickListener menuItemClickListener;
+    private ButtonClickListener buttonClickListener;
+
+    public interface MenuItemClickListener{
+        void onEditClick(long habitId);
+        void onDeleteClick(long habitId);
+        void onExportClick(long habitId);
+        void onArchiveClick(long habitId);
+    }
+
+    public interface ButtonClickListener{
+        void onPlayButtonClicked(long habitId);
+        void onCardClicked(long habitId);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView name, streakCount;
+        public CardView rootView;
         public ImageView categoryAccent;
+        public Toolbar toolbar;
+        public TextView streakCount;
+        public ImageButton playButton;
 
         public ViewHolder(View view) {
             super(view);
-            this.name = (TextView) view.findViewById(R.id.habit_name_card_view);
             this.streakCount = (TextView) view.findViewById(R.id.streak_counter_card_view);
             this.categoryAccent = (ImageView) view.findViewById(R.id.category_accent);
+            this.toolbar = (Toolbar) view.findViewById(R.id.card_toolbar);
+            this.playButton = (ImageButton) view.findViewById(R.id.session_control_button);
+            this.rootView = (CardView)view;
         }
     }
 
-    public HabitViewAdapter(List<Habit> habitsList){
+    public HabitViewAdapter(List<Habit> habitsList, MenuItemClickListener menuItemClickListener,
+                            ButtonClickListener buttonClickListener){
+
         this.habitsList = habitsList;
+        this.menuItemClickListener = menuItemClickListener;
+        this.buttonClickListener = buttonClickListener;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.habit_view_layout, parent, false);
+                .inflate(R.layout.habit_card, parent, false);
 
         setMargins(itemView, 0, 20, 0, 20);
 
@@ -57,10 +85,64 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewAdapter.View
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Habit item = habitsList.get(position);
+        final long habitId = item.getDatabaseId();
 
-        holder.name.setText(item.getName());
         holder.streakCount.setText(String.valueOf(item.calculateStreakCount()));
         holder.categoryAccent.setBackgroundColor(item.getCategory().getColorAsInt());
+
+        holder.rootView.setTag(String.valueOf(item.getDatabaseId()));
+
+        // Make sure menu hasn't been inflated yet.
+        int menuSize = holder.toolbar.getMenu().size();
+        if(menuSize == 0) {
+            holder.toolbar.inflateMenu(R.menu.menu_habit_card);
+            holder.toolbar.setTitle(item.getName());
+
+            holder.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    int id = menuItem.getItemId();
+
+                    switch (id) {
+                        case (R.id.habit_menu_edit): {
+                            menuItemClickListener.onEditClick(habitId);
+                        }
+                        break;
+
+                        case (R.id.habit_menu_delete): {
+                            menuItemClickListener.onDeleteClick(habitId);
+                        }
+                        break;
+
+                        case (R.id.habit_menu_export): {
+                            menuItemClickListener.onExportClick(habitId);
+                        }
+                        break;
+
+                        case (R.id.habit_menu_archive): {
+                            menuItemClickListener.onArchiveClick(habitId);
+                        }
+                        break;
+                    }
+
+                    return true;
+                }
+            });
+        }
+
+        holder.playButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buttonClickListener.onPlayButtonClicked(habitId);
+            }
+        });
+
+        holder.rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buttonClickListener.onCardClicked(habitId);
+            }
+        });
     }
 
     @Override
@@ -68,3 +150,4 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewAdapter.View
         return habitsList.size();
     }
 }
+

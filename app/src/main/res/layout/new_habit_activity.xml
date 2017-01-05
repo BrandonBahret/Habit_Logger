@@ -18,7 +18,7 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Habit Name"
+            android:hint="@string/habit_name"
             android:layout_weight="1"
             android:id="@+id/habit_name"/>
 
@@ -36,51 +36,67 @@
             android:id="@+id/habit_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Habit Description" />
+            android:hint="@string/habit_description" />
     </android.support.design.widget.TextInputLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/category_spinner"
+        android:gravity="center"
+        android:id="@+id/button_holder">
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/habit_category_layout"
+            android:layout_width="0dp"
+            android:layout_height="65dp"
+            android:layout_weight="6">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/habit_category"
+                android:id="@+id/habit_category" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <ImageButton
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_paint_brush"
+
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+
+            android:background="@drawable/circle_background"
+            android:id="@+id/colorPicker" />
+
+        <ImageButton
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_picture_layer_1"
+
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+
+            android:background="@drawable/circle_background"
+            android:id="@+id/iconPicker"
+            app:srcCompat="@drawable/ic_image_box" />
+    </LinearLayout>
 
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/category_spinner"
         android:layout_below="@+id/habit_description_layout"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/spinner" />
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/habit_category_layout"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/spinner"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
-
-        <EditText
-            android:id="@+id/habit_category"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Habit Category"/>
-
-    </android.support.design.widget.TextInputLayout>
-
-    <ImageButton
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:src="@drawable/ic_paint_brush"
-        android:id="@+id/colorPicker"
-        android:layout_below="@+id/spinner"
-        android:layout_toRightOf="@+id/habit_category_layout"
-        android:layout_toEndOf="@+id/habit_category_layout"/>
-
-    <ImageButton
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:src="@drawable/ic_picture_layer_1"
-        android:id="@+id/iconPicker"
-        android:layout_below="@+id/spinner"
-        android:layout_toRightOf="@+id/colorPicker"
-        android:layout_toEndOf="@+id/colorPicker"
-        android:layout_marginLeft="20dp"
-        app:srcCompat="@drawable/ic_image_box" />
+        android:layout_margin="10dp"/>
 
 </RelativeLayout>
