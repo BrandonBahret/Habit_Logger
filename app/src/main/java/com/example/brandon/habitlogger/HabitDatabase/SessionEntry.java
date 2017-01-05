@@ -77,7 +77,7 @@ public class SessionEntry implements Serializable{
      * @return a time in milliseconds for the length of the session.
      */
     public long getDuration(){
-        return this.duration / 1000;
+        return this.duration;
     }
 
     /**

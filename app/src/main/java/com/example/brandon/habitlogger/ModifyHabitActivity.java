@@ -5,6 +5,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,38 +14,52 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 
 /**
  * Created by Brandon on 12/6/2016.
  */
 
-public class NewHabitActivity extends AppCompatActivity {
+public class ModifyHabitActivity extends AppCompatActivity {
 
     public static final int NEW_HABIT_RESULT_CODE = 100;
+    public static final int EDIT_HABIT_RESULT_CODE = 101;
     public int color = 0xFF9E9E9E;
 
-    ImageButton colorPicker;
+    EditText habitName, habitDescription, habitCategory;
+    ImageButton colorPicker, iconPicker;
     Spinner categorySpinner;
+
+    Habit oldHabit = null;
+
+    HabitDatabase habitDatabase;
+
+    boolean isEditMode;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_habit_activity);
 
-        categorySpinner = (Spinner) findViewById(R.id.category_spinner);
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        CharSequence data[] = new CharSequence[]{"Name", "Foo", "Bar"};
+        habitDatabase = new HabitDatabase(this, null, false);
+
+        isEditMode = getIntent().hasExtra("edit");
+
+        categorySpinner  = (Spinner)     findViewById(R.id.category_spinner);
+        habitName        = (EditText)    findViewById(R.id.habit_name);
+        habitDescription = (EditText)    findViewById(R.id.habit_description);
+        habitCategory    = (EditText)    findViewById(R.id.habit_category);
+        colorPicker      = (ImageButton) findViewById(R.id.colorPicker);
+        iconPicker       = (ImageButton) findViewById(R.id.icon_picker);
+
+        CharSequence data[] = new CharSequence[]{}; //TODO habitDatabase.getCategories();
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, data);
-        // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
         categorySpinner.setAdapter(adapter);
 
-        colorPicker = (ImageButton)findViewById(R.id.colorPicker);
         setColorOfColorPickerButton(color);
         colorPicker.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,11 +76,22 @@ public class NewHabitActivity extends AppCompatActivity {
             }
         });
 
+        ActionBar toolbar = getSupportActionBar();
+        if(toolbar != null){
+            if(isEditMode) {
+                toolbar.setTitle(R.string.edit_habit_title);
+                setupEditMode();
+            }
+            else{
+                toolbar.setTitle(R.string.new_habit_title);
+            }
+        }
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_new_habit_activity, menu);
+        getMenuInflater().inflate(R.menu.menu_modify_habit_activity, menu);
 
         return true;
     }
@@ -77,17 +103,23 @@ public class NewHabitActivity extends AppCompatActivity {
 
         switch (id) {
             case (R.id.new_habit_confirm): {
-                Toast.makeText(this, "Confirm Tapped", Toast.LENGTH_SHORT).show();
-
                 Intent data = new Intent();
-                data.putExtra("habit", getHabit());
+                data.putExtra("new_habit", getHabit());
                 setResult(RESULT_OK, data);
                 finish();
-
             }break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void setupEditMode() {
+        oldHabit = (Habit)getIntent().getSerializableExtra("habit");
+
+        habitName.setText(oldHabit.getName());
+        habitDescription.setText(oldHabit.getDescription());
+        habitCategory.setText(oldHabit.getCategory().getName());
+        setColorOfColorPickerButton(oldHabit.getCategory().getColorAsInt());
     }
 
     public void setColorOfColorPickerButton(int color){
@@ -96,23 +128,29 @@ public class NewHabitActivity extends AppCompatActivity {
         ImageButton colorPicker = (ImageButton)findViewById(R.id.colorPicker);
         Drawable background = getDrawable(R.drawable.circle_background);
         if(background == null){
-            throw new Error("Failed to get background drawable @ line 97 NewHabitActivity.java");
+            throw new Error("Failed to get background drawable @ line 97 ModifyHabitActivity.java");
         }
 
         background.setColorFilter(color, PorterDuff.Mode.SRC);
         colorPicker.setBackground(background);
     }
 
-    public Habit getHabit(){
-        EditText nameView = (EditText) findViewById(R.id.habit_name);
-        String name = nameView.getText().toString();
+    public Habit getHabit() {
+        String name = habitName.getText().toString();
+        String description = habitDescription.getText().toString();
+        String categoryName = habitCategory.getText().toString();
 
-        EditText descriptionView = (EditText) findViewById(R.id.habit_description);
-        String description = descriptionView.getText().toString();
+        if (oldHabit == null) {
+            return new Habit(name, description,
+                    new HabitCategory(this.color, categoryName),
+                    null, "icon res");
+        } else {
+            oldHabit.setName(name);
+            oldHabit.setDescription(description);
+            oldHabit.setCategory(new HabitCategory(this.color, categoryName));
+            // oldHabit.setIconResId("icon res");
 
-        EditText categoryView = (EditText) findViewById(R.id.habit_category);
-        String categoryName = categoryView.getText().toString();
-
-        return new Habit(name, description, new HabitCategory(this.color, categoryName), null, "icon res");
+            return oldHabit;
+        }
     }
 }

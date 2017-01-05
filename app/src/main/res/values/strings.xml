@@ -55,4 +55,7 @@
     <string name="habit_description">Habit Description</string>
     <string name="habit_category">Habit Category</string>
 
+    <string name="new_habit_title">New Habit</string>
+    <string name="edit_habit_title">Edit Habit</string>
+
 </resources>

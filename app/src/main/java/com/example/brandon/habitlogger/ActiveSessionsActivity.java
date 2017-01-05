@@ -24,7 +24,6 @@ import com.example.brandon.habitlogger.RecyclerVIewAdapters.ActiveSessionViewAda
 import com.example.brandon.habitlogger.SessionManager.SessionManager;
 
 import java.util.List;
-import java.util.Locale;
 
 public class ActiveSessionsActivity extends AppCompatActivity {
 
@@ -84,18 +83,9 @@ public class ActiveSessionsActivity extends AppCompatActivity {
                 int size = sessionEntries.size();
 
                 for(int i = 0; i < size; i++){
-                    SessionEntry entry = sessionEntries.get(i);
-                    long habitId = entry.getHabitId();
-
-                    if(!sessionManager.isSessionActive(habitId)){
-                        sessionEntries.remove(i);
-                        sessionViewAdapter.notifyItemRemoved(i);
-                        size--;
-                    }
-
-                    else {
-                        long duration = sessionManager.calculateDuration(habitId) / 1000;
-                        entry.setDuration(duration);
+                    long habitId = sessionEntries.get(i).getHabitId();
+                    if(sessionManager.isSessionActive(habitId)) {
+                        SessionEntry entry = sessionManager.getSession(habitId);
                         sessionEntries.set(i, entry);
 
                         View item = sessionViewContainer.getChildAt(i);
@@ -103,11 +93,16 @@ public class ActiveSessionsActivity extends AppCompatActivity {
                         if(item != null) {
                             TextView timeTextView = (TextView) item.findViewById(R.id.active_habit_time);
 
-                            SessionManager.TimeDisplay time = new SessionManager.TimeDisplay(duration);
-                            String timeText = String.format(Locale.US, "%02d:%02d:%02d", time.hours, time.minutes, time.seconds);
+                            String timeText =
+                                    new SessionManager.TimeDisplay(entry.getDuration()).toString();
 
                             timeTextView.setText(timeText);
                         }
+                    }
+                    else{
+                        sessionEntries.remove(i);
+                        sessionViewAdapter.notifyItemRemoved(i);
+                        size--;
                     }
                 }
 

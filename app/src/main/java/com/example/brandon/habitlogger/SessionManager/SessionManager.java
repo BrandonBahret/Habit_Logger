@@ -1,13 +1,23 @@
 package com.example.brandon.habitlogger.SessionManager;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
+import android.widget.Toast;
 
+import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
+import com.example.brandon.habitlogger.MainActivity;
+import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.SessionActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,13 +72,11 @@ public class SessionManager {
      * @return the row ID of the last row inserted, if this insert is successful. -1 otherwise.
      */
     public long startSession(long habitId){
-        String habitName = habitDatabase.getHabitName(habitId);
-        String habitCategoryName = "none";
-        HabitCategory category = habitDatabase.getCategory(habitId);
+        Habit habit = habitDatabase.getHabit(habitId);
 
-        if(category != null){
-            habitCategoryName = category.getName();
-        }
+        String habitName = habit.getName();
+        HabitCategory category = habit.getCategory();
+        String habitCategoryName = category.getName();
 
         insertSessionStatement.bindLong(1, habitId);          // HABIT_ID
         insertSessionStatement.bindString(2, habitName);         // HABIT_NAME
@@ -80,7 +88,88 @@ public class SessionManager {
         insertSessionStatement.bindLong(8, 0);                // IS_PAUSED
         insertSessionStatement.bindString(9, "");             // NOTE
 
+        createSessionNotification(habit);
+
         return insertSessionStatement.executeInsert();
+    }
+
+    public void createSessionNotification(final Habit habit) {
+        Toast.makeText(context, "Create notification", Toast.LENGTH_SHORT).show();
+
+
+        Intent intent = new Intent(context, SessionManager.class);
+
+        PendingIntent pIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), intent, 0);
+
+        NotificationCompat.Action action = new NotificationCompat.Action(
+                R.drawable.ic_play_circle_outline_black_24dp,
+                "pause",
+                pIntent
+        );
+
+        NotificationCompat.Action action2 = new NotificationCompat.Action(
+                R.drawable.ic_check_white_24px,
+                "finish",
+                pIntent
+        );
+
+        final NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.drawable.ic_timer_white_24px)
+                        .setColor(habit.getCategory().getColorAsInt())
+                        .setContentTitle(habit.getName())
+                        .setContentText(habit.getCategory().getName())
+                        .setTicker("Session for '" +habit.getName()+ "' started")
+                        .addAction(action)
+                        .addAction(action2)
+                        ;
+
+        Intent resultIntent = new Intent(context, SessionActivity.class);
+        resultIntent.putExtra("habit", habit);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+
+        int mNotificationId = (int)habit.getDatabaseId();
+
+        final NotificationManager mNotificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(mNotificationId, mBuilder.build());
+
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        while(true) { // TODO fix this warning!
+                            try {
+
+                                SessionEntry entry = getSession(habit.getDatabaseId());
+                                TimeDisplay display = new TimeDisplay(entry.getDuration());
+
+                                // When the loop is finished, updates the notification
+                                mBuilder.setContentText(display.toString());
+
+                                mNotificationManager.notify((int) habit.getDatabaseId(), mBuilder.build());
+                                Thread.sleep(1000);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
+                }
+// Starts the thread by calling the run() method in its Runnable
+        ).start();
+
     }
 
     /**
@@ -154,6 +243,7 @@ public class SessionManager {
         }
 
         SessionEntry entry = getSession(habitId);
+        entry.setDuration(calculateDuration(habitId));
 
         cancelSession(habitId);
 
@@ -392,6 +482,8 @@ public class SessionManager {
         }
 
         public void updateTime(long time){
+            time /= 1000;
+
             this.hours = (time - (time % 3600) ) / 3600;
             time -= this.hours * 3600;
 
@@ -399,6 +491,11 @@ public class SessionManager {
             time -= this.minutes * 60;
 
             this.seconds = time;
+        }
+
+        @Override
+        public String toString() {
+            return String.format(Locale.US, "%02d:%02d:%02d", this.hours, this.minutes, this.seconds);
         }
     }
 }

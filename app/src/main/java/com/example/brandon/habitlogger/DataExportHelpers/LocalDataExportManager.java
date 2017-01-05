@@ -145,16 +145,21 @@ public class LocalDataExportManager {
     /**
      * @param backup The habit object to be stored.
      * @param isPublic This selects external or internal storage.
-     * @return True if successful, false if it failed.
+     * @return The filepath of the csv, null if failed.
      */
-    public boolean exportHabit(Habit backup, boolean isPublic){
+    public String exportHabit(Habit backup, boolean isPublic){
         String habitFolderPath = String.format(Locale.US, categoryFolderFormatString,
                 backup.getCategory().getName());
 
         String filename = backup.getName() + ".csv";
         String dataPath = isPublic ? dataPathPublic : dataPathPrivate;
         String filepath = dataPath + File.separator + habitFolderPath;
-        return saveHabitCSV(filepath, filename, backup.toCSV(), isPublic);
+        if(saveHabitCSV(filepath, filename, backup.toCSV(), isPublic)){
+            return filepath;
+        }
+        else{
+            throw new Error("Failed to export habit.");
+        }
     }
 
     private boolean saveHabitCSV(String pathParent, String pathChild, String CSV, boolean isPublic) {

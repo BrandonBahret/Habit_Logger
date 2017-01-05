@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static android.widget.Toast.makeText;
 import static com.example.brandon.habitlogger.R.menu.main;
 
 public class MainActivity extends AppCompatActivity
@@ -56,7 +57,8 @@ public class MainActivity extends AppCompatActivity
     LocalDataExportManager exportManager;
     GoogleDriveDataExportManager googleDrive;
 
-    List<Habit> habitList = new ArrayList<>();;
+    List<Habit> habitList = new ArrayList<>();
+    ;
     RecyclerView habitCardContainer;
     HabitViewAdapter habitAdapter;
 
@@ -71,8 +73,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent newHabit = new Intent(MainActivity.this, NewHabitActivity.class);
-                startActivityForResult(newHabit, NewHabitActivity.NEW_HABIT_RESULT_CODE);
+                startNewHabitActivity();
             }
         });
 
@@ -90,10 +91,10 @@ public class MainActivity extends AppCompatActivity
             cache = savedInstanceState.getSerializable("dataCache");
         }
 
-        habitDatabase  = new HabitDatabase(MainActivity.this, cache, true);
+        habitDatabase = new HabitDatabase(MainActivity.this, cache, true);
         sessionManager = new SessionManager(this);
-        exportManager  = new LocalDataExportManager(MainActivity.this);
-        googleDrive    = new GoogleDriveDataExportManager(MainActivity.this);
+        exportManager = new LocalDataExportManager(MainActivity.this);
+        googleDrive = new GoogleDriveDataExportManager(MainActivity.this);
         googleDrive.connect();
 
         habitDatabase.setOnDatabaseChangeListener(new HabitDatabase.OnDatabaseChange() {
@@ -109,27 +110,27 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        currentSession      = (CardView)findViewById(R.id.current_sessions_card);
-        habitCardContainer  = (RecyclerView)findViewById(R.id.habit_recycler_view);
+        currentSession = (CardView) findViewById(R.id.current_sessions_card);
+        habitCardContainer = (RecyclerView) findViewById(R.id.habit_recycler_view);
 
         HabitViewAdapter.MenuItemClickListener menuItemClickListener = new HabitViewAdapter.MenuItemClickListener() {
             @Override
             public void onEditClick(long habitId) {
-
+                startModifyHabitActivity(habitDatabase.getHabit(habitId));
             }
 
             @Override
             public void onDeleteClick(long habitId) {
-                if(sessionManager.isSessionActive(habitId)){
+                if (sessionManager.isSessionActive(habitId)) {
                     sessionManager.cancelSession(habitId);
                     updateCurrentSessionCard();
                 }
 
                 habitDatabase.deleteHabit(habitId);
 
-                for(int position = 0; position < habitList.size(); position++){
+                for (int position = 0; position < habitList.size(); position++) {
                     Habit habit = habitList.get(position);
-                    if(habit.getDatabaseId() == habitId){
+                    if (habit.getDatabaseId() == habitId) {
                         habitList.remove(position);
                         habitAdapter.notifyItemRemoved(position);
                         break;
@@ -139,7 +140,9 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onExportClick(long habitId) {
-
+                Habit habit = habitDatabase.getHabit(habitId);
+                String filepath = exportManager.exportHabit(habit, true);
+                Toast.makeText(MainActivity.this, "Habit exported to: " + filepath, Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -165,18 +168,6 @@ public class MainActivity extends AppCompatActivity
         habitCardContainer.setLayoutManager(layoutManager);
         habitCardContainer.setItemAnimator(new DefaultItemAnimator());
         habitCardContainer.setAdapter(habitAdapter);
-
-//        habitCardContainer.addOnItemTouchListener(new RecyclerTouchListener(this, habitCardContainer, new RecyclerTouchListener.ClickListener() {
-//            @Override
-//            public void onClick(View view, int position) {
-//                startSession(habitList.get(position));
-//            }
-//
-//            @Override
-//            public void onLongClick(View view, int position) {
-//
-//            }
-//        }));
 
         currentSession.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,7 +196,7 @@ public class MainActivity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(main, menu);
 
-        SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setOnQueryTextListener(
                 new SearchView.OnQueryTextListener() {
                     @Override
@@ -231,22 +222,29 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
 
         final int id = item.getItemId();
-        switch(id){
-            case (R.id.menu_database_export):{
+        switch (id) {
+            case (R.id.menu_database_export): {
+                exportManager.exportDatabase(true);
+            }
+            break;
 
-            }break;
+            case (R.id.menu_database_restore): {
+                exportManager.importDatabase(true);
 
-            case (R.id.menu_database_restore):{
+                habitDatabase.loadAllContents();
+                habitDatabase.notifyChange();
+            }
+            break;
 
-            }break;
-
-            case (R.id.menu_settings):{
+            case (R.id.menu_settings): {
                 startSettingsActivity();
-            }break;
+            }
+            break;
 
-            case (R.id.menu_about):{
+            case (R.id.menu_about): {
                 startAboutActivity();
-            }break;
+            }
+            break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -258,26 +256,31 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        switch(id){
-            case(R.id.home_nav):{
-                Toast.makeText(this, "Home", Toast.LENGTH_SHORT).show();
-            }break;
+        switch (id) {
+            case (R.id.home_nav): {
+                makeText(this, "Home", Toast.LENGTH_SHORT).show();
+            }
+            break;
 
-            case(R.id.running_habits_nav):{
+            case (R.id.running_habits_nav): {
                 startActiveSessionsActivity();
-            }break;
+            }
+            break;
 
-            case(R.id.overall_stats_nav):{
-                Toast.makeText(this, "Overall stats", Toast.LENGTH_SHORT).show();
-            }break;
+            case (R.id.overall_stats_nav): {
+                makeText(this, "Overall stats", Toast.LENGTH_SHORT).show();
+            }
+            break;
 
-            case(R.id.settings_nav):{
+            case (R.id.settings_nav): {
                 startSettingsActivity();
-            }break;
+            }
+            break;
 
-            case(R.id.about_nav):{
+            case (R.id.about_nav): {
                 startAboutActivity();
-            }break;
+            }
+            break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -289,39 +292,53 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK) {
             switch (requestCode) {
-                case NewHabitActivity.NEW_HABIT_RESULT_CODE:
-                {
-                    Habit newHabit = (Habit)data.getSerializableExtra("habit");
+                case ModifyHabitActivity.NEW_HABIT_RESULT_CODE: {
+                    Habit newHabit = (Habit) data.getSerializableExtra("new_habit");
                     habitDatabase.addHabitAndCategory(newHabit);
                     showDatabase();
-                }break;
+                }
+                break;
+
+                case ModifyHabitActivity.EDIT_HABIT_RESULT_CODE: {
+                    Habit editHabit = (Habit) data.getSerializableExtra("new_habit");
+                    habitDatabase.updateHabit(editHabit.getDatabaseId(), editHabit);
+
+                    int position = getHabitPositionInList(editHabit.getDatabaseId());
+                    habitList.remove(position);
+                    habitList.add(position, editHabit);
+                    habitAdapter.notifyItemChanged(position);
+                }
+                break;
 
                 case 1: {
                     String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
                     Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
                     exportManager.importDatabase(true);
                     showDatabase();
-                }break;
+                }
+                break;
 
-                case 2:{
+                case 2: {
                     String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
                     exportManager.importHabit(filePath, true);
                     showDatabase();
-                }break;
+                }
+                break;
 
-                case SessionActivity.RESULT_SESSION_FINISH : {
-                    if(data.hasExtra("entry")) {
+                case SessionActivity.RESULT_SESSION_FINISH: {
+                    if (data.hasExtra("entry")) {
                         SessionEntry entry = (SessionEntry) data.getSerializableExtra("entry");
-                        Toast.makeText(this, entry.toString(), Toast.LENGTH_SHORT).show();
                         habitDatabase.addEntry(entry.getHabitId(), entry);
                     }
-                }break;
+                }
+                break;
 
-                case GoogleDriveDataExportManager.REQUEST_CODE_RESOLUTION:{
+                case GoogleDriveDataExportManager.REQUEST_CODE_RESOLUTION: {
                     googleDrive.connect();
-                }break;
+                }
+                break;
             }
         }
     }
@@ -335,7 +352,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        habitDatabase.dataCache = (DatabaseCache)savedInstanceState.getSerializable("dataCache");
+        habitDatabase.dataCache = (DatabaseCache) savedInstanceState.getSerializable("dataCache");
     }
 
     @Override
@@ -346,8 +363,8 @@ public class MainActivity extends AppCompatActivity
         updateCurrentSessionCard();
     }
 
-    public void processUserQuery(String query){
-        if(query.length() != 0) {
+    public void processUserQuery(String query) {
+        if (query.length() != 0) {
             Set<Long> ids = habitDatabase.queryDatabaseByTheUser(query);
 
             habitList.clear();
@@ -358,8 +375,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             habitAdapter.notifyDataSetChanged();
-        }
-        else {
+        } else {
             showDatabase();
         }
     }
@@ -370,7 +386,7 @@ public class MainActivity extends AppCompatActivity
         this.showCurrentSessionsAlways = preferences.getBoolean(getString(R.string.preference_display_current_sessions_at_zero), true);
     }
 
-    public void startSession(Habit habit){
+    public void startSession(Habit habit) {
         Intent startSession = new Intent(this, SessionActivity.class);
         startSession.putExtra("habit", habit);
         startActivityForResult(startSession, SessionActivity.RESULT_SESSION_FINISH);
@@ -382,18 +398,30 @@ public class MainActivity extends AppCompatActivity
             Intent startTargetActivity = new Intent(this, ActiveSessionsActivity.class);
             startActivity(startTargetActivity);
         } else {
-            Toast.makeText(this, R.string.cannot_open_active_sessions_activity, Toast.LENGTH_SHORT).show();
+            makeText(this, R.string.cannot_open_active_sessions_activity, Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void startAboutActivity(){
+    public void startAboutActivity() {
         Intent startAbout = new Intent(this, AboutActivity.class);
         startActivity(startAbout);
     }
 
-    public void startSettingsActivity(){
+    public void startSettingsActivity() {
         Intent startSettings = new Intent(this, SettingsActivity.class);
         startActivity(startSettings);
+    }
+
+    public void startNewHabitActivity() {
+        Intent newHabit = new Intent(MainActivity.this, ModifyHabitActivity.class);
+        startActivityForResult(newHabit, ModifyHabitActivity.NEW_HABIT_RESULT_CODE);
+    }
+
+    public void startModifyHabitActivity(Habit habit){
+        Intent editHabit = new Intent(MainActivity.this, ModifyHabitActivity.class);
+        editHabit.putExtra("edit", true);
+        editHabit.putExtra("habit", habit);
+        startActivityForResult(editHabit, ModifyHabitActivity.EDIT_HABIT_RESULT_CODE);
     }
 
     public void updateCurrentSessionCard() {
@@ -505,5 +533,18 @@ public class MainActivity extends AppCompatActivity
         }
 
         return false;
+    }
+
+    public int getHabitPositionInList(long habitId){
+        int position = 0;
+
+        for(Habit habit : habitList){
+            if(habit.getDatabaseId() == habitId){
+                return position;
+            }
+            position++;
+        }
+
+        return -1;
     }
 }

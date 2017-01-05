@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/new_habit_confirm"
-        android:title="confirm habit creation"
+        android:title="Confirm"
         android:icon="@drawable/ic_check_white_24px"
         app:showAsAction="always" />
 

@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteStatement;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import java.io.Serializable;
 import java.nio.ByteBuffer;
@@ -89,11 +90,14 @@ public class HabitDatabase {
     private class loadAllContents extends AsyncTask<Void, Void, Void>{
         @Override
         protected Void doInBackground(Void... voids) {
-            for(int categoryIndex = 0; categoryIndex < getNumberOfCategories(); categoryIndex++) {
-                long categoryId = getCategoryIdFromIndex(categoryIndex);
+            if(dataCache != null) {
+                dataCache.clearCache();
+                for (int categoryIndex = 0; categoryIndex < getNumberOfCategories(); categoryIndex++) {
+                    long categoryId = getCategoryIdFromIndex(categoryIndex);
 
-                Habit loadHabits[] = getHabits(categoryId);
-                dataCache.cacheHabits(loadHabits);
+                    Habit loadHabits[] = getHabits(categoryId);
+                    dataCache.cacheHabits(loadHabits);
+                }
             }
             return null;
         }
@@ -400,7 +404,7 @@ public class HabitDatabase {
     public long getCategoryIdByObject(HabitCategory category){
         long rowId = category.getDatabaseId();
 
-        if(rowId == -1) {
+        if(rowId < 0) {
             String whereClause = DatabaseHelper.CATEGORY_NAME + " =? AND " +
                     DatabaseHelper.CATEGORY_COLOR + " =?";
             String selectionArgs[] = {category.getName(), category.getColor()};
@@ -671,7 +675,7 @@ public class HabitDatabase {
 
         long entryId = -1;
         if(c != null) {
-            if (c.moveToFirst()) {
+            if (c.move(entryIndex + 1)) {
                 int idInd = c.getColumnIndex(DatabaseHelper.ENTRY_ID);
                 entryId   = c.getLong(idInd);
             }
@@ -987,6 +991,7 @@ public class HabitDatabase {
 
         HabitCategory category = getCategory(categoryId);
 
+
         SessionEntry entries[] = new SessionEntry[getNumberOfEntries(habitId)];
         for (int i = 0; i < getNumberOfEntries(habitId); i++) {
             entries[i] = getEntry(getEntryId(habitId, i));
@@ -1005,7 +1010,6 @@ public class HabitDatabase {
      * @param habitId The row id of the habit you wish to receive.
      * @return The habit object found.
      */
-    @Nullable
     public Habit getHabit(long habitId){
         String selectionArgs[] = {String.valueOf(habitId)};
 
@@ -1019,6 +1023,11 @@ public class HabitDatabase {
                 habit = getHabitFromCursor(c);
                 c.close();
             }
+        }
+
+        if(habit == null){
+            throw new Error("Couldn't find a habit for " + String.valueOf(habitId) +
+                            " in database: Habit = null");
         }
 
         return habit;
@@ -1170,7 +1179,14 @@ public class HabitDatabase {
         if(getHabit(habitId) != null){
             updateHabitName(habitId, habit.getName());
             updateHabitDescription(habitId, habit.getDescription());
-            updateHabitCategory(habitId, getCategoryIdByObject(habit.getCategory()));
+
+            HabitCategory category = habit.getCategory();
+            long categoryId = getCategoryIdByObject(category);
+            if(categoryId == -1){
+                categoryId = addCategory(category);
+            }
+
+            updateHabitCategory(habitId, categoryId);
             updateHabitIconResId(habitId, habit.getIconResId());
             return 1;
         }

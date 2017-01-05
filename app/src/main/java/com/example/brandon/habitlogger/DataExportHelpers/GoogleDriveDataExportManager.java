@@ -81,6 +81,10 @@ public class GoogleDriveDataExportManager implements GoogleApiClient.ConnectionC
         return googleApiClient.isConnected();
     }
 
+    public boolean isConnected(){
+        return googleApiClient.isConnected();
+    }
+
     private void showMessage(String message){
         Log.i(TAG, message);
     }

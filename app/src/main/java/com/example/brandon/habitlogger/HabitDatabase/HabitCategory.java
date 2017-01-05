@@ -60,6 +60,10 @@ public class HabitCategory implements Serializable{
         this.color = color;
     }
 
+    public void setColor(int color){
+        setColor("#" + Integer.toHexString(color));
+    }
+
     /**
      * @return A color in hexadecimal form Ex: "#ffffff"
      */
