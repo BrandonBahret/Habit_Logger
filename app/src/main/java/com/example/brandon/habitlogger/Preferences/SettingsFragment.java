@@ -1,7 +1,9 @@
-package com.example.brandon.habitlogger;
+package com.example.brandon.habitlogger.Preferences;
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+
+import com.example.brandon.habitlogger.R;
 
 public class SettingsFragment extends PreferenceFragment {
 

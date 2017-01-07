@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteStatement;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.widget.Toast;
 
 import java.io.Serializable;
 import java.nio.ByteBuffer;
@@ -588,7 +587,7 @@ public class HabitDatabase {
         return searchTableForIdsByName(
                 "SELECT "+DatabaseHelper.ENTRY_ID+" FROM " +
                 DatabaseHelper.ENTRIES_TABLE_NAME + " WHERE " +
-                DatabaseHelper.ENTRY_NOTE + " LIKE  '%" + query + "%' AND " +
+                DatabaseHelper.ENTRY_NOTE + " LIKE ? AND " +
                 DatabaseHelper.ENTRY_HABIT_ID + "=?",
 
                 new String[]{"%" + query + "%", String.valueOf(habitId)}, DatabaseHelper.ENTRY_ID
@@ -1010,6 +1009,7 @@ public class HabitDatabase {
      * @param habitId The row id of the habit you wish to receive.
      * @return The habit object found.
      */
+    @Nullable
     public Habit getHabit(long habitId){
         String selectionArgs[] = {String.valueOf(habitId)};
 
@@ -1023,11 +1023,6 @@ public class HabitDatabase {
                 habit = getHabitFromCursor(c);
                 c.close();
             }
-        }
-
-        if(habit == null){
-            throw new Error("Couldn't find a habit for " + String.valueOf(habitId) +
-                            " in database: Habit = null");
         }
 
         return habit;

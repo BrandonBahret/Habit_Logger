@@ -1,7 +1,9 @@
-package com.example.brandon.habitlogger.SessionManager;
+package com.example.brandon.habitlogger.HabitSessions;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -9,22 +11,22 @@ import android.database.sqlite.SQLiteStatement;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.widget.Toast;
+import android.widget.RemoteViews;
 
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.MainActivity;
+import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.SessionActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static com.example.brandon.habitlogger.SessionManager.DatabaseHelper.HABIT_ID;
-import static com.example.brandon.habitlogger.SessionManager.DatabaseHelper.SESSIONS_TABLE;
+import static com.example.brandon.habitlogger.HabitSessions.DatabaseHelper.HABIT_ID;
+import static com.example.brandon.habitlogger.HabitSessions.DatabaseHelper.SESSIONS_TABLE;
 
 /**
  * Created by Brandon on 12/4/2016.
@@ -37,13 +39,19 @@ public class SessionManager {
     private SQLiteStatement insertSessionStatement;
     private Context context;
 
+    private PreferenceChecker preferenceChecker;
     private HabitDatabase habitDatabase;
+    private NotificationManager notificationManager;
 
     public SessionManager(Context context){
         this.context = context;
         dbHelper = new DatabaseHelper(context);
         insertSessionStatement = getInsertSessionStatement();
 
+        notificationManager = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        this.preferenceChecker = new PreferenceChecker(context);
         this.habitDatabase = new HabitDatabase(context, null, false);
     }
 
@@ -51,7 +59,7 @@ public class SessionManager {
      * Get a sqlite statement for creating new sessions.
      */
     public SQLiteStatement getInsertSessionStatement(){
-        String sql = "INSERT INTO "+ DatabaseHelper.SESSIONS_TABLE +
+        String sql = "INSERT INTO "+ SESSIONS_TABLE +
                 " ("+
                 HABIT_ID +
                 ", "+ DatabaseHelper.HABIT_NAME+
@@ -74,102 +82,147 @@ public class SessionManager {
     public long startSession(long habitId){
         Habit habit = habitDatabase.getHabit(habitId);
 
-        String habitName = habit.getName();
-        HabitCategory category = habit.getCategory();
-        String habitCategoryName = category.getName();
+        if(habit != null) {
+            String habitName = habit.getName();
+            HabitCategory category = habit.getCategory();
+            String habitCategoryName = category.getName();
 
-        insertSessionStatement.bindLong(1, habitId);          // HABIT_ID
-        insertSessionStatement.bindString(2, habitName);         // HABIT_NAME
-        insertSessionStatement.bindString(3, habitCategoryName); // HABIT_CATEGORY
-        insertSessionStatement.bindLong(4, 0);                // DURATION
-        insertSessionStatement.bindLong(5, getCurrentTime()); // STARTING_TIME
-        insertSessionStatement.bindLong(6, 0);                // LAST_TIME_PAUSED
-        insertSessionStatement.bindLong(7, 0);                // TOTAL_PAUSE_TIME
-        insertSessionStatement.bindLong(8, 0);                // IS_PAUSED
-        insertSessionStatement.bindString(9, "");             // NOTE
+            insertSessionStatement.bindLong(1, habitId);             // HABIT_ID
+            insertSessionStatement.bindString(2, habitName);         // HABIT_NAME
+            insertSessionStatement.bindString(3, habitCategoryName); // HABIT_CATEGORY
+            insertSessionStatement.bindLong(4, 0);                   // DURATION
+            insertSessionStatement.bindLong(5, getCurrentTime());    // STARTING_TIME
+            insertSessionStatement.bindLong(6, 0);                   // LAST_TIME_PAUSED
+            insertSessionStatement.bindLong(7, 0);                   // TOTAL_PAUSE_TIME
+            insertSessionStatement.bindLong(8, 0);                   // IS_PAUSED
+            insertSessionStatement.bindString(9, "");                // NOTE
 
-        createSessionNotification(habit);
+            long result = insertSessionStatement.executeInsert();
 
-        return insertSessionStatement.executeInsert();
+            if (preferenceChecker.doShowNotificationsAutomatically()) {
+                createSessionNotification(habit);
+            }
+
+            return result;
+        }
+
+        return -1;
     }
 
-    public void createSessionNotification(final Habit habit) {
-        Toast.makeText(context, "Create notification", Toast.LENGTH_SHORT).show();
+    public void createSessionNotification(long habitId) {
+        Habit habit = habitDatabase.getHabit(habitId);
+        createSessionNotification(habit);
+    }
+
+    public void createSessionNotification(Habit habit) {
+        // TODO CLEAN UP!
+        if (preferenceChecker.doShowNotifications()) {
+            final int habitId = (int) habit.getDatabaseId();
+
+            boolean isPaused = getIsPaused(habitId);
+            int iconResId = isPaused? R.drawable.ic_play_circle_filled_black_24dp :
+                    R.drawable.ic_play_circle_outline_black_24dp;
+
+            RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+                    R.layout.notification_layout);
+
+            remoteViews.setTextViewText(R.id.active_session_habit_name, habit.getName());
+            remoteViews.setInt(R.id.card_accent, "setBackgroundColor", habit.getCategory().getColorAsInt());
+            remoteViews.setInt(R.id.session_pause_play, "setImageResource", iconResId);
+
+            Intent sessionToggleButton = new Intent("session_toggle_pressed");
+            sessionToggleButton.putExtra("habitId", habitId);
+            sessionToggleButton.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(context, habitId, sessionToggleButton, 0);
+            remoteViews.setOnClickPendingIntent(R.id.session_pause_play, pendingToggleIntent);
 
 
-        Intent intent = new Intent(context, SessionManager.class);
+            final NotificationCompat.Builder builder =
+                    new NotificationCompat.Builder(context)
+                            .setSmallIcon(R.drawable.ic_notification_icon)
+                            .setContentText("")
+                            .setContentTitle("")
+                            .setVisibility(Notification.VISIBILITY_PUBLIC)
+                            .setPriority(Notification.PRIORITY_MAX)
+                            .setAutoCancel(false)
+                            .setOngoing(true)
+                            .setSortKey(habit.getName())
+                            .setCustomContentView(remoteViews);
 
-        PendingIntent pIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), intent, 0);
+            if(preferenceChecker.doShowTicker()) {
+                String ticker = String.format
+                        (Locale.getDefault(), context.getString(R.string.session_notification_ticker_format_string), habit.getName());
+                builder.setTicker(ticker);
+            }
 
-        NotificationCompat.Action action = new NotificationCompat.Action(
-                R.drawable.ic_play_circle_outline_black_24dp,
-                "pause",
-                pIntent
-        );
+            Intent resultIntent = new Intent(context, SessionActivity.class);
+            resultIntent.putExtra("habit", habit);
 
-        NotificationCompat.Action action2 = new NotificationCompat.Action(
-                R.drawable.ic_check_white_24px,
-                "finish",
-                pIntent
-        );
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            stackBuilder.addParentStack(MainActivity.class);
+            stackBuilder.addNextIntent(resultIntent);
 
-        final NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.ic_timer_white_24px)
-                        .setColor(habit.getCategory().getColorAsInt())
-                        .setContentTitle(habit.getName())
-                        .setContentText(habit.getCategory().getName())
-                        .setTicker("Session for '" +habit.getName()+ "' started")
-                        .addAction(action)
-                        .addAction(action2)
-                        ;
+            PendingIntent resultPendingIntent =
+                    stackBuilder.getPendingIntent(
+                            habitId,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+            builder.setContentIntent(resultPendingIntent);
 
-        Intent resultIntent = new Intent(context, SessionActivity.class);
-        resultIntent.putExtra("habit", habit);
+            notificationManager.notify(habitId, builder.build());
 
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addNextIntent(resultIntent);
+            new Thread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            SessionEntry entry = getSession(habitId);
+                            String timeDisplayText = TimeDisplay.getDisplay(entry.getDuration());
 
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-        mBuilder.setContentIntent(resultPendingIntent);
+                            RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+                                    R.layout.notification_layout);
+                            remoteViews.setTextViewText(R.id.active_habit_time, timeDisplayText);
 
-        int mNotificationId = (int)habit.getDatabaseId();
+                            builder.setCustomContentView(remoteViews);
+                            notificationManager.notify(habitId, builder.build());
 
-        final NotificationManager mNotificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(mNotificationId, mBuilder.build());
-
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        while(true) { // TODO fix this warning!
-                            try {
-
-                                SessionEntry entry = getSession(habit.getDatabaseId());
-                                TimeDisplay display = new TimeDisplay(entry.getDuration());
-
-                                // When the loop is finished, updates the notification
-                                mBuilder.setContentText(display.toString());
-
-                                mNotificationManager.notify((int) habit.getDatabaseId(), mBuilder.build());
-                                Thread.sleep(1000);
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                            if(isSessionActive(habitId) && preferenceChecker.doShowNotifications()) {
+                                try {
+                                    Thread.sleep(1000);
+                                    this.run();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            else{
+                                notificationManager.cancel(habitId);
                             }
                         }
-
                     }
-                }
-// Starts the thread by calling the run() method in its Runnable
-        ).start();
+            ).start();
+        }
+    }
+    public static class SessionToggle extends BroadcastReceiver {
 
+        @Override
+        public void onReceive(Context context, Intent data) {
+            int habitId = data.getIntExtra("habitId", -1);
+
+            SessionManager manager = new SessionManager(context);
+            boolean isPaused = manager.getIsPaused(habitId);
+            manager.setPauseState(habitId, !isPaused);
+            manager.createSessionNotification(habitId);
+        }
+    }
+
+    public void createAllSessionNotifications(){
+        List<SessionEntry> entries = getActiveSessionList();
+        for(SessionEntry entry: entries){
+            createSessionNotification(entry.getHabitId());
+        }
+    }
+
+    public void clearAllNotifications(){
+        notificationManager.cancelAll();
     }
 
     /**
@@ -195,6 +248,13 @@ public class SessionManager {
         }
 
         return null;
+    }
+
+    public void setPauseState(long habitId, boolean pause){
+        if(pause)
+            pauseSession(habitId);
+        else
+            playSession(habitId);
     }
 
     /**
@@ -225,6 +285,8 @@ public class SessionManager {
      * @return the number of rows affected if a whereClause is passed in, 0 otherwise.
      */
     public long cancelSession(long habitId){
+        notificationManager.cancel((int)habitId);
+
         return dbHelper.writableDatabase.delete(
                 SESSIONS_TABLE,
                 HABIT_ID + " =?",
@@ -269,7 +331,7 @@ public class SessionManager {
         List<SessionEntry> sessions = new ArrayList<>();
 
         Cursor c = dbHelper.getReadableDatabase()
-                .query(DatabaseHelper.SESSIONS_TABLE, new String[]{DatabaseHelper.HABIT_ID},
+                .query(SESSIONS_TABLE, new String[]{HABIT_ID},
                         null, null, null, null, null);
 
         if (c.moveToFirst()) {
@@ -293,8 +355,8 @@ public class SessionManager {
 
         List<SessionEntry> sessions = new ArrayList<>();
 
-        Cursor c = dbHelper.readableDatabase.rawQuery("SELECT "+DatabaseHelper.HABIT_ID+" FROM " +
-                DatabaseHelper.SESSIONS_TABLE + " WHERE " +
+        Cursor c = dbHelper.readableDatabase.rawQuery("SELECT "+ HABIT_ID+" FROM " +
+                SESSIONS_TABLE + " WHERE " +
                 DatabaseHelper.HABIT_NAME + " LIKE  '%" + query + "%' OR " +
                 DatabaseHelper.HABIT_CATEGORY + " LIKE  '%" + query + "%'", null);
 
@@ -496,6 +558,10 @@ public class SessionManager {
         @Override
         public String toString() {
             return String.format(Locale.US, "%02d:%02d:%02d", this.hours, this.minutes, this.seconds);
+        }
+
+        public static String getDisplay(long duration) {
+            return new TimeDisplay(duration).toString();
         }
     }
 }

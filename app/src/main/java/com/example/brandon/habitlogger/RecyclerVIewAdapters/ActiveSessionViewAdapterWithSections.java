@@ -12,8 +12,8 @@ import android.widget.TextView;
 
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
+import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.SessionManager.SessionManager;
 
 import java.util.List;
 import java.util.Locale;

@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.SessionManager;
+package com.example.brandon.habitlogger.HabitSessions;
 
 import android.content.ContentValues;
 import android.content.Context;

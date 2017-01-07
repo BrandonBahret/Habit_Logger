@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger;
+package com.example.brandon.habitlogger.ModifyHabitActivity;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -13,6 +13,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+
+import com.example.brandon.habitlogger.R;
 
 import java.util.ArrayList;
 

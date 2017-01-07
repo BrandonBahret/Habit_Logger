@@ -6,6 +6,8 @@ import android.test.RenamingDelegatingContext;
 import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 
+import java.util.Set;
+
 /**
  * Instrumentation test, which will execute on an Android device.
  *
@@ -69,9 +71,9 @@ public class HabitDatabaseNonAsyncCategoryMethodsTest extends AndroidTestCase {
         long expectedId = db.addCategory(new HabitCategory("color", "two"));
         db.addCategory(new HabitCategory("color", "three"));
 
-        long[] ids = db.searchCategoryIdsByName("wo");
+        Set<Long> ids = db.searchCategoryIdsByName("wo");
 
-        assertEquals(expectedId, ids[0]);
+        assertEquals(expectedId, ids.toArray()[0]);
     }
 
     public void testGetCategory(){

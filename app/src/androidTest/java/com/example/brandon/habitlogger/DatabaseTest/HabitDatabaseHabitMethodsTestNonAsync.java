@@ -9,6 +9,8 @@ import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Instrumentation test, which will execute on an Android device.
@@ -87,14 +89,14 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
 
     public void testSearchHabitIdsByName(){
 
-        long expectedIds[] = new long[2];
+        Set<Long> expectedIds = new HashSet<>(2);
 
         db.addHabitAndCategory(new Habit("one", "", getDummyHabit().getCategory(), null, ""));
-        expectedIds[0] = db.addHabitAndCategory(new Habit("two", "", getDummyHabit().getCategory(), null, ""));
-        expectedIds[1] = db.addHabitAndCategory(new Habit("three", "", getDummyHabit().getCategory(), null, ""));
+        expectedIds.add(db.addHabitAndCategory(new Habit("two", "", getDummyHabit().getCategory(), null, "")));
+        expectedIds.add(db.addHabitAndCategory(new Habit("three", "", getDummyHabit().getCategory(), null, "")));
         db.addHabitAndCategory(new Habit("four", "", getDummyHabit().getCategory(), null, ""));
 
-        assertTrue(Arrays.equals(expectedIds, db.searchHabitIdsByName("t", 1)));
+        assertTrue(expectedIds.equals(db.searchHabitIdsByName("t")));
     }
 
     public void testGetHabit(){

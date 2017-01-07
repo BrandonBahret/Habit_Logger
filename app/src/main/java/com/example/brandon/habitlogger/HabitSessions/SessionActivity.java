@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger;
+package com.example.brandon.habitlogger.HabitSessions;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,13 +17,15 @@ import android.widget.TextView;
 
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
-import com.example.brandon.habitlogger.SessionManager.SessionManager;
+import com.example.brandon.habitlogger.R;
 
 import java.util.Locale;
 
 public class SessionActivity extends AppCompatActivity {
 
     public static final int RESULT_SESSION_FINISH = 300;
+    public static final int RESULT_NOTIFICATION_FINISH = 301;
+    public static final int RESULT_NOTIFICATION_PAUSE_PLAY = 302;
 
     Runnable updateTimeDisplayRunnable;
     Handler handler = new Handler();
@@ -104,24 +106,6 @@ public class SessionActivity extends AppCompatActivity {
         };
     }
 
-    public void updateTimeDisplay(){
-        SessionEntry entry = sessionManager.getSession(habitId);
-
-        long time = entry.getDuration();
-        SessionManager.TimeDisplay display = new SessionManager.TimeDisplay(time);
-
-        hoursView.setText  (String.format(Locale.US, "%02d", display.hours));
-        minutesView.setText(String.format(Locale.US, "%02d", display.minutes));
-        secondsView.setText(String.format(Locale.US, "%02d", display.seconds));
-    }
-
-    public void reloadNote(){
-        String note = sessionManager.getNote(habitId);
-        if(!note.equals("")){
-            noteArea.setText(note);
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_session_confirmation, menu);
@@ -150,15 +134,6 @@ public class SessionActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void prepareTimerDisplay(){
-        if(sessionManager.getIsPaused(habitId)){
-            playButton.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
-        }
-        updateTimeDisplay();
-        reloadNote();
-        handler.post(updateTimeDisplayRunnable);
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -181,5 +156,32 @@ public class SessionActivity extends AppCompatActivity {
     protected void onPause() {
         handler.removeCallbacks(updateTimeDisplayRunnable);
         super.onPause();
+    }
+
+    public void updateTimeDisplay(){
+        SessionEntry entry = sessionManager.getSession(habitId);
+
+        long time = entry.getDuration();
+        SessionManager.TimeDisplay display = new SessionManager.TimeDisplay(time);
+
+        hoursView.setText  (String.format(Locale.US, "%02d", display.hours));
+        minutesView.setText(String.format(Locale.US, "%02d", display.minutes));
+        secondsView.setText(String.format(Locale.US, "%02d", display.seconds));
+    }
+
+    public void reloadNote(){
+        String note = sessionManager.getNote(habitId);
+        if(!note.equals("")){
+            noteArea.setText(note);
+        }
+    }
+
+    public void prepareTimerDisplay(){
+        if(sessionManager.getIsPaused(habitId)){
+            playButton.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
+        }
+        updateTimeDisplay();
+        reloadNote();
+        handler.post(updateTimeDisplayRunnable);
     }
 }

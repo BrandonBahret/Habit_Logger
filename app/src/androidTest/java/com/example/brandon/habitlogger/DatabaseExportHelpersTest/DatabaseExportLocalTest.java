@@ -98,8 +98,8 @@ public class DatabaseExportLocalTest extends AndroidTestCase{
         assertNotNull(expectedHabit);
 
         // Private storage
-        boolean result = dataExportManager.exportHabit(expectedHabit, false);
-        assertEquals(true , result);
+        String result = dataExportManager.exportHabit(expectedHabit, false);
+        assertNotNull(result);
 
         Habit actualHabit = dataExportManager.getHabit(
                 dataExportManager.getFilePathFromHabit(expectedHabit, false),
@@ -111,7 +111,7 @@ public class DatabaseExportLocalTest extends AndroidTestCase{
         // Public storage
 
         result = dataExportManager.exportHabit(expectedHabit, true);
-        assertEquals(true , result);
+        assertNotNull(result);
 
         actualHabit = dataExportManager.getHabit(
                 dataExportManager.getFilePathFromHabit(expectedHabit, true),

@@ -6,16 +6,30 @@
         <item>Sections</item>
         <item>None</item>
     </string-array>
+    <string-array name="category_options_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 
     <string-array name="theme_options">
         <item>Light</item>
         <item>Dark</item>
+    </string-array>
+    <string-array name="theme_options_values">
+        <item>0</item>
+        <item>1</item>
     </string-array>
 
     <string-array name="date_format_options">
         <item>DD-MM-YYYY</item>
         <item>MM-DD-YYYY</item>
         <item>MM-YYYY</item>
+    </string-array>
+    <string-array name="date_format_options_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
     </string-array>
 
 </resources>

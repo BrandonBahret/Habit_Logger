@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger;
+package com.example.brandon.habitlogger.ModifyHabitActivity;
 
 import android.content.Intent;
 import android.graphics.PorterDuff;
@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
+import com.example.brandon.habitlogger.R;
 
 /**
  * Created by Brandon on 12/6/2016.

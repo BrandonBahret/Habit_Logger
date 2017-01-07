@@ -8,7 +8,8 @@ import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Instrumentation test, which will execute on an Android device.
@@ -71,46 +72,45 @@ public class HabitDatabaseNonAsyncEntryMethodsTest extends AndroidTestCase {
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "2"));
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "3"));
         long expectedId  = db.addEntry(mainHabitId, new SessionEntry(0, 0, "4"));
-        long actualIds[] = db.searchEntryIdsByComment(mainHabitId, "4");
+        Set<Long> actualIds = db.searchEntryIdsByComment(mainHabitId, "4");
 
         assertNotNull(actualIds);
-        assertEquals(expectedId, actualIds[0]);
+        assertEquals(expectedId, actualIds.toArray()[0]);
     }
 
     public void testSearchEntriesWithTimeRangeForAHabit(){
-        long expectedIds[] = new long[2];
+        Set<Long> expectedIds = new HashSet<>(2);
 
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "1"));
-        expectedIds[0] = db.addEntry(mainHabitId, new SessionEntry(600, 0, "4"));
-        expectedIds[1] = db.addEntry(mainHabitId, new SessionEntry(600, 0, "5"));
+        expectedIds.add(db.addEntry(mainHabitId, new SessionEntry(600, 0, "4")));
+        expectedIds.add(db.addEntry(mainHabitId, new SessionEntry(600, 0, "5")));
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "7"));
 
-        long actualIds[] = db.searchEntriesWithTimeRangeForAHabit(mainHabitId, 500, 1000);
+        Set<Long> actualIds = db.searchEntriesWithTimeRangeForAHabit(mainHabitId, 500, 1000);
 
         assertNotNull(expectedIds);
         assertNotNull(actualIds);
-        assertTrue(Arrays.equals(expectedIds, actualIds));
+        assertEquals(expectedIds, actualIds);
     }
 
     public void testSearchAllEntriesWithTimeRange(){
-        long expectedIds[] = new long[4];
-        int idInd = 0;
+        Set<Long> expectedIds = new HashSet<>(4);
 
         long newHabitId = db.addHabitAndCategory(new Habit("new habit", "", new HabitCategory("color", "name"), null, ""));
 
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "1"));
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "2"));
-        expectedIds[idInd++] = db.addEntry(newHabitId, new SessionEntry(600, 0, "3"));
-        expectedIds[idInd++] = db.addEntry(newHabitId, new SessionEntry(600, 0, "4"));
-        expectedIds[idInd++] = db.addEntry(mainHabitId, new SessionEntry(600, 0, "5"));
-        expectedIds[idInd] = db.addEntry(mainHabitId, new SessionEntry(600, 0, "6"));
+        expectedIds.add(db.addEntry(newHabitId, new SessionEntry(600, 0, "3")));
+        expectedIds.add(db.addEntry(newHabitId, new SessionEntry(600, 0, "4")));
+        expectedIds.add(db.addEntry(mainHabitId, new SessionEntry(600, 0, "5")));
+        expectedIds.add(db.addEntry(mainHabitId, new SessionEntry(600, 0, "6")));
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "7"));
 
-        long actualIds[] = db.searchAllEntriesWithTimeRange(500, 1000);
+        Set<Long> actualIds = db.searchAllEntriesWithTimeRange(500, 1000);
 
         assertNotNull(expectedIds);
         assertNotNull(actualIds);
-        assertTrue(Arrays.equals(expectedIds, actualIds));
+        assertEquals(expectedIds, actualIds);
     }
 
     public void testGetEntryId(){

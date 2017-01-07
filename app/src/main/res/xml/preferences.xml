@@ -5,51 +5,68 @@
         android:title="Main Screen Settings">
 
         <ListPreference
-            android:key="@string/preference_display_categories"
+            android:key="category_preference"
             android:title="Categories"
             android:summary="Set how the app displays habit categories."
-            android:defaultValue="Cards"
+            android:defaultValue="0"
             android:entries="@array/category_options"
-            android:entryValues="@array/category_options"
+            android:entryValues="@array/category_options_values"
             android:dialogTitle="Display categories as..." />
 
         <SwitchPreference
-            android:key="@string/preference_display_current_sessions_card"
+            android:key="display_current_sessions_card"
             android:title="Current Sessions"
             android:summary="Display the 'Current Sessions' card."
             android:defaultValue="true"/>
 
         <CheckBoxPreference
-            android:key="@string/preference_display_current_sessions_at_zero"
-            android:title="Display Always"
+            android:key="display_current_sessions_at_zero"
+            android:title="Always Display Current Sessions"
             android:dependency="display_current_sessions_card"
-            android:summary="Display the 'Current Sessions' card even when zero sessions are active." />
+            android:summary="Display the 'Current Sessions' card even when zero sessions are active."
+            android:defaultValue="true"/>
+    </PreferenceCategory>
 
+    <PreferenceCategory android:title="Notifications">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:title="Show Notifications"
+            android:key="do_show_notifications"
+            android:summary="Show notifications for active sessions." />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:title="Automatically Show Notifications"
+            android:key="do_automatically_show_notifications"
+            android:dependency="do_show_notifications"
+            android:summary="Have the app automatically display notifications." />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:title="Show Ticker"
+            android:key="show_ticker"
+            android:dependency="do_show_notifications"
+            android:summary="Show the header in the status bar when a notification is made." />
     </PreferenceCategory>
 
     <PreferenceCategory
         android:title="Appearance">
 
         <ListPreference
-            android:key="@string/preference_theme"
+            android:key="theme"
             android:title="Theme"
             android:summary="change the theme of the app"
-            android:defaultValue="Light"
+            android:defaultValue="0"
             android:entries="@array/theme_options"
             android:entryValues="@array/theme_options"
             android:dialogTitle="Select a theme" />
 
         <ListPreference
-            android:key="@string/preference_date_format"
+            android:key="date_format"
             android:title="Date Format"
             android:summary="Set the format used to display dates."
             android:entries="@array/date_format_options"
-            android:entryValues="@array/date_format_options"
+            android:entryValues="@array/date_format_options_values"
             android:dialogTitle="Select a format"
-            android:defaultValue="DD-MM-YYYY"/>
-
+            android:defaultValue="0"/>
     </PreferenceCategory>
-
-
 
 </PreferenceScreen>

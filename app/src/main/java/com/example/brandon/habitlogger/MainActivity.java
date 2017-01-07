@@ -2,10 +2,8 @@ package com.example.brandon.habitlogger;
 
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -32,8 +30,13 @@ import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
+import com.example.brandon.habitlogger.HabitSessions.ActiveSessionsActivity;
+import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
+import com.example.brandon.habitlogger.HabitSessions.SessionManager;
+import com.example.brandon.habitlogger.ModifyHabitActivity.ModifyHabitActivity;
+import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
+import com.example.brandon.habitlogger.Preferences.SettingsActivity;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.HabitViewAdapter;
-import com.example.brandon.habitlogger.SessionManager.SessionManager;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
 import java.io.Serializable;
@@ -47,8 +50,7 @@ import static com.example.brandon.habitlogger.R.menu.main;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    // Preferences
-    boolean showCurrentSessions, showCurrentSessionsAlways;
+    PreferenceChecker preferenceChecker;
 
     SessionManager sessionManager;
     CardView currentSession;
@@ -58,7 +60,7 @@ public class MainActivity extends AppCompatActivity
     GoogleDriveDataExportManager googleDrive;
 
     List<Habit> habitList = new ArrayList<>();
-    ;
+
     RecyclerView habitCardContainer;
     HabitViewAdapter habitAdapter;
 
@@ -176,7 +178,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        updatePreferences();
+        preferenceChecker = new PreferenceChecker(this);
         updateCurrentSessionCard();
         showDatabase();
     }
@@ -356,12 +358,21 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(preferenceChecker.doShowNotificationsAutomatically()) {
+            sessionManager.createAllSessionNotifications();
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
-
-        updatePreferences();
         updateCurrentSessionCard();
     }
+
+
 
     public void processUserQuery(String query) {
         if (query.length() != 0) {
@@ -378,12 +389,6 @@ public class MainActivity extends AppCompatActivity
         } else {
             showDatabase();
         }
-    }
-
-    private void updatePreferences() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        this.showCurrentSessions = preferences.getBoolean(getString(R.string.preference_display_current_sessions_card), true);
-        this.showCurrentSessionsAlways = preferences.getBoolean(getString(R.string.preference_display_current_sessions_at_zero), true);
     }
 
     public void startSession(Habit habit) {
@@ -431,10 +436,10 @@ public class MainActivity extends AppCompatActivity
         int count = sessionManager.getSessionCount();
         currentSession.setAlpha(count == 0? 0.5f : 1.0f);
 
-        if((count != 0 || showCurrentSessionsAlways) && showCurrentSessions
+        if((count != 0 || preferenceChecker.doAlwaysShowCurrentSessions()) && preferenceChecker.doShowCurrentSessions()
                 && (currentSession.getVisibility() == View.GONE)) {
             currentSession.setVisibility(View.VISIBLE);
-        } else if (!showCurrentSessions) {
+        } else if (!preferenceChecker.doShowCurrentSessions()) {
             currentSession.setVisibility(View.GONE);
         }
 
@@ -443,7 +448,7 @@ public class MainActivity extends AppCompatActivity
                 countText.setText(R.string.no);
                 countLabelText.setText(R.string.active_sessions);
 
-                if(!showCurrentSessionsAlways){
+                if(!preferenceChecker.doAlwaysShowCurrentSessions()){
                     currentSession.setVisibility(View.GONE);
                 }
 
@@ -461,7 +466,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private class addJunkData extends AsyncTask<Void, Void, Void>{
+    public class addJunkData extends AsyncTask<Void, Void, Void>{
         int numberOfCategories, numberOfEntries, numberOfHabits;
 
         addJunkData(int numberOfCategories, int numberOfEntries, int numberOfHabits){
