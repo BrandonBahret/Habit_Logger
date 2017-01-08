@@ -45,7 +45,7 @@
 
         <activity
             android:name=".HabitSessions.SessionActivity"
-            android:launchMode="singleTask"
+            android:launchMode="singleTop"
             android:label="Habit Session"
             android:theme="@style/AppTheme"/>
 

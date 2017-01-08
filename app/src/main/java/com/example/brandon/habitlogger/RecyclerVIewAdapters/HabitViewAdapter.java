@@ -36,6 +36,8 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewAdapter.View
 
     public interface ButtonClickListener{
         void onPlayButtonClicked(long habitId);
+        void onPlayButtonLongClicked(long habitId);
+
         void onCardClicked(long habitId);
     }
 
@@ -134,6 +136,14 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewAdapter.View
             @Override
             public void onClick(View view) {
                 buttonClickListener.onPlayButtonClicked(habitId);
+            }
+        });
+
+        holder.playButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                buttonClickListener.onPlayButtonLongClicked(habitId);
+                return true;
             }
         });
 

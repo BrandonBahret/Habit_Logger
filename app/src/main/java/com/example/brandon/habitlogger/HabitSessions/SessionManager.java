@@ -10,14 +10,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
 
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
-import com.example.brandon.habitlogger.MainActivity;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
 
@@ -42,6 +40,16 @@ public class SessionManager {
     private PreferenceChecker preferenceChecker;
     private HabitDatabase habitDatabase;
     private NotificationManager notificationManager;
+
+    private static SessionChangeListener sessionChangeListener = null;
+
+    public interface SessionChangeListener{
+        void sessionPauseStateChanged(long sessionId, boolean isPaused);
+    }
+
+    public void setSessionChangedListener(SessionChangeListener listener){
+        this.sessionChangeListener = listener;
+    }
 
     public SessionManager(Context context){
         this.context = context;
@@ -114,21 +122,23 @@ public class SessionManager {
         createSessionNotification(habit);
     }
 
+    public int getResourceIdForPauseButton(boolean isPaused){
+        return isPaused? R.drawable.ic_play_circle_filled_black_24dp :
+                R.drawable.ic_play_circle_outline_black_24dp;
+    }
+
     public void createSessionNotification(Habit habit) {
         // TODO CLEAN UP!
         if (preferenceChecker.doShowNotifications()) {
             final int habitId = (int) habit.getDatabaseId();
-
-            boolean isPaused = getIsPaused(habitId);
-            int iconResId = isPaused? R.drawable.ic_play_circle_filled_black_24dp :
-                    R.drawable.ic_play_circle_outline_black_24dp;
 
             RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
                     R.layout.notification_layout);
 
             remoteViews.setTextViewText(R.id.active_session_habit_name, habit.getName());
             remoteViews.setInt(R.id.card_accent, "setBackgroundColor", habit.getCategory().getColorAsInt());
-            remoteViews.setInt(R.id.session_pause_play, "setImageResource", iconResId);
+            remoteViews.setInt(R.id.session_pause_play, "setImageResource",
+                    getResourceIdForPauseButton(getIsPaused(habitId)));
 
             Intent sessionToggleButton = new Intent("session_toggle_pressed");
             sessionToggleButton.putExtra("habitId", habitId);
@@ -158,15 +168,7 @@ public class SessionManager {
             Intent resultIntent = new Intent(context, SessionActivity.class);
             resultIntent.putExtra("habit", habit);
 
-            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-            stackBuilder.addParentStack(MainActivity.class);
-            stackBuilder.addNextIntent(resultIntent);
-
-            PendingIntent resultPendingIntent =
-                    stackBuilder.getPendingIntent(
-                            habitId,
-                            PendingIntent.FLAG_UPDATE_CURRENT
-                    );
+            PendingIntent resultPendingIntent = PendingIntent.getActivity(context, habitId, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             builder.setContentIntent(resultPendingIntent);
 
             notificationManager.notify(habitId, builder.build());
@@ -175,17 +177,25 @@ public class SessionManager {
                     new Runnable() {
                         @Override
                         public void run() {
-                            SessionEntry entry = getSession(habitId);
-                            String timeDisplayText = TimeDisplay.getDisplay(entry.getDuration());
-
-                            RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-                                    R.layout.notification_layout);
-                            remoteViews.setTextViewText(R.id.active_habit_time, timeDisplayText);
-
-                            builder.setCustomContentView(remoteViews);
-                            notificationManager.notify(habitId, builder.build());
 
                             if(isSessionActive(habitId) && preferenceChecker.doShowNotifications()) {
+                                SessionEntry entry = getSession(habitId);
+                                String timeDisplayText = TimeDisplay.getDisplay(entry.getDuration());
+
+                                RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+                                        R.layout.notification_layout);
+                                remoteViews.setTextViewText(R.id.active_habit_time, timeDisplayText);
+                                remoteViews.setInt(R.id.session_pause_play, "setImageResource",
+                                        getResourceIdForPauseButton(getIsPaused(habitId)));
+
+                                builder.setCustomContentView(remoteViews);
+                                Intent resultIntent = new Intent(context, SessionActivity.class);
+                                resultIntent.putExtra("habit", habitDatabase.getHabit(habitId));
+                                PendingIntent resultPendingIntent = PendingIntent.getActivity(context, habitId, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                builder.setContentIntent(resultPendingIntent);
+
+                                notificationManager.notify(habitId, builder.build());
+
                                 try {
                                     Thread.sleep(1000);
                                     this.run();
@@ -251,6 +261,10 @@ public class SessionManager {
     }
 
     public void setPauseState(long habitId, boolean pause){
+        if (sessionChangeListener != null) {
+            sessionChangeListener.sessionPauseStateChanged(habitId, pause);
+        }
+
         if(pause)
             pauseSession(habitId);
         else

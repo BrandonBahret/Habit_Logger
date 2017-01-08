@@ -4,6 +4,7 @@ package com.example.brandon.habitlogger;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -20,6 +21,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,6 +62,8 @@ public class MainActivity extends AppCompatActivity
     GoogleDriveDataExportManager googleDrive;
 
     List<Habit> habitList = new ArrayList<>();
+    Runnable updateCards;
+    Handler handler = new Handler();
 
     RecyclerView habitCardContainer;
     HabitViewAdapter habitAdapter;
@@ -67,6 +71,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getIntent().hasExtra("from_notification")) {
+            Habit habit = (Habit)getIntent().getSerializableExtra("habit");
+            startSession(habit);
+        }
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -156,6 +165,18 @@ public class MainActivity extends AppCompatActivity
         HabitViewAdapter.ButtonClickListener buttonClickListener = new HabitViewAdapter.ButtonClickListener() {
             @Override
             public void onPlayButtonClicked(long habitId) {
+                if(!sessionManager.isSessionActive(habitId)) {
+                    startSession(habitDatabase.getHabit(habitId));
+                }
+                else{
+                    boolean isPaused = sessionManager.getIsPaused(habitId);
+                    sessionManager.setPauseState(habitId, !isPaused);
+                    handler.post(updateCards);
+                }
+            }
+
+            @Override
+            public void onPlayButtonLongClicked(long habitId) {
                 startSession(habitDatabase.getHabit(habitId));
             }
 
@@ -164,6 +185,38 @@ public class MainActivity extends AppCompatActivity
 
             }
         };
+
+        updateCards = new Runnable() {
+            @Override
+            public void run() {
+                int size = habitList.size();
+
+                for(int i = 0; i < size; i++){
+                    long habitId = habitList.get(i).getDatabaseId();
+
+                    if(sessionManager.isSessionActive(habitId)) {
+                        SessionEntry entry = sessionManager.getSession(habitId);
+
+                        View item = habitCardContainer.getChildAt(i);
+
+                        if(item != null) {
+                            TextView timeTextView = (TextView) item.findViewById(R.id.habit_card_time_display);
+                            ImageButton pauseButton = (ImageButton)item.findViewById(R.id.session_control_button);
+                            pauseButton.setImageResource(sessionManager.getResourceIdForPauseButton(sessionManager.getIsPaused(habitId)));
+
+                            String timeText =
+                                    new SessionManager.TimeDisplay(entry.getDuration()).toString();
+
+                            timeTextView.setText(timeText);
+
+                        }
+                    }
+                }
+
+                handler.postDelayed(updateCards, 1000);
+            }
+        };
+        handler.post(updateCards);
 
         habitAdapter = new HabitViewAdapter(habitList, menuItemClickListener, buttonClickListener);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
@@ -339,8 +392,7 @@ public class MainActivity extends AppCompatActivity
 
                 case GoogleDriveDataExportManager.REQUEST_CODE_RESOLUTION: {
                     googleDrive.connect();
-                }
-                break;
+                }break;
             }
         }
     }

@@ -21,6 +21,8 @@ import com.example.brandon.habitlogger.R;
 
 import java.util.Locale;
 
+import static com.example.brandon.habitlogger.R.drawable.ic_play_circle_filled_black_24dp;
+
 public class SessionActivity extends AppCompatActivity {
 
     public static final int RESULT_SESSION_FINISH = 300;
@@ -58,6 +60,13 @@ public class SessionActivity extends AppCompatActivity {
             position = data.getIntExtra("position", RecyclerView.NO_POSITION);
 
         sessionManager = new SessionManager(this);
+        sessionManager.setSessionChangedListener(new SessionManager.SessionChangeListener() {
+            @Override
+            public void sessionPauseStateChanged(long habitId, boolean isPaused) {
+                updateSessionPlayButton(isPaused);
+            }
+        });
+
         if(!sessionManager.isSessionActive(habitId)){
             sessionManager.startSession(habitId);
         }
@@ -85,15 +94,9 @@ public class SessionActivity extends AppCompatActivity {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(sessionManager.getIsPaused(habitId)){
-                    sessionManager.playSession(habitId);
-                    playButton.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
-                }
-
-                else{
-                    sessionManager.pauseSession(habitId);
-                    playButton.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
-                }
+                boolean isPaused = !sessionManager.getIsPaused(habitId);
+                sessionManager.setPauseState(habitId, isPaused);
+                updateSessionPlayButton(isPaused);
             }
         });
 
@@ -123,6 +126,9 @@ public class SessionActivity extends AppCompatActivity {
 
                 String note = noteArea.getText().toString();
                 entry.setNote(note);
+
+//                HabitDatabase database = new HabitDatabase(this, null, false);
+//                database.addEntry(habitId, entry);
 
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("entry", entry);
@@ -177,11 +183,16 @@ public class SessionActivity extends AppCompatActivity {
     }
 
     public void prepareTimerDisplay(){
-        if(sessionManager.getIsPaused(habitId)){
-            playButton.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
-        }
+        updateSessionPlayButton(sessionManager.getIsPaused(habitId));
         updateTimeDisplay();
         reloadNote();
         handler.post(updateTimeDisplayRunnable);
+    }
+
+    private void updateSessionPlayButton(boolean isPaused) {
+        int resourceId = isPaused ? ic_play_circle_filled_black_24dp :
+                R.drawable.ic_play_circle_outline_black_24dp;
+
+        playButton.setImageResource(resourceId);
     }
 }

@@ -47,6 +47,19 @@ public class ActiveSessionsActivity extends AppCompatActivity {
             toolbar.setDisplayHomeAsUpEnabled(true);
 
         sessionManager = new SessionManager(this);
+        sessionManager.setSessionChangedListener(new SessionManager.SessionChangeListener() {
+            @Override
+            public void sessionPauseStateChanged(long habitId, boolean isPaused) {
+                for (SessionEntry entry : sessionEntries) {
+                    if(entry.getHabitId() == habitId){
+                        int position = sessionEntries.indexOf(entry);
+                        sessionViewAdapter.notifyItemChanged(position);
+                        break;
+                    }
+                }
+            }
+        });
+
         habitDatabase  = new HabitDatabase(this, null, false);
         sessionEntries = sessionManager.getActiveSessionList();
 
@@ -60,15 +73,8 @@ public class ActiveSessionsActivity extends AppCompatActivity {
             @Override
             public void onPauseClick(ActiveSessionViewAdapterWithSections.ViewHolder holder, long habitId) {
                 boolean isPaused = sessionManager.getIsPaused(habitId);
-
-                if(isPaused){
-                    sessionManager.playSession(habitId);
-                    holder.pauseButton.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
-                }
-                else{
-                    sessionManager.pauseSession(habitId);
-                    holder.pauseButton.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
-                }
+                sessionManager.setPauseState(habitId, !isPaused);
+                sessionViewAdapter.notifyItemChanged(holder.getAdapterPosition());
             }
         });
 
@@ -113,6 +119,19 @@ public class ActiveSessionsActivity extends AppCompatActivity {
             }
         };
         handler.post(updateCards);
+    }
+
+    private void updateSessionToggleButtonImageResource(int adapterPosition, boolean isPaused) {
+        SessionEntry entry = sessionEntries.get(adapterPosition);
+        entry.setIsPaused(isPaused);
+        sessionViewAdapter.notifyItemChanged(adapterPosition);
+
+//        if(isPaused){
+//            holder.pauseButton.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
+//        }
+//        else{
+//            holder.pauseButton.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
+//        }
     }
 
     @Override
