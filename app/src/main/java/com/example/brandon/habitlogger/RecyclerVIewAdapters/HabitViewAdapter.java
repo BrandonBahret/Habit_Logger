@@ -97,7 +97,12 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewAdapter.View
         // Make sure menu hasn't been inflated yet.
         int menuSize = holder.toolbar.getMenu().size();
         if(menuSize == 0) {
-            holder.toolbar.inflateMenu(R.menu.menu_habit_card);
+            if(item.getIsArchived()){
+                holder.toolbar.inflateMenu(R.menu.menu_archived_habit_card);
+            }
+            else{
+                holder.toolbar.inflateMenu(R.menu.menu_habit_card);
+            }
             holder.toolbar.setTitle(item.getName());
 
             holder.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {

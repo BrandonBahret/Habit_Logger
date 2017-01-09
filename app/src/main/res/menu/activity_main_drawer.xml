@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/home_nav"
         android:title="@string/home_nav_string"
@@ -11,6 +12,9 @@
         android:icon="@drawable/ic_timer_black_24px"
         />
 
+    <item android:title="@string/menu_archive"
+        android:id="@+id/archived_habits"
+        android:icon="@drawable/ic_archive_black_24dp" />
     <item android:id="@+id/overall_stats_nav"
         android:title="@string/overall_stats_nav_string"
         android:icon="@drawable/ic_health_graph_1"

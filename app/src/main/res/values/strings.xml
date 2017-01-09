@@ -53,5 +53,6 @@
     <string name="new_habit_title">New Habit</string>
     <string name="edit_habit_title">Edit Habit</string>
     <string name="session_notification_ticker_format_string">Controller for \"%s\" created</string>
+    <string name="menu_archive">Archive</string>
 
 </resources>

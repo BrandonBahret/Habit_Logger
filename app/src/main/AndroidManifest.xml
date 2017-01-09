@@ -11,12 +11,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,7 +31,6 @@
                     android:scheme="http" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ModifyHabitActivity.ModifyHabitActivity"
             android:label="New Habit"
@@ -42,14 +39,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
         <activity
             android:name=".HabitSessions.SessionActivity"
-            android:launchMode="singleTop"
             android:label="Habit Session"
-            android:theme="@style/AppTheme"/>
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme" />
 
-        <receiver android:name=".HabitSessions.SessionManager$SessionToggle"
+        <receiver
+            android:name=".HabitSessions.SessionManager$SessionToggle"
             android:exported="false">
             <intent-filter>
                 <action android:name="session_toggle_pressed" />
@@ -60,13 +57,13 @@
             android:name=".HabitSessions.ActiveSessionsActivity"
             android:label="Active Habits"
             android:theme="@style/AppTheme" />
-
         <activity
             android:name=".AboutActivity"
             android:label="About"
             android:theme="@style/AppTheme" />
 
-        <activity android:name=".Preferences.SettingsActivity"/>
+        <activity android:name=".Preferences.SettingsActivity" />
+
     </application>
 
 </manifest>

@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.R;
 
@@ -64,6 +65,11 @@ public class SessionActivity extends AppCompatActivity {
             @Override
             public void sessionPauseStateChanged(long habitId, boolean isPaused) {
                 updateSessionPlayButton(isPaused);
+            }
+
+            @Override
+            public void sessionEnded(long habitId, boolean wasCanceled) {
+
             }
         });
 
@@ -127,12 +133,8 @@ public class SessionActivity extends AppCompatActivity {
                 String note = noteArea.getText().toString();
                 entry.setNote(note);
 
-//                HabitDatabase database = new HabitDatabase(this, null, false);
-//                database.addEntry(habitId, entry);
-
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("entry", entry);
-                setResult(Activity.RESULT_OK, resultIntent);
+                HabitDatabase database = new HabitDatabase(this, null, false);
+                database.addEntry(habitId, entry);
                 finish();
             }break;
         }

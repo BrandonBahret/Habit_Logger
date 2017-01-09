@@ -41,14 +41,15 @@ public class SessionManager {
     private HabitDatabase habitDatabase;
     private NotificationManager notificationManager;
 
-    private static SessionChangeListener sessionChangeListener = null;
+    private static ArrayList<SessionChangeListener> sessionChangeListeners = new ArrayList<>();
 
     public interface SessionChangeListener{
-        void sessionPauseStateChanged(long sessionId, boolean isPaused);
+        void sessionPauseStateChanged(long habitId, boolean isPaused);
+        void sessionEnded(long habitId, boolean wasCanceled);
     }
 
     public void setSessionChangedListener(SessionChangeListener listener){
-        this.sessionChangeListener = listener;
+        this.sessionChangeListeners.add(listener);
     }
 
     public SessionManager(Context context){
@@ -261,8 +262,10 @@ public class SessionManager {
     }
 
     public void setPauseState(long habitId, boolean pause){
-        if (sessionChangeListener != null) {
-            sessionChangeListener.sessionPauseStateChanged(habitId, pause);
+        if (sessionChangeListeners != null) {
+            for(SessionChangeListener listener: sessionChangeListeners) {
+                listener.sessionPauseStateChanged(habitId, pause);
+            }
         }
 
         if(pause)
@@ -301,6 +304,12 @@ public class SessionManager {
     public long cancelSession(long habitId){
         notificationManager.cancel((int)habitId);
 
+        if (sessionChangeListeners != null) {
+            for(SessionChangeListener listener: sessionChangeListeners) {
+                listener.sessionEnded(habitId, true);
+            }
+        }
+
         return dbHelper.writableDatabase.delete(
                 SESSIONS_TABLE,
                 HABIT_ID + " =?",
@@ -316,6 +325,12 @@ public class SessionManager {
     public SessionEntry finishSession(long habitId){
         if(getIsPaused(habitId)){
             playSession(habitId);
+        }
+
+        if (sessionChangeListeners != null) {
+            for(SessionChangeListener listener: sessionChangeListeners) {
+                listener.sessionEnded(habitId, false);
+            }
         }
 
         SessionEntry entry = getSession(habitId);

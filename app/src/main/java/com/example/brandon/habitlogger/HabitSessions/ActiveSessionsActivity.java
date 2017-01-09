@@ -58,6 +58,11 @@ public class ActiveSessionsActivity extends AppCompatActivity {
                     }
                 }
             }
+
+            @Override
+            public void sessionEnded(long habitId, boolean wasCanceled) {
+
+            }
         });
 
         habitDatabase  = new HabitDatabase(this, null, false);

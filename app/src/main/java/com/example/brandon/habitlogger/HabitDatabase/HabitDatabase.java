@@ -1085,6 +1085,22 @@ public class HabitDatabase {
         return habits;
     }
 
+    public boolean getIsHabitArchived(long habitId) {
+        Cursor c = readableDatabase.query(DatabaseHelper.HABITS_TABLE_NAME, new String[]{DatabaseHelper.HABIT_IS_ARCHIVED},
+                DatabaseHelper.HABIT_ID + "=?", new String[]{String.valueOf(habitId)}, null, null, null);
+
+        boolean isArchived = false;
+
+        if(c != null){
+            if(c.moveToFirst()){
+                isArchived = c.getInt(0) != 0;
+                c.close();
+            }
+        }
+
+        return isArchived;
+    }
+
     /**
      * @param habitId The row id to be updated.
      * @param state Set true to archive the habit, false to unarchive.
