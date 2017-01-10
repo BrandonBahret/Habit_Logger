@@ -61,8 +61,20 @@
             android:name=".AboutActivity"
             android:label="About"
             android:theme="@style/AppTheme" />
-
         <activity android:name=".Preferences.SettingsActivity" />
+
+        <activity
+            android:name=".HabitActivity.HabitActivity"
+            android:label="@string/title_activity_habit"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleTop"
+            android:parentActivityName=".MainActivity">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+
+        </activity>
 
     </application>
 

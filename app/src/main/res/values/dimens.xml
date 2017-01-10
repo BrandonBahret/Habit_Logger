@@ -10,4 +10,5 @@
     <!-- Custom dimensions -->
     <dimen name="accent_strip_width">8dp</dimen>
     <dimen name="link_buttion_size">40dp</dimen>
+    <dimen name="appbar_padding_top">8dp</dimen>
 </resources>

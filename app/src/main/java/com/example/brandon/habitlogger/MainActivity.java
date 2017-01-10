@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.example.brandon.habitlogger.DataExportHelpers.GoogleDriveDataExportManager;
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
+import com.example.brandon.habitlogger.HabitActivity.HabitActivity;
 import com.example.brandon.habitlogger.HabitDatabase.DatabaseCache;
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
@@ -206,7 +207,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onCardClicked(long habitId) {
-
+                startHabitActivity(habitId);
             }
         };
 
@@ -535,6 +536,12 @@ public class MainActivity extends AppCompatActivity
         editHabit.putExtra("edit", true);
         editHabit.putExtra("habit", habit);
         startActivityForResult(editHabit, ModifyHabitActivity.EDIT_HABIT_RESULT_CODE);
+    }
+
+    public void startHabitActivity(long habitId){
+        Intent startTargetActivity = new Intent(MainActivity.this, HabitActivity.class);
+        startTargetActivity.putExtra("habitId", habitId);
+        startActivity(startTargetActivity);
     }
 
     public void updateCurrentSessionCard() {
