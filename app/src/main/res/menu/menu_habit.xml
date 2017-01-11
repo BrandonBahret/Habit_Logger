@@ -3,19 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.brandon.habitlogger.HabitActivity">
     <item
-        android:id="@+id/action_edit"
+        android:id="@+id/menu_habit_edit"
         android:orderInCategory="100"
         android:title="@string/action_edit" />
     <item
         android:title="@string/action_archive"
         android:orderInCategory="102"
-        android:id="@+id/action_toggle_archive" />
+        android:id="@+id/menu_toggle_archive" />
     <item
         android:title="@string/action_export"
         android:orderInCategory="104"
-        android:id="@+id/action_export" />
+        android:id="@+id/menu_export_habit" />
     <item
         android:title="@string/action_delete"
         android:orderInCategory="106"
-        android:id="@+id/action_delete" />
+        android:id="@+id/menu_delete_habit" />
 </menu>

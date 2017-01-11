@@ -31,14 +31,14 @@
                     android:scheme="http" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".ModifyHabitActivity.ModifyHabitActivity"
             android:label="New Habit"
             android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+
         </activity>
+
         <activity
             android:name=".HabitSessions.SessionActivity"
             android:label="Habit Session"
@@ -62,20 +62,26 @@
             android:label="About"
             android:theme="@style/AppTheme" />
         <activity android:name=".Preferences.SettingsActivity" />
-
         <activity
             android:name=".HabitActivity.HabitActivity"
             android:label="@string/title_activity_habit"
-            android:theme="@style/AppTheme.NoActionBar"
             android:launchMode="singleTop"
-            android:parentActivityName=".MainActivity">
-
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
-
         </activity>
 
+        <activity
+            android:name=".OverallStatistics.OverallStatisticsActivity"
+            android:label="@string/title_activity_overall_statistics"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.brandon.habitlogger.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

@@ -38,6 +38,7 @@ import com.example.brandon.habitlogger.HabitSessions.ActiveSessionsActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.ModifyHabitActivity.ModifyHabitActivity;
+import com.example.brandon.habitlogger.OverallStatistics.OverallStatisticsActivity;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.Preferences.SettingsActivity;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.HabitViewAdapter;
@@ -323,8 +324,11 @@ public class MainActivity extends AppCompatActivity
 
                 habitDatabase.loadAllContents();
                 habitDatabase.notifyChange();
-            }
-            break;
+            }break;
+
+            case (R.id.menu_export_database_as_csv):{
+                Toast.makeText(this, "export", Toast.LENGTH_SHORT).show();
+            }break;
 
             case (R.id.menu_settings): {
                 startSettingsActivity();
@@ -360,7 +364,7 @@ public class MainActivity extends AppCompatActivity
             }break;
 
             case (R.id.overall_stats_nav): {
-                makeText(this, "Overall stats", Toast.LENGTH_SHORT).show();
+                startOverallStatisticsActivity();
             }
             break;
 
@@ -446,6 +450,7 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         updateCurrentSessionCard();
+        showDatabase();
     }
 
 
@@ -510,9 +515,7 @@ public class MainActivity extends AppCompatActivity
             toolbar.setTitle("Archive");
         }
 
-        habitList.clear();
         habitDisplayMode = ONLY_ARCHIVED_HABITS;
-        habitCardContainer.removeAllViews();
         showDatabase();
     }
 
@@ -541,6 +544,11 @@ public class MainActivity extends AppCompatActivity
     public void startHabitActivity(long habitId){
         Intent startTargetActivity = new Intent(MainActivity.this, HabitActivity.class);
         startTargetActivity.putExtra("habitId", habitId);
+        startActivity(startTargetActivity);
+    }
+
+    private void startOverallStatisticsActivity() {
+        Intent startTargetActivity = new Intent(MainActivity.this, OverallStatisticsActivity.class);
         startActivity(startTargetActivity);
     }
 
@@ -628,6 +636,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void showDatabase(){
+
+        // TODO make this proper
+
+        habitList.clear();
+        habitCardContainer.removeAllViews();
+
         for(int categoryInd = 0; categoryInd < habitDatabase.getNumberOfCategories(); categoryInd++) {
 
             long categoryId = habitDatabase.getCategoryIdFromIndex(categoryInd);

@@ -6,7 +6,7 @@
         android:id="@+id/habit_menu_edit" />
     <item android:title="Delete"
         android:id="@+id/habit_menu_delete" />
-    <item android:title="Export as CSV"
+    <item android:title="Export Data (CSV)"
         android:id="@+id/habit_menu_export" />
     <item android:title="Archive"
         android:id="@+id/habit_menu_archive" />

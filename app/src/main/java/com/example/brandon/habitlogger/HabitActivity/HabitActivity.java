@@ -19,10 +19,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
+import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
+import com.example.brandon.habitlogger.ModifyHabitActivity.ModifyHabitActivity;
 import com.example.brandon.habitlogger.R;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -46,6 +49,7 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
     private ViewPager mViewPager;
 
     private HabitDatabase habitDatabase;
+    private LocalDataExportManager exportManager;
     private SessionManager sessionManager;
     private Habit habit;
     private long habitId;
@@ -58,18 +62,15 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
         setContentView(R.layout.activity_habit);
 
         habitDatabase = new HabitDatabase(this, null, false);
+        sessionManager = new SessionManager(this);
+
         Intent data = getIntent();
         habitId = data.getLongExtra("habitId", -1);
         habit = habitDatabase.getHabit(habitId);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(habit.getName());
-        setSupportActionBar(toolbar);
+        exportManager = new LocalDataExportManager(this);
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        updateActivity();
 
         fabMenu = (FloatingActionMenu) findViewById(R.id.menu_fab);
         fabMenu.setClosedOnTouchOutside(true);
@@ -79,7 +80,7 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
             @Override
             public void onClick(View view) {
                 fabMenu.close(true);
-                startSession(habit);
+                startSession();
             }
         });
 
@@ -87,8 +88,19 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
         createEntry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(HabitActivity.this, "create entry", Toast.LENGTH_SHORT).show();
+
+                NewEntryForm dialog = new NewEntryForm();
+                dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
+                    @Override
+                    public void onFinishedWithResult(SessionEntry entry) {
+                        if(entry != null){
+                            habitDatabase.addEntry(habitId, entry);
+                        }
+                    }
+                });
+
                 fabMenu.close(true);
+                dialog.show(getSupportFragmentManager(), "new-entry");
             }
         });
 
@@ -124,13 +136,41 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
         tabLayout.setupWithViewPager(mViewPager);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case ModifyHabitActivity.EDIT_HABIT_RESULT_CODE: {
+                    Habit editHabit = (Habit) data.getSerializableExtra("new_habit");
+                    habit = editHabit;
+                    habitDatabase.updateHabit(editHabit.getDatabaseId(), editHabit);
+
+                    updateActivity();
+                }break;
+            }
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_habit, menu);
+
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem archive = menu.findItem(R.id.menu_toggle_archive);
+        if (habit.getIsArchived()) {
+            archive.setTitle("Unarchive");
+        } else {
+            archive.setTitle("Archive");
+        }
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -142,6 +182,33 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
 
         switch(id){
             case(android.R.id.home):{
+                finish();
+            }break;
+
+            case(R.id.menu_habit_edit):{
+                startModifyHabitActivity();
+            }break;
+
+            case(R.id.menu_toggle_archive):{
+                boolean archivedState = !habitDatabase.getIsHabitArchived(habitId);
+                habitDatabase.updateHabitIsArchived(habitId, archivedState);
+                habit.setIsArchived(archivedState);
+                updateColorTheme();
+
+            }break;
+
+            case(R.id.menu_export_habit):{
+                Habit habit = habitDatabase.getHabit(habitId);
+                String filepath = exportManager.exportHabit(habit, true);
+                Toast.makeText(this, "Habit exported to: " + filepath, Toast.LENGTH_LONG).show();
+            }break;
+
+            case(R.id.menu_delete_habit):{
+                if (sessionManager.isSessionActive(habitId)) {
+                    sessionManager.cancelSession(habitId);
+                }
+
+                habitDatabase.deleteHabit(habitId);
                 finish();
             }break;
         }
@@ -189,7 +256,42 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
         }
     }
 
+    public void startSession() {
+        Intent startSession = new Intent(this, SessionActivity.class);
+        startSession.putExtra("habit", habit);
+        startActivity(startSession);
+    }
 
+    private void startModifyHabitActivity() {
+        Intent startTargetActivity = new Intent(HabitActivity.this, ModifyHabitActivity.class);
+        startTargetActivity.putExtra("edit", true);
+        startTargetActivity.putExtra("habit", habit);
+        startActivityForResult(startTargetActivity, ModifyHabitActivity.EDIT_HABIT_RESULT_CODE);
+    }
+
+    private void updateActivity() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(habit.getName());
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    private void updateColorTheme() {
+        // TODO create this method
+
+        if(habit.getIsArchived()){
+            int color = 0xFFCCCCCC;
+            // Set theme grey
+        }
+        else{
+            // Set theme matching 'color'
+            int color = habit.getCategory().getColorAsInt();
+        }
+    }
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -235,13 +337,5 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
             }
             return null;
         }
-    }
-
-
-
-    public void startSession(Habit habit) {
-        Intent startSession = new Intent(this, SessionActivity.class);
-        startSession.putExtra("habit", habit);
-        startActivity(startSession);
     }
 }

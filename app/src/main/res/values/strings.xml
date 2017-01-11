@@ -8,7 +8,7 @@
 
     <string name="home_nav_string">Home</string>
     <string name="running_habits_nav_string">Running Habits</string>
-    <string name="overall_stats_nav_string">Overall Stats</string>
+    <string name="overall_stats_nav_string">Overall Statistics</string>
     <string name="settings_nav_string">Settings</string>
     <string name="about_nav_string">About</string>
 
@@ -22,8 +22,8 @@
     <string name="card_view_accent_description">A color accent indicating the category type.</string>
     <string name="session_note_hint">Note</string>
     <string name="session_pause_play_content_description">Session pause, or play toggle button.</string>
-    <string name="export_database">Backup</string>
-    <string name="restore_database">Restore</string>
+    <string name="export_database">Create Backup</string>
+    <string name="restore_database">Restore Data</string>
     <string name="settings">Settings</string>
     <string name="about">About</string>
     <string name="current_sessions">Current Sessions</string>
@@ -61,11 +61,12 @@
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
     <string name="action_session">Session</string>
-    <string name="action_export">Export</string>
+    <string name="action_export">Export Data (CSV)</string>
     <string name="action_archive">Archive</string>
     <string name="action_unarchive">Unarchive</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_overall_statistics">Overall Statistics</string>
 
 </resources>
