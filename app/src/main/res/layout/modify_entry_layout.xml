@@ -82,39 +82,13 @@
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/entry_date_layout"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintBottom_creator="1"
-        app:layout_constraintBottom_toTopOf="@+id/entry_time_layout"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:layout_constraintLeft_creator="1"
-        android:layout_marginBottom="15dp"
-        app:layout_constraintLeft_toLeftOf="parent">
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Session Date"
-            android:id="@+id/entry_date"
-            tools:layout_editor_absoluteY="98dp"
-            tools:layout_editor_absoluteX="26dp"
-            android:layout_weight="1" />
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="0dp"
         android:id="@+id/entry_note_layout"
         android:layout_height="wrap_content"
         tools:layout_constraintRight_creator="1"
-        tools:layout_constraintBottom_creator="1"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="@+id/entry_time_layout"
         tools:layout_constraintLeft_creator="1"
-        android:layout_marginBottom="84dp"
-        app:layout_constraintLeft_toLeftOf="@+id/entry_time_layout">
+        app:layout_constraintLeft_toLeftOf="@+id/entry_time_layout"
+        tools:layout_editor_absoluteY="316dp">
 
         <EditText
             android:layout_width="match_parent"
@@ -142,6 +116,32 @@
             android:layout_height="wrap_content"
             android:hint="Starting Time"
             android:id="@+id/entry_time" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/entry_date_layout"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toTopOf="@+id/entry_time_layout"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        android:layout_marginBottom="15dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/entry_second_layout">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Session Date"
+            android:id="@+id/entry_date"
+            tools:layout_editor_absoluteY="98dp"
+            tools:layout_editor_absoluteX="26dp"
+            android:layout_weight="1" />
     </android.support.design.widget.TextInputLayout>
 
 </android.support.constraint.ConstraintLayout>

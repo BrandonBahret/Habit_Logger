@@ -162,6 +162,14 @@ public class LocalDataExportManager {
         }
     }
 
+    public String exportDatabaseAsCsv(){
+        for(Habit eachHabit : habitDatabase.getHabits()){
+            exportHabit(eachHabit, true);
+        }
+
+        return dataPathPublic;
+    }
+
     private boolean saveHabitCSV(String pathParent, String pathChild, String CSV, boolean isPublic) {
         try {
             if (updateDirectories(isPublic)) {

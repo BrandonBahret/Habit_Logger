@@ -6,7 +6,6 @@
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context="com.example.brandon.habitlogger.HabitActivity.HabitActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -70,11 +69,9 @@
 
     </com.github.clans.fab.FloatingActionMenu>
 
-
     <android.support.v4.view.ViewPager
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        android:layout_height="match_parent" />
 
 </android.support.design.widget.CoordinatorLayout>

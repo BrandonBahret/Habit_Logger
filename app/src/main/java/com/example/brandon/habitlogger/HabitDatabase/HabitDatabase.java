@@ -12,6 +12,8 @@ import android.support.annotation.Nullable;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -1081,6 +1083,19 @@ public class HabitDatabase {
         }
 
         c.close();
+
+        return habits;
+    }
+
+    public ArrayList<Habit> getHabits(){
+        ArrayList<Habit> habits = new ArrayList<>();
+
+        int numberOfCategories = getNumberOfCategories();
+
+        for(int i = 0; i < numberOfCategories; i++) {
+            long categoryId = getCategoryIdFromIndex(i);
+            habits.addAll(Arrays.asList(getHabits(categoryId)));
+        }
 
         return habits;
     }

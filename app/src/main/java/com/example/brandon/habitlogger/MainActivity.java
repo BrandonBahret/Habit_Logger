@@ -327,7 +327,8 @@ public class MainActivity extends AppCompatActivity
             }break;
 
             case (R.id.menu_export_database_as_csv):{
-                Toast.makeText(this, "export", Toast.LENGTH_SHORT).show();
+                String filepath = exportManager.exportDatabaseAsCsv();
+                Toast.makeText(this, "Database exported to: " + filepath, Toast.LENGTH_LONG).show();
             }break;
 
             case (R.id.menu_settings): {
