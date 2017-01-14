@@ -4,11 +4,19 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
+import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.RecyclerVIewAdapters.EntryViewAdapter;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,16 +27,16 @@ import com.example.brandon.habitlogger.R;
  * create an instance of this fragment.
  */
 public class EntriesFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private static final String HABIT_ID = "HABIT_ID";
+    private long habitId;
 
     private OnFragmentInteractionListener mListener;
+
+    HabitDatabase habitDatabase;
+    RecyclerView entriesContainer;
+    List<SessionEntry> sessionEntries;
+    EntryViewAdapter entryAdapter;
 
     public EntriesFragment() {
         // Required empty public constructor
@@ -38,16 +46,13 @@ public class EntriesFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment EntriesFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static EntriesFragment newInstance(String param1, String param2) {
+    public static EntriesFragment newInstance(long habitId) {
         EntriesFragment fragment = new EntriesFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putLong(HABIT_ID, habitId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,8 +61,7 @@ public class EntriesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            this.habitId = getArguments().getLong(HABIT_ID);
         }
     }
 
@@ -65,7 +69,28 @@ public class EntriesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_entries, container, false);
+        View v = inflater.inflate(R.layout.fragment_entries, container, false);
+
+        habitDatabase = new HabitDatabase(getContext(), null, false);
+
+        entriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
+        sessionEntries = habitDatabase.getEntries(habitId);
+
+        entryAdapter = new EntryViewAdapter(sessionEntries, getContext(),
+                new EntryViewAdapter.OnClickListeners() {
+                    @Override
+                    public void onRootClick(long habitId, long entryId) {
+
+                    }
+                });
+
+
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        entriesContainer.setLayoutManager(layoutManager);
+        entriesContainer.setItemAnimator(new DefaultItemAnimator());
+        entriesContainer.setAdapter(entryAdapter);
+
+        return v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

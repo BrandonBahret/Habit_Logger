@@ -4,6 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.example.brandon.habitlogger.R;
+
+import static java.lang.Integer.parseInt;
+
 /**
  * Created by Brandon on 1/6/2017.
  * A class to check shared preferences.
@@ -30,7 +34,7 @@ public class PreferenceChecker {
     // Main Screen Settings
     public int howToDisplayCategories(){
         String displayCategories = preferences.getString("category_preference", "1");
-        return Integer.parseInt(displayCategories);
+        return parseInt(displayCategories);
     }
 
     public boolean doShowCurrentSessions(){
@@ -57,11 +61,13 @@ public class PreferenceChecker {
     // Appearances
     public int getTheme(){
         String themeIndex = preferences.getString("theme", "1");
-        return Integer.parseInt(themeIndex);
+        return parseInt(themeIndex);
     }
 
-    public int stringGetDateFormat(){
-        return Integer.parseInt(preferences.getString("date_format", "0"));
+    public String stringGetDateFormat(){
+        String[] dateOptions = context.getResources().getStringArray(R.array.date_format_options);
+        int optionIndex = Integer.parseInt(preferences.getString("date_format", "0"));
+        return dateOptions[optionIndex];
     }
 
 }

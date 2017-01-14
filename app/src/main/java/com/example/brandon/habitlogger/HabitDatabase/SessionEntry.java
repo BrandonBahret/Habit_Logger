@@ -2,7 +2,11 @@ package com.example.brandon.habitlogger.HabitDatabase;
 
 import android.support.annotation.NonNull;
 
+import com.example.brandon.habitlogger.HabitSessions.SessionManager;
+
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -139,4 +143,22 @@ public class SessionEntry implements Serializable{
         return this.isPaused;
     }
 
+    public String getDurationAsString() {
+        return new SessionManager.TimeDisplay(getDuration()).toString();
+    }
+
+    public String getStartTimeAsString(String dateFormat) {
+        return getDate(getStartTime(), dateFormat);
+    }
+
+    /**
+     * Return date in specified format.
+     * @param milliSeconds Date in milliseconds
+     * @param dateFormat Date format
+     * @return String representing date in specified format
+     */
+    public static String getDate(long milliSeconds, String dateFormat) {
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.getDefault());
+        return formatter.format(new Date(milliSeconds));
+    }
 }

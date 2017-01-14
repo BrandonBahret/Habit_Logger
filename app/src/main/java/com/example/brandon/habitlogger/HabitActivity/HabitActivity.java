@@ -278,18 +278,15 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
         if (actionBar != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+        updateColorTheme();
     }
 
     private void updateColorTheme() {
         // TODO create this method
+        int color = 0xFFCCCCCC;
 
-        if(habit.getIsArchived()){
-            int color = 0xFFCCCCCC;
-            // Set theme grey
-        }
-        else{
-            // Set theme matching 'color'
-            int color = habit.getCategory().getColorAsInt();
+        if(!habit.getIsArchived()){
+            color = habit.getCategory().getColorAsInt();
         }
     }
 
@@ -309,7 +306,8 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position) {
                 case 0:
-                    return new EntriesFragment();
+                    return EntriesFragment.newInstance(habitId);
+
                 case 1:
 
                 case 2:

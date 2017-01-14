@@ -15,6 +15,7 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -708,6 +709,17 @@ public class HabitDatabase {
         }
 
         return entry;
+    }
+
+    public List<SessionEntry> getEntries(long habitId) {
+        int size = getNumberOfEntries(habitId);
+        List<SessionEntry> entries = new ArrayList<>(size);
+
+        for(int i = 0; i < size; i++) {
+            entries.add(i, getEntry(getEntryId(habitId, i)));
+        }
+
+        return entries;
     }
 
     /**
