@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.HabitActivity;
+package com.example.brandon.habitlogger.OverallStatistics;
 
 import android.content.Context;
 import android.net.Uri;
@@ -21,24 +21,21 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link EntriesFragment.OnFragmentInteractionListener} interface
+ * {@link OverallEntriesFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link EntriesFragment#newInstance} factory method to
+ * Use the {@link OverallEntriesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class EntriesFragment extends Fragment {
+public class OverallEntriesFragment extends Fragment {
 
-    private static final String HABIT_ID = "HABIT_ID";
-    private long habitId;
-
-    private OnFragmentInteractionListener mListener;
+    private OverallEntriesFragment.OnFragmentInteractionListener listener;
 
     HabitDatabase habitDatabase;
     RecyclerView entriesContainer;
     List<SessionEntry> sessionEntries;
     EntryViewAdapter entryAdapter;
 
-    public EntriesFragment() {
+    public OverallEntriesFragment() {
         // Required empty public constructor
     }
 
@@ -49,20 +46,13 @@ public class EntriesFragment extends Fragment {
      * @return A new instance of fragment EntriesFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static EntriesFragment newInstance(long habitId) {
-        EntriesFragment fragment = new EntriesFragment();
-        Bundle args = new Bundle();
-        args.putLong(HABIT_ID, habitId);
-        fragment.setArguments(args);
-        return fragment;
+    public static OverallEntriesFragment newInstance() {
+        return new OverallEntriesFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            this.habitId = getArguments().getLong(HABIT_ID);
-        }
     }
 
     @Override
@@ -74,23 +64,13 @@ public class EntriesFragment extends Fragment {
         habitDatabase = new HabitDatabase(getContext(), null, false);
 
         entriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
-        sessionEntries = habitDatabase.getEntries(habitId);
+        sessionEntries = habitDatabase.lookUpEntries(habitDatabase.searchAllEntriesWithTimeRange(0, Long.MAX_VALUE));
 
         entryAdapter = new EntryViewAdapter(sessionEntries, getContext(),
                 new EntryViewAdapter.OnClickListeners() {
                     @Override
                     public void onRootClick(long habitId, long entryId) {
-                        NewEntryForm dialog = NewEntryForm.newInstance(habitDatabase.getEntry(entryId));
-                        dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
-                            @Override
-                            public void onFinishedWithResult(SessionEntry entry) {
-                                if(entry != null){
-                                    habitDatabase.updateEntry(entry.getDatabaseId(), entry);
-                                }
-                            }
-                        });
 
-                        dialog.show(getFragmentManager(), "edit-entry");
                     }
                 });
 
@@ -105,8 +85,8 @@ public class EntriesFragment extends Fragment {
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+        if (listener != null) {
+            listener.onFragmentInteraction(uri);
         }
     }
 
@@ -114,7 +94,7 @@ public class EntriesFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+            listener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -124,7 +104,7 @@ public class EntriesFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     /**

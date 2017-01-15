@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.OverallStatistics;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -20,7 +21,7 @@ import android.widget.Toast;
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.R;
 
-public class OverallStatisticsActivity extends AppCompatActivity {
+public class OverallStatisticsActivity extends AppCompatActivity implements OverallEntriesFragment.OnFragmentInteractionListener {
 
     private SectionsPagerAdapter sectionsPagerAdapter;
     private ViewPager viewPager;
@@ -86,6 +87,11 @@ public class OverallStatisticsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -137,8 +143,8 @@ public class OverallStatisticsActivity extends AppCompatActivity {
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch(position){
                 case(0):{
-
-                }break;
+                    return OverallEntriesFragment.newInstance();
+                }
 
                 case(1):{
 

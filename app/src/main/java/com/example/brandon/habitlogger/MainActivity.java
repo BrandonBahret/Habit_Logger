@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static android.support.design.R.styleable.RecyclerView;
 import static android.widget.Toast.makeText;
 import static com.example.brandon.habitlogger.R.menu.main;
 

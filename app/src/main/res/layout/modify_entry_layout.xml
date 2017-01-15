@@ -1,147 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="8dp">
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:id="@+id/entry_hour_layout"
-        app:layout_constraintRight_toLeftOf="@+id/entry_minute_layout"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintRight_creator="1"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <EditText
-            android:layout_width="match_parent"
+        <android.support.design.widget.TextInputLayout
             android:layout_height="wrap_content"
-            android:inputType="number"
-            android:hint="Hours"
-            android:text="0"
-            android:id="@+id/entry_hours"
-            android:textAlignment="center"
-            android:nextFocusRight="@+id/entry_minutes"
-            android:imeOptions="actionNext"/>
+            android:layout_weight="1"
+            android:id="@+id/entry_minute_layout"
+            android:layout_width="65dp"
+            tools:layout_constraintTop_creator="1"
+            tools:layout_constraintRight_creator="1"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="8dp"
+            tools:layout_constraintLeft_creator="1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_bias="0.45">
 
-    </android.support.design.widget.TextInputLayout>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:hint="Minutes"
+                android:text="0"
+                android:id="@+id/entry_minutes"
+                android:textAlignment="center"
+                android:nextFocusRight="@+id/entry_seconds"
+                android:imeOptions="actionNext"/>
+        </android.support.design.widget.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="60dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:id="@+id/entry_minute_layout"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintRight_creator="1"
-        android:layout_marginStart="64dp"
-        android:layout_marginEnd="57dp"
-        app:layout_constraintRight_toRightOf="@+id/entry_second_layout"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="@+id/entry_date_layout"
-        app:layout_constraintTop_toTopOf="@+id/entry_hour_layout">
-
-        <EditText
-            android:layout_width="match_parent"
+        <android.support.design.widget.TextInputLayout
             android:layout_height="wrap_content"
-            android:inputType="number"
-            android:hint="Minutes"
-            android:text="0"
-            android:id="@+id/entry_minutes"
-            android:textAlignment="center"
-            android:nextFocusRight="@+id/entry_seconds"
-            android:imeOptions="actionNext"/>
-    </android.support.design.widget.TextInputLayout>
+            android:id="@+id/entry_time_layout"
+            android:layout_width="0dp"
+            tools:layout_constraintTop_creator="1"
+            tools:layout_constraintRight_creator="1"
+            android:layout_marginStart="7dp"
+            android:layout_marginEnd="7dp"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="7dp"
+            app:layout_constraintTop_toBottomOf="@+id/entry_date_layout"
+            tools:layout_constraintLeft_creator="1"
+            app:layout_constraintLeft_toLeftOf="parent">
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="60dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:id="@+id/entry_second_layout"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintRight_creator="1"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/entry_minute_layout">
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Starting Time"
+                android:id="@+id/entry_time" />
+        </android.support.design.widget.TextInputLayout>
 
-        <EditText
-            android:layout_width="match_parent"
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:inputType="number"
-            android:hint="Seconds"
-            android:text="0"
-            android:id="@+id/entry_seconds"
-            android:textAlignment="center" />
-    </android.support.design.widget.TextInputLayout>
+            android:id="@+id/entry_date_layout"
+            tools:layout_constraintTop_creator="1"
+            tools:layout_constraintRight_creator="1"
+            android:layout_marginStart="7dp"
+            android:layout_marginEnd="7dp"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="15dp"
+            app:layout_constraintTop_toBottomOf="@+id/entry_hour_layout"
+            tools:layout_constraintLeft_creator="1"
+            app:layout_constraintLeft_toLeftOf="parent">
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="0dp"
-        android:id="@+id/entry_note_layout"
-        android:layout_height="wrap_content"
-        tools:layout_constraintRight_creator="1"
-        app:layout_constraintRight_toRightOf="@+id/entry_time_layout"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="@+id/entry_time_layout"
-        tools:layout_editor_absoluteY="316dp">
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Session Date"
+                android:id="@+id/entry_date"
+                tools:layout_editor_absoluteY="98dp"
+                tools:layout_editor_absoluteX="26dp"
+                android:layout_weight="1" />
+        </android.support.design.widget.TextInputLayout>
 
-        <EditText
-            android:layout_width="match_parent"
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="0dp"
+            android:id="@+id/entry_note_layout"
             android:layout_height="wrap_content"
-            android:hint="Note"
-            android:id="@+id/entry_note" />
-    </android.support.design.widget.TextInputLayout>
+            tools:layout_constraintTop_creator="1"
+            tools:layout_constraintRight_creator="1"
+            app:layout_constraintRight_toRightOf="@+id/entry_time_layout"
+            android:layout_marginTop="1dp"
+            app:layout_constraintTop_toBottomOf="@+id/entry_time_layout"
+            tools:layout_constraintLeft_creator="1"
+            app:layout_constraintLeft_toLeftOf="@+id/entry_time_layout">
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_height="wrap_content"
-        android:id="@+id/entry_time_layout"
-        android:layout_width="0dp"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintBottom_creator="1"
-        app:layout_constraintBottom_toTopOf="@+id/entry_note_layout"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:layout_constraintLeft_creator="1"
-        android:layout_marginBottom="9dp"
-        app:layout_constraintLeft_toLeftOf="parent">
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Note"
+                android:id="@+id/entry_note" />
+        </android.support.design.widget.TextInputLayout>
 
-        <EditText
-            android:layout_width="match_parent"
+        <android.support.design.widget.TextInputLayout
             android:layout_height="wrap_content"
-            android:hint="Starting Time"
-            android:id="@+id/entry_time" />
-    </android.support.design.widget.TextInputLayout>
+            android:layout_weight="1"
+            android:id="@+id/entry_second_layout"
+            android:layout_width="65dp"
+            tools:layout_constraintTop_creator="1"
+            tools:layout_constraintRight_creator="1"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintHorizontal_bias="0.75">
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/entry_date_layout"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintBottom_creator="1"
-        app:layout_constraintBottom_toTopOf="@+id/entry_time_layout"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:layout_constraintLeft_creator="1"
-        android:layout_marginBottom="15dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/entry_second_layout">
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:hint="Seconds"
+                android:text="0"
+                android:id="@+id/entry_seconds"
+                android:textAlignment="center" />
+        </android.support.design.widget.TextInputLayout>
 
-        <EditText
-            android:layout_width="match_parent"
+        <android.support.design.widget.TextInputLayout
             android:layout_height="wrap_content"
-            android:hint="Session Date"
-            android:id="@+id/entry_date"
-            tools:layout_editor_absoluteY="98dp"
-            tools:layout_editor_absoluteX="26dp"
-            android:layout_weight="1" />
-    </android.support.design.widget.TextInputLayout>
+            android:layout_weight="1"
+            android:id="@+id/entry_hour_layout"
+            android:layout_width="65dp"
+            tools:layout_constraintTop_creator="1"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="16dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintHorizontal_bias="0.1">
 
-</android.support.constraint.ConstraintLayout>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:hint="Hours"
+                android:text="0"
+                android:id="@+id/entry_hours"
+                android:textAlignment="center"
+                android:nextFocusRight="@+id/entry_minutes"
+                android:imeOptions="actionNext"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+    </android.support.constraint.ConstraintLayout>
+
+</ScrollView>

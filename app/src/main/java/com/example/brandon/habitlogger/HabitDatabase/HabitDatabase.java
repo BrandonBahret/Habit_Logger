@@ -642,6 +642,16 @@ public class HabitDatabase {
         return searchTableForIdsByName(SQL, values, DatabaseHelper.ENTRY_ID);
     }
 
+    public List<SessionEntry> lookUpEntries(Set<Long> ids){
+        List<SessionEntry> entries = new ArrayList<>(ids.size());
+
+        for(long id : ids){
+            entries.add(getEntry(id));
+        }
+
+        return entries;
+    }
+
     /**
      * @param c A cursor object above an entry record.
      * @return An entry object.
