@@ -405,7 +405,7 @@ public class SessionManager {
     /**
      * @return The current time in ms.
      */
-    public long getCurrentTime(){
+    public static long getCurrentTime(){
         return System.currentTimeMillis();
     }
 

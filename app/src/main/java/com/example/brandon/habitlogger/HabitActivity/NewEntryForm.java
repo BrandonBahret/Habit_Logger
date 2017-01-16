@@ -18,8 +18,10 @@ public class NewEntryForm extends DialogFragment {
     private OnFinishedListener onFinishedListener;
 
     private View content;
+    EditText note, startingTime, date, hours, minutes, seconds;
 
     private SessionEntry entry;
+    private boolean modify = false;
 
     public void setOnFinishedListener(OnFinishedListener listener){
         onFinishedListener = listener;
@@ -27,14 +29,20 @@ public class NewEntryForm extends DialogFragment {
 
     public interface OnFinishedListener{
         void onFinishedWithResult(SessionEntry entry);
+
+        void onDeleteClicked(SessionEntry entry);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        this.entry = new SessionEntry(SessionManager.getCurrentTime(), 0, "");
+
         if (getArguments() != null) {
             if(getArguments().containsKey(ENTRY)) {
                 this.entry = (SessionEntry) getArguments().getSerializable(ENTRY);
+                this.modify = true;
             }
         }
     }
@@ -51,11 +59,18 @@ public class NewEntryForm extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-
-        View dialogView = View.inflate(getContext(), R.layout.modify_entry_layout, null);
         builder.setCancelable(true);
 
-        if (entry == null) {
+        View dialogView = View.inflate(getContext(), R.layout.modify_entry_layout, null);
+        note = (EditText)dialogView.findViewById(R.id.entry_note);
+        startingTime = (EditText)dialogView.findViewById(R.id.entry_time);
+        date = (EditText)dialogView.findViewById(R.id.entry_date);
+        hours = (EditText)dialogView.findViewById(R.id.entry_hours);
+        minutes = (EditText)dialogView.findViewById(R.id.entry_minutes);
+        seconds = (EditText)dialogView.findViewById(R.id.entry_seconds);
+
+
+        if (!modify) {
             builder.setTitle("Create Entry");
             builder.setPositiveButton("Add Entry", new DialogInterface.OnClickListener() {
                 @Override
@@ -72,7 +87,11 @@ public class NewEntryForm extends DialogFragment {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     SessionEntry entry = getEntry();
-                    onFinishedListener.onFinishedWithResult(entry);
+
+                    if(onFinishedListener != null) {
+                        onFinishedListener.onFinishedWithResult(entry);
+                    }
+
                     dismiss();
                 }
             });
@@ -80,30 +99,21 @@ public class NewEntryForm extends DialogFragment {
             builder.setNegativeButton("Delete Entry", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    // onFinishedListener.onFinishedWithResult(null);
+                    if(onFinishedListener != null) {
+                        onFinishedListener.onDeleteClicked(entry);
+                    }
                 }
             });
-
-            EditText note = (EditText)dialogView.findViewById(R.id.entry_note);
-            note.setText(entry.getNote());
-
-            EditText startingTime = (EditText)dialogView.findViewById(R.id.entry_time);
-            startingTime.setText(entry.getStartTimeAsString("h:mm a"));
-
-            EditText date = (EditText)dialogView.findViewById(R.id.entry_date);
-            date.setText(entry.getStartTimeAsString(new PreferenceChecker(getContext()).stringGetDateFormat()));
-
-            SessionManager.TimeDisplay time = new SessionManager.TimeDisplay(entry.getDuration());
-
-            EditText hours = (EditText)dialogView.findViewById(R.id.entry_hours);
-            hours.setText(String.valueOf(time.hours));
-
-            EditText minutes = (EditText)dialogView.findViewById(R.id.entry_minutes);
-            minutes.setText(String.valueOf(time.minutes));
-
-            EditText seconds = (EditText)dialogView.findViewById(R.id.entry_seconds);
-            seconds.setText(String.valueOf(time.seconds));
         }
+
+        note.setText(entry.getNote());
+        startingTime.setText(entry.getStartTimeAsString("h:mm a"));
+        date.setText(entry.getStartTimeAsString(new PreferenceChecker(getContext()).stringGetDateFormat()));
+
+        SessionManager.TimeDisplay time = new SessionManager.TimeDisplay(entry.getDuration());
+        hours.setText(String.valueOf(time.hours));
+        minutes.setText(String.valueOf(time.minutes));
+        seconds.setText(String.valueOf(time.seconds));
 
         builder.setView(dialogView);
 
@@ -111,6 +121,16 @@ public class NewEntryForm extends DialogFragment {
     }
 
     private SessionEntry getEntry() {
-        return null;
+        long duration = 0;
+
+        duration += Integer.parseInt(hours.getText().toString()) * 60 * 60 * 1000;
+        duration += Integer.parseInt(minutes.getText().toString()) * 60 * 1000;
+        duration += Integer.parseInt(seconds.getText().toString()) * 1000;
+        entry.setDuration(duration);
+
+        String note = this.note.getText().toString();
+        entry.setNote(note);
+
+        return entry;
     }
 }

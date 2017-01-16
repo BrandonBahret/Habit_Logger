@@ -95,7 +95,14 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
                     public void onFinishedWithResult(SessionEntry entry) {
                         if(entry != null){
                             habitDatabase.addEntry(habitId, entry);
+
+                            mSectionsPagerAdapter.entriesFragment.addSessionEntry(entry);
                         }
+                    }
+
+                    @Override
+                    public void onDeleteClicked(SessionEntry entry) {
+
                     }
                 });
 
@@ -295,6 +302,7 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
+        public EntriesFragment entriesFragment = EntriesFragment.newInstance(habitId);
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -306,7 +314,7 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position) {
                 case 0:
-                    return EntriesFragment.newInstance(habitId);
+                    return entriesFragment;
 
                 case 1:
 

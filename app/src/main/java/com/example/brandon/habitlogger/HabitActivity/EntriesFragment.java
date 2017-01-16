@@ -79,14 +79,21 @@ public class EntriesFragment extends Fragment {
         entryAdapter = new EntryViewAdapter(sessionEntries, getContext(),
                 new EntryViewAdapter.OnClickListeners() {
                     @Override
-                    public void onRootClick(long habitId, long entryId) {
+                    public void onRootClick(long habitId, final long entryId) {
                         NewEntryForm dialog = NewEntryForm.newInstance(habitDatabase.getEntry(entryId));
                         dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
                             @Override
                             public void onFinishedWithResult(SessionEntry entry) {
                                 if(entry != null){
                                     habitDatabase.updateEntry(entry.getDatabaseId(), entry);
+                                    updateSessionEntryById(entry.getDatabaseId(), entry);
                                 }
+                            }
+
+                            @Override
+                            public void onDeleteClicked(SessionEntry entry) {
+                                habitDatabase.deleteEntry(entry.getDatabaseId());
+                                removeSessionEntryById(entry.getDatabaseId());
                             }
                         });
 
@@ -101,6 +108,36 @@ public class EntriesFragment extends Fragment {
         entriesContainer.setAdapter(entryAdapter);
 
         return v;
+    }
+
+    private int getSessionEntryIndex(long entryId){
+        int index = 0;
+
+        for(SessionEntry entry : sessionEntries){
+            if(entry.getDatabaseId() == entryId){
+                break;
+            }
+            index++;
+        }
+
+        return index;
+    }
+
+    public void addSessionEntry(SessionEntry entry) {
+        sessionEntries.add(entry);
+        entryAdapter.notifyItemInserted(sessionEntries.size() - 1);
+    }
+
+    public void removeSessionEntryById(long databaseId) {
+        int index = getSessionEntryIndex(databaseId);
+        sessionEntries.remove(index);
+        entryAdapter.notifyItemRemoved(index);
+    }
+
+    public void updateSessionEntryById(long databaseId, SessionEntry entry){
+        int index = getSessionEntryIndex(databaseId);
+        sessionEntries.set(index, entry);
+        entryAdapter.notifyItemChanged(index);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

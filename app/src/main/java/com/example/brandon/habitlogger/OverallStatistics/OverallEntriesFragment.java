@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.brandon.habitlogger.HabitActivity.NewEntryForm;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.R;
@@ -70,9 +71,28 @@ public class OverallEntriesFragment extends Fragment {
                 new EntryViewAdapter.OnClickListeners() {
                     @Override
                     public void onRootClick(long habitId, long entryId) {
+                        NewEntryForm dialog = NewEntryForm.newInstance(habitDatabase.getEntry(entryId));
+                        dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
+                            @Override
+                            public void onFinishedWithResult(SessionEntry entry) {
+                                if(entry != null){
+                                    habitDatabase.updateEntry(entry.getDatabaseId(), entry);
+                                    updateSessionEntryById(entry.getDatabaseId(), entry);
+                                }
+                            }
 
+                            @Override
+                            public void onDeleteClicked(SessionEntry entry) {
+                                habitDatabase.deleteEntry(entry.getDatabaseId());
+                                removeSessionEntryById(entry.getDatabaseId());
+                            }
+                        });
+
+                        dialog.show(getFragmentManager(), "edit-entry");
                     }
                 });
+
+
 
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -88,6 +108,31 @@ public class OverallEntriesFragment extends Fragment {
         if (listener != null) {
             listener.onFragmentInteraction(uri);
         }
+    }
+
+    private int getSessionEntryIndex(long entryId){
+        int index = 0;
+
+        for(SessionEntry entry : sessionEntries){
+            if(entry.getDatabaseId() == entryId){
+                break;
+            }
+            index++;
+        }
+
+        return index;
+    }
+
+    public void removeSessionEntryById(long databaseId) {
+        int index = getSessionEntryIndex(databaseId);
+        sessionEntries.remove(index);
+        entryAdapter.notifyItemRemoved(index);
+    }
+
+    public void updateSessionEntryById(long databaseId, SessionEntry entry){
+        int index = getSessionEntryIndex(databaseId);
+        sessionEntries.set(index, entry);
+        entryAdapter.notifyItemChanged(index);
     }
 
     @Override
