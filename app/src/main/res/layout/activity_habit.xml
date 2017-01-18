@@ -13,7 +13,6 @@
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/appbar_padding_top"
         android:theme="@style/AppTheme.AppBarOverlay"
         android:elevation="4dp">
 
@@ -45,8 +44,8 @@
         app:menu_fab_show_animation="@anim/jump_from_down"
         android:elevation="3dp"
         app:menu_shadowColor="@color/shadow_black"
-        app:menu_colorNormal="@color/colorAccent"
-        app:menu_colorPressed="@color/colorPrimaryDark"
+        app:menu_colorNormal="?attr/colorAccent"
+        app:menu_colorPressed="?attr/colorPrimaryDark"
         app:theme="@style/MenuButtonsStyle"
         fab:menu_labels_ellipsize="end"
         fab:menu_labels_singleLine="true"

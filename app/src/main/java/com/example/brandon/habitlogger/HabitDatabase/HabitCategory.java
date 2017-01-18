@@ -79,6 +79,14 @@ public class HabitCategory implements Serializable{
         return Color.parseColor(getColor());
     }
 
+    public static int darkenColor(int color, float scale){
+        int r = Color.red(color);
+        int b = Color.blue(color);
+        int g = Color.green(color);
+
+        return Color.rgb((int)(r*scale), (int)(g*scale), (int)(b*scale));
+    }
+
     /**
      * @param name The name of the category
      */

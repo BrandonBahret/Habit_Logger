@@ -26,7 +26,7 @@ public class SessionManagerTest extends AndroidTestCase {
         context = new RenamingDelegatingContext(getContext(), "test_");
 
         HabitDatabase db = new HabitDatabase(context, null, false);
-        habitId = db.addHabitAndCategory(new Habit("null", "null", new HabitCategory("null", "null"), null, "null"));
+        habitId = db.addHabitAndCategory(new Habit("null", "null", new HabitCategory("#FFFFFFFF", "null"), null, "null"));
         mng = new SessionManager(context);
     }
 

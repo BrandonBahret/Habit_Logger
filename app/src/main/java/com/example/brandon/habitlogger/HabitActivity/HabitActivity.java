@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
@@ -54,12 +55,22 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
     private Habit habit;
     private long habitId;
 
+    TabLayout tabLayout;
+    Toolbar toolbar;
     FloatingActionMenu fabMenu;
+    FloatingActionButton enterSession, createEntry;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_habit);
+
+        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        fabMenu = (FloatingActionMenu) findViewById(R.id.menu_fab);
+        enterSession = (FloatingActionButton) findViewById(R.id.enter_session_fab);
+        createEntry = (FloatingActionButton) findViewById(R.id.create_entry_fab);
+        mViewPager = (ViewPager) findViewById(R.id.container);
 
         habitDatabase = new HabitDatabase(this, null, false);
         sessionManager = new SessionManager(this);
@@ -70,12 +81,8 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
 
         exportManager = new LocalDataExportManager(this);
 
-        updateActivity();
-
-        fabMenu = (FloatingActionMenu) findViewById(R.id.menu_fab);
         fabMenu.setClosedOnTouchOutside(true);
 
-        FloatingActionButton enterSession = (FloatingActionButton) findViewById(R.id.enter_session_fab);
         enterSession.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -84,7 +91,6 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
             }
         });
 
-        FloatingActionButton createEntry = (FloatingActionButton) findViewById(R.id.create_entry_fab);
         createEntry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -116,7 +122,6 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.addOnPageChangeListener (new ViewPager.OnPageChangeListener() {
             public void onPageScrollStateChanged(int state) {}
@@ -138,9 +143,9 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
                 }
             }
         });
-
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+
+        updateActivity();
     }
 
     @Override
@@ -291,10 +296,25 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
     private void updateColorTheme() {
         // TODO create this method
         int color = 0xFFCCCCCC;
+        int darkerColor = 0xFFBBBBBB;
 
         if(!habit.getIsArchived()){
             color = habit.getCategory().getColorAsInt();
+            darkerColor = HabitCategory.darkenColor(color, 0.7f);
         }
+
+        getWindow().setStatusBarColor(darkerColor);
+        tabLayout.setBackgroundColor(color);
+        toolbar.setBackgroundColor(color);
+
+        fabMenu.setMenuButtonColorNormal(color);
+        fabMenu.setMenuButtonColorPressed(darkerColor);
+
+        enterSession.setColorNormal(color);
+        enterSession.setColorPressed(darkerColor);
+
+        createEntry.setColorNormal(color);
+        createEntry.setColorPressed(darkerColor);
     }
 
     /**

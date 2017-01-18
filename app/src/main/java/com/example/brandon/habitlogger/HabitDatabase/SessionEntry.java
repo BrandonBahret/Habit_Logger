@@ -6,6 +6,7 @@ import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -68,6 +69,40 @@ public class SessionEntry implements Serializable{
      */
     public long getStartTime(){
         return this.startTime;
+    }
+
+    public int getStartingTimeHours(){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(getStartTime());
+
+        return c.get(Calendar.HOUR_OF_DAY);
+    }
+
+    public int getStartingTimeMinutes(){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(getStartTime());
+
+        return c.get(Calendar.MINUTE);
+    }
+
+    public void setStartingHour(int hour){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(getStartTime());
+
+        c.set(Calendar.HOUR_OF_DAY, hour);
+
+        long time = c.getTimeInMillis();
+        setStartTime(time);
+    }
+
+    public void setStartingMinute(int minute){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(getStartTime());
+
+        c.set(Calendar.MINUTE, minute);
+
+        long time = c.getTimeInMillis();
+        setStartTime(time);
     }
 
     /**

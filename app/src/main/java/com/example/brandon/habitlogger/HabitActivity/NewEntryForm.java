@@ -115,6 +115,48 @@ public class NewEntryForm extends DialogFragment {
         minutes.setText(String.valueOf(time.minutes));
         seconds.setText(String.valueOf(time.seconds));
 
+        date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StartingDateDialog dialog = new StartingDateDialog();
+
+                Bundle args = new Bundle();
+                args.putLong("date_in_milliseconds", entry.getStartTime());
+                dialog.setArguments(args);
+
+                dialog.setOnFinishedListener(new StartingDateDialog.OnFinishedListener() {
+                    @Override
+                    public void onFinishedWithResult(String monthName, int day, int year, long time) {
+                        entry.setStartTime(time);
+                        String dateString = entry.getStartTimeAsString(new PreferenceChecker(getContext()).stringGetDateFormat());
+                        date.setText(dateString);
+                    }
+                });
+                dialog.show(getFragmentManager(), "get-date");
+            }
+        });
+
+        startingTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int hours = entry.getStartingTimeHours();
+                int minutes = entry.getStartingTimeMinutes();
+
+                StartingTimeDialog dialog = StartingTimeDialog.newInstance(hours, minutes);
+
+                dialog.setOnFinishedListener(new StartingTimeDialog.OnFinishedListener() {
+                    @Override
+                    public void onFinishedWithResult(int hours, int minutes) {
+                        entry.setStartingHour(hours);
+                        entry.setStartingMinute(minutes);
+
+                        startingTime.setText(entry.getStartTimeAsString("h:mm a"));
+                    }
+                });
+                dialog.show(getFragmentManager(), "get-date");
+            }
+        });
+
         builder.setView(dialogView);
 
         return builder.create();
