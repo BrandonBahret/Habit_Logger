@@ -49,7 +49,6 @@ public class StartingDateDialog extends DialogFragment implements
 
         // Create a new instance of DatePickerDialog and return it
         DatePickerDialog dialog = new DatePickerDialog(getActivity(), this, year, month, day);
-        dialog.getDatePicker().setMinDate(minTime);
 
         return dialog;
     }

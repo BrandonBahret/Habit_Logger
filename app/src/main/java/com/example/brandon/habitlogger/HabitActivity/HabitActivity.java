@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
@@ -32,7 +31,8 @@ import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
 
-public class HabitActivity extends AppCompatActivity implements EntriesFragment.OnFragmentInteractionListener{
+public class HabitActivity extends AppCompatActivity implements
+        EntriesFragment.OnFragmentInteractionListener, CalendarFragment.OnFragmentInteractionListener{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -66,6 +66,8 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
         setContentView(R.layout.activity_habit);
 
         toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar.setPopupTheme(R.style.PopupMenu);
+
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         fabMenu = (FloatingActionMenu) findViewById(R.id.menu_fab);
         enterSession = (FloatingActionButton) findViewById(R.id.enter_session_fab);
@@ -211,8 +213,7 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
 
             case(R.id.menu_export_habit):{
                 Habit habit = habitDatabase.getHabit(habitId);
-                String filepath = exportManager.exportHabit(habit, true);
-                Toast.makeText(this, "Habit exported to: " + filepath, Toast.LENGTH_LONG).show();
+                exportManager.shareExportHabit(habit);
             }break;
 
             case(R.id.menu_delete_habit):{
@@ -323,6 +324,7 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
         public EntriesFragment entriesFragment = EntriesFragment.newInstance(habitId);
+        public CalendarFragment calendarFragment = CalendarFragment.newInstance();
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -337,6 +339,7 @@ public class HabitActivity extends AppCompatActivity implements EntriesFragment.
                     return entriesFragment;
 
                 case 1:
+                    return calendarFragment;
 
                 case 2:
 

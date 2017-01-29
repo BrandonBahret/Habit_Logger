@@ -95,6 +95,7 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
 
         holder.startTimeText.setText(item.getStartTimeAsString(dateFormat + " h:mm a"));
         holder.durationText.setText(item.getDurationAsString());
+
         holder.accent.setBackgroundColor(habitDatabase.getHabitColor(holder.habitId));
 
         String note = item.getNote();
@@ -136,7 +137,7 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
             }
         });
     }
-
+    
     /**
      * Checks if the text of the supplied {@link TextView} has been ellipsized.
      *

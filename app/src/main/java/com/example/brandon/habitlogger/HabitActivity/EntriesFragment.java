@@ -1,9 +1,12 @@
 package com.example.brandon.habitlogger.HabitActivity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +18,7 @@ import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.EntryViewAdapter;
+import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.List;
 
@@ -35,8 +39,10 @@ public class EntriesFragment extends Fragment {
 
     HabitDatabase habitDatabase;
     RecyclerView entriesContainer;
+    FloatingActionMenu fab;
     List<SessionEntry> sessionEntries;
     EntryViewAdapter entryAdapter;
+    CardView dateRange;
 
     public EntriesFragment() {
         // Required empty public constructor
@@ -63,6 +69,8 @@ public class EntriesFragment extends Fragment {
         if (getArguments() != null) {
             this.habitId = getArguments().getLong(HABIT_ID);
         }
+
+        fab = (FloatingActionMenu)getActivity().findViewById(R.id.menu_fab);
     }
 
     @Override
@@ -74,6 +82,7 @@ public class EntriesFragment extends Fragment {
         habitDatabase = new HabitDatabase(getContext(), null, false);
 
         entriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
+        dateRange = (CardView)v.findViewById(R.id.date_range);
         sessionEntries = habitDatabase.getEntries(habitId);
 
         entryAdapter = new EntryViewAdapter(sessionEntries, getContext(),
@@ -106,6 +115,38 @@ public class EntriesFragment extends Fragment {
         entriesContainer.setLayoutManager(layoutManager);
         entriesContainer.setItemAnimator(new DefaultItemAnimator());
         entriesContainer.setAdapter(entryAdapter);
+
+        entriesContainer.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+                if (dy > 0) {
+                    if(fab!=null) {
+                        fab.hideMenu(true);
+                    }
+                    dateRange.animate()
+                            .setStartDelay(0)
+                            .setDuration(250)
+                            .alpha(0)
+                            .translationY(-dateRange.getHeight())
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    super.onAnimationEnd(animation);
+                                }
+                            });
+                }
+                else if (dy < 0) {
+                    if(fab!=null) {
+                        fab.showMenu(true);
+                    }
+                    dateRange.animate()
+                            .setStartDelay(0)
+                            .setDuration(250)
+                            .alpha(1)
+                            .translationY(0);
+                }
+            }
+        });
 
         return v;
     }

@@ -1,9 +1,12 @@
 package com.example.brandon.habitlogger.OverallStatistics;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,6 +38,7 @@ public class OverallEntriesFragment extends Fragment {
     RecyclerView entriesContainer;
     List<SessionEntry> sessionEntries;
     EntryViewAdapter entryAdapter;
+    CardView dateRange;
 
     public OverallEntriesFragment() {
         // Required empty public constructor
@@ -65,6 +69,7 @@ public class OverallEntriesFragment extends Fragment {
         habitDatabase = new HabitDatabase(getContext(), null, false);
 
         entriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
+        dateRange = (CardView) v.findViewById(R.id.date_range);
         sessionEntries = habitDatabase.lookUpEntries(habitDatabase.searchAllEntriesWithTimeRange(0, Long.MAX_VALUE));
 
         entryAdapter = new EntryViewAdapter(sessionEntries, getContext(),
@@ -99,6 +104,32 @@ public class OverallEntriesFragment extends Fragment {
         entriesContainer.setLayoutManager(layoutManager);
         entriesContainer.setItemAnimator(new DefaultItemAnimator());
         entriesContainer.setAdapter(entryAdapter);
+
+        entriesContainer.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+                if (dy > 0) {
+                    dateRange.animate()
+                            .setStartDelay(0)
+                            .setDuration(250)
+                            .alpha(0)
+                            .translationY(-dateRange.getHeight())
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    super.onAnimationEnd(animation);
+                                }
+                            });
+                }
+                else if (dy < 0) {
+                    dateRange.animate()
+                            .setStartDelay(0)
+                            .setDuration(250)
+                            .alpha(1)
+                            .translationY(0);
+                }
+            }
+        });
 
         return v;
     }

@@ -1,6 +1,7 @@
 package com.example.brandon.habitlogger.DataExportHelpers;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Environment;
 
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
@@ -154,11 +155,29 @@ public class LocalDataExportManager {
         String filename = backup.getName() + ".csv";
         String dataPath = isPublic ? dataPathPublic : dataPathPrivate;
         String filepath = dataPath + File.separator + habitFolderPath;
+
         if(saveHabitCSV(filepath, filename, backup.toCSV(), isPublic)){
             return filepath;
         }
         else{
             throw new Error("Failed to export habit.");
+        }
+    }
+
+    public void shareExportHabit(Habit backup){
+        share(backup.toCSV());
+    }
+
+    private void share(String text) {
+        try {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/csv");
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Habit Logger");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+
+            context.startActivity(Intent.createChooser(shareIntent, "Export CSV..."));
+        } catch(Exception e) {
+            e.printStackTrace();
         }
     }
 

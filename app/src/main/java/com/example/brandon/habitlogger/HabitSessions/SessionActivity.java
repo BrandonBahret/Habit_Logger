@@ -2,6 +2,9 @@ package com.example.brandon.habitlogger.HabitSessions;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
@@ -16,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.R;
@@ -39,7 +43,9 @@ public class SessionActivity extends AppCompatActivity {
     private int position = RecyclerView.NO_POSITION;
 
     private ImageButton playButton;
+    private Button cancelButton;
     private TextView hoursView, minutesView, secondsView;
+    private ActionBar actionBar;
     private EditText noteArea;
 
     @Override
@@ -52,6 +58,7 @@ public class SessionActivity extends AppCompatActivity {
         minutesView = (TextView)    findViewById(R.id.session_minutes_view);
         secondsView = (TextView)    findViewById(R.id.session_seconds_view);
         noteArea    = (EditText)    findViewById(R.id.session_note);
+        actionBar = getSupportActionBar();
 
         Intent data = getIntent();
         habit = (Habit)data.getSerializableExtra("habit");
@@ -82,7 +89,7 @@ public class SessionActivity extends AppCompatActivity {
             actionBar.setTitle(habit.getName());
         }
 
-        Button cancelButton = (Button)findViewById(R.id.session_cancel);
+        cancelButton = (Button)findViewById(R.id.session_cancel);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -146,12 +153,14 @@ public class SessionActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         prepareTimerDisplay();
+        setColorTheme();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         prepareTimerDisplay();
+        setColorTheme();
     }
 
     @Override
@@ -164,6 +173,26 @@ public class SessionActivity extends AppCompatActivity {
     protected void onPause() {
         handler.removeCallbacks(updateTimeDisplayRunnable);
         super.onPause();
+    }
+
+    public void setColorTheme(){
+        // TODO create this method
+        int color = 0xFFCCCCCC;
+        int darkerColor = 0xFFBBBBBB;
+
+        if(!habit.getIsArchived()){
+            color = habit.getCategory().getColorAsInt();
+            darkerColor = HabitCategory.darkenColor(color, 0.7f);
+        }
+
+        getWindow().setStatusBarColor(darkerColor);
+        cancelButton.getBackground().setColorFilter(color, PorterDuff.Mode.SRC);
+
+        Drawable drawable = noteArea.getBackground(); // get current EditText drawable
+        drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP); // change the drawable color
+        noteArea.setBackground(drawable);
+
+        actionBar.setBackgroundDrawable(new ColorDrawable(color));
     }
 
     public void updateTimeDisplay(){

@@ -56,7 +56,7 @@
             android:summary="change the theme of the app"
             android:defaultValue="0"
             android:entries="@array/theme_options"
-            android:entryValues="@array/theme_options"
+            android:entryValues="@array/theme_options_values"
             android:dialogTitle="Select a theme" />
 
         <ListPreference

@@ -48,6 +48,8 @@ public class OverallStatisticsActivity extends AppCompatActivity implements Over
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
+        getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+
         exportManager = new LocalDataExportManager(this);
     }
 

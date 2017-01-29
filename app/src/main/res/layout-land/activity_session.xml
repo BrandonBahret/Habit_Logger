@@ -11,15 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/session_time_display_layout"
-        android:paddingBottom="10dp"
+        android:paddingBottom="4dp"
 
         android:orientation="horizontal"
         android:gravity="center_horizontal"
-        android:background="@drawable/underline_background">
+        android:background="@drawable/underline_background"
+        android:weightSum="1">
 
         <ImageButton
-            android:layout_width="60dp"
-            android:layout_height="60dp"
             android:id="@+id/session_pause_play"
 
             android:scaleType="centerCrop"
@@ -29,7 +28,9 @@
 
             android:layout_gravity="center_vertical"
             android:contentDescription="@string/session_pause_play_content_description"
-            />
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_weight="0.00" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -42,16 +43,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                android:textSize="75sp"
+                android:textSize="@dimen/land_time_display"
                 android:fontFamily="sans-serif-condensed"
-                />
-
-            <TextView
-                android:text="H"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/hours_place"
-                android:textAlignment="center"
                 />
 
         </LinearLayout>
@@ -61,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:textSize="75sp"
+            android:textSize="@dimen/land_time_display"
             android:fontFamily="sans-serif-condensed"
             />
 
@@ -77,16 +70,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                android:textSize="75sp"
+                android:textSize="@dimen/land_time_display"
                 android:fontFamily="sans-serif-condensed"
-                />
-
-            <TextView
-                android:text="M"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/minutes_place"
-                android:textAlignment="center"
                 />
 
         </LinearLayout>
@@ -96,7 +81,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:textSize="75sp"
+            android:textSize="@dimen/land_time_display"
             android:fontFamily="sans-serif-condensed"
             />
 
@@ -111,16 +96,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                android:textSize="75sp"
+                android:textSize="@dimen/land_time_display"
                 android:fontFamily="sans-serif-condensed"
-                />
-
-            <TextView
-                android:text="S"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/seconds_place"
-                android:textAlignment="center"
                 />
 
         </LinearLayout>

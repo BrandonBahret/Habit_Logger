@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.R;
@@ -45,12 +44,10 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewAdapter.View
         public CardView rootView;
         public ImageView categoryAccent;
         public Toolbar toolbar;
-        public TextView streakCount;
         public ImageButton playButton;
 
         public ViewHolder(View view) {
             super(view);
-            this.streakCount = (TextView) view.findViewById(R.id.streak_counter_card_view);
             this.categoryAccent = (ImageView) view.findViewById(R.id.category_accent);
             this.toolbar = (Toolbar) view.findViewById(R.id.card_toolbar);
             this.playButton = (ImageButton) view.findViewById(R.id.session_control_button);
@@ -89,9 +86,6 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewAdapter.View
         Habit item = habitsList.get(position);
         final long habitId = item.getDatabaseId();
 
-        holder.streakCount.setText(String.valueOf(item.calculateStreakCount()));
-        holder.categoryAccent.setBackgroundColor(item.getCategory().getColorAsInt());
-
         holder.rootView.setTag(String.valueOf(item.getDatabaseId()));
 
         // Make sure menu hasn't been inflated yet.
@@ -99,9 +93,11 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewAdapter.View
         if(menuSize == 0) {
             if(item.getIsArchived()){
                 holder.toolbar.inflateMenu(R.menu.menu_archived_habit_card);
+                holder.categoryAccent.setBackgroundColor(0xFFCCCCCC);
             }
             else{
                 holder.toolbar.inflateMenu(R.menu.menu_habit_card);
+                holder.categoryAccent.setBackgroundColor(item.getCategory().getColorAsInt());
             }
             holder.toolbar.setTitle(item.getName());
 

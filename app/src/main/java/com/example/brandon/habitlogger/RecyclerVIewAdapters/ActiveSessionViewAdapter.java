@@ -95,13 +95,20 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
             String timeDisplay = String.format(Locale.US, "%02d:%02d:%02d", time.hours, time.minutes, time.seconds);
             holder.time.setText(timeDisplay);
 
+            if(habitDatabase.getIsHabitArchived(habitId)){
+                holder.accent.setColorFilter(0xFFCCCCCC);
+            }
+            else{
+                holder.accent.setColorFilter(habitDatabase.getHabitColor(habitId));
+            }
+
             if (sessionManager.getIsPaused(habitId)) {
                 holder.pauseButton.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
             } else {
                 holder.pauseButton.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
             }
 
-            holder.accent.setColorFilter(habitDatabase.getHabitColor(habitId));
+
 
             holder.rootView.setOnClickListener(new View.OnClickListener() {
                 @Override

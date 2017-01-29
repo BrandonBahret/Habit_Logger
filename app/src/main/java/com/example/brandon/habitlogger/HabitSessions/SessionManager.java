@@ -137,7 +137,8 @@ public class SessionManager {
                     R.layout.notification_layout);
 
             remoteViews.setTextViewText(R.id.active_session_habit_name, habit.getName());
-            remoteViews.setInt(R.id.card_accent, "setBackgroundColor", habit.getCategory().getColorAsInt());
+            int categoryColor = habit.getIsArchived()? 0xFFCCCCCC : habit.getCategory().getColorAsInt();
+            remoteViews.setInt(R.id.card_accent, "setBackgroundColor", categoryColor);
             remoteViews.setInt(R.id.session_pause_play, "setImageResource",
                     getResourceIdForPauseButton(getIsPaused(habitId)));
 
@@ -186,8 +187,13 @@ public class SessionManager {
                                 RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
                                         R.layout.notification_layout);
                                 remoteViews.setTextViewText(R.id.active_habit_time, timeDisplayText);
+                                remoteViews.setTextViewText(R.id.time_started, entry.getStartTimeAsString("h:mm a"));
                                 remoteViews.setInt(R.id.session_pause_play, "setImageResource",
                                         getResourceIdForPauseButton(getIsPaused(habitId)));
+                                int categoryColor = habitDatabase.getIsHabitArchived(habitId)? 0xFFCCCCCC :
+                                        habitDatabase.getHabitColor(habitId);
+
+                                remoteViews.setInt(R.id.card_accent, "setBackgroundColor", categoryColor);
 
                                 builder.setCustomContentView(remoteViews);
                                 Intent resultIntent = new Intent(context, SessionActivity.class);

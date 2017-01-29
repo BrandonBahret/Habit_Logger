@@ -130,13 +130,6 @@ public class ActiveSessionsActivity extends AppCompatActivity {
         SessionEntry entry = sessionEntries.get(adapterPosition);
         entry.setIsPaused(isPaused);
         sessionViewAdapter.notifyItemChanged(adapterPosition);
-
-//        if(isPaused){
-//            holder.pauseButton.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
-//        }
-//        else{
-//            holder.pauseButton.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
-//        }
     }
 
     @Override

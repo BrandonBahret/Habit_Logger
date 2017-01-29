@@ -5,6 +5,9 @@
     android:layout_height="match_parent"
     tools:context="com.example.brandon.habitlogger.HabitActivity.EntriesFragment">
 
+    <include layout="@layout/date_range_selector"
+        android:id="@+id/date_range"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/entries_holder"
         android:layout_width="match_parent"

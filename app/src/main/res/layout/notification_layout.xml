@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent" android:layout_height="60dp"
-    android:background="@color/cardview_light_background"
+    android:background="@color/habitCard"
     android:weightSum="100"
     android:foreground="?android:attr/selectableItemBackground">
 
@@ -30,16 +30,6 @@
         android:background="?android:attr/selectableItemBackgroundBorderless" />
 
     <TextView
-        android:text="@string/time_display_placeholder"
-        android:textColor="@android:color/black"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/active_habit_time"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/session_pause_play"
-        android:layout_toStartOf="@+id/session_pause_play" />
-
-    <TextView
         android:text="@string/habit_name_placeholder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -59,5 +49,25 @@
         android:layout_marginStart="14dp"
         android:layout_toLeftOf="@+id/active_habit_time"
         android:layout_toStartOf="@+id/active_habit_time" />
+
+    <TextView
+        android:text="@string/time_display_placeholder"
+        android:textColor="@android:color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/active_habit_time"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/session_pause_play" />
+
+    <TextView
+        android:text="@string/time_display_placeholder"
+        android:textColor="@android:color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/time_started"
+        android:textSize="10sp"
+        android:textAlignment="center"
+        android:layout_below="@+id/active_habit_time"
+        android:layout_toStartOf="@+id/session_pause_play" />
 
 </RelativeLayout>

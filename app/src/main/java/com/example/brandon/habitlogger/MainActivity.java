@@ -13,6 +13,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -49,7 +50,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static android.support.design.R.styleable.RecyclerView;
 import static android.widget.Toast.makeText;
 import static com.example.brandon.habitlogger.R.menu.main;
 
@@ -57,19 +57,19 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     PreferenceChecker preferenceChecker;
-
     SessionManager sessionManager;
-    CardView currentSession;
 
+    CardView currentSession;
     HabitDatabase habitDatabase;
+
     LocalDataExportManager exportManager;
     GoogleDriveDataExportManager googleDrive;
-
     List<Habit> habitList = new ArrayList<>();
+
     Runnable updateCards;
     Handler handler = new Handler();
-
     RecyclerView habitCardContainer;
+
     HabitViewAdapter habitAdapter;
 
     final int NO_ARCHIVED_HABITS = 0, ONLY_ARCHIVED_HABITS = 1;
@@ -77,9 +77,17 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        preferenceChecker = new PreferenceChecker(this);
+//        setActivityTheme();
+        AppCompatDelegate.setDefaultNightMode(
+                preferenceChecker.getTheme() == PreferenceChecker.LIGHT_THEME?
+                AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES);
+
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setPopupTheme(R.style.PopupMenu);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -174,8 +182,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onExportClick(long habitId) {
                 Habit habit = habitDatabase.getHabit(habitId);
-                String filepath = exportManager.exportHabit(habit, true);
-                Toast.makeText(MainActivity.this, "Habit exported to: " + filepath, Toast.LENGTH_LONG).show();
+                exportManager.shareExportHabit(habit);
             }
 
             @Override
@@ -256,9 +263,12 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        preferenceChecker = new PreferenceChecker(this);
         updateCurrentSessionCard();
         showDatabase();
+    }
+
+    private void setActivityTheme() {
+
     }
 
     public int getItemPosition(long habitId){
@@ -317,11 +327,19 @@ public class MainActivity extends AppCompatActivity
         switch (id) {
             case (R.id.menu_database_export): {
                 exportManager.exportDatabase(true);
+                if(googleDrive.isConnected()) {
+                    googleDrive.backupDatabase();
+                }
             }
             break;
 
             case (R.id.menu_database_restore): {
-                exportManager.importDatabase(true);
+                if(googleDrive.isConnected()) {
+                    googleDrive.restoreDatabase();
+                }
+                else{
+                    exportManager.importDatabase(true);
+                }
 
                 habitDatabase.loadAllContents();
                 habitDatabase.notifyChange();
@@ -425,6 +443,11 @@ public class MainActivity extends AppCompatActivity
                 }break;
             }
         }
+        else if(resultCode == RESULT_CANCELED){
+            if(requestCode == SettingsActivity.REQUEST_SETTINGS){
+                recreate();
+            }
+        }
     }
 
     @Override
@@ -446,13 +469,18 @@ public class MainActivity extends AppCompatActivity
         if(preferenceChecker.doShowNotificationsAutomatically()) {
             sessionManager.createAllSessionNotifications();
         }
+
+        handler.post(updateCards);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        setActivityTheme();
         updateCurrentSessionCard();
         showDatabase();
+        handler.post(updateCards);
     }
 
 
@@ -527,8 +555,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startSettingsActivity() {
-        Intent startSettings = new Intent(this, SettingsActivity.class);
-        startActivity(startSettings);
+        Intent startSettings = new Intent(MainActivity.this, SettingsActivity.class);
+        startActivityForResult(startSettings, SettingsActivity.REQUEST_SETTINGS);
     }
 
     public void startNewHabitActivity() {
