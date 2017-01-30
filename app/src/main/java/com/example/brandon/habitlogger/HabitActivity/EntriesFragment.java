@@ -1,12 +1,10 @@
 package com.example.brandon.habitlogger.HabitActivity;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.CardView;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.brandon.habitlogger.FloatingDateRangeWidgetManager;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.R;
@@ -21,6 +20,7 @@ import com.example.brandon.habitlogger.RecyclerVIewAdapters.EntryViewAdapter;
 import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,7 +42,7 @@ public class EntriesFragment extends Fragment {
     FloatingActionMenu fab;
     List<SessionEntry> sessionEntries;
     EntryViewAdapter entryAdapter;
-    CardView dateRange;
+    FloatingDateRangeWidgetManager dateRangeManager;
 
     public EntriesFragment() {
         // Required empty public constructor
@@ -80,10 +80,20 @@ public class EntriesFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_entries, container, false);
 
         habitDatabase = new HabitDatabase(getContext(), null, false);
+        sessionEntries = habitDatabase.getEntries(habitId);
 
         entriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
-        dateRange = (CardView)v.findViewById(R.id.date_range);
-        sessionEntries = habitDatabase.getEntries(habitId);
+
+        dateRangeManager = new FloatingDateRangeWidgetManager((AppCompatActivity)getActivity(), v.findViewById(R.id.date_range), sessionEntries);
+        dateRangeManager.setDateRangeChangeListener(new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
+            @Override
+            public void dateRangeChanged(long dateFrom, long dateTo) {
+                Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo);
+                sessionEntries = habitDatabase.lookUpEntries(ids);
+                dateRangeManager.updateSessionEntries(sessionEntries);
+                updateEntriesContainer(ids);
+            }
+        });
 
         entryAdapter = new EntryViewAdapter(sessionEntries, getContext(),
                 new EntryViewAdapter.OnClickListeners() {
@@ -120,30 +130,17 @@ public class EntriesFragment extends Fragment {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy){
                 if (dy > 0) {
-                    if(fab!=null) {
+                    if(fab!=null)
                         fab.hideMenu(true);
-                    }
-                    dateRange.animate()
-                            .setStartDelay(0)
-                            .setDuration(250)
-                            .alpha(0)
-                            .translationY(-dateRange.getHeight())
-                            .setListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    super.onAnimationEnd(animation);
-                                }
-                            });
+
+                    dateRangeManager.hideView();
                 }
+
                 else if (dy < 0) {
-                    if(fab!=null) {
+                    if(fab!=null)
                         fab.showMenu(true);
-                    }
-                    dateRange.animate()
-                            .setStartDelay(0)
-                            .setDuration(250)
-                            .alpha(1)
-                            .translationY(0);
+
+                    dateRangeManager.showView();
                 }
             }
         });
@@ -153,7 +150,6 @@ public class EntriesFragment extends Fragment {
 
     private int getSessionEntryIndex(long entryId){
         int index = 0;
-
         for(SessionEntry entry : sessionEntries){
             if(entry.getDatabaseId() == entryId){
                 break;
@@ -179,6 +175,10 @@ public class EntriesFragment extends Fragment {
         int index = getSessionEntryIndex(databaseId);
         sessionEntries.set(index, entry);
         entryAdapter.notifyItemChanged(index);
+    }
+
+    public void updateEntriesContainer(Set<Long> ids){
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event

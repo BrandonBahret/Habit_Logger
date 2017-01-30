@@ -46,7 +46,7 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         public CardView rootView;
 
         public long entryId;
-        public Long habitId;
+        public long habitId;
 
         public ViewHolder(View view) {
             super(view);

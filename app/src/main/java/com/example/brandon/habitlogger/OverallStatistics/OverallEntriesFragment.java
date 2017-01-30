@@ -6,6 +6,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.brandon.habitlogger.FloatingDateRangeWidgetManager;
 import com.example.brandon.habitlogger.HabitActivity.NewEntryForm;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
@@ -38,7 +40,9 @@ public class OverallEntriesFragment extends Fragment {
     RecyclerView entriesContainer;
     List<SessionEntry> sessionEntries;
     EntryViewAdapter entryAdapter;
+
     CardView dateRange;
+    FloatingDateRangeWidgetManager dateRangeManager;
 
     public OverallEntriesFragment() {
         // Required empty public constructor
@@ -69,8 +73,17 @@ public class OverallEntriesFragment extends Fragment {
         habitDatabase = new HabitDatabase(getContext(), null, false);
 
         entriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
-        dateRange = (CardView) v.findViewById(R.id.date_range);
         sessionEntries = habitDatabase.lookUpEntries(habitDatabase.searchAllEntriesWithTimeRange(0, Long.MAX_VALUE));
+
+        dateRange = (CardView) v.findViewById(R.id.date_range);
+        dateRangeManager = new FloatingDateRangeWidgetManager((AppCompatActivity)getActivity(), v.findViewById(R.id.date_range), sessionEntries);
+        dateRangeManager.setDateRangeChangeListener(new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
+            @Override
+            public void dateRangeChanged(long dateFrom, long dateTo) {
+
+            }
+        });
+
 
         entryAdapter = new EntryViewAdapter(sessionEntries, getContext(),
                 new EntryViewAdapter.OnClickListeners() {

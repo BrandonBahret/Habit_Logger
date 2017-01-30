@@ -3,6 +3,7 @@
     <string-array name="date_range_type_options">
         <item>Year</item>
         <item>Month</item>
+        <item>Week</item>
         <item>Today</item>
         <item>Start</item>
         <item>Custom</item>
