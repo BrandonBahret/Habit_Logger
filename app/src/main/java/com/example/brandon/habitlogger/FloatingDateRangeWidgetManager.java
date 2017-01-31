@@ -41,6 +41,7 @@ public class FloatingDateRangeWidgetManager {
     private DateRangeChangeListener listener;
     private long totalDuration;
     private long numberOfEntries;
+    public boolean isShown = true;
 
     public interface DateRangeChangeListener{
         public void dateRangeChanged(long dateFrom, long dateTo);
@@ -89,13 +90,13 @@ public class FloatingDateRangeWidgetManager {
 
                     // Time presets: Year, Month, Week, Day in milliseconds
                     long timePresets[] = new long[]{31536000000L, 2592000000L, 604800000L, 86400000L};
-                    if(i < 4){
-                        setPresetDateRange(timePresets[i]);
+                    if(i !=0 && i < 5){
+                        setPresetDateRange(timePresets[i - 1]);
                     }
 
                     else{
                         switch(i){
-                            case 4:{
+                            case 0:{
                                 setStartRange();
                             }break;
 
@@ -169,6 +170,7 @@ public class FloatingDateRangeWidgetManager {
                 .setDuration(250)
                 .alpha(0)
                 .translationY(-view.getHeight());
+        isShown = false;
     }
 
     public void showView(){
@@ -177,6 +179,7 @@ public class FloatingDateRangeWidgetManager {
                 .setDuration(250)
                 .alpha(1)
                 .translationY(0);
+        isShown = true;
     }
 
     private void setDateRangeEnabled(boolean state){
@@ -194,6 +197,7 @@ public class FloatingDateRangeWidgetManager {
     }
 
     public void updateSessionEntries(List<SessionEntry> sessionEntries) {
+        this.sessionEntries = sessionEntries;
         this.minimumTime = sessionEntries.isEmpty()? 0 :
                 sessionEntries.get(0).getStartTime();
 
@@ -233,6 +237,18 @@ public class FloatingDateRangeWidgetManager {
 
         c.set(Calendar.DAY_OF_MONTH, c.getActualMinimum(Calendar.DAY_OF_MONTH));
         dateFromTime = c.getTimeInMillis();
+
+        updateDateRangeLabels();
+    }
+
+    public void setDateRangeForDate(int year, int month, int dayOfMonth) {
+        setDateRangeEnabled(false);
+
+        Calendar c = Calendar.getInstance();
+        c.set(year, month, dayOfMonth);
+
+        dateToTime = c.getTimeInMillis();
+        dateFromTime = dateToTime - 86400000L;
 
         updateDateRangeLabels();
     }

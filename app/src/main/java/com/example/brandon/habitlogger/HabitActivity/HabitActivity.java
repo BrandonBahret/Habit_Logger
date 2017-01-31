@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.HabitActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,8 +18,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
+import com.example.brandon.habitlogger.FloatingDateRangeWidgetManager;
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
@@ -26,9 +29,18 @@ import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.ModifyHabitActivity.ModifyHabitActivity;
+import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
+import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener.State.COLLAPSED;
+import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener.State.EXPANDED;
 
 
 public class HabitActivity extends AppCompatActivity implements
@@ -50,6 +62,8 @@ public class HabitActivity extends AppCompatActivity implements
     private ViewPager mViewPager;
 
     private HabitDatabase habitDatabase;
+    private PreferenceChecker preferenceChecker;
+    private List<SessionEntry> sessionEntries = new ArrayList<>();
     private LocalDataExportManager exportManager;
     private SessionManager sessionManager;
     private Habit habit;
@@ -60,14 +74,20 @@ public class HabitActivity extends AppCompatActivity implements
     FloatingActionMenu fabMenu;
     FloatingActionButton enterSession, createEntry;
 
+    FloatingDateRangeWidgetManager dateRangeManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_habit);
 
-        toolbar = (Toolbar)findViewById(R.id.toolbar);
-        toolbar.setPopupTheme(R.style.PopupMenu);
+        preferenceChecker = new PreferenceChecker(this);
 
+        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        if(preferenceChecker.getTheme() == PreferenceChecker.DARK_THEME)
+            toolbar.setPopupTheme(R.style.PopupMenu);
+
+        AppBarLayout appBar = (AppBarLayout)findViewById(R.id.appbar);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         fabMenu = (FloatingActionMenu) findViewById(R.id.menu_fab);
         enterSession = (FloatingActionButton) findViewById(R.id.enter_session_fab);
@@ -76,6 +96,33 @@ public class HabitActivity extends AppCompatActivity implements
 
         habitDatabase = new HabitDatabase(this, null, false);
         sessionManager = new SessionManager(this);
+
+        List<SessionEntry> sessionEntries = new ArrayList<>();
+        dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), sessionEntries);
+        dateRangeManager.setDateRangeChangeListener(new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
+            @Override
+            public void dateRangeChanged(long dateFrom, long dateTo) {
+                Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo);
+                HabitActivity.this.sessionEntries = habitDatabase.lookUpEntries(ids);
+                dateRangeManager.updateSessionEntries(HabitActivity.this.sessionEntries);
+            }
+        });
+
+        appBar.addOnOffsetChangedListener(new AppBarStateChangeListener() {
+            @Override
+            public void onStateChanged(AppBarLayout appBarLayout, State state) {
+                if(state == COLLAPSED){
+                    dateRangeManager.hideView();
+                    if(mViewPager.getCurrentItem() == 0)
+                        fabMenu.hideMenu(true);
+                }
+                else if(state == EXPANDED){
+                    dateRangeManager.showView();
+                    if(mViewPager.getCurrentItem() == 0)
+                        fabMenu.showMenu(true);
+                }
+            }
+        });
 
         Intent data = getIntent();
         habitId = data.getLongExtra("habitId", -1);
@@ -133,14 +180,17 @@ public class HabitActivity extends AppCompatActivity implements
                 switch (position) {
                     case 0:
                         fabMenu.showMenu(true);
+                        dateRangeManager.showView();
                         break;
 
                     case 1:
                         fabMenu.hideMenu(true);
+                        dateRangeManager.hideView();
                         break;
 
                     case 2:
                         fabMenu.hideMenu(true);
+                        dateRangeManager.showView();
                         break;
                 }
             }
@@ -325,7 +375,6 @@ public class HabitActivity extends AppCompatActivity implements
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
         public EntriesFragment entriesFragment = EntriesFragment.newInstance(habitId);
         public CalendarFragment calendarFragment = CalendarFragment.newInstance();
-
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -339,6 +388,15 @@ public class HabitActivity extends AppCompatActivity implements
                     return entriesFragment;
 
                 case 1:
+                    calendarFragment.setListener(new CalendarFragment.Listener() {
+                        @Override
+                        public void onDateClicked(int year, int month, int dayOfMonth) {
+                            dateRangeManager.setDateRangeForDate(year, month, dayOfMonth);
+                            mViewPager.setCurrentItem(0, true);
+                            String text = String.format(Locale.getDefault(), "%d %d, %d", month, dayOfMonth, year);
+                            Toast.makeText(HabitActivity.this, text, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     return calendarFragment;
 
                 case 2:

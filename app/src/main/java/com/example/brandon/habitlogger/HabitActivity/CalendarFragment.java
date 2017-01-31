@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.HabitActivity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.CalendarView;
 
 import com.example.brandon.habitlogger.R;
+
+import java.util.Calendar;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,8 +26,18 @@ public class CalendarFragment extends Fragment{
     private OnFragmentInteractionListener mListener;
     private CalendarView calendar;
 
+    private Listener listener;
+
     public CalendarFragment() {
         // Required empty public constructor
+    }
+
+    public interface Listener{
+        public void onDateClicked(int year, int month, int dayOfMonth);
+    }
+
+    public void setListener(Listener listener){
+        this.listener = listener;
     }
 
     /**
@@ -50,6 +63,13 @@ public class CalendarFragment extends Fragment{
 
         calendar = (CalendarView)v.findViewById(R.id.calendarView);
 
+        calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView calendarView, int year, int month, int dayOfMonth) {
+                if(listener != null)
+                    listener.onDateClicked(year, month, dayOfMonth);
+            }
+        });
 
         return v;
     }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.FloatingDateRangeWidgetManager;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.R;
@@ -42,7 +40,6 @@ public class EntriesFragment extends Fragment {
     FloatingActionMenu fab;
     List<SessionEntry> sessionEntries;
     EntryViewAdapter entryAdapter;
-    FloatingDateRangeWidgetManager dateRangeManager;
 
     public EntriesFragment() {
         // Required empty public constructor
@@ -84,17 +81,6 @@ public class EntriesFragment extends Fragment {
 
         entriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
 
-        dateRangeManager = new FloatingDateRangeWidgetManager((AppCompatActivity)getActivity(), v.findViewById(R.id.date_range), sessionEntries);
-        dateRangeManager.setDateRangeChangeListener(new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
-            @Override
-            public void dateRangeChanged(long dateFrom, long dateTo) {
-                Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo);
-                sessionEntries = habitDatabase.lookUpEntries(ids);
-                dateRangeManager.updateSessionEntries(sessionEntries);
-                updateEntriesContainer(ids);
-            }
-        });
-
         entryAdapter = new EntryViewAdapter(sessionEntries, getContext(),
                 new EntryViewAdapter.OnClickListeners() {
                     @Override
@@ -125,25 +111,6 @@ public class EntriesFragment extends Fragment {
         entriesContainer.setLayoutManager(layoutManager);
         entriesContainer.setItemAnimator(new DefaultItemAnimator());
         entriesContainer.setAdapter(entryAdapter);
-
-        entriesContainer.addOnScrollListener(new RecyclerView.OnScrollListener(){
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
-                if (dy > 0) {
-                    if(fab!=null)
-                        fab.hideMenu(true);
-
-                    dateRangeManager.hideView();
-                }
-
-                else if (dy < 0) {
-                    if(fab!=null)
-                        fab.showMenu(true);
-
-                    dateRangeManager.showView();
-                }
-            }
-        });
 
         return v;
     }

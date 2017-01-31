@@ -7,6 +7,7 @@ import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
@@ -25,6 +26,13 @@ public class SessionEntry implements Serializable{
     private long habitId = -1;
 
     private long databaseId = -1;
+
+    public static Comparator<SessionEntry> StartingTimeComparator = new Comparator<SessionEntry>() {
+        @Override
+        public int compare(SessionEntry sessionOne, SessionEntry sessionTwo) {
+            return Long.compare(sessionOne.getStartTime(), sessionTwo.getStartTime());
+        }
+    };
 
     /**
      * @param startTime a time in milliseconds for the time the session was started.

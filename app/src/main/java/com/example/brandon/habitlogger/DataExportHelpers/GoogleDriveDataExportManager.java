@@ -144,6 +144,7 @@ public class GoogleDriveDataExportManager implements GoogleApiClient.ConnectionC
             public void onResult(@NonNull DriveApi.MetadataBufferResult metadataBufferResult) {
                 MetadataBuffer data = metadataBufferResult.getMetadataBuffer();
                 Metadata metadata = data.get(0);
+                data.release();
                 final int filesize = (int)metadata.getFileSize();
 
                 metadata.getDriveId().asDriveFile().open(googleApiClient, DriveFile.MODE_READ_ONLY, null).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {

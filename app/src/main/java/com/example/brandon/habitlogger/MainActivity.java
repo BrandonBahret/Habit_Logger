@@ -78,16 +78,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         preferenceChecker = new PreferenceChecker(this);
-//        setActivityTheme();
         AppCompatDelegate.setDefaultNightMode(
                 preferenceChecker.getTheme() == PreferenceChecker.LIGHT_THEME?
                 AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES);
 
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setPopupTheme(R.style.PopupMenu);
+        if(preferenceChecker.getTheme() == PreferenceChecker.DARK_THEME)
+            toolbar.setPopupTheme(R.style.PopupMenu);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

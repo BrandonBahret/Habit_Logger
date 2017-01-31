@@ -2,6 +2,7 @@ package com.example.brandon.habitlogger.OverallStatistics;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -19,12 +20,31 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
+import com.example.brandon.habitlogger.FloatingDateRangeWidgetManager;
+import com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener;
+import com.example.brandon.habitlogger.HabitActivity.CalendarFragment;
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
+import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
+import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
 
-public class OverallStatisticsActivity extends AppCompatActivity implements OverallEntriesFragment.OnFragmentInteractionListener {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener.State.COLLAPSED;
+import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener.State.EXPANDED;
+
+public class OverallStatisticsActivity extends AppCompatActivity implements
+        OverallEntriesFragment.OnFragmentInteractionListener, CalendarFragment.OnFragmentInteractionListener {
 
     private SectionsPagerAdapter sectionsPagerAdapter;
+    private PreferenceChecker preferenceChecker;
     private ViewPager viewPager;
+
+    private FloatingDateRangeWidgetManager dateRangeManager;
+    private List<SessionEntry> sessionEntries = new ArrayList<>();
+    private HabitDatabase habitDatabase;
 
     private LocalDataExportManager exportManager;
 
@@ -33,7 +53,13 @@ public class OverallStatisticsActivity extends AppCompatActivity implements Over
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_overall_statistcs);
 
+        preferenceChecker = new PreferenceChecker(this);
+
+        AppBarLayout appBar = (AppBarLayout)findViewById(R.id.appbar);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if(preferenceChecker.getTheme() == PreferenceChecker.DARK_THEME)
+            toolbar.setPopupTheme(R.style.PopupMenu);
+
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
@@ -43,7 +69,43 @@ public class OverallStatisticsActivity extends AppCompatActivity implements Over
 
         sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.container);
+        viewPager.addOnPageChangeListener (new ViewPager.OnPageChangeListener() {
+            public void onPageScrollStateChanged(int state) {}
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+
+            public void onPageSelected(int position) {
+                switch (position) {
+                    case 0:
+                        dateRangeManager.showView();
+                        break;
+
+                    case 1:
+                        dateRangeManager.hideView();
+                        break;
+
+                    case 2:
+                        dateRangeManager.showView();
+                        break;
+                }
+            }
+        });
         viewPager.setAdapter(sectionsPagerAdapter);
+
+        habitDatabase = new HabitDatabase(this, null, false);
+        sessionEntries = habitDatabase.lookUpEntries(habitDatabase.searchAllEntriesWithTimeRange(0, Long.MAX_VALUE));
+        dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), sessionEntries);
+
+        appBar.addOnOffsetChangedListener(new AppBarStateChangeListener() {
+            @Override
+            public void onStateChanged(AppBarLayout appBarLayout, State state) {
+                if(state == COLLAPSED){
+                    dateRangeManager.hideView();
+                }
+                else if(state == EXPANDED){
+                    dateRangeManager.showView();
+                }
+            }
+        });
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
@@ -134,6 +196,8 @@ public class OverallStatisticsActivity extends AppCompatActivity implements Over
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
+        public OverallEntriesFragment entriesFragment = OverallEntriesFragment.newInstance();
+        public CalendarFragment calendarFragment = CalendarFragment.newInstance();
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -144,13 +208,19 @@ public class OverallStatisticsActivity extends AppCompatActivity implements Over
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch(position){
-                case(0):{
-                    return OverallEntriesFragment.newInstance();
-                }
+                case(0):
+                    return entriesFragment;
 
-                case(1):{
-
-                }break;
+                case(1):
+                    calendarFragment.setListener(new CalendarFragment.Listener() {
+                        @Override
+                        public void onDateClicked(int year, int month, int dayOfMonth) {
+                            viewPager.setCurrentItem(0, true);
+                            String text = String.format(Locale.getDefault(), "%d %d, %d", month, dayOfMonth, year);
+                            Toast.makeText(OverallStatisticsActivity.this, text, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    return calendarFragment;
 
                 case(2):{
 

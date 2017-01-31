@@ -34,6 +34,23 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <FrameLayout
+        android:id="@+id/content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <include layout="@layout/date_range_selector"
+            android:id="@+id/date_range"/>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
+
+
     <com.github.clans.fab.FloatingActionMenu
         android:id="@+id/menu_fab"
         android:layout_width="match_parent"
@@ -69,12 +86,5 @@
             fab:fab_label="Manually Create Entry" />
 
     </com.github.clans.fab.FloatingActionMenu>
-
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </android.support.design.widget.CoordinatorLayout>
