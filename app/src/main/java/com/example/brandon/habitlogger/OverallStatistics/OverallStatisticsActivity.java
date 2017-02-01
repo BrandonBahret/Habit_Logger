@@ -23,6 +23,7 @@ import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.FloatingDateRangeWidgetManager;
 import com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener;
 import com.example.brandon.habitlogger.HabitActivity.CalendarFragment;
+import com.example.brandon.habitlogger.HabitActivity.StatisticsFragment;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
@@ -198,6 +199,7 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
         public OverallEntriesFragment entriesFragment = OverallEntriesFragment.newInstance();
         public CalendarFragment calendarFragment = CalendarFragment.newInstance();
+        public StatisticsFragment statisticsFragment = StatisticsFragment.newInstance();
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -222,12 +224,11 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
                     });
                     return calendarFragment;
 
-                case(2):{
-
-                }break;
+                case(2):
+                    return statisticsFragment;
             }
 
-            return PlaceholderFragment.newInstance(position + 1);
+            return null;
         }
 
         @Override

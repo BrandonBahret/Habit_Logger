@@ -1,0 +1,37 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.example.brandon.habitlogger.HabitActivity.StatisticsFragment">
+
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="50dp" />
+
+            <fragment
+                android:id="@+id/time_averages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.TimeAverages"
+                tools:layout="@layout/fragment_time_averages" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="75dp" />
+
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+
+</FrameLayout>

@@ -105,6 +105,7 @@ public class HabitActivity extends AppCompatActivity implements
                 Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo);
                 HabitActivity.this.sessionEntries = habitDatabase.lookUpEntries(ids);
                 dateRangeManager.updateSessionEntries(HabitActivity.this.sessionEntries);
+                mSectionsPagerAdapter.updateEntries(HabitActivity.this.sessionEntries);
             }
         });
 
@@ -196,6 +197,7 @@ public class HabitActivity extends AppCompatActivity implements
             }
         });
         tabLayout.setupWithViewPager(mViewPager);
+        mSectionsPagerAdapter.updateEntries(this.sessionEntries);
 
         updateActivity();
     }
@@ -375,6 +377,7 @@ public class HabitActivity extends AppCompatActivity implements
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
         public EntriesFragment entriesFragment = EntriesFragment.newInstance(habitId);
         public CalendarFragment calendarFragment = CalendarFragment.newInstance();
+        public StatisticsFragment statisticsFragment = StatisticsFragment.newInstance();
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -400,10 +403,10 @@ public class HabitActivity extends AppCompatActivity implements
                     return calendarFragment;
 
                 case 2:
-
+                    return statisticsFragment;
             }
 
-            return PlaceholderFragment.newInstance(position + 1);
+            return null;
         }
 
         @Override
@@ -423,6 +426,10 @@ public class HabitActivity extends AppCompatActivity implements
                     return "Statistics";
             }
             return null;
+        }
+
+        public void updateEntries(List<SessionEntry> sessionEntries) {
+            statisticsFragment.updateEntries(sessionEntries);
         }
     }
 }
