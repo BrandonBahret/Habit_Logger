@@ -57,27 +57,29 @@ public class TimeAverages extends Fragment {
 
     public void updateEntries(List<SessionEntry> entries){
 
-        long totalDuration = 0;
-        for (SessionEntry entry : entries) {
-            totalDuration += entry.getDuration();
+        if(!entries.isEmpty()){
+            long totalDuration = 0;
+            for (SessionEntry entry : entries) {
+                totalDuration += entry.getDuration();
+            }
+
+            long beginningTime = entries.get(0).getStartTime();
+            long endingTime = entries.get(entries.size() - 1).getStartTime();
+            long totalTime = endingTime - beginningTime;
+
+            double months = totalTime / 2592000000L;
+            double weeks = totalTime / 604800000L;
+            double days = totalTime / 86400000L;
+
+            double totalHours = totalDuration / 3600000L;
+
+            double hoursPerMonthTime = months == 0 ? totalHours : totalHours / months;
+            double hoursPerWeekTime = weeks == 0 ? totalHours : totalHours / weeks;
+            double hoursPerDayTime = days == 0 ? totalHours : totalHours / days;
+
+            hoursPerMonth.setText(String.valueOf(hoursPerMonthTime));
+            hoursPerWeek.setText(String.valueOf(hoursPerWeekTime));
+            hoursPerDay.setText(String.valueOf(hoursPerDayTime));
         }
-
-        long beginningTime = entries.get(0).getStartTime();
-        long endingTime = entries.get(entries.size() - 1).getStartTime();
-        long totalTime = endingTime - beginningTime;
-
-        double months = totalTime / 2592000000L;
-        double weeks = totalTime / 604800000L;
-        double days = totalTime / 86400000L;
-
-        double totalHours = totalDuration / 3600000L;
-
-        double hoursPerMonthTime = months == 0 ? totalHours : totalHours / months;
-        double hoursPerWeekTime = weeks == 0 ? totalHours : totalHours / weeks;
-        double hoursPerDayTime = days == 0 ? totalHours : totalHours / days;
-
-        hoursPerMonth.setText(String.valueOf(hoursPerMonthTime));
-        hoursPerWeek.setText(String.valueOf(hoursPerWeekTime));
-        hoursPerDay.setText(String.valueOf(hoursPerDayTime));
     }
 }

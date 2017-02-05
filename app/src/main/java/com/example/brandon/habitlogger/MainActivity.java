@@ -54,7 +54,8 @@ import static android.widget.Toast.makeText;
 import static com.example.brandon.habitlogger.R.menu.main;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener{
+
 
     PreferenceChecker preferenceChecker;
     SessionManager sessionManager;
@@ -71,6 +72,9 @@ public class MainActivity extends AppCompatActivity
     RecyclerView habitCardContainer;
 
     HabitViewAdapter habitAdapter;
+    HabitViewAdapter.MenuItemClickListener menuItemClickListener;
+    HabitViewAdapter.ButtonClickListener buttonClickListener;
+
 
     final int NO_ARCHIVED_HABITS = 0, ONLY_ARCHIVED_HABITS = 1;
     int habitDisplayMode = NO_ARCHIVED_HABITS;
@@ -159,7 +163,7 @@ public class MainActivity extends AppCompatActivity
         currentSession = (CardView) findViewById(R.id.current_sessions_card);
         habitCardContainer = (RecyclerView) findViewById(R.id.habit_recycler_view);
 
-        HabitViewAdapter.MenuItemClickListener menuItemClickListener = new HabitViewAdapter.MenuItemClickListener() {
+        menuItemClickListener = new HabitViewAdapter.MenuItemClickListener() {
             @Override
             public void onEditClick(long habitId) {
                 startModifyHabitActivity(habitDatabase.getHabit(habitId));
@@ -194,9 +198,14 @@ public class MainActivity extends AppCompatActivity
                 habitList.remove(position);
                 habitAdapter.notifyItemRemoved(position);
             }
+
+            @Override
+            public void onStartSession(long habitId) {
+                startSession(habitId);
+            }
         };
 
-        HabitViewAdapter.ButtonClickListener buttonClickListener = new HabitViewAdapter.ButtonClickListener() {
+        buttonClickListener = new HabitViewAdapter.ButtonClickListener() {
             @Override
             public void onPlayButtonClicked(long habitId) {
                 if(!sessionManager.isSessionActive(habitId)) {
@@ -255,6 +264,7 @@ public class MainActivity extends AppCompatActivity
         habitCardContainer.setLayoutManager(layoutManager);
         habitCardContainer.setItemAnimator(new DefaultItemAnimator());
         habitCardContainer.setAdapter(habitAdapter);
+
 
         currentSession.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -483,8 +493,6 @@ public class MainActivity extends AppCompatActivity
         handler.post(updateCards);
     }
 
-
-
     public void processUserQuery(String query) {
         if (query.length() != 0) {
             Set<Long> ids = habitDatabase.queryDatabaseByTheUser(query);
@@ -522,6 +530,11 @@ public class MainActivity extends AppCompatActivity
         showDatabase();
     }
 
+
+    public void startSession(long habitId){
+        Habit habit = habitDatabase.getHabit(habitId);
+        startSession(habit);
+    }
     public void startSession(Habit habit) {
         Intent startSession = new Intent(this, SessionActivity.class);
         startSession.putExtra("habit", habit);

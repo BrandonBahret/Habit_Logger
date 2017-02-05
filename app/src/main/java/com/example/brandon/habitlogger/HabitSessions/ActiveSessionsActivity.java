@@ -10,6 +10,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -83,6 +84,10 @@ public class ActiveSessionsActivity extends AppCompatActivity {
             }
         });
 
+        ItemTouchHelper touchHelper = new ItemTouchHelper(createItemTouchCallback());
+        touchHelper.attachToRecyclerView(sessionViewContainer);
+
+
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         sessionViewContainer.setLayoutManager(layoutManager);
         sessionViewContainer.setItemAnimator(new DefaultItemAnimator());
@@ -123,6 +128,26 @@ public class ActiveSessionsActivity extends AppCompatActivity {
                 handler.postDelayed(updateCards, 1000);
             }
         };
+        handler.post(updateCards);
+    }
+
+    private ItemTouchHelper.Callback createItemTouchCallback() {
+        return new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                cancelSession(viewHolder.getAdapterPosition());
+            }
+        };
+    }
+
+    private void cancelSession(int adapterPosition) {
+        SessionEntry entry = sessionEntries.get(adapterPosition);
+        sessionManager.cancelSession(entry.getHabitId());
         handler.post(updateCards);
     }
 

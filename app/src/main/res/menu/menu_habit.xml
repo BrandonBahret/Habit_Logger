@@ -4,18 +4,22 @@
     tools:context="com.example.brandon.habitlogger.HabitActivity">
     <item
         android:id="@+id/menu_habit_edit"
-        android:orderInCategory="100"
+        android:orderInCategory="102"
         android:title="@string/action_edit" />
     <item
+        android:title="Enter Session"
+        android:orderInCategory="103"
+        android:id="@+id/menu_enter_session" />
+    <item
         android:title="@string/action_archive"
-        android:orderInCategory="102"
+        android:orderInCategory="104"
         android:id="@+id/menu_toggle_archive" />
     <item
         android:title="@string/action_export"
-        android:orderInCategory="104"
+        android:orderInCategory="105"
         android:id="@+id/menu_export_habit" />
     <item
         android:title="@string/action_delete"
-        android:orderInCategory="106"
+        android:orderInCategory="107"
         android:id="@+id/menu_delete_habit" />
 </menu>

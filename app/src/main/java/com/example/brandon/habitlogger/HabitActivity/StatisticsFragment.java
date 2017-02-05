@@ -3,11 +3,11 @@ package com.example.brandon.habitlogger.HabitActivity;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.TimeAverages;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.R;
 
@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class StatisticsFragment extends Fragment {
 
-    TimeAverages timeAverages;
+    private static View view;
 
     public StatisticsFragment() {
         // Required empty public constructor
@@ -28,15 +28,23 @@ public class StatisticsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_statistics, container, false);
+        if (view != null) {
+            ViewGroup parent = (ViewGroup) view.getParent();
+            if (parent != null)
+                parent.removeView(view);
+        }
+        try {
+            view = inflater.inflate(R.layout.fragment_statistics, container, false);
+        } catch (InflateException e) {
+            /* fragment is already there, just return view as it is */
+        }
+
+        return view;
     }
 
     @Override
     public void onAttachFragment(Fragment childFragment) {
         super.onAttachFragment(childFragment);
-
-        timeAverages = (TimeAverages)childFragment.getFragmentManager().findFragmentById(R.id.time_averages);
     }
 
     /**
@@ -50,8 +58,7 @@ public class StatisticsFragment extends Fragment {
     }
 
     public void updateEntries(List<SessionEntry> sessionEntries){
-        if(timeAverages != null)
-            timeAverages.updateEntries(sessionEntries);
+
     }
 
 }

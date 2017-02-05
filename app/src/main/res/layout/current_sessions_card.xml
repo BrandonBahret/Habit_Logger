@@ -15,6 +15,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:elevation="4dp"
             android:padding="5dp"
             android:src="@drawable/ic_timer_black_24px"
             android:tint="@android:color/white"

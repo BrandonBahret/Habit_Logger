@@ -17,6 +17,8 @@
         android:layout_height="match_parent"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
+        android:clipToPadding="false"
+
         android:scrollbars="none"
         android:layout_below="@+id/current_sessions_card">
 

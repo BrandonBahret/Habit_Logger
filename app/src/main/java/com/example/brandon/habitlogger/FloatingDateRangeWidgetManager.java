@@ -170,6 +170,7 @@ public class FloatingDateRangeWidgetManager {
                 .setDuration(250)
                 .alpha(0)
                 .translationY(-view.getHeight());
+
         isShown = false;
     }
 
@@ -230,19 +231,11 @@ public class FloatingDateRangeWidgetManager {
 
     public void setCustomRange(){
         setDateRangeEnabled(true);
-
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
-        dateToTime = c.getTimeInMillis();
-
-        c.set(Calendar.DAY_OF_MONTH, c.getActualMinimum(Calendar.DAY_OF_MONTH));
-        dateFromTime = c.getTimeInMillis();
-
         updateDateRangeLabels();
     }
 
     public void setDateRangeForDate(int year, int month, int dayOfMonth) {
-        setDateRangeEnabled(false);
+        viewHolder.rangeType.setSelection(5);
 
         Calendar c = Calendar.getInstance();
         c.set(year, month, dayOfMonth);

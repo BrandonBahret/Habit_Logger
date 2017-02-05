@@ -7,7 +7,7 @@
 
 
     <color name="habitCard">#fdfdfd</color>
-    <color name="habitCardButtonColor">#ff000000</color>
+    <color name="habitCardButtonColor">#4e4d4d</color>
 
     <color name="cardBackgroundColor">#ecfffa</color>
     <color name="cardBackgroundDisabledColor">#d1e2de</color>

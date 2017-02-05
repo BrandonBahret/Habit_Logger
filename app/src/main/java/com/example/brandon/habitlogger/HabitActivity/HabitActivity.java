@@ -46,34 +46,21 @@ import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeLis
 public class HabitActivity extends AppCompatActivity implements
         EntriesFragment.OnFragmentInteractionListener, CalendarFragment.OnFragmentInteractionListener{
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private SectionsPagerAdapter sectionsPagerAdapter;
+    private ViewPager viewPager;
 
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
-
-    private HabitDatabase habitDatabase;
-    private PreferenceChecker preferenceChecker;
-    private List<SessionEntry> sessionEntries = new ArrayList<>();
-    private LocalDataExportManager exportManager;
-    private SessionManager sessionManager;
-    private Habit habit;
-    private long habitId;
+    HabitDatabase habitDatabase;
+    PreferenceChecker preferenceChecker;
+    List<SessionEntry> sessionEntries = new ArrayList<>();
+    LocalDataExportManager exportManager;
+    SessionManager sessionManager;
+    Habit habit;
+    long habitId;
 
     TabLayout tabLayout;
     Toolbar toolbar;
     FloatingActionMenu fabMenu;
     FloatingActionButton enterSession, createEntry;
-
     FloatingDateRangeWidgetManager dateRangeManager;
 
     @Override
@@ -81,99 +68,60 @@ public class HabitActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_habit);
 
-        preferenceChecker = new PreferenceChecker(this);
-
         toolbar = (Toolbar)findViewById(R.id.toolbar);
+        AppBarLayout appBar = (AppBarLayout)findViewById(R.id.appbar);
+        tabLayout    = (TabLayout) findViewById(R.id.tabs);
+        fabMenu      = (FloatingActionMenu) findViewById(R.id.menu_fab);
+        enterSession = (FloatingActionButton) findViewById(R.id.enter_session_fab);
+        createEntry  = (FloatingActionButton) findViewById(R.id.create_entry_fab);
+        viewPager    = (ViewPager) findViewById(R.id.container);
+
+        preferenceChecker = new PreferenceChecker(this);
+        habitDatabase  = new HabitDatabase(this, null, false);
+        sessionManager = new SessionManager(this);
+        exportManager = new LocalDataExportManager(this);
+
+        Intent data = getIntent();
+        habitId = data.getLongExtra("habitId", -1);
+        habit = habitDatabase.getHabit(habitId);
+        sessionEntries = habitDatabase.getEntries(habitId);
+
+        dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), sessionEntries);
+        sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
         if(preferenceChecker.getTheme() == PreferenceChecker.DARK_THEME)
             toolbar.setPopupTheme(R.style.PopupMenu);
-
-        AppBarLayout appBar = (AppBarLayout)findViewById(R.id.appbar);
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
-        fabMenu = (FloatingActionMenu) findViewById(R.id.menu_fab);
-        enterSession = (FloatingActionButton) findViewById(R.id.enter_session_fab);
-        createEntry = (FloatingActionButton) findViewById(R.id.create_entry_fab);
-        mViewPager = (ViewPager) findViewById(R.id.container);
-
-        habitDatabase = new HabitDatabase(this, null, false);
-        sessionManager = new SessionManager(this);
-
-        List<SessionEntry> sessionEntries = new ArrayList<>();
-        dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), sessionEntries);
-        dateRangeManager.setDateRangeChangeListener(new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
-            @Override
-            public void dateRangeChanged(long dateFrom, long dateTo) {
-                Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo);
-                HabitActivity.this.sessionEntries = habitDatabase.lookUpEntries(ids);
-                dateRangeManager.updateSessionEntries(HabitActivity.this.sessionEntries);
-                mSectionsPagerAdapter.updateEntries(HabitActivity.this.sessionEntries);
-            }
-        });
 
         appBar.addOnOffsetChangedListener(new AppBarStateChangeListener() {
             @Override
             public void onStateChanged(AppBarLayout appBarLayout, State state) {
                 if(state == COLLAPSED){
                     dateRangeManager.hideView();
-                    if(mViewPager.getCurrentItem() == 0)
+                    if(viewPager.getCurrentItem() == 0)
                         fabMenu.hideMenu(true);
                 }
                 else if(state == EXPANDED){
-                    dateRangeManager.showView();
-                    if(mViewPager.getCurrentItem() == 0)
+                    if(viewPager.getCurrentItem() != 1)
+                        dateRangeManager.showView();
+
+                    if(viewPager.getCurrentItem() == 0)
                         fabMenu.showMenu(true);
                 }
             }
         });
 
-        Intent data = getIntent();
-        habitId = data.getLongExtra("habitId", -1);
-        habit = habitDatabase.getHabit(habitId);
-
-        exportManager = new LocalDataExportManager(this);
-
-        fabMenu.setClosedOnTouchOutside(true);
-
-        enterSession.setOnClickListener(new View.OnClickListener() {
+        dateRangeManager.setDateRangeChangeListener(new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
             @Override
-            public void onClick(View view) {
-                fabMenu.close(true);
-                startSession();
+            public void dateRangeChanged(long dateFrom, long dateTo) {
+                Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo);
+                HabitActivity.this.sessionEntries = habitDatabase.lookUpEntries(ids);
+                dateRangeManager.updateSessionEntries(HabitActivity.this.sessionEntries);
+                sectionsPagerAdapter.updateEntries(HabitActivity.this.sessionEntries);
             }
         });
 
-        createEntry.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                NewEntryForm dialog = new NewEntryForm();
-                dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
-                    @Override
-                    public void onFinishedWithResult(SessionEntry entry) {
-                        if(entry != null){
-                            habitDatabase.addEntry(habitId, entry);
-
-                            mSectionsPagerAdapter.entriesFragment.addSessionEntry(entry);
-                        }
-                    }
-
-                    @Override
-                    public void onDeleteClicked(SessionEntry entry) {
-
-                    }
-                });
-
-                fabMenu.close(true);
-                dialog.show(getSupportFragmentManager(), "new-entry");
-            }
-        });
-
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.addOnPageChangeListener (new ViewPager.OnPageChangeListener() {
+        viewPager.setAdapter(sectionsPagerAdapter);
+        viewPager.addOnPageChangeListener (new ViewPager.OnPageChangeListener() {
             public void onPageScrollStateChanged(int state) {}
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
@@ -196,8 +144,44 @@ public class HabitActivity extends AppCompatActivity implements
                 }
             }
         });
-        tabLayout.setupWithViewPager(mViewPager);
-        mSectionsPagerAdapter.updateEntries(this.sessionEntries);
+        tabLayout.setupWithViewPager(viewPager);
+        sectionsPagerAdapter.updateEntries(this.sessionEntries);
+
+        fabMenu.setClosedOnTouchOutside(true);
+
+        enterSession.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fabMenu.close(true);
+                startSession();
+            }
+        });
+
+        createEntry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                NewEntryForm dialog = new NewEntryForm();
+                dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
+                    @Override
+                    public void onFinishedWithResult(SessionEntry entry) {
+                        if(entry != null){
+                            habitDatabase.addEntry(habitId, entry);
+
+                            sectionsPagerAdapter.entriesFragment.addSessionEntry(entry);
+                        }
+                    }
+
+                    @Override
+                    public void onDeleteClicked(SessionEntry entry) {
+
+                    }
+                });
+
+                fabMenu.close(true);
+                dialog.show(getSupportFragmentManager(), "new-entry");
+            }
+        });
 
         updateActivity();
     }
@@ -255,6 +239,10 @@ public class HabitActivity extends AppCompatActivity implements
                 startModifyHabitActivity();
             }break;
 
+
+            case(R.id.menu_enter_session):{
+                startSession();
+            }break;
             case(R.id.menu_toggle_archive):{
                 boolean archivedState = !habitDatabase.getIsHabitArchived(habitId);
                 habitDatabase.updateHabitIsArchived(habitId, archivedState);
@@ -395,7 +383,7 @@ public class HabitActivity extends AppCompatActivity implements
                         @Override
                         public void onDateClicked(int year, int month, int dayOfMonth) {
                             dateRangeManager.setDateRangeForDate(year, month, dayOfMonth);
-                            mViewPager.setCurrentItem(0, true);
+                            viewPager.setCurrentItem(0, true);
                             String text = String.format(Locale.getDefault(), "%d %d, %d", month, dayOfMonth, year);
                             Toast.makeText(HabitActivity.this, text, Toast.LENGTH_SHORT).show();
                         }
@@ -429,6 +417,7 @@ public class HabitActivity extends AppCompatActivity implements
         }
 
         public void updateEntries(List<SessionEntry> sessionEntries) {
+            entriesFragment.updateEntries(sessionEntries);
             statisticsFragment.updateEntries(sessionEntries);
         }
     }

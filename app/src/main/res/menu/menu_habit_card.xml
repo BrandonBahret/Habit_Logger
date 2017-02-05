@@ -4,6 +4,8 @@
 
     <item android:title="Edit"
         android:id="@+id/habit_menu_edit" />
+    <item android:title="Enter Session"
+        android:id="@+id/menu_enter_session" />
     <item android:title="Delete"
         android:id="@+id/habit_menu_delete" />
     <item android:title="Export Data (CSV)"

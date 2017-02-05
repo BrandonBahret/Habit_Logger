@@ -144,6 +144,13 @@ public class EntriesFragment extends Fragment {
         entryAdapter.notifyItemChanged(index);
     }
 
+    public void updateEntries(List<SessionEntry> sessionEntries) {
+        if(entryAdapter != null) {
+            this.sessionEntries = sessionEntries;
+            entryAdapter.notifyDataSetChanged();
+        }
+    }
+
     public void updateEntriesContainer(Set<Long> ids){
 
     }
