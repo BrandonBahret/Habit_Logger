@@ -22,9 +22,12 @@ public class SessionEntry implements Serializable{
     private long startTime, duration;
     private String name = "NAME_NOT_SET";
     private boolean isPaused = false;
+    private long lastTimePaused;
+    private long totalPauseTime;
     @NonNull private String note;
-    private long habitId = -1;
+    private String category;
 
+    private long habitId = -1;
     private long databaseId = -1;
 
     public static Comparator<SessionEntry> StartingTimeComparator = new Comparator<SessionEntry>() {
@@ -33,6 +36,24 @@ public class SessionEntry implements Serializable{
             return Long.compare(sessionOne.getStartTime(), sessionTwo.getStartTime());
         }
     };
+
+    public static Comparator<SessionEntry> CategoryComparator = new Comparator<SessionEntry>() {
+        @Override
+        public int compare(SessionEntry sessionOne, SessionEntry sessionTwo) {
+            if(sessionOne.category == null || sessionTwo.category == null){
+                throw new IllegalArgumentException("SessionEntry.CategoryComparator requires entries to have categories set.");
+            }
+            return sessionOne.category.compareTo(sessionTwo.category);
+        }
+    };
+
+    public static Comparator<SessionEntry> Alphabetical = new Comparator<SessionEntry>() {
+        @Override
+        public int compare(SessionEntry sessionOne, SessionEntry sessionTwo) {
+            return sessionOne.getName().compareTo(sessionTwo.getName());
+        }
+    };
+
 
     /**
      * @param startTime a time in milliseconds for the time the session was started.
@@ -79,6 +100,19 @@ public class SessionEntry implements Serializable{
         return this.startTime;
     }
 
+    public long getStartingTimeDate() {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(getStartTime());
+
+        c.set(Calendar.AM_PM, 0);
+        c.set(Calendar.HOUR, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+
+        return c.getTimeInMillis();
+    }
+
     public int getStartingTimeHours(){
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(getStartTime());
@@ -111,6 +145,22 @@ public class SessionEntry implements Serializable{
 
         long time = c.getTimeInMillis();
         setStartTime(time);
+    }
+
+    public long getLastTimePaused() {
+        return lastTimePaused;
+    }
+
+    public void setLastTimePaused(long milliseconds) {
+        lastTimePaused = milliseconds;
+    }
+
+    public long getTotalPauseTime() {
+        return totalPauseTime;
+    }
+
+    public void setTotalPauseTime(long milliseconds) {
+        totalPauseTime = milliseconds;
     }
 
     /**
@@ -204,4 +254,9 @@ public class SessionEntry implements Serializable{
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.getDefault());
         return formatter.format(new Date(milliSeconds));
     }
+
+    public void setCategoryName(String categoryName) {
+        this.category = categoryName;
+    }
+
 }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -24,16 +25,21 @@ import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.ActiveSessionViewAdapter;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.ActiveSessionViewAdapterWithSections;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ActiveSessionsActivity extends AppCompatActivity {
 
+    List<SessionEntry> sessionEntriesUndoStack = new ArrayList<>();
     List<SessionEntry> sessionEntries;
     SessionManager sessionManager;
     HabitDatabase habitDatabase;
 
     ActiveSessionViewAdapterWithSections sessionViewAdapter;
     RecyclerView sessionViewContainer;
+
+    Snackbar snackbar;
 
     Runnable updateCards;
     Handler handler = new Handler();
@@ -48,7 +54,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
             toolbar.setDisplayHomeAsUpEnabled(true);
 
         sessionManager = new SessionManager(this);
-        sessionManager.setSessionChangedListener(new SessionManager.SessionChangeListener() {
+        sessionManager.addSessionChangedListener(new SessionManager.SessionChangeListener() {
             @Override
             public void sessionPauseStateChanged(long habitId, boolean isPaused) {
                 for (SessionEntry entry : sessionEntries) {
@@ -122,13 +128,24 @@ public class ActiveSessionsActivity extends AppCompatActivity {
                     }
                 }
 
-                if(sessionManager.getSessionCount() == 0)
+
+
+                if(sessionManager.getSessionCount() == 0 && !isSnackBarShown())
                     finish();
 
                 handler.postDelayed(updateCards, 1000);
             }
         };
         handler.post(updateCards);
+    }
+
+    private boolean isSnackBarShown(){
+        boolean snackBarVisible = false;
+        if(snackbar != null){
+            snackBarVisible = snackbar.isShownOrQueued();
+        }
+
+        return snackBarVisible;
     }
 
     private ItemTouchHelper.Callback createItemTouchCallback() {
@@ -140,9 +157,59 @@ public class ActiveSessionsActivity extends AppCompatActivity {
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                cancelSession(viewHolder.getAdapterPosition());
+                int position = viewHolder.getAdapterPosition();
+                long habitId = sessionEntries.get(position).getHabitId();
+                sessionEntriesUndoStack.add(sessionManager.getSession(habitId));
+
+                sessionManager.cancelSession(habitId);
+                sessionEntries.remove(position);
+                sessionViewAdapter.notifyItemRemoved(position);
+
+                if(!isSnackBarShown()) {
+                    snackbar = Snackbar.make(findViewById(R.id.activity_active_sessions), "Session canceled", Snackbar.LENGTH_LONG)
+                            .setCallback(new Snackbar.Callback() {
+                                @Override
+                                public void onDismissed(Snackbar snackbar, int event) {
+                                    super.onDismissed(snackbar, event);
+                                    if (event == DISMISS_EVENT_TIMEOUT || event == DISMISS_EVENT_SWIPE) {
+                                        sessionEntriesUndoStack.clear();
+
+                                        if (sessionManager.getSessionCount() == 0) {
+                                            finish();
+                                        }
+                                    }
+                                }
+                            })
+                            .setAction("UNDO", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    for (SessionEntry entry : sessionEntriesUndoStack) {
+                                        sessionManager.insertSession(entry);
+                                        sessionEntries.add(entry);
+                                    }
+                                    sessionEntriesUndoStack.clear();
+                                    sortEntries();
+
+                                    sessionViewAdapter.notifyDataSetChanged();
+                                }
+                            })
+                            .setActionTextColor(getResources().getColor(R.color.colorAccent));
+
+                    snackbar.show();
+                }else{
+                    snackbar.show();
+                }
             }
         };
+    }
+
+    private void sortEntries(){
+        Collections.sort(this.sessionEntries, SessionEntry.Alphabetical);
+        Collections.sort(this.sessionEntries, SessionEntry.CategoryComparator);
+    }
+    private void sortEntries(List<SessionEntry> sessionEntries) {
+        Collections.sort(sessionEntries, SessionEntry.Alphabetical);
+        Collections.sort(sessionEntries, SessionEntry.CategoryComparator);
     }
 
     private void cancelSession(int adapterPosition) {

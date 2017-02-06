@@ -69,6 +69,7 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
         }
 
         sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        sectionsPagerAdapter.updateEntries(this.sessionEntries);
         viewPager = (ViewPager) findViewById(R.id.container);
         viewPager.addOnPageChangeListener (new ViewPager.OnPageChangeListener() {
             public void onPageScrollStateChanged(int state) {}
@@ -95,6 +96,18 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
         habitDatabase = new HabitDatabase(this, null, false);
         sessionEntries = habitDatabase.lookUpEntries(habitDatabase.searchAllEntriesWithTimeRange(0, Long.MAX_VALUE));
         dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), sessionEntries);
+        dateRangeManager.setDateRangeChangeListener(new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
+            @Override
+            public void dateRangeChanged(long dateFrom, long dateTo) {
+                OverallStatisticsActivity.this.sessionEntries =
+                        habitDatabase.lookUpEntries(
+                                habitDatabase.searchAllEntriesWithTimeRange(dateFrom, dateTo)
+                        );
+
+                dateRangeManager.updateSessionEntries(OverallStatisticsActivity.this.sessionEntries);
+                sectionsPagerAdapter.updateEntries(OverallStatisticsActivity.this.sessionEntries);
+            }
+        });
 
         appBar.addOnOffsetChangedListener(new AppBarStateChangeListener() {
             @Override
@@ -248,6 +261,11 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
                     return "Statistics";
             }
             return null;
+        }
+
+        public void updateEntries(List<SessionEntry> sessionEntries) {
+            entriesFragment.updateEntries(sessionEntries);
+            statisticsFragment.updateEntries(sessionEntries);
         }
     }
 }

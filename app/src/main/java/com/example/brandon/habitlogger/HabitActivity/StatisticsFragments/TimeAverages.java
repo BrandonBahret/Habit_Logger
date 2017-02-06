@@ -26,19 +26,8 @@ public class TimeAverages extends Fragment {
      *
      * @return A new instance of fragment TimeAverages.
      */
-    public static TimeAverages newInstance(String param1, String param2) {
-        TimeAverages fragment = new TimeAverages();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-
-        }
+    public static TimeAverages newInstance() {
+        return new TimeAverages();
     }
 
     @Override

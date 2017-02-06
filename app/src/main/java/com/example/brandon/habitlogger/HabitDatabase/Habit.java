@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Locale;
 
 /**
@@ -36,6 +37,13 @@ public class Habit implements Serializable{
         this.entries     = entries;
         this.iconResId   = iconResId;
     }
+
+    public static Comparator<Habit> CategoryNameComparator = new Comparator<Habit>() {
+        @Override
+        public int compare(Habit itemOne, Habit itemTwo) {
+            return itemOne.getCategory().getName().compareTo(itemTwo.getCategory().getName());
+        }
+    };
 
     @Override
     public boolean equals(Object obj) {
@@ -224,6 +232,10 @@ public class Habit implements Serializable{
     @NonNull
     public HabitCategory getCategory() {
         return category;
+    }
+
+    public int getColor(){
+        return getIsArchived()? 0xFFCCCCCC : category.getColorAsInt();
     }
 
     /**

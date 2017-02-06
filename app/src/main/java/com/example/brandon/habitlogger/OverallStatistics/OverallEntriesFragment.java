@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.OverallStatistics;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,9 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.brandon.habitlogger.ComplexDecoration;
 import com.example.brandon.habitlogger.HabitActivity.NewEntryForm;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
+import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.EntryViewAdapter;
 
@@ -36,6 +39,8 @@ public class OverallEntriesFragment extends Fragment {
     List<SessionEntry> sessionEntries;
     EntryViewAdapter entryAdapter;
 
+    PreferenceChecker preferenceChecker;
+
     public OverallEntriesFragment() {
         // Required empty public constructor
     }
@@ -54,6 +59,8 @@ public class OverallEntriesFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        preferenceChecker = new PreferenceChecker(getContext());
     }
 
     @Override
@@ -92,8 +99,26 @@ public class OverallEntriesFragment extends Fragment {
                     }
                 });
 
+        entriesContainer.addItemDecoration(new ComplexDecoration(getContext(), new ComplexDecoration.Callback() {
+            @Override
+            public long getGroupId(int position) {
+                if(position >= 0 && position < sessionEntries.size()) {
+                    return sessionEntries.get(position).getStartingTimeDate();
+                } else{
+                    return -1;
+                }
+            }
 
-
+            @Override @NonNull
+            public String getGroupFirstLine(int position) {
+                if(position >= 0 && position < sessionEntries.size()) {
+                    String dateFormat = preferenceChecker.stringGetDateFormat();
+                    return sessionEntries.get(position).getStartTimeAsString(dateFormat);
+                } else{
+                    return "";
+                }
+            }
+        }));
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         entriesContainer.setLayoutManager(layoutManager);
@@ -127,6 +152,15 @@ public class OverallEntriesFragment extends Fragment {
         int index = getSessionEntryIndex(databaseId);
         sessionEntries.remove(index);
         entryAdapter.notifyItemRemoved(index);
+    }
+
+    public void updateEntries(List<SessionEntry> sessionEntries) {
+        if(entryAdapter != null) {
+            this.sessionEntries = sessionEntries;
+
+            entryAdapter = new EntryViewAdapter(this.sessionEntries, getContext(), entryAdapter.getListener());
+            entriesContainer.setAdapter(entryAdapter);
+        }
     }
 
     public void updateSessionEntryById(long databaseId, SessionEntry entry){

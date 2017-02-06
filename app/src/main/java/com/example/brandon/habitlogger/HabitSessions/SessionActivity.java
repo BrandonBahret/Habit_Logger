@@ -68,7 +68,7 @@ public class SessionActivity extends AppCompatActivity {
             position = data.getIntExtra("position", RecyclerView.NO_POSITION);
 
         sessionManager = new SessionManager(this);
-        sessionManager.setSessionChangedListener(new SessionManager.SessionChangeListener() {
+        sessionManager.addSessionChangedListener(new SessionManager.SessionChangeListener() {
             @Override
             public void sessionPauseStateChanged(long habitId, boolean isPaused) {
                 updateSessionPlayButton(isPaused);

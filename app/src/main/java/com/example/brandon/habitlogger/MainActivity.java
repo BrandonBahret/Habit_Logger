@@ -47,6 +47,7 @@ import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -118,7 +119,7 @@ public class MainActivity extends AppCompatActivity
 
         habitDatabase = new HabitDatabase(MainActivity.this, cache, true);
         sessionManager = new SessionManager(this);
-        sessionManager.setSessionChangedListener(new SessionManager.SessionChangeListener() {
+        sessionManager.addSessionChangedListener(new SessionManager.SessionChangeListener() {
             @Override
             public void sessionPauseStateChanged(long habitId, boolean isPaused) {
 
@@ -234,22 +235,25 @@ public class MainActivity extends AppCompatActivity
             public void run() {
                 int size = habitList.size();
 
-                for(int i = 0; i < size; i++) {
-                    long habitId = habitList.get(i).getDatabaseId();
+                if(habitCardContainer.getChildCount() == size) {
+                    for (int i = 0; i < size; i++) {
+                        View item = habitCardContainer.getChildAt(i);
+                        int position = habitCardContainer.getChildAdapterPosition(item);
+                        long habitId = habitList.get(position).getDatabaseId();
 
-                    View item = habitCardContainer.getChildAt(i);
-                    if(item != null) {
-                        TextView timeTextView = (TextView) item.findViewById(R.id.habit_card_time_display);
-                        ImageButton pauseButton = (ImageButton) item.findViewById(R.id.session_control_button);
+                        if (item != null) {
+                            TextView timeTextView = (TextView) item.findViewById(R.id.habit_card_time_display);
+                            ImageButton pauseButton = (ImageButton) item.findViewById(R.id.session_control_button);
 
-                        if (sessionManager.isSessionActive(habitId)) {
-                            SessionEntry entry = sessionManager.getSession(habitId);
+                            if (sessionManager.isSessionActive(habitId)) {
+                                SessionEntry entry = sessionManager.getSession(habitId);
 
-                            timeTextView.setText(
-                                    new SessionManager.TimeDisplay(entry.getDuration()).toString());
+                                timeTextView.setText(
+                                        new SessionManager.TimeDisplay(entry.getDuration()).toString());
 
-                            pauseButton.setImageResource(
-                                    sessionManager.getResourceIdForPauseButton(sessionManager.getIsPaused(habitId)));
+                                pauseButton.setImageResource(
+                                        sessionManager.getResourceIdForPauseButton(sessionManager.getIsPaused(habitId)));
+                            }
                         }
                     }
                 }
@@ -259,10 +263,32 @@ public class MainActivity extends AppCompatActivity
         };
         handler.post(updateCards);
 
-        habitAdapter = new HabitViewAdapter(habitList, menuItemClickListener, buttonClickListener);
+        if(preferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_SECTIONS){
+            habitCardContainer.addItemDecoration(new ComplexDecoration(this, new ComplexDecoration.Callback() {
+                @Override
+                public long getGroupId(int position) {
+                    if(position >= 0 && position < habitList.size()) {
+                        return habitList.get(position).getCategory().getDatabaseId();
+                    } else{
+                        return -1;
+                    }
+                }
+
+                @Override @NonNull
+                public String getGroupFirstLine(int position) {
+                    if(position >= 0 && position < habitList.size()) {
+                        return habitList.get(position).getCategory().getName();
+                    } else{
+                        return "";
+                    }
+                }
+            }));
+        }
+
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         habitCardContainer.setLayoutManager(layoutManager);
         habitCardContainer.setItemAnimator(new DefaultItemAnimator());
+        habitAdapter = new HabitViewAdapter(habitList, menuItemClickListener, buttonClickListener);
         habitCardContainer.setAdapter(habitAdapter);
 
 
@@ -344,12 +370,13 @@ public class MainActivity extends AppCompatActivity
             break;
 
             case (R.id.menu_database_restore): {
-                if(googleDrive.isConnected()) {
-                    googleDrive.restoreDatabase();
-                }
-                else{
+                // TODO figure out google drive restore
+//                if(googleDrive.isConnected()) {
+//                    googleDrive.restoreDatabase();
+//                }
+//                else{
                     exportManager.importDatabase(true);
-                }
+//                }
 
                 habitDatabase.loadAllContents();
                 habitDatabase.notifyChange();
@@ -682,8 +709,7 @@ public class MainActivity extends AppCompatActivity
 
         // TODO make this proper
 
-        habitList.clear();
-        habitCardContainer.removeAllViews();
+        habitList = new ArrayList<>();
 
         for(int categoryInd = 0; categoryInd < habitDatabase.getNumberOfCategories(); categoryInd++) {
 
@@ -703,7 +729,10 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        habitAdapter.notifyDataSetChanged();
+        Collections.sort(habitList, Habit.CategoryNameComparator);
+
+        habitAdapter = new HabitViewAdapter(habitList, menuItemClickListener, buttonClickListener);
+        habitCardContainer.setAdapter(habitAdapter);
     }
 
     public boolean checkListForHabitId(long habitId){

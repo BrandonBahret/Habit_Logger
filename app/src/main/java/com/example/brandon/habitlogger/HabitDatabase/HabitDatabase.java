@@ -732,6 +732,8 @@ public class HabitDatabase {
             entries.add(i, getEntry(getEntryId(habitId, i)));
         }
 
+        Collections.sort(entries, SessionEntry.StartingTimeComparator);
+
         return entries;
     }
 

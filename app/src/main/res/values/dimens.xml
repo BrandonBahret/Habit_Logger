@@ -13,4 +13,7 @@
     <dimen name="appbar_padding_top">8dp</dimen>
 
     <dimen name="land_time_display">40sp</dimen>
+
+    <dimen name="indent_pad_top">24dp</dimen>
+    <dimen name="indent_pad_bottom">8dp</dimen>
 </resources>

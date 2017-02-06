@@ -1,11 +1,5 @@
 package com.example.brandon.habitlogger.RecyclerVIewAdapters;
 
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -89,64 +83,70 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewAdapter.View
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         Habit item = habitsList.get(position);
-        final long habitId = item.getDatabaseId();
-
-        holder.rootView.setTag(String.valueOf(item.getDatabaseId()));
 
         // Make sure menu hasn't been inflated yet.
         int menuSize = holder.toolbar.getMenu().size();
         if(menuSize == 0) {
-            if(item.getIsArchived()){
+            if (item.getIsArchived()) {
                 holder.toolbar.inflateMenu(R.menu.menu_archived_habit_card);
-                holder.categoryAccent.setBackgroundColor(0xFFCCCCCC);
-            }
-            else{
+            } else {
                 holder.toolbar.inflateMenu(R.menu.menu_habit_card);
-                holder.categoryAccent.setBackgroundColor(item.getCategory().getColorAsInt());
             }
-            holder.toolbar.setTitle(item.getName());
-
-            holder.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
-                    int id = menuItem.getItemId();
-
-                    switch (id) {
-                        case (R.id.habit_menu_edit): {
-                            menuItemClickListener.onEditClick(habitId);
-                        }
-                        break;
-
-                        case(R.id.menu_enter_session):{
-                            menuItemClickListener.onStartSession(habitId);
-                        }break;
-
-                        case (R.id.habit_menu_delete): {
-                            menuItemClickListener.onDeleteClick(habitId);
-                        }
-                        break;
-
-                        case (R.id.habit_menu_export): {
-                            menuItemClickListener.onExportClick(habitId);
-                        }
-                        break;
-
-                        case (R.id.habit_menu_archive): {
-                            menuItemClickListener.onArchiveClick(habitId);
-                        }
-                        break;
-                    }
-
-                    return true;
-                }
-            });
         }
+
+        holder.categoryAccent.setBackgroundColor(item.getColor());
+        holder.toolbar.setTitle(item.getName());
+
+        holder.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                int id = menuItem.getItemId();
+
+                int position = holder.getAdapterPosition();
+                Habit item = habitsList.get(position);
+                long habitId = item.getDatabaseId();
+
+                switch (id) {
+                    case (R.id.habit_menu_edit): {
+                        menuItemClickListener.onEditClick(habitId);
+                    }
+                    break;
+
+                    case(R.id.menu_enter_session):{
+                        menuItemClickListener.onStartSession(habitId);
+                    }break;
+
+                    case (R.id.habit_menu_delete): {
+                        menuItemClickListener.onDeleteClick(habitId);
+                    }
+                    break;
+
+                    case (R.id.habit_menu_export): {
+                        menuItemClickListener.onExportClick(habitId);
+                    }
+                    break;
+
+                    case (R.id.habit_menu_archive): {
+                        menuItemClickListener.onArchiveClick(habitId);
+                    }
+                    break;
+                }
+
+                return true;
+            }
+        });
 
         holder.playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                int position = holder.getAdapterPosition();
+                Habit item = habitsList.get(position);
+                long habitId = item.getDatabaseId();
+
+
                 buttonClickListener.onPlayButtonClicked(habitId);
             }
         });
@@ -154,6 +154,10 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewAdapter.View
         holder.playButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
+                int position = holder.getAdapterPosition();
+                Habit item = habitsList.get(position);
+                long habitId = item.getDatabaseId();
+
                 buttonClickListener.onPlayButtonLongClicked(habitId);
                 return true;
             }
@@ -162,6 +166,10 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewAdapter.View
         holder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                int position = holder.getAdapterPosition();
+                Habit item = habitsList.get(position);
+                long habitId = item.getDatabaseId();
+
                 buttonClickListener.onCardClicked(habitId);
             }
         });
@@ -170,64 +178,6 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewAdapter.View
     @Override
     public int getItemCount() {
         return habitsList.size();
-    }
-
-    public static class VerticalSpaceItemDecoration extends RecyclerView.ItemDecoration {
-
-        private final int verticalSpaceHeight;
-
-        public VerticalSpaceItemDecoration(int verticalSpaceHeight) {
-            this.verticalSpaceHeight = verticalSpaceHeight;
-        }
-
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
-                                   RecyclerView.State state) {
-            outRect.bottom = verticalSpaceHeight;
-        }
-    }
-
-    public static class DividerItemDecoration extends RecyclerView.ItemDecoration {
-
-        private static final int[] ATTRS = new int[]{android.R.attr.listDivider};
-
-        private Drawable divider;
-
-        /**
-         * Default divider will be used
-         */
-        public DividerItemDecoration(Context context, String text) {
-            final TypedArray styledAttributes = context.obtainStyledAttributes(ATTRS);
-
-            divider = styledAttributes.getDrawable(0);
-            styledAttributes.recycle();
-        }
-
-        /**
-         * Custom divider will be used
-         */
-        public DividerItemDecoration(Context context, int resId) {
-            divider = ContextCompat.getDrawable(context, resId);
-        }
-
-        @Override
-        public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
-            int left = parent.getPaddingLeft();
-            int right = parent.getWidth() - parent.getPaddingRight();
-
-            int childCount = parent.getChildCount();
-            for (int i = 0; i < childCount; i++) {
-                View child = parent.getChildAt(i);
-
-                RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
-
-                int top = child.getBottom() + params.bottomMargin;
-                int bottom = top + divider.getIntrinsicHeight();
-
-                divider.setBounds(left, top, right, bottom);
-                divider.draw(c);
-            }
-        }
     }
 }
 
