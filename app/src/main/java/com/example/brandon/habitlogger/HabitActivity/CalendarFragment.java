@@ -6,13 +6,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
 
 import com.example.brandon.habitlogger.R;
-
-import java.util.Calendar;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,11 +25,16 @@ import java.util.Calendar;
 public class CalendarFragment extends Fragment{
     private OnFragmentInteractionListener mListener;
     private CalendarView calendar;
+    private int menuRes = R.menu.menu_habit;
 
     private Listener listener;
 
     public CalendarFragment() {
         // Required empty public constructor
+    }
+
+    public void setMenuRes(int res) {
+        this.menuRes = res;
     }
 
     public interface Listener{
@@ -48,6 +53,14 @@ public class CalendarFragment extends Fragment{
      */
     public static CalendarFragment newInstance() {
         return new CalendarFragment();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(this.menuRes, menu);
+        menu.findItem(R.id.search).setVisible(false);
     }
 
     @Override

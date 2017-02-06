@@ -598,6 +598,16 @@ public class HabitDatabase {
         );
     }
 
+    public Set<Long> searchEntryIdsByComment(String query) {
+        return searchTableForIdsByName(
+                "SELECT "+DatabaseHelper.ENTRY_ID+" FROM " +
+                        DatabaseHelper.ENTRIES_TABLE_NAME + " WHERE " +
+                        DatabaseHelper.ENTRY_NOTE + " LIKE ? ",
+
+                new String[]{"%" + query + "%"}, DatabaseHelper.ENTRY_ID
+        );
+    }
+
     /**
      * @param habitId The row id for the habit to search entries for.
      * @param beginTime The starting time for the query.

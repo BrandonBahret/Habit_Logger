@@ -10,13 +10,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
@@ -129,12 +126,37 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
         exportManager = new LocalDataExportManager(this);
     }
 
-
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_overall_statistcs, menu);
-        return true;
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        if(searchView != null) {
+            searchView.setOnQueryTextListener(
+                    new SearchView.OnQueryTextListener() {
+                        @Override
+                        public boolean onQueryTextSubmit(String query) {
+                            processQuery(query);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onQueryTextChange(String query) {
+                            processQuery(query);
+                            return false;
+                        }
+                    }
+            );
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    public void processQuery(String query){
+        List<SessionEntry> entries = habitDatabase.lookUpEntries(
+                habitDatabase.searchEntryIdsByComment(query)
+        );
+
+        sectionsPagerAdapter.updateEntries(entries);
+        dateRangeManager.updateSessionEntries(entries);
     }
 
     @Override
@@ -170,40 +192,6 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
 
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        public PlaceholderFragment() {
-        }
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_overall_statistcs, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
-    }
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -224,9 +212,12 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch(position){
                 case(0):
+                    entriesFragment.setHasOptionsMenu(true);
                     return entriesFragment;
 
                 case(1):
+                    calendarFragment.setHasOptionsMenu(true);
+                    calendarFragment.setMenuRes(R.menu.menu_overall_statistcs);
                     calendarFragment.setListener(new CalendarFragment.Listener() {
                         @Override
                         public void onDateClicked(int year, int month, int dayOfMonth) {
@@ -238,6 +229,8 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
                     return calendarFragment;
 
                 case(2):
+                    statisticsFragment.setHasOptionsMenu(true);
+                    statisticsFragment.setMenuRes(R.menu.menu_overall_statistcs);
                     return statisticsFragment;
             }
 

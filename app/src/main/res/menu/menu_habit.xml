@@ -2,21 +2,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.brandon.habitlogger.HabitActivity">
+
+    <item android:id="@+id/search"
+        android:title="@string/search"
+        android:icon="@drawable/ic_search_white_24dp"
+        app:showAsAction="collapseActionView|ifRoom"
+        app:actionViewClass="android.support.v7.widget.SearchView" />
+
     <item
         android:id="@+id/menu_habit_edit"
-        android:orderInCategory="102"
+        android:orderInCategory="103"
         android:title="@string/action_edit" />
     <item
         android:title="Enter Session"
-        android:orderInCategory="103"
+        android:orderInCategory="104"
         android:id="@+id/menu_enter_session" />
     <item
         android:title="@string/action_archive"
-        android:orderInCategory="104"
+        android:orderInCategory="105"
         android:id="@+id/menu_toggle_archive" />
     <item
         android:title="@string/action_export"
-        android:orderInCategory="105"
+        android:orderInCategory="106"
         android:id="@+id/menu_export_habit" />
     <item
         android:title="@string/action_delete"

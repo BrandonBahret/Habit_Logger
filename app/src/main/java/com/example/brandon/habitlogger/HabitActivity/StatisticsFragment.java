@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.InflateException;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -19,9 +21,21 @@ import java.util.List;
 public class StatisticsFragment extends Fragment {
 
     private static View view;
+    int menuRes = R.menu.menu_habit;
 
     public StatisticsFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(this.menuRes, menu);
+        menu.findItem(R.id.search).setVisible(false);
+    }
+    public void setMenuRes(int res) {
+        this.menuRes = res;
     }
 
     @Override
@@ -60,5 +74,4 @@ public class StatisticsFragment extends Fragment {
     public void updateEntries(List<SessionEntry> sessionEntries){
 
     }
-
 }

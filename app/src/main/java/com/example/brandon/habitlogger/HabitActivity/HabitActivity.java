@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -69,6 +70,8 @@ public class HabitActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_habit);
 
         toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         AppBarLayout appBar = (AppBarLayout)findViewById(R.id.appbar);
         tabLayout    = (TabLayout) findViewById(R.id.tabs);
         fabMenu      = (FloatingActionMenu) findViewById(R.id.menu_fab);
@@ -204,23 +207,44 @@ public class HabitActivity extends AppCompatActivity implements
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_habit, menu);
-
-        return true;
-    }
-
-    @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem archive = menu.findItem(R.id.menu_toggle_archive);
+
         if (habit.getIsArchived()) {
             archive.setTitle("Unarchive");
         } else {
             archive.setTitle("Archive");
         }
 
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        if(searchView != null) {
+            searchView.setOnQueryTextListener(
+                    new SearchView.OnQueryTextListener() {
+                        @Override
+                        public boolean onQueryTextSubmit(String query) {
+                            processQuery(query);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onQueryTextChange(String query) {
+                            processQuery(query);
+                            return false;
+                        }
+                    }
+            );
+        }
+
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    public void processQuery(String query){
+        List<SessionEntry> entries = habitDatabase.lookUpEntries(
+                habitDatabase.searchEntryIdsByComment(habitId, query)
+        );
+
+        sectionsPagerAdapter.updateEntries(entries);
+        dateRangeManager.updateSessionEntries(entries);
     }
 
     @Override
@@ -372,13 +396,13 @@ public class HabitActivity extends AppCompatActivity implements
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position) {
                 case 0:
+                    entriesFragment.setHasOptionsMenu(true);
                     return entriesFragment;
 
                 case 1:
+                    calendarFragment.setHasOptionsMenu(true);
                     calendarFragment.setListener(new CalendarFragment.Listener() {
                         @Override
                         public void onDateClicked(int year, int month, int dayOfMonth) {
@@ -391,6 +415,7 @@ public class HabitActivity extends AppCompatActivity implements
                     return calendarFragment;
 
                 case 2:
+                    statisticsFragment.setHasOptionsMenu(true);
                     return statisticsFragment;
             }
 

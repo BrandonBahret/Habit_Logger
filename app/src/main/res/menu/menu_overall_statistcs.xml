@@ -2,17 +2,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.brandon.habitlogger.OverallStatistics.OverallStatistcsActivity">
+
+    <item android:id="@+id/search"
+        android:title="@string/search"
+        android:icon="@drawable/ic_search_white_24dp"
+        app:showAsAction="collapseActionView|ifRoom"
+        app:actionViewClass="android.support.v7.widget.SearchView" />
+
     <item
         android:title="Create Backup"
-        android:orderInCategory="100"
+        android:orderInCategory="101"
         android:id="@+id/menu_backup_database" />
     <item
         android:title="Restore Data"
-        android:orderInCategory="101"
+        android:orderInCategory="102"
         android:id="@+id/menu_restore_database" />
     <item
         android:id="@+id/menu_export_database_as_csv"
-        android:orderInCategory="102"
+        android:orderInCategory="103"
         android:title="Export Data (CSV)"
         app:showAsAction="never" />
 </menu>
