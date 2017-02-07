@@ -20,6 +20,8 @@ import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.R;
 
+import java.io.Serializable;
+
 /**
  * Created by Brandon on 12/6/2016.
  */
@@ -105,7 +107,7 @@ public class ModifyHabitActivity extends AppCompatActivity {
         switch (id) {
             case (R.id.new_habit_confirm): {
                 Intent data = new Intent();
-                data.putExtra("new_habit", getHabit());
+                data.putExtra("new_habit", (Serializable)getHabit());
                 setResult(RESULT_OK, data);
                 finish();
             }break;

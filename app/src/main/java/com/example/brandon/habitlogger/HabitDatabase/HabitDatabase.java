@@ -1137,6 +1137,35 @@ public class HabitDatabase {
         return habits;
     }
 
+    public List<Habit> lookUpHabits(Set<Long> ids){
+        List<Habit> habits = new ArrayList<>(ids.size());
+
+        for (long id : ids) {
+            habits.add(getHabit(id));
+        }
+
+        return habits;
+    }
+
+    public CategoryHabitsContainer getCategoryHabitsContainer(long categoryId){
+        Set<Long> ids = getHabitIds(categoryId);
+        List<Habit> habits = lookUpHabits(ids);
+
+        return new CategoryHabitsContainer(getCategory(categoryId), habits);
+    }
+
+    public List<CategoryHabitsContainer> getCategoryHabitsContainers(){
+        int size = getNumberOfCategories();
+        List<CategoryHabitsContainer> containers = new ArrayList<>(size);
+
+        for(int i = 0; i < size; i++){
+            long id = getCategoryIdFromIndex(i);
+            containers.add(getCategoryHabitsContainer(id));
+        }
+
+        return containers;
+    }
+
     public boolean getIsHabitArchived(long habitId) {
         Cursor c = readableDatabase.query(DatabaseHelper.HABITS_TABLE_NAME, new String[]{DatabaseHelper.HABIT_IS_ARCHIVED},
                 DatabaseHelper.HABIT_ID + "=?", new String[]{String.valueOf(habitId)}, null, null, null);

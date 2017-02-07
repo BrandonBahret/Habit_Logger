@@ -40,7 +40,8 @@ dependencies {
     compile files('libs/opencsv-3.8.jar')
 
     // TODO Add attribution
-
+    compile 'com.thoughtbot:expandablerecyclerview:1.3'
+    compile 'com.thoughtbot:expandablecheckrecyclerview:1.4'
 
     compile 'com.android.support:appcompat-v7:25.0.1'
     compile 'com.android.support:design:25.0.1'

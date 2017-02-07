@@ -19,6 +19,7 @@ import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -155,7 +156,7 @@ public class SessionManager {
         createSessionNotification(habit);
     }
 
-    public int getResourceIdForPauseButton(boolean isPaused){
+    public static int getResourceIdForPauseButton(boolean isPaused){
         return isPaused? R.drawable.ic_play_circle_filled_black_24dp :
                 R.drawable.ic_play_circle_outline_black_24dp;
     }
@@ -200,7 +201,7 @@ public class SessionManager {
             }
 
             Intent resultIntent = new Intent(context, SessionActivity.class);
-            resultIntent.putExtra("habit", habit);
+            resultIntent.putExtra("habit", (Serializable)habit);
 
             PendingIntent resultPendingIntent = PendingIntent.getActivity(context, habitId, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             builder.setContentIntent(resultPendingIntent);
@@ -229,7 +230,7 @@ public class SessionManager {
 
                                 builder.setCustomContentView(remoteViews);
                                 Intent resultIntent = new Intent(context, SessionActivity.class);
-                                resultIntent.putExtra("habit", habitDatabase.getHabit(habitId));
+                                resultIntent.putExtra("habit", (Serializable)habitDatabase.getHabit(habitId));
                                 PendingIntent resultPendingIntent = PendingIntent.getActivity(context, habitId, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                                 builder.setContentIntent(resultPendingIntent);
 

@@ -1,5 +1,7 @@
 package com.example.brandon.habitlogger.HabitDatabase;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -17,7 +19,7 @@ import java.util.Locale;
  * This is a class that defines the habit object.
  */
 
-public class Habit implements Serializable{
+public class Habit implements Serializable, Parcelable{
 
     @NonNull private String name;
     @NonNull private String description;
@@ -27,6 +29,18 @@ public class Habit implements Serializable{
     private int isArchived = 0;
 
     private long databaseId = -1;
+
+    public Habit(Parcel in) {
+        Habit habit = (Habit)in.readSerializable();
+
+        this.name        = habit.name;
+        this.description = habit.description;
+        this.category    = habit.category;
+        this.entries     = habit.entries;
+        this.iconResId   = habit.iconResId;
+        this.databaseId  = habit.databaseId;
+        this.isArchived  = habit.isArchived;
+    }
 
     public Habit(@NonNull String name, @NonNull String description, @NonNull HabitCategory category,
           @Nullable SessionEntry[] entries, @NonNull String iconResId){
@@ -288,4 +302,25 @@ public class Habit implements Serializable{
         return (this.isArchived == 1);
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeSerializable(this);
+    }
+
+    public static final Creator<Habit> CREATOR = new Creator<Habit>() {
+        @Override
+        public Habit createFromParcel(Parcel in) {
+            return new Habit(in);
+        }
+
+        @Override
+        public Habit[] newArray(int size) {
+            return new Habit[size];
+        }
+    };
 }

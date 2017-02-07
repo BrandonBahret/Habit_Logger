@@ -12,7 +12,7 @@
     android:clickable="true"
 
     card_view:layout_collapseParallaxMultiplier="1.0"
-    card_view:cardElevation="3dp"
+    card_view:cardElevation="4dp"
     android:layout_height="wrap_content">
 
     <LinearLayout

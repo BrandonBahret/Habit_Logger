@@ -33,7 +33,7 @@ public class PreferenceChecker {
 
     // Main Screen Settings
     public int howToDisplayCategories(){
-        String displayCategories = preferences.getString("category_preference", "1");
+        String displayCategories = preferences.getString("category_preference", String.valueOf(AS_SECTIONS));
         return parseInt(displayCategories);
     }
 

@@ -62,6 +62,7 @@ public class SessionActivity extends AppCompatActivity {
 
         Intent data = getIntent();
         habit = (Habit)data.getSerializableExtra("habit");
+
         habitId = habit.getDatabaseId();
 
         if(data.hasExtra("position"))

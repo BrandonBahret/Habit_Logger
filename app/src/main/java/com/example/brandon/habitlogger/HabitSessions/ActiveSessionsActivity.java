@@ -25,6 +25,7 @@ import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.ActiveSessionViewAdapter;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.ActiveSessionViewAdapterWithSections;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -306,7 +307,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
 
         handler.removeCallbacks(updateCards);
         Intent startSession = new Intent(this, SessionActivity.class);
-        startSession.putExtra("habit", habit);
+        startSession.putExtra("habit", (Serializable)habit);
         startActivityForResult(startSession, SessionActivity.RESULT_SESSION_FINISH);
     }
 }

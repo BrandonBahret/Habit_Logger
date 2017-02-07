@@ -35,6 +35,7 @@ import com.example.brandon.habitlogger.R;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -335,14 +336,14 @@ public class HabitActivity extends AppCompatActivity implements
 
     public void startSession() {
         Intent startSession = new Intent(this, SessionActivity.class);
-        startSession.putExtra("habit", habit);
+        startSession.putExtra("habit", (Serializable)habit);
         startActivity(startSession);
     }
 
     private void startModifyHabitActivity() {
         Intent startTargetActivity = new Intent(HabitActivity.this, ModifyHabitActivity.class);
         startTargetActivity.putExtra("edit", true);
-        startTargetActivity.putExtra("habit", habit);
+        startTargetActivity.putExtra("habit", (Serializable)habit);
         startActivityForResult(startTargetActivity, ModifyHabitActivity.EDIT_HABIT_RESULT_CODE);
     }
 
