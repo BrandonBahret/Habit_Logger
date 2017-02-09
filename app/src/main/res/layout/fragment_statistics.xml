@@ -18,14 +18,16 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="50dp" />
+                android:layout_height="100dp" />
+
 
             <fragment
-                android:id="@+id/time_averages"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.TimeAverages"
+                android:id="@+id/time_averages"
                 tools:layout="@layout/fragment_time_averages" />
+
 
             <Space
                 android:layout_width="match_parent"

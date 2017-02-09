@@ -1,5 +1,7 @@
 package com.example.brandon.habitlogger.HabitDatabase;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
@@ -17,7 +19,7 @@ import java.util.Locale;
  * This object is used to store the session data for the habits.
  */
 
-public class SessionEntry implements Serializable{
+public class SessionEntry implements Serializable, Parcelable{
 
     private long startTime, duration;
     private String name = "NAME_NOT_SET";
@@ -64,6 +66,21 @@ public class SessionEntry implements Serializable{
         this.startTime = startTime;
         this.duration  = duration;
         this.note      = note;
+    }
+
+    public SessionEntry(Parcel in){
+        SessionEntry entry = (SessionEntry)in.readSerializable();
+
+        this.startTime = entry.startTime;
+        this.duration  = entry.duration;
+        this.note      = entry.note;
+        this.databaseId = entry.databaseId;
+        this.habitId = entry.habitId;
+        this.name = entry.name;
+        this.category = entry.category;
+        this.isPaused = entry.isPaused;
+        this.lastTimePaused = entry.lastTimePaused;
+        this.totalPauseTime = entry.totalPauseTime;
     }
 
     @Override
@@ -259,4 +276,25 @@ public class SessionEntry implements Serializable{
         this.category = categoryName;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeSerializable(this);
+    }
+
+    public static final Creator<SessionEntry> CREATOR = new Creator<SessionEntry>() {
+        @Override
+        public SessionEntry createFromParcel(Parcel in) {
+            return new SessionEntry(in);
+        }
+
+        @Override
+        public SessionEntry[] newArray(int size) {
+            return new SessionEntry[size];
+        }
+    };
 }

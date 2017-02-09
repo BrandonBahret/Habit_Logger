@@ -19,7 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.FloatingDateRangeWidgetManager;
@@ -38,7 +37,6 @@ import com.github.clans.fab.FloatingActionMenu;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener.State.COLLAPSED;
@@ -46,7 +44,8 @@ import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeLis
 
 
 public class HabitActivity extends AppCompatActivity implements
-        EntriesFragment.OnFragmentInteractionListener, CalendarFragment.OnFragmentInteractionListener{
+        EntriesFragment.OnFragmentInteractionListener, CalendarFragment.OnFragmentInteractionListener,
+        CallbackInterface {
 
     private SectionsPagerAdapter sectionsPagerAdapter;
     private ViewPager viewPager;
@@ -56,7 +55,7 @@ public class HabitActivity extends AppCompatActivity implements
     List<SessionEntry> sessionEntries = new ArrayList<>();
     LocalDataExportManager exportManager;
     SessionManager sessionManager;
-    Habit habit;
+    public Habit habit;
     long habitId;
 
     TabLayout tabLayout;
@@ -64,6 +63,13 @@ public class HabitActivity extends AppCompatActivity implements
     FloatingActionMenu fabMenu;
     FloatingActionButton enterSession, createEntry;
     FloatingDateRangeWidgetManager dateRangeManager;
+
+    List<UpdateEntriesInterface> callbacks = new ArrayList<>();
+
+    @Override
+    public void addCallback(UpdateEntriesInterface callback) {
+        callbacks.add(callback);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,7 +155,6 @@ public class HabitActivity extends AppCompatActivity implements
             }
         });
         tabLayout.setupWithViewPager(viewPager);
-        sectionsPagerAdapter.updateEntries(this.sessionEntries);
 
         fabMenu.setClosedOnTouchOutside(true);
 
@@ -211,14 +216,19 @@ public class HabitActivity extends AppCompatActivity implements
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem archive = menu.findItem(R.id.menu_toggle_archive);
 
-        if (habit.getIsArchived()) {
-            archive.setTitle("Unarchive");
-        } else {
-            archive.setTitle("Archive");
+        if(archive != null) {
+            if (habit.getIsArchived()) {
+                archive.setTitle("Unarchive");
+            } else {
+                archive.setTitle("Archive");
+            }
         }
 
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        if(searchView != null) {
+
+        MenuItem search = menu.findItem(R.id.search);
+
+        if(search != null){
+            SearchView searchView = (SearchView) search.getActionView();
             searchView.setOnQueryTextListener(
                     new SearchView.OnQueryTextListener() {
                         @Override
@@ -395,6 +405,8 @@ public class HabitActivity extends AppCompatActivity implements
             super(fm);
         }
 
+        public final String[] titles = {"Entries", "Calendar", "Statistics"};
+
         @Override
         public Fragment getItem(int position) {
             switch (position) {
@@ -409,8 +421,6 @@ public class HabitActivity extends AppCompatActivity implements
                         public void onDateClicked(int year, int month, int dayOfMonth) {
                             dateRangeManager.setDateRangeForDate(year, month, dayOfMonth);
                             viewPager.setCurrentItem(0, true);
-                            String text = String.format(Locale.getDefault(), "%d %d, %d", month, dayOfMonth, year);
-                            Toast.makeText(HabitActivity.this, text, Toast.LENGTH_SHORT).show();
                         }
                     });
                     return calendarFragment;
@@ -431,20 +441,15 @@ public class HabitActivity extends AppCompatActivity implements
 
         @Override
         public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "Entries";
-                case 1:
-                    return "Calendar";
-                case 2:
-                    return "Statistics";
-            }
-            return null;
+            return titles[position];
         }
 
         public void updateEntries(List<SessionEntry> sessionEntries) {
             entriesFragment.updateEntries(sessionEntries);
-            statisticsFragment.updateEntries(sessionEntries);
+
+            for (UpdateEntriesInterface callback : callbacks) {
+                callback.updateEntries(sessionEntries);
+            }
         }
     }
 }

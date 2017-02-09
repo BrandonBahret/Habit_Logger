@@ -20,7 +20,9 @@ import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.FloatingDateRangeWidgetManager;
 import com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener;
 import com.example.brandon.habitlogger.HabitActivity.CalendarFragment;
+import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
 import com.example.brandon.habitlogger.HabitActivity.StatisticsFragment;
+import com.example.brandon.habitlogger.HabitActivity.UpdateEntriesInterface;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
@@ -34,7 +36,8 @@ import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeLis
 import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener.State.EXPANDED;
 
 public class OverallStatisticsActivity extends AppCompatActivity implements
-        OverallEntriesFragment.OnFragmentInteractionListener, CalendarFragment.OnFragmentInteractionListener {
+        OverallEntriesFragment.OnFragmentInteractionListener, CalendarFragment.OnFragmentInteractionListener,
+        CallbackInterface {
 
     private SectionsPagerAdapter sectionsPagerAdapter;
     private PreferenceChecker preferenceChecker;
@@ -45,6 +48,14 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
     private HabitDatabase habitDatabase;
 
     private LocalDataExportManager exportManager;
+
+    List<UpdateEntriesInterface> callbacks = new ArrayList<>();
+
+    @Override
+    public void addCallback(UpdateEntriesInterface callback) {
+        callbacks.add(callback);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,8 +139,10 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        if(searchView != null) {
+        MenuItem search = menu.findItem(R.id.search);
+
+        if(search != null){
+            SearchView searchView = (SearchView) search.getActionView();
             searchView.setOnQueryTextListener(
                     new SearchView.OnQueryTextListener() {
                         @Override
@@ -191,7 +204,6 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
     public void onFragmentInteraction(Uri uri) {
 
     }
-
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -258,7 +270,10 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
 
         public void updateEntries(List<SessionEntry> sessionEntries) {
             entriesFragment.updateEntries(sessionEntries);
-            statisticsFragment.updateEntries(sessionEntries);
+
+            for(UpdateEntriesInterface callback : callbacks){
+                callback.updateEntries(sessionEntries);
+            }
         }
     }
 }

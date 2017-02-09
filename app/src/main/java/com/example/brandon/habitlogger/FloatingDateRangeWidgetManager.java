@@ -30,7 +30,6 @@ public class FloatingDateRangeWidgetManager {
 
     private AppCompatActivity activity;
 
-    private CardView view;
     private ViewHolder viewHolder;
     private PreferenceChecker preferenceChecker;
     private HabitDatabase database;
@@ -43,6 +42,7 @@ public class FloatingDateRangeWidgetManager {
     private long numberOfEntries;
     public boolean isShown = true;
 
+
     public interface DateRangeChangeListener{
         public void dateRangeChanged(long dateFrom, long dateTo);
     }
@@ -51,6 +51,7 @@ public class FloatingDateRangeWidgetManager {
         public Spinner rangeType;
         public EditText dateFrom, dateTo;
         public TextView entriesCountText, totalTimeText;
+        public CardView view;
 
         public ViewHolder(View view){
             rangeType = (Spinner)view.findViewById(R.id.date_range_type_spinner);
@@ -58,17 +59,15 @@ public class FloatingDateRangeWidgetManager {
             dateTo    = (EditText)view.findViewById(R.id.date_to);
             entriesCountText = (TextView)view.findViewById(R.id.entries_count_text);
             totalTimeText = (TextView)view.findViewById(R.id.total_time_text);
+            this.view = (CardView)view;
         }
     }
 
     public FloatingDateRangeWidgetManager(AppCompatActivity activity_, View floatingDateRangeCardView, List<SessionEntry> sessionEntries){
         if(floatingDateRangeCardView instanceof CardView) {
-            this.view = (CardView) floatingDateRangeCardView;
-            this.viewHolder = new ViewHolder(this.view);
+            this.viewHolder = new ViewHolder(floatingDateRangeCardView);
             this.activity = activity_;
             this.preferenceChecker = new PreferenceChecker(activity);
-
-            updateSessionEntries(sessionEntries);
 
             viewHolder.dateFrom.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -112,6 +111,9 @@ public class FloatingDateRangeWidgetManager {
 
                 }
             });
+
+            updateSessionEntries(sessionEntries);
+            setStartRange();
         }
 
         else {
@@ -165,17 +167,17 @@ public class FloatingDateRangeWidgetManager {
     }
 
     public void hideView(){
-        view.animate()
+        viewHolder.view.animate()
                 .setStartDelay(0)
                 .setDuration(250)
                 .alpha(0)
-                .translationY(-view.getHeight());
+                .translationY(-viewHolder.view.getHeight());
 
         isShown = false;
     }
 
     public void showView(){
-        view.animate()
+        viewHolder.view.animate()
                 .setStartDelay(0)
                 .setDuration(250)
                 .alpha(1)

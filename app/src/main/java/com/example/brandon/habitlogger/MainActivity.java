@@ -309,10 +309,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void setActivityTheme() {
-
-    }
-
     public int getItemPosition(long habitId){
         int position;
 
@@ -526,7 +522,6 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
 
-        setActivityTheme();
         updateCurrentSessionCard();
         showDatabase();
         handler.post(updateCards);

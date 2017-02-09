@@ -23,8 +23,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/textView3"
-                android:textSize="10sp"
-                android:textAlignment="center" />
+                android:textSize="12sp"
+                android:textAlignment="center"
+                android:textStyle="normal|bold" />
 
             <LinearLayout
                 android:orientation="horizontal"

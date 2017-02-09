@@ -3,62 +3,23 @@ package com.example.brandon.habitlogger.HabitActivity;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.R;
-
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class StatisticsFragment extends Fragment {
+public class StatisticsFragment extends Fragment{
 
-    private static View view;
     int menuRes = R.menu.menu_habit;
 
     public StatisticsFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(this.menuRes, menu);
-        menu.findItem(R.id.search).setVisible(false);
-    }
-    public void setMenuRes(int res) {
-        this.menuRes = res;
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        if (view != null) {
-            ViewGroup parent = (ViewGroup) view.getParent();
-            if (parent != null)
-                parent.removeView(view);
-        }
-        try {
-            view = inflater.inflate(R.layout.fragment_statistics, container, false);
-        } catch (InflateException e) {
-            /* fragment is already there, just return view as it is */
-        }
-
-        return view;
-    }
-
-    @Override
-    public void onAttachFragment(Fragment childFragment) {
-        super.onAttachFragment(childFragment);
     }
 
     /**
@@ -71,7 +32,22 @@ public class StatisticsFragment extends Fragment {
         return new StatisticsFragment();
     }
 
-    public void updateEntries(List<SessionEntry> sessionEntries){
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState){
 
+        return inflater.inflate(R.layout.fragment_statistics, container, false);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(this.menuRes, menu);
+        menu.findItem(R.id.search).setVisible(false);
+    }
+
+    public void setMenuRes(int res) {
+        this.menuRes = res;
     }
 }
