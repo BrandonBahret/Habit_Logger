@@ -29,6 +29,20 @@
                 tools:layout="@layout/fragment_time_averages" />
 
 
+            <fragment
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.StreaksFragment"
+                android:id="@+id/fragment"
+                tools:layout="@layout/fragment_streaks" />
+
+            <fragment
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.PieGraphCompletion"
+                android:id="@+id/pie_graph_completion"
+                tools:layout="@layout/fragment_pie_graph_completion" />
+
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="75dp" />

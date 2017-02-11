@@ -9,5 +9,5 @@ import java.util.List;
  */
 
 public interface UpdateEntriesInterface {
-    void updateEntries(List<SessionEntry> sessionEntry);
+    void updateEntries(List<SessionEntry> sessionEntries, long dateFrom, long dateTo);
 }

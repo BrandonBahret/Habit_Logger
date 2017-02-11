@@ -36,8 +36,7 @@ import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeLis
 import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener.State.EXPANDED;
 
 public class OverallStatisticsActivity extends AppCompatActivity implements
-        OverallEntriesFragment.OnFragmentInteractionListener, CalendarFragment.OnFragmentInteractionListener,
-        CallbackInterface {
+        OverallEntriesFragment.OnFragmentInteractionListener, CallbackInterface {
 
     private SectionsPagerAdapter sectionsPagerAdapter;
     private PreferenceChecker preferenceChecker;
@@ -54,6 +53,11 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
     @Override
     public void addCallback(UpdateEntriesInterface callback) {
         callbacks.add(callback);
+    }
+
+    @Override
+    public SessionEntriesSample getSessionEntries() {
+        return new SessionEntriesSample(sessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
     }
 
 
@@ -104,18 +108,19 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
         habitDatabase = new HabitDatabase(this, null, false);
         sessionEntries = habitDatabase.lookUpEntries(habitDatabase.searchAllEntriesWithTimeRange(0, Long.MAX_VALUE));
         dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), sessionEntries);
-        dateRangeManager.setDateRangeChangeListener(new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
-            @Override
-            public void dateRangeChanged(long dateFrom, long dateTo) {
-                OverallStatisticsActivity.this.sessionEntries =
-                        habitDatabase.lookUpEntries(
-                                habitDatabase.searchAllEntriesWithTimeRange(dateFrom, dateTo)
-                        );
+        dateRangeManager.setDateRangeChangeListener(
+                new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
+                    @Override
+                    public void dateRangeChanged(long dateFrom, long dateTo) {
+                        OverallStatisticsActivity.this.sessionEntries =
+                                habitDatabase.lookUpEntries(
+                                        habitDatabase.searchAllEntriesWithTimeRange(dateFrom, dateTo)
+                                );
 
-                dateRangeManager.updateSessionEntries(OverallStatisticsActivity.this.sessionEntries);
-                sectionsPagerAdapter.updateEntries(OverallStatisticsActivity.this.sessionEntries);
-            }
-        });
+                        dateRangeManager.updateSessionEntries(OverallStatisticsActivity.this.sessionEntries);
+                        sectionsPagerAdapter.updateEntries(OverallStatisticsActivity.this.sessionEntries);
+                    }
+                });
 
         appBar.addOnOffsetChangedListener(new AppBarStateChangeListener() {
             @Override
@@ -272,7 +277,7 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
             entriesFragment.updateEntries(sessionEntries);
 
             for(UpdateEntriesInterface callback : callbacks){
-                callback.updateEntries(sessionEntries);
+                callback.updateEntries(sessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
             }
         }
     }

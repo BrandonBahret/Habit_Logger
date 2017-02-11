@@ -119,6 +119,7 @@ public class SessionEntry implements Serializable, Parcelable{
 
     public long getStartingTimeDate() {
         Calendar c = Calendar.getInstance();
+
         c.setTimeInMillis(getStartTime());
 
         c.set(Calendar.AM_PM, 0);

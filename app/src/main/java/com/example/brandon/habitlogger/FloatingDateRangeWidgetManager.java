@@ -39,7 +39,7 @@ public class FloatingDateRangeWidgetManager {
 
     private DateRangeChangeListener listener;
     private long totalDuration;
-    private long numberOfEntries;
+    private int numberOfEntries;
     public boolean isShown = true;
 
 
@@ -63,7 +63,9 @@ public class FloatingDateRangeWidgetManager {
         }
     }
 
-    public FloatingDateRangeWidgetManager(AppCompatActivity activity_, View floatingDateRangeCardView, List<SessionEntry> sessionEntries){
+    public FloatingDateRangeWidgetManager(AppCompatActivity activity_, View floatingDateRangeCardView,
+                                          List<SessionEntry> sessionEntries){
+
         if(floatingDateRangeCardView instanceof CardView) {
             this.viewHolder = new ViewHolder(floatingDateRangeCardView);
             this.activity = activity_;
@@ -111,9 +113,7 @@ public class FloatingDateRangeWidgetManager {
 
                 }
             });
-
             updateSessionEntries(sessionEntries);
-            setStartRange();
         }
 
         else {
@@ -157,6 +157,12 @@ public class FloatingDateRangeWidgetManager {
         this.listener = listener;
     }
 
+    public void notifyDateRangeChanged(long timeFrom, long timeTo){
+        if(listener != null){
+            listener.dateRangeChanged(timeFrom, timeTo);
+        }
+    }
+
     private long getCurrentTime(){
         return System.currentTimeMillis();
     }
@@ -194,17 +200,16 @@ public class FloatingDateRangeWidgetManager {
         viewHolder.dateTo.setText(getDate(dateToTime, preferenceChecker.stringGetDateFormat()));
         viewHolder.dateFrom.setText(getDate(dateFromTime, preferenceChecker.stringGetDateFormat()));
 
-        if(listener != null) {
-            listener.dateRangeChanged(dateFromTime, dateToTime);
-        }
+        notifyDateRangeChanged(dateFromTime, dateToTime);
     }
 
     public void updateSessionEntries(List<SessionEntry> sessionEntries) {
         this.sessionEntries = sessionEntries;
+        this.numberOfEntries = sessionEntries.size();
+
         this.minimumTime = sessionEntries.isEmpty()? 0 :
                 sessionEntries.get(0).getStartTime();
 
-        this.numberOfEntries = sessionEntries.size();
         this.totalDuration = 0;
         for (SessionEntry entry : sessionEntries) {
             this.totalDuration += entry.getDuration();
@@ -246,5 +251,13 @@ public class FloatingDateRangeWidgetManager {
         dateFromTime = dateToTime - 86400000L;
 
         updateDateRangeLabels();
+    }
+
+    public long getDateFrom(){
+        return this.dateFromTime;
+    }
+
+    public long getDateTo(){
+        return this.dateToTime;
     }
 }

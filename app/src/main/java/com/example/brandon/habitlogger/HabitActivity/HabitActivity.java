@@ -1,7 +1,6 @@
 package com.example.brandon.habitlogger.HabitActivity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
@@ -13,12 +12,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.FloatingDateRangeWidgetManager;
@@ -43,9 +39,7 @@ import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeLis
 import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener.State.EXPANDED;
 
 
-public class HabitActivity extends AppCompatActivity implements
-        EntriesFragment.OnFragmentInteractionListener, CalendarFragment.OnFragmentInteractionListener,
-        CallbackInterface {
+public class HabitActivity extends AppCompatActivity implements CallbackInterface {
 
     private SectionsPagerAdapter sectionsPagerAdapter;
     private ViewPager viewPager;
@@ -69,6 +63,11 @@ public class HabitActivity extends AppCompatActivity implements
     @Override
     public void addCallback(UpdateEntriesInterface callback) {
         callbacks.add(callback);
+    }
+
+    @Override
+    public SessionEntriesSample getSessionEntries() {
+        return new SessionEntriesSample(sessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
     }
 
     @Override
@@ -97,6 +96,16 @@ public class HabitActivity extends AppCompatActivity implements
         sessionEntries = habitDatabase.getEntries(habitId);
 
         dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), sessionEntries);
+        dateRangeManager.setDateRangeChangeListener(new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
+            @Override
+            public void dateRangeChanged(long dateFrom, long dateTo) {
+                Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo);
+                HabitActivity.this.sessionEntries = habitDatabase.lookUpEntries(ids);
+                dateRangeManager.updateSessionEntries(HabitActivity.this.sessionEntries);
+                updateEntries(HabitActivity.this.sessionEntries);
+            }
+        });
+
         sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         if(preferenceChecker.getTheme() == PreferenceChecker.DARK_THEME)
@@ -117,16 +126,6 @@ public class HabitActivity extends AppCompatActivity implements
                     if(viewPager.getCurrentItem() == 0)
                         fabMenu.showMenu(true);
                 }
-            }
-        });
-
-        dateRangeManager.setDateRangeChangeListener(new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
-            @Override
-            public void dateRangeChanged(long dateFrom, long dateTo) {
-                Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo);
-                HabitActivity.this.sessionEntries = habitDatabase.lookUpEntries(ids);
-                dateRangeManager.updateSessionEntries(HabitActivity.this.sessionEntries);
-                sectionsPagerAdapter.updateEntries(HabitActivity.this.sessionEntries);
             }
         });
 
@@ -176,8 +175,8 @@ public class HabitActivity extends AppCompatActivity implements
                     public void onFinishedWithResult(SessionEntry entry) {
                         if(entry != null){
                             habitDatabase.addEntry(habitId, entry);
-
-                            sectionsPagerAdapter.entriesFragment.addSessionEntry(entry);
+                            sessionEntries.add(entry);
+                            updateEntries(sessionEntries);
                         }
                     }
 
@@ -254,15 +253,11 @@ public class HabitActivity extends AppCompatActivity implements
                 habitDatabase.searchEntryIdsByComment(habitId, query)
         );
 
-        sectionsPagerAdapter.updateEntries(entries);
         dateRangeManager.updateSessionEntries(entries);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         switch(id){
@@ -274,10 +269,10 @@ public class HabitActivity extends AppCompatActivity implements
                 startModifyHabitActivity();
             }break;
 
-
             case(R.id.menu_enter_session):{
                 startSession();
             }break;
+
             case(R.id.menu_toggle_archive):{
                 boolean archivedState = !habitDatabase.getIsHabitArchived(habitId);
                 habitDatabase.updateHabitIsArchived(habitId, archivedState);
@@ -302,46 +297,6 @@ public class HabitActivity extends AppCompatActivity implements
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        public PlaceholderFragment() {
-        }
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_habit, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
     }
 
     public void startSession() {
@@ -370,7 +325,6 @@ public class HabitActivity extends AppCompatActivity implements
     }
 
     private void updateColorTheme() {
-        // TODO create this method
         int color = 0xFFCCCCCC;
         int darkerColor = 0xFFBBBBBB;
 
@@ -393,14 +347,17 @@ public class HabitActivity extends AppCompatActivity implements
         createEntry.setColorPressed(darkerColor);
     }
 
+    public void updateEntries(List<SessionEntry> sessionEntries) {
+        for (UpdateEntriesInterface callback : callbacks) {
+            callback.updateEntries(sessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+        }
+    }
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
-        public EntriesFragment entriesFragment = EntriesFragment.newInstance(habitId);
-        public CalendarFragment calendarFragment = CalendarFragment.newInstance();
-        public StatisticsFragment statisticsFragment = StatisticsFragment.newInstance();
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -410,24 +367,30 @@ public class HabitActivity extends AppCompatActivity implements
         @Override
         public Fragment getItem(int position) {
             switch (position) {
-                case 0:
-                    entriesFragment.setHasOptionsMenu(true);
-                    return entriesFragment;
+                case 0: {
+                    EntriesFragment fragment = EntriesFragment.newInstance(habitId);
+                    fragment.setHasOptionsMenu(true);
+                    return fragment;
+                }
 
-                case 1:
-                    calendarFragment.setHasOptionsMenu(true);
-                    calendarFragment.setListener(new CalendarFragment.Listener() {
+                case 1: {
+                    CalendarFragment fragment = CalendarFragment.newInstance();
+                    fragment.setHasOptionsMenu(true);
+                    fragment.setListener(new CalendarFragment.Listener() {
                         @Override
                         public void onDateClicked(int year, int month, int dayOfMonth) {
                             dateRangeManager.setDateRangeForDate(year, month, dayOfMonth);
                             viewPager.setCurrentItem(0, true);
                         }
                     });
-                    return calendarFragment;
+                    return fragment;
+                }
 
-                case 2:
-                    statisticsFragment.setHasOptionsMenu(true);
-                    return statisticsFragment;
+                case 2: {
+                    StatisticsFragment fragment = StatisticsFragment.newInstance();
+                    fragment.setHasOptionsMenu(true);
+                    return fragment;
+                }
             }
 
             return null;
@@ -442,14 +405,6 @@ public class HabitActivity extends AppCompatActivity implements
         @Override
         public CharSequence getPageTitle(int position) {
             return titles[position];
-        }
-
-        public void updateEntries(List<SessionEntry> sessionEntries) {
-            entriesFragment.updateEntries(sessionEntries);
-
-            for (UpdateEntriesInterface callback : callbacks) {
-                callback.updateEntries(sessionEntries);
-            }
         }
     }
 }

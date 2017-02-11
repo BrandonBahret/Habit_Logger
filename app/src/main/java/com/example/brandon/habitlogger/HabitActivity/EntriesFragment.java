@@ -1,7 +1,6 @@
 package com.example.brandon.habitlogger.HabitActivity;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -23,22 +22,11 @@ import com.example.brandon.habitlogger.RecyclerVIewAdapters.EntryViewAdapter;
 import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.List;
-import java.util.Set;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link EntriesFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link EntriesFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class EntriesFragment extends Fragment {
+public class EntriesFragment extends Fragment implements UpdateEntriesInterface {
 
     private static final String HABIT_ID = "HABIT_ID";
     private long habitId;
-
-    private OnFragmentInteractionListener mListener;
 
     PreferenceChecker preferenceChecker;
 
@@ -52,13 +40,6 @@ public class EntriesFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment EntriesFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static EntriesFragment newInstance(long habitId) {
         EntriesFragment fragment = new EntriesFragment();
         Bundle args = new Bundle();
@@ -71,7 +52,6 @@ public class EntriesFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.menu_habit, menu);
     }
 
@@ -151,6 +131,14 @@ public class EntriesFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        CallbackInterface callbackInterface = (CallbackInterface)context;
+        callbackInterface.addCallback(this);
+    }
+
     private int getSessionEntryIndex(long entryId){
         int index = 0;
         for(SessionEntry entry : sessionEntries){
@@ -180,55 +168,13 @@ public class EntriesFragment extends Fragment {
         entryAdapter.notifyItemChanged(index);
     }
 
-    public void updateEntries(List<SessionEntry> sessionEntries) {
+    @Override
+    public void updateEntries(List<SessionEntry> sessionEntries, long dateFrom, long dateTo) {
         if(entryAdapter != null) {
             this.sessionEntries = sessionEntries;
 
             entryAdapter = new EntryViewAdapter(this.sessionEntries, getContext(), entryAdapter.getListener());
             entriesContainer.setAdapter(entryAdapter);
         }
-    }
-
-    public void updateEntriesContainer(Set<Long> ids){
-
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 }

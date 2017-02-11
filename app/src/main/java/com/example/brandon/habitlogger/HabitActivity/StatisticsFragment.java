@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.HabitActivity;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,6 +17,7 @@ import com.example.brandon.habitlogger.R;
  */
 public class StatisticsFragment extends Fragment{
 
+    private static View view;
     int menuRes = R.menu.menu_habit;
 
     public StatisticsFragment() {
@@ -32,11 +34,20 @@ public class StatisticsFragment extends Fragment{
         return new StatisticsFragment();
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState){
 
-        return inflater.inflate(R.layout.fragment_statistics, container, false);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (view != null) {
+            ViewGroup parent = (ViewGroup) view.getParent();
+            if (parent != null)
+                parent.removeView(view);
+        }
+        try {
+            view = inflater.inflate(R.layout.fragment_statistics, container, false);
+        } catch (InflateException e) {
+        /* map is already there, just return view as it is */
+        }
+        return view;
     }
 
     @Override

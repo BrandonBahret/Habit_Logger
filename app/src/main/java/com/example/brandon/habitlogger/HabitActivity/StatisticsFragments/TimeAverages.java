@@ -2,7 +2,6 @@ package com.example.brandon.habitlogger.HabitActivity.StatisticsFragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,10 +15,12 @@ import com.example.brandon.habitlogger.R;
 
 import java.util.List;
 
+import static android.R.attr.entries;
+
 public class TimeAverages extends Fragment implements UpdateEntriesInterface {
 
     private TextView hoursPerMonth, hoursPerWeek, hoursPerDay, habitFrequency;
-    List<SessionEntry> sessionEntries;
+    CallbackInterface callbackInterface;
 
     public TimeAverages() {
         // Required empty public constructor
@@ -31,21 +32,14 @@ public class TimeAverages extends Fragment implements UpdateEntriesInterface {
      *
      * @return A new instance of fragment TimeAverages.
      */
-    public static TimeAverages newInstance(List<SessionEntry> sessionEntries) {
-        TimeAverages frag = new TimeAverages();
-
-        Bundle args = new Bundle();
-        if(sessionEntries != null)
-            args.putParcelableArray("entries", sessionEntries.toArray(new Parcelable[sessionEntries.size()]));
-
-        frag.setArguments(args);
-
-        return frag;
+    public static TimeAverages newInstance() {
+        return new TimeAverages();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_time_averages, container, false);
 
@@ -54,10 +48,6 @@ public class TimeAverages extends Fragment implements UpdateEntriesInterface {
         hoursPerDay    = (TextView) view.findViewById(R.id.hours_per_day_text);
         habitFrequency = (TextView) view.findViewById(R.id.habit_frequency_text);
 
-        if(sessionEntries != null){
-            updateEntries(sessionEntries);
-        }
-
         return view;
     }
 
@@ -65,21 +55,28 @@ public class TimeAverages extends Fragment implements UpdateEntriesInterface {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        CallbackInterface callbackInterface = (CallbackInterface)context;
+        callbackInterface = (CallbackInterface)context;
         callbackInterface.addCallback(this);
     }
 
     @Override
-    public void updateEntries(List<SessionEntry> entries){
+    public void onStart() {
+        super.onStart();
+        CallbackInterface.SessionEntriesSample sample = callbackInterface.getSessionEntries();
+        updateEntries(sample.sessionEntries, sample.dateFromTime, sample.dateToTime);
+    }
 
-        if(!entries.isEmpty()){
+    @Override
+    public void updateEntries(List<SessionEntry> sessionEntries, long dateFrom, long dateTo){
+
+        if(!sessionEntries.isEmpty()){
             long totalDuration = 0;
-            for (SessionEntry entry : entries) {
+            for (SessionEntry entry : sessionEntries) {
                 totalDuration += entry.getDuration();
             }
 
-            long beginningTime = entries.get(0).getStartTime();
-            long endingTime    = entries.get(entries.size() - 1).getStartTime();
+            long beginningTime = sessionEntries.get(0).getStartTime();
+            long endingTime    = sessionEntries.get(sessionEntries.size() - 1).getStartTime();
             long totalTime     = endingTime - beginningTime;
 
             double months = totalTime / 2592000000L;
