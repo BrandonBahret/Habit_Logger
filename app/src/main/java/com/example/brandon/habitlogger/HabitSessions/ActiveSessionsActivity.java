@@ -73,7 +73,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
             }
         });
 
-        habitDatabase  = new HabitDatabase(this, null, false);
+        habitDatabase  = new HabitDatabase(this);
         sessionEntries = sessionManager.getActiveSessionList();
 
         sessionViewContainer = (RecyclerView) findViewById(R.id.session_view_container);

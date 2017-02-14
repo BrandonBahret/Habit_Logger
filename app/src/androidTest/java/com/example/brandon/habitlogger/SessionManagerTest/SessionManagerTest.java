@@ -7,7 +7,6 @@ import android.test.RenamingDelegatingContext;
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 
 /**
@@ -16,16 +15,15 @@ import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 
 public class SessionManagerTest extends AndroidTestCase {
     private SessionManager mng;
-    RenamingDelegatingContext context;
-
-    long habitId;
+    private RenamingDelegatingContext context;
+    private long habitId;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
         context = new RenamingDelegatingContext(getContext(), "test_");
 
-        HabitDatabase db = new HabitDatabase(context, null, false);
+        HabitDatabase db = new HabitDatabase(context);
         habitId = db.addHabitAndCategory(new Habit("null", "null", new HabitCategory("#FFFFFFFF", "null"), null, "null"));
         mng = new SessionManager(context);
     }
@@ -36,48 +34,10 @@ public class SessionManagerTest extends AndroidTestCase {
     }
 
     public void testGetCurrentTime(){
-        long currentTime = mng.getCurrentTime();
+        long currentTime = SessionManager.getCurrentTime();
         SystemClock.sleep(100);
-        long nextTime = mng.getCurrentTime();
+        long nextTime = SessionManager.getCurrentTime();
         assertTrue((nextTime - currentTime) >= 100);
     }
 
-    public void testStartSession() {
-        assertNotSame(-1, mng.startSession(habitId));
-
-        SessionEntry entry = mng.getSession(habitId);
-        assertTrue(habitId == entry.getHabitId());
-    }
-
-    public void testPausePlaySession(){
-        // Start session
-        mng.startSession(habitId);
-
-        // Pause session for 250 ms
-        mng.pauseSession(habitId);
-        SystemClock.sleep(100);
-
-        // Play the session
-        mng.playSession(habitId);
-
-        long pauseTime = mng.getTotalPauseTime(habitId);
-        assertTrue(pauseTime >= 100);
-    }
-
-    public void testCancelSession(){
-        mng.startSession(habitId);
-        SessionEntry entry = mng.getSession(habitId);
-        assertTrue(habitId == entry.getHabitId());
-
-        mng.cancelSession(habitId);
-        assertTrue(!mng.isSessionActive(habitId));
-    }
-
-    public void testFinishSession(){
-        mng.startSession(habitId);
-        SystemClock.sleep(2000);
-        SessionEntry entry = mng.finishSession(habitId);
-
-        assertTrue(entry.getDuration() >= 2);
-    }
 }

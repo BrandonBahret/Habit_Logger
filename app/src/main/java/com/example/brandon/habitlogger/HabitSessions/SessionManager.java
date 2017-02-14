@@ -64,7 +64,7 @@ public class SessionManager {
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         this.preferenceChecker = new PreferenceChecker(context);
-        this.habitDatabase = new HabitDatabase(context, null, false);
+        this.habitDatabase = new HabitDatabase(context);
     }
 
     /**

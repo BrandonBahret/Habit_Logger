@@ -141,7 +141,7 @@ public class SessionActivity extends AppCompatActivity {
                 String note = noteArea.getText().toString();
                 entry.setNote(note);
 
-                HabitDatabase database = new HabitDatabase(this, null, false);
+                HabitDatabase database = new HabitDatabase(this);
                 database.addEntry(habitId, entry);
                 finish();
             }break;

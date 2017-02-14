@@ -22,7 +22,7 @@ public class HabitDatabaseNonAsyncCategoryMethodsTest extends AndroidTestCase {
         super.setUp();
         RenamingDelegatingContext context = new RenamingDelegatingContext(getContext(), "test_");
 
-        db = new HabitDatabase(context, null, false);
+        db = new HabitDatabase(context);
     }
 
     @Override

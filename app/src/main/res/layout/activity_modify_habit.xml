@@ -43,60 +43,28 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/category_spinner"
         android:gravity="center"
-        android:id="@+id/button_holder">
+        android:id="@+id/button_holder"
+        android:layout_below="@+id/habit_description_layout"
+        android:layout_alignParentStart="true">
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/habit_category_layout"
+        <Spinner
             android:layout_width="0dp"
             android:layout_height="65dp"
-            android:layout_weight="6">
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/habit_category"
-                android:id="@+id/habit_category" />
-
-        </android.support.design.widget.TextInputLayout>
+            android:layout_weight="6"
+            android:spinnerMode="dialog"
+            android:id="@+id/spinner_category_selector"
+            android:background="@drawable/spinner_background" />
 
         <ImageButton
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_paint_brush"
-
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-
-            android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"
-
-            android:background="@drawable/circle_background"
-            android:id="@+id/colorPicker" />
-
-        <ImageButton
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_picture_layer_1"
-
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-
-            android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"
-
-            android:background="@drawable/circle_background"
             android:id="@+id/icon_picker"
-            app:srcCompat="@drawable/ic_image_box" />
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_image_box"
+            style="@style/circle_button"
+            />
+
     </LinearLayout>
 
-    <Spinner
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/category_spinner"
-        android:layout_below="@+id/habit_description_layout"
-        android:layout_alignParentStart="true"
-        android:layout_margin="10dp"/>
 
 </RelativeLayout>

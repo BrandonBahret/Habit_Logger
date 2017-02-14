@@ -86,7 +86,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         viewPager    = (ViewPager) findViewById(R.id.container);
 
         preferenceChecker = new PreferenceChecker(this);
-        habitDatabase  = new HabitDatabase(this, null, false);
+        habitDatabase  = new HabitDatabase(this);
         sessionManager = new SessionManager(this);
         exportManager = new LocalDataExportManager(this);
 

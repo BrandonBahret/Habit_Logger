@@ -8,7 +8,7 @@
 
 
     <color name="habitCard">#377a8c</color>
-    <color name="habitCardButtonColor">#bab8b8</color>
+    <color name="habitCardButtonColor">#f7f7f7</color>
 
     <color name="cardBackgroundColor">#75a9c6</color>
     <color name="cardBackgroundDisabledColor">#bad9e9</color>
@@ -16,7 +16,7 @@
     <color name="black_semi_transparent">#b2000000</color>
     <color name="shadow_black">#42000000</color>
     <color name="background">#105769</color>
-    <color name="headerTextColor">#cfcdcd</color>
+    <color name="headerTextColor">#f7f7f7</color>
 
     <integer-array name="colors">
         <item>0xffd32f2f</item>

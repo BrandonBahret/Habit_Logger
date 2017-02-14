@@ -57,7 +57,7 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
 
     public ActiveSessionViewAdapter(List<SessionEntry> sessionEntries, Context context, OnClickListeners listener){
         this.sessionEntries = sessionEntries;
-        this.habitDatabase  = new HabitDatabase(context, null, false);
+        this.habitDatabase  = new HabitDatabase(context);
         this.sessionManager = new SessionManager(context);
         this.context = context;
         this.listener = listener;

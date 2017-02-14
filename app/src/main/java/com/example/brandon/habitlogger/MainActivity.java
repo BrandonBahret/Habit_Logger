@@ -2,7 +2,6 @@ package com.example.brandon.habitlogger;
 
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -31,11 +30,8 @@ import com.example.brandon.habitlogger.DataExportHelpers.GoogleDriveDataExportMa
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.HabitActivity.HabitActivity;
 import com.example.brandon.habitlogger.HabitDatabase.CategoryHabitsContainer;
-import com.example.brandon.habitlogger.HabitDatabase.DatabaseCache;
 import com.example.brandon.habitlogger.HabitDatabase.Habit;
-import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.HabitSessions.ActiveSessionsActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
@@ -111,18 +107,13 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        Serializable cache = null;
-        if (savedInstanceState != null) {
-            cache = savedInstanceState.getSerializable("dataCache");
-        }
-
-        habitDatabase = new HabitDatabase(MainActivity.this, cache, true);
+        habitDatabase = new HabitDatabase(MainActivity.this);
         sessionManager = new SessionManager(this);
         sessionManager.addSessionChangedListener(new SessionManager.SessionChangeListener() {
             @Override
@@ -372,15 +363,7 @@ public class MainActivity extends AppCompatActivity
             break;
 
             case (R.id.menu_database_restore): {
-                // TODO figure out google drive restore
-//                if(googleDrive.isConnected()) {
-//                    googleDrive.restoreDatabase();
-//                }
-//                else{
-                    exportManager.importDatabase(true);
-//                }
-
-                habitDatabase.loadAllContents();
+                exportManager.importDatabase(true);
                 habitDatabase.notifyChange();
             }break;
 
@@ -491,7 +474,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("dataCache", habitDatabase.dataCache);
 
         if(categoryAdapter!=null) {
             categoryAdapter.onSaveInstanceState(outState);
@@ -501,7 +483,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        habitDatabase.dataCache = (DatabaseCache) savedInstanceState.getSerializable("dataCache");
+
         if(categoryAdapter != null) {
             categoryAdapter.onRestoreInstanceState(savedInstanceState);
         }
@@ -666,91 +648,34 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public class addJunkData extends AsyncTask<Void, Void, Void>{
-        int numberOfCategories, numberOfEntries, numberOfHabits;
-
-        addJunkData(int numberOfCategories, int numberOfEntries, int numberOfHabits){
-            this.numberOfCategories = numberOfCategories;
-            this.numberOfEntries = numberOfEntries;
-            this.numberOfHabits = numberOfHabits;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            HabitCategory categories[] = new HabitCategory[numberOfCategories];
-            SessionEntry  entries[]    = new SessionEntry[numberOfEntries];
-            Habit         habits[]     = new Habit[numberOfHabits];
-
-            int intColors[] = getResources().getIntArray(R.array.colors);
-            for(Integer i = 0; i < categories.length; i++){
-                categories[i] = new HabitCategory(intColors[i % intColors.length], i.toString());
-            }
-            habitDatabase.addCategories(categories);
-
-            SessionEntry entry = new SessionEntry(0, 0, "note");
-            for(int i = 0; i < entries.length; i++){
-                entries[i] = entry;
-            }
-
-            for(int i = 0; i < habits.length; i++){
-                habits[i] = new Habit(String.valueOf(i), String.valueOf(i),
-                        categories[i % numberOfCategories], entries, "");
-                habitDatabase.addHabit(habits[i]);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            habitDatabase.loadAllContents();
-            habitDatabase.notifyChange();
-        }
-    }
-
-    public void addJunkData(int numberOfCategories, int numberOfEntries, int numberOfHabits){
-        new addJunkData(numberOfCategories, numberOfEntries, numberOfHabits).execute();
-    }
-
     public void showDatabase(){
-
-        // TODO make this proper
         if(preferenceChecker.howToDisplayCategories() != PreferenceChecker.AS_CARDS) {
-            habitList = new ArrayList<>();
-
-            for (int categoryInd = 0; categoryInd < habitDatabase.getNumberOfCategories(); categoryInd++) {
-
-                long categoryId = habitDatabase.getCategoryIdFromIndex(categoryInd);
-
-                for (int habitInd = 0; habitInd < habitDatabase.getNumberOfHabits(categoryId); habitInd++) {
-                    long habitId = habitDatabase.getHabitIdFromIndex(categoryId, habitInd);
-                    Habit habit = habitDatabase.getHabit(habitId);
-
-                    if (habit != null) {
-                        if (habitDisplayMode == ONLY_ARCHIVED_HABITS && habit.getIsArchived()) {
-                            habitList.add(habit);
-                        } else if (habitDisplayMode == NO_ARCHIVED_HABITS && !habit.getIsArchived()) {
-                            habitList.add(habit);
-                        }
-                    }
-                }
-            }
+            habitList = habitDatabase.getHabits();
+//            habitList = new ArrayList<>();
+//
+//            for (int categoryInd = 0; categoryInd < habitDatabase.getNumberOfCategories(); categoryInd++) {
+//
+//                long categoryId = habitDatabase.getCategoryIdFromIndex(categoryInd);
+//
+//                for (int habitInd = 0; habitInd < habitDatabase.getNumberOfHabits(categoryId); habitInd++) {
+//                    long habitId = habitDatabase.getHabitIdFromIndex(categoryId, habitInd);
+//                    Habit habit = habitDatabase.getHabit(habitId);
+//
+//                    if (habit != null) {
+//                        if (habitDisplayMode == ONLY_ARCHIVED_HABITS && habit.getIsArchived()) {
+//                            habitList.add(habit);
+//                        } else if (habitDisplayMode == NO_ARCHIVED_HABITS && !habit.getIsArchived()) {
+//                            habitList.add(habit);
+//                        }
+//                    }
+//                }
+//            }
 
             Collections.sort(habitList, Habit.CategoryNameComparator);
 
             habitAdapter = new HabitViewAdapter(habitList, menuItemClickListener, buttonClickListener);
             habitCardContainer.setAdapter(habitAdapter);
         }
-    }
-
-    public boolean checkListForHabitId(long habitId){
-        for(Habit habit : habitList){
-            if(habit.getDatabaseId() == habitId){
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public int getHabitPositionInList(long habitId){

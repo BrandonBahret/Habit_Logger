@@ -68,5 +68,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_overall_statistics">Overall Statistics</string>
+    <string name="choose_color">Choose color</string>
+    <string name="choose_icon">Choose Icon</string>
 
 </resources>

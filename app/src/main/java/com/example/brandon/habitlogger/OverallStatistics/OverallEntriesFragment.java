@@ -77,7 +77,7 @@ public class OverallEntriesFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_entries, container, false);
 
-        habitDatabase = new HabitDatabase(getContext(), null, false);
+        habitDatabase = new HabitDatabase(getContext());
 
         entriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
         sessionEntries = habitDatabase.lookUpEntries(habitDatabase.searchAllEntriesWithTimeRange(0, Long.MAX_VALUE));

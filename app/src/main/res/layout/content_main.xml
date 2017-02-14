@@ -20,9 +20,7 @@
         android:clipToPadding="false"
 
         android:scrollbars="none"
-        android:layout_below="@+id/current_sessions_card">
-
-    </android.support.v7.widget.RecyclerView>
+        android:layout_below="@+id/current_sessions_card"/>
 
 
 </RelativeLayout>

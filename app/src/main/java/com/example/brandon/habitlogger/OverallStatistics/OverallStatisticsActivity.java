@@ -105,7 +105,7 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
         });
         viewPager.setAdapter(sectionsPagerAdapter);
 
-        habitDatabase = new HabitDatabase(this, null, false);
+        habitDatabase = new HabitDatabase(this);
         sessionEntries = habitDatabase.lookUpEntries(habitDatabase.searchAllEntriesWithTimeRange(0, Long.MAX_VALUE));
         dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), sessionEntries);
         dateRangeManager.setDateRangeChangeListener(

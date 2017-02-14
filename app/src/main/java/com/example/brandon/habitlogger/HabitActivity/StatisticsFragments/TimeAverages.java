@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.HabitActivity.StatisticsFragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +14,9 @@ import com.example.brandon.habitlogger.HabitActivity.UpdateEntriesInterface;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.R;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
-import static android.R.attr.entries;
 
 public class TimeAverages extends Fragment implements UpdateEntriesInterface {
 
@@ -66,18 +67,63 @@ public class TimeAverages extends Fragment implements UpdateEntriesInterface {
         updateEntries(sample.sessionEntries, sample.dateFromTime, sample.dateToTime);
     }
 
+    public List<StreaksFragment.Streak> getWeekStreaks(List<SessionEntry> sessionEntries) {
+        List<StreaksFragment.Streak> streaks = new ArrayList<>();
+
+        if(!sessionEntries.isEmpty()) {
+            Collections.sort(sessionEntries, SessionEntry.StartingTimeComparator);
+
+            long initialDate = sessionEntries.get(0).getStartingTimeDate();
+            long currentDate = initialDate;
+            long previousDate = currentDate;
+            long endOfWeek = currentDate + DateUtils.WEEK_IN_MILLIS;
+
+            StreaksFragment.Streak currentStreak = new StreaksFragment.Streak(initialDate);
+
+            for(SessionEntry entry : sessionEntries){
+                currentDate = entry.getStartingTimeDate();
+
+                if(currentDate < endOfWeek && currentDate != previousDate){
+                    currentStreak.streakLength++;
+                    previousDate = currentDate;
+                }
+                else if(currentDate >= endOfWeek && currentDate != previousDate){
+                    currentStreak.streakLength++;
+                    previousDate = currentDate;
+                    currentStreak.streakEnd = currentDate;
+                    streaks.add(currentStreak);
+                }
+            }
+
+        }
+
+        return streaks;
+    }
+
     @Override
     public void updateEntries(List<SessionEntry> sessionEntries, long dateFrom, long dateTo){
 
         if(!sessionEntries.isEmpty()){
+            List<StreaksFragment.Streak> streaks = StreaksFragment.getWeekStreaks(sessionEntries);
+
+            int amount = 0;
+            for(StreaksFragment.Streak streak : streaks){
+                amount += streak.streakLength;
+            }
+
+            if(streaks.size() != 0) {// Don't divide by zero
+                amount /= streaks.size();
+            }
+
+            this.habitFrequency.setText(String.valueOf(amount));
+
+
             long totalDuration = 0;
             for (SessionEntry entry : sessionEntries) {
                 totalDuration += entry.getDuration();
             }
 
-            long beginningTime = sessionEntries.get(0).getStartTime();
-            long endingTime    = sessionEntries.get(sessionEntries.size() - 1).getStartTime();
-            long totalTime     = endingTime - beginningTime;
+            long totalTime = dateTo - dateFrom;
 
             double months = totalTime / 2592000000L;
             double weeks  = totalTime / 604800000L;
@@ -93,5 +139,7 @@ public class TimeAverages extends Fragment implements UpdateEntriesInterface {
             hoursPerWeek.setText(String.valueOf(hoursPerWeekTime));
             hoursPerDay.setText(String.valueOf(hoursPerDayTime));
         }
+
+
     }
 }
