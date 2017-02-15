@@ -28,6 +28,7 @@ import java.util.Locale;
 
 import static com.example.brandon.habitlogger.R.drawable.ic_play_circle_filled_black_24dp;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class SessionActivity extends AppCompatActivity {
 
     public static final int RESULT_SESSION_FINISH = 300;

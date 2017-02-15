@@ -1,12 +1,12 @@
 package com.example.brandon.habitlogger.OverallStatistics;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -35,11 +35,9 @@ import java.util.Locale;
 import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener.State.COLLAPSED;
 import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener.State.EXPANDED;
 
-public class OverallStatisticsActivity extends AppCompatActivity implements
-        OverallEntriesFragment.OnFragmentInteractionListener, CallbackInterface {
+public class OverallStatisticsActivity extends AppCompatActivity implements CallbackInterface {
 
     private SectionsPagerAdapter sectionsPagerAdapter;
-    private PreferenceChecker preferenceChecker;
     private ViewPager viewPager;
 
     private FloatingDateRangeWidgetManager dateRangeManager;
@@ -66,11 +64,11 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_overall_statistcs);
 
-        preferenceChecker = new PreferenceChecker(this);
+        PreferenceChecker preferenceChecker = new PreferenceChecker(this);
 
-        AppBarLayout appBar = (AppBarLayout)findViewById(R.id.appbar);
+        AppBarLayout appBar = (AppBarLayout) findViewById(R.id.appbar);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        if(preferenceChecker.getTheme() == PreferenceChecker.DARK_THEME)
+        if (preferenceChecker.isNightMode())
             toolbar.setPopupTheme(R.style.PopupMenu);
 
         setSupportActionBar(toolbar);
@@ -83,8 +81,9 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
         sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         sectionsPagerAdapter.updateEntries(this.sessionEntries);
         viewPager = (ViewPager) findViewById(R.id.container);
-        viewPager.addOnPageChangeListener (new ViewPager.OnPageChangeListener() {
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             public void onPageScrollStateChanged(int state) {}
+
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
             public void onPageSelected(int position) {
@@ -125,10 +124,10 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
         appBar.addOnOffsetChangedListener(new AppBarStateChangeListener() {
             @Override
             public void onStateChanged(AppBarLayout appBarLayout, State state) {
-                if(state == COLLAPSED){
+                if (state == COLLAPSED) {
                     dateRangeManager.hideView();
                 }
-                else if(state == EXPANDED){
+                else if (state == EXPANDED) {
                     dateRangeManager.showView();
                 }
             }
@@ -137,7 +136,10 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        int statusColor = ContextCompat
+                .getColor(OverallStatisticsActivity.this, R.color.colorPrimaryDark);
+
+        getWindow().setStatusBarColor(statusColor);
 
         exportManager = new LocalDataExportManager(this);
     }
@@ -146,7 +148,7 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem search = menu.findItem(R.id.search);
 
-        if(search != null){
+        if (search != null) {
             SearchView searchView = (SearchView) search.getActionView();
             searchView.setOnQueryTextListener(
                     new SearchView.OnQueryTextListener() {
@@ -168,7 +170,7 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
         return super.onPrepareOptionsMenu(menu);
     }
 
-    public void processQuery(String query){
+    public void processQuery(String query) {
         List<SessionEntry> entries = habitDatabase.lookUpEntries(
                 habitDatabase.searchEntryIdsByComment(query)
         );
@@ -184,30 +186,28 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        switch(id){
-            case(R.id.menu_backup_database):{
+        switch (id) {
+            case (R.id.menu_backup_database): {
                 Toast.makeText(this, "Backup Created", Toast.LENGTH_SHORT).show();
                 exportManager.exportDatabase(true);
-            }break;
+            }
+            break;
 
-            case(R.id.menu_restore_database):{
+            case (R.id.menu_restore_database): {
                 Toast.makeText(this, "Data Restored", Toast.LENGTH_SHORT).show();
                 exportManager.importDatabase(true);
-            }break;
+            }
+            break;
 
-            case(R.id.menu_export_database_as_csv):{
+            case (R.id.menu_export_database_as_csv): {
                 String filepath = exportManager.exportDatabaseAsCsv();
                 Toast.makeText(this, "Database exported to: " + filepath, Toast.LENGTH_LONG).show();
-            }break;
+            }
+            break;
 
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
     }
 
     /**
@@ -227,12 +227,12 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            switch(position){
-                case(0):
+            switch (position) {
+                case (0):
                     entriesFragment.setHasOptionsMenu(true);
                     return entriesFragment;
 
-                case(1):
+                case (1):
                     calendarFragment.setHasOptionsMenu(true);
                     calendarFragment.setMenuRes(R.menu.menu_overall_statistcs);
                     calendarFragment.setListener(new CalendarFragment.Listener() {
@@ -245,7 +245,7 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
                     });
                     return calendarFragment;
 
-                case(2):
+                case (2):
                     statisticsFragment.setHasOptionsMenu(true);
                     statisticsFragment.setMenuRes(R.menu.menu_overall_statistcs);
                     return statisticsFragment;
@@ -276,7 +276,7 @@ public class OverallStatisticsActivity extends AppCompatActivity implements
         public void updateEntries(List<SessionEntry> sessionEntries) {
             entriesFragment.updateEntries(sessionEntries);
 
-            for(UpdateEntriesInterface callback : callbacks){
+            for (UpdateEntriesInterface callback : callbacks) {
                 callback.updateEntries(sessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
             }
         }

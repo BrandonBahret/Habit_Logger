@@ -16,6 +16,7 @@ import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder;
 
 /**
  * Created by Brandon on 2/6/2017.
+ * ViewHolder for HabitViewAdapter
  */
 
 public class HabitViewHolder extends ChildViewHolder {

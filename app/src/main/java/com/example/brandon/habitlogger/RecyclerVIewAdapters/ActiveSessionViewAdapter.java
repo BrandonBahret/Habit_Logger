@@ -16,10 +16,10 @@ import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.R;
 
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by Brandon on 12/26/2016.
+ * RecyclerView adapter for active session activity.
  */
 
 public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSessionViewAdapter.ViewHolder> {
@@ -38,7 +38,7 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView name, time;
+        public TextView name, time, timeStarted;
         public ImageView accent;
         public ImageButton pauseButton;
         public CardView rootView;
@@ -49,6 +49,7 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
             super(view);
             this.name = (TextView) view.findViewById(R.id.active_session_habit_name);
             this.time = (TextView) view.findViewById(R.id.active_habit_time);
+            this.timeStarted = (TextView) view.findViewById(R.id.time_started);
             this.pauseButton = (ImageButton) view.findViewById(R.id.session_pause_play);
             this.accent = (ImageView) view.findViewById(R.id.card_accent);
             this.rootView = (CardView)view.getRootView();
@@ -92,8 +93,9 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
             holder.name.setText(item.getName());
 
             SessionManager.TimeDisplay time = new SessionManager.TimeDisplay(item.getDuration());
-            String timeDisplay = String.format(Locale.US, "%02d:%02d:%02d", time.hours, time.minutes, time.seconds);
-            holder.time.setText(timeDisplay);
+            holder.time.setText(time.toString());
+
+            holder.timeStarted.setText(item.getStartTimeAsString("h:mm a"));
 
             if(habitDatabase.getIsHabitArchived(habitId)){
                 holder.accent.setColorFilter(0xFFCCCCCC);
@@ -107,8 +109,6 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
             } else {
                 holder.pauseButton.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
             }
-
-
 
             holder.rootView.setOnClickListener(new View.OnClickListener() {
                 @Override

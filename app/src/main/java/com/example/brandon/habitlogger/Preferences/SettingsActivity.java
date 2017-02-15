@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.Preferences;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
@@ -24,11 +25,11 @@ public class SettingsActivity extends AppCompatActivity
         preferenceChecker = new PreferenceChecker(this);
 
         AppCompatDelegate.setDefaultNightMode(
-                preferenceChecker.getTheme() == PreferenceChecker.LIGHT_THEME?
-                        AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES);
+                preferenceChecker.isNightMode()? AppCompatDelegate.MODE_NIGHT_YES :
+                        AppCompatDelegate.MODE_NIGHT_NO
+        );
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
 
         sessionManager = new SessionManager(this);
 
@@ -92,11 +93,23 @@ public class SettingsActivity extends AppCompatActivity
             sessionManager.createAllSessionNotifications();
         }
 
-        if(key.equals("theme")){
+        if(key.equals("is_night_mode")){
             AppCompatDelegate.setDefaultNightMode(
-                    preferenceChecker.getTheme() == PreferenceChecker.LIGHT_THEME?
-                            AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES);
+                    preferenceChecker.isNightMode()? AppCompatDelegate.MODE_NIGHT_YES :
+                            AppCompatDelegate.MODE_NIGHT_NO
+            );
+
             recreate();
+        }
+    }
+
+    public static class SettingsFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            // Load the preferences from an XML resource
+            addPreferencesFromResource(R.xml.preferences);
         }
     }
 }

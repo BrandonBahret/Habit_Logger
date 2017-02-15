@@ -17,17 +17,15 @@ import com.example.brandon.habitlogger.R;
 import java.util.List;
 
 public class CalendarFragment extends Fragment implements UpdateEntriesInterface {
-    private CalendarView calendar;
-    private int menuRes = R.menu.menu_habit;
-
     private Listener listener;
+    private int mMenuRes = R.menu.menu_habit;
 
     public CalendarFragment() {
         // Required empty public constructor
     }
 
-    public void setMenuRes(int res) {
-        this.menuRes = res;
+    public static CalendarFragment newInstance() {
+        return new CalendarFragment();
     }
 
     public interface Listener{
@@ -38,15 +36,13 @@ public class CalendarFragment extends Fragment implements UpdateEntriesInterface
         this.listener = listener;
     }
 
-    public static CalendarFragment newInstance() {
-        return new CalendarFragment();
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+
         // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(this.menuRes, menu);
+        inflater.inflate(mMenuRes, menu);
         menu.findItem(R.id.search).setVisible(false);
     }
 
@@ -61,8 +57,7 @@ public class CalendarFragment extends Fragment implements UpdateEntriesInterface
 
         View v = inflater.inflate(R.layout.fragment_calendar, container, false);
 
-        calendar = (CalendarView)v.findViewById(R.id.calendarView);
-
+        CalendarView calendar = (CalendarView) v.findViewById(R.id.calendarView);
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView calendarView, int year, int month, int dayOfMonth) {
@@ -85,5 +80,9 @@ public class CalendarFragment extends Fragment implements UpdateEntriesInterface
     @Override
     public void updateEntries(List<SessionEntry> sessionEntries, long dateFrom, long dateTo) {
 
+    }
+
+    public void setMenuRes(int menuRes) {
+        mMenuRes = menuRes;
     }
 }

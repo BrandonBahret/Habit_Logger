@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
@@ -18,8 +19,9 @@ import com.example.brandon.habitlogger.R;
 
 import java.util.ArrayList;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class ChangeColorDialogFragment extends DialogFragment {
-    private ArrayList<OnFinishedListener> onFinishedListeners = new ArrayList<OnFinishedListener>();
+    private ArrayList<OnFinishedListener> onFinishedListeners = new ArrayList<>();
 
     public void setOnFinishedListener(OnFinishedListener listener){
         onFinishedListeners.add(listener);
@@ -29,6 +31,7 @@ public class ChangeColorDialogFragment extends DialogFragment {
         void onFinishedWithResult(int color);
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -94,12 +97,16 @@ class ColorArrayAdapter extends ArrayAdapter<Integer> {
         this.context = context;
     }
 
-    public View getView(int position, View convertView, ViewGroup parent) {
+    @NonNull
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         Integer color = getItem(position);
         ImageView view = new ImageView(context);
 
         view.setImageResource(R.drawable.ic_simple_circle);
-        view.setColorFilter(color);
+
+        if(color != null)
+            view.setColorFilter(color);
+
         view.setScaleX(1.8f);
         view.setScaleY(1.8f);
         view.setPadding(20, 30, 20, 30);

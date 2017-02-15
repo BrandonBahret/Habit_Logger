@@ -19,8 +19,6 @@ public class PreferenceChecker {
     private Context context;
 
     public static final int AS_CARDS = 0, AS_SECTIONS = 1, WITHOUT_CATEGORIES = 2;
-    public static final int LIGHT_THEME = 0, DARK_THEME = 1;
-
 
     public PreferenceChecker(Context context){
         this.context = context;
@@ -59,9 +57,8 @@ public class PreferenceChecker {
     }
 
     // Appearances
-    public int getTheme(){
-        String themeIndex = preferences.getString("theme", "1");
-        return parseInt(themeIndex);
+    public boolean isNightMode(){
+        return preferences.getBoolean("is_night_mode", false);
     }
 
     public String stringGetDateFormat(){

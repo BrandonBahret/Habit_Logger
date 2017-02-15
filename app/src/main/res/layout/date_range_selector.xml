@@ -4,8 +4,8 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
-    app:cardElevation="8dp"
-    app:cardBackgroundColor="@color/habitCard">
+    app:cardBackgroundColor="@color/habitCard"
+    app:cardElevation="8dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -13,108 +13,109 @@
         android:padding="8dp">
 
         <LinearLayout
-            android:orientation="horizontal"
-            android:layout_below="@+id/layout_one"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_one"
+            android:orientation="horizontal">
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
                 android:text="Entries: "
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                
-                android:layout_weight="0" />
+
+                android:textSize="12sp" />
 
             <TextView
-                android:text="0"
+                android:id="@+id/entries_count_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
+                android:layout_weight="0"
 
-                android:id="@+id/entries_count_text"
-                android:layout_weight="0" />
+                android:text="0"
+                android:textSize="12sp" />
 
             <Space
                 android:layout_width="20dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0"/>
+                android:layout_weight="0" />
 
             <TextView
-                android:text="Total Time: "
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:layout_weight="0" />
+                android:layout_weight="0"
+                android:text="Total Time: "
+                android:textSize="12sp" />
+
             <TextView
-                android:text="00:00:00"
+                android:id="@+id/total_time_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:id="@+id/total_time_text"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:text="00:00:00"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/layout_one"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
             android:layout_below="@+id/layout_two"
-            android:layout_alignParentStart="true">
+            android:orientation="horizontal">
 
             <TextView
-                android:text="From"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/textView10"
-                android:layout_weight="0" />
-
-            <EditText
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:enabled="false"
-                android:ems="10"
-                android:id="@+id/date_from"
-                android:layout_weight="1" />
-
-            <TextView
-                android:text="To"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView9"
-                android:layout_weight="0" />
+                android:layout_weight="0"
+                android:text="From" />
 
             <EditText
+                android:id="@+id/date_from"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:focusable="false"
-                android:enabled="false"
+                android:layout_weight="1"
                 android:ems="10"
+                android:enabled="false"
+                android:focusable="false" />
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="To" />
+
+            <EditText
                 android:id="@+id/date_to"
-                android:layout_weight="1" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:enabled="false"
+                android:focusable="false" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/layout_two"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true">
+            android:orientation="horizontal">
 
             <TextView
-                android:text="Date Range Type"
+                android:id="@+id/textView11"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView11"
-                android:layout_weight="0" />
+                android:layout_weight="0"
+                android:text="Date Range Type" />
 
             <Spinner
+                android:id="@+id/date_range_type_spinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/date_range_type_spinner"
                 android:layout_weight="1"
                 android:entries="@array/date_range_type_options" />
 

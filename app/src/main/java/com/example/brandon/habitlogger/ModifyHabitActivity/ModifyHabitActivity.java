@@ -21,6 +21,7 @@ import java.util.List;
 
 /**
  * Created by Brandon on 12/6/2016.
+ * An activity to create/modify habit objects
  */
 
 public class ModifyHabitActivity extends AppCompatActivity {

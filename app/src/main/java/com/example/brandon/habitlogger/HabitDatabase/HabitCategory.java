@@ -12,43 +12,43 @@ import java.util.Locale;
  * This object is used to give habits categorical organization.
  */
 
-public class HabitCategory implements Serializable{
+public class HabitCategory implements Serializable {
     @NonNull private String color = "";
-    @NonNull private String name  = "";
+    @NonNull private String name = "";
 
     private long databaseId = -1;
 
     /**
      * @param color A color in hexadecimal format. Ex: "#ffffff"
-     * @param name The name of the category
+     * @param name  The name of the category
      */
-    public HabitCategory(@NonNull String color, @NonNull String name){
+    public HabitCategory(@NonNull String color, @NonNull String name) {
         this.color = color;
-        this.name  = name;
+        this.name = name;
     }
 
     /**
      * @param color A color represented by an int
-     * @param name The name of the category
+     * @param name  The name of the category
      */
-    public HabitCategory(int color, @NonNull String name){
+    public HabitCategory(int color, @NonNull String name) {
         this.color = "#" + Integer.toHexString(color);
-        this.name  = name;
+        this.name = name;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof HabitCategory){
-            HabitCategory compare = (HabitCategory)obj;
+        if (obj instanceof HabitCategory) {
+            HabitCategory compare = (HabitCategory) obj;
             return compare.getName().equals(getName()) &&
                     compare.getColor().equals(getColor());
         }
-        else{
+        else {
             return false;
         }
     }
 
-    public String toString(){
+    public String toString() {
         String format = "%s {\n\tColor: %s\n}\n";
         return String.format(Locale.US, format, getName(), getColor());
     }
@@ -56,11 +56,11 @@ public class HabitCategory implements Serializable{
     /**
      * @param color A color in hexadecimal form Ex: "#ffffff"
      */
-    public void setColor(@NonNull String color){
+    public void setColor(@NonNull String color) {
         this.color = color;
     }
 
-    public void setColor(int color){
+    public void setColor(int color) {
         setColor("#" + Integer.toHexString(color));
     }
 
@@ -68,29 +68,29 @@ public class HabitCategory implements Serializable{
      * @return A color in hexadecimal form Ex: "#ffffff"
      */
     @NonNull
-    public String getColor(){
+    public String getColor() {
         return this.color;
     }
 
     /**
      * @return A color stored as an int
      */
-    public int getColorAsInt(){
+    public int getColorAsInt() {
         return Color.parseColor(getColor());
     }
 
-    public static int darkenColor(int color, float scale){
+    public static int darkenColor(int color, float scale) {
         int r = Color.red(color);
         int b = Color.blue(color);
         int g = Color.green(color);
 
-        return Color.rgb((int)(r*scale), (int)(g*scale), (int)(b*scale));
+        return Color.rgb((int) (r * scale), (int) (g * scale), (int) (b * scale));
     }
 
     /**
      * @param name The name of the category
      */
-    public void setName(@NonNull String name){
+    public void setName(@NonNull String name) {
         this.name = name;
     }
 
@@ -98,7 +98,7 @@ public class HabitCategory implements Serializable{
      * @return The name of the category
      */
     @NonNull
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 

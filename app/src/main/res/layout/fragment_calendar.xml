@@ -5,17 +5,15 @@
     android:layout_height="match_parent"
     tools:context="com.example.brandon.habitlogger.HabitActivity.CalendarFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <CalendarView
+        android:id="@+id/calendarView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/calendarView"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:isScrollContainer="true"
         android:maxDate="12/31/2184"
-        android:showWeekNumber="false"
-        android:selectedWeekBackgroundColor="@color/transparent" />
+        android:selectedWeekBackgroundColor="@color/transparent"
+        android:showWeekNumber="false" />
 
 </FrameLayout>

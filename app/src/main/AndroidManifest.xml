@@ -83,16 +83,17 @@
                 android:value="com.example.brandon.habitlogger.MainActivity" />
         </activity>
 
-        <activity android:name=".DataExportHelpers.LocalExportActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:exported="false">
+        <activity
+            android:name=".DataExportHelpers.LocalExportActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
 
             <intent-filter
-                android:label="Save Locally"
-                android:icon="@drawable/ic_save_black_24dp">
-                <action android:name="android.intent.action.SEND"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="text/csv"/>
+                android:icon="@drawable/ic_save_black_24dp"
+                android:label="Save Locally">
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/csv" />
             </intent-filter>
 
         </activity>

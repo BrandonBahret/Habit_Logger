@@ -44,9 +44,9 @@ public class TimeAverages extends Fragment implements UpdateEntriesInterface {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_time_averages, container, false);
 
-        hoursPerMonth  = (TextView) view.findViewById(R.id.hours_per_month_text);
-        hoursPerWeek   = (TextView) view.findViewById(R.id.hours_per_week_text);
-        hoursPerDay    = (TextView) view.findViewById(R.id.hours_per_day_text);
+        hoursPerMonth = (TextView) view.findViewById(R.id.hours_per_month_text);
+        hoursPerWeek = (TextView) view.findViewById(R.id.hours_per_week_text);
+        hoursPerDay = (TextView) view.findViewById(R.id.hours_per_day_text);
         habitFrequency = (TextView) view.findViewById(R.id.habit_frequency_text);
 
         return view;
@@ -56,7 +56,7 @@ public class TimeAverages extends Fragment implements UpdateEntriesInterface {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        callbackInterface = (CallbackInterface)context;
+        callbackInterface = (CallbackInterface) context;
         callbackInterface.addCallback(this);
     }
 
@@ -67,51 +67,84 @@ public class TimeAverages extends Fragment implements UpdateEntriesInterface {
         updateEntries(sample.sessionEntries, sample.dateFromTime, sample.dateToTime);
     }
 
-    public List<StreaksFragment.Streak> getWeekStreaks(List<SessionEntry> sessionEntries) {
+    public static List<StreaksFragment.Streak> getWeekStreaks(List<SessionEntry> sessionEntries) {
         List<StreaksFragment.Streak> streaks = new ArrayList<>();
 
-        if(!sessionEntries.isEmpty()) {
+        if (!sessionEntries.isEmpty()) {
             Collections.sort(sessionEntries, SessionEntry.StartingTimeComparator);
 
-            long initialDate = sessionEntries.get(0).getStartingTimeDate();
-            long currentDate = initialDate;
-            long previousDate = currentDate;
-            long endOfWeek = currentDate + DateUtils.WEEK_IN_MILLIS;
+            int size = sessionEntries.size();
+            long targetDate = sessionEntries.get(0).getStartingTimeDate();
 
-            StreaksFragment.Streak currentStreak = new StreaksFragment.Streak(initialDate);
+            long interval = DateUtils.WEEK_IN_MILLIS;
+            long endOfWeek = targetDate + interval - DateUtils.DAY_IN_MILLIS;
 
-            for(SessionEntry entry : sessionEntries){
-                currentDate = entry.getStartingTimeDate();
+            StreaksFragment.Streak currentStreak = new StreaksFragment.Streak(targetDate, endOfWeek, 0);
 
-                if(currentDate < endOfWeek && currentDate != previousDate){
+            for (SessionEntry entry : sessionEntries) {
+                long currentDate = entry.getStartingTimeDate();
+                boolean endOfList = sessionEntries.indexOf(entry) == (size - 1);
+
+                if (currentDate == targetDate) {
                     currentStreak.streakLength++;
-                    previousDate = currentDate;
+
+                    if (currentDate >= endOfWeek) {
+                        streaks.add(currentStreak);
+                        endOfWeek = currentDate + interval;
+                        currentStreak = new StreaksFragment.Streak(currentDate + DateUtils.DAY_IN_MILLIS, endOfWeek, 0);
+                        targetDate = currentDate + DateUtils.DAY_IN_MILLIS;
+                    }
+                    else if (endOfList) {
+                        streaks.add(currentStreak);
+                        break;
+                    }
+                    else {
+                        targetDate += DateUtils.DAY_IN_MILLIS;
+                    }
+
                 }
-                else if(currentDate >= endOfWeek && currentDate != previousDate){
+                else if (currentDate > targetDate) {
+
                     currentStreak.streakLength++;
-                    previousDate = currentDate;
-                    currentStreak.streakEnd = currentDate;
+
+                    if (currentDate >= endOfWeek) {
+                        streaks.add(currentStreak);
+                        endOfWeek = currentDate + interval;
+                        currentStreak = new StreaksFragment.Streak(currentDate + DateUtils.DAY_IN_MILLIS, endOfWeek, 0);
+                        targetDate = currentDate + DateUtils.DAY_IN_MILLIS;
+                    }
+
+                    else if (endOfList) {
+                        streaks.add(currentStreak);
+                        break;
+                    }
+                    else {
+                        targetDate = currentDate + DateUtils.DAY_IN_MILLIS;
+                    }
+                }
+
+                else if (endOfList) {
                     streaks.add(currentStreak);
+                    break;
                 }
             }
-
         }
 
         return streaks;
     }
 
     @Override
-    public void updateEntries(List<SessionEntry> sessionEntries, long dateFrom, long dateTo){
+    public void updateEntries(List<SessionEntry> sessionEntries, long dateFrom, long dateTo) {
 
-        if(!sessionEntries.isEmpty()){
-            List<StreaksFragment.Streak> streaks = StreaksFragment.getWeekStreaks(sessionEntries);
+        if (!sessionEntries.isEmpty()) {
+            List<StreaksFragment.Streak> streaks = getWeekStreaks(sessionEntries);
 
             int amount = 0;
-            for(StreaksFragment.Streak streak : streaks){
+            for (StreaksFragment.Streak streak : streaks) {
                 amount += streak.streakLength;
             }
 
-            if(streaks.size() != 0) {// Don't divide by zero
+            if (streaks.size() != 0) {// Don't divide by zero
                 amount /= streaks.size();
             }
 
@@ -126,20 +159,18 @@ public class TimeAverages extends Fragment implements UpdateEntriesInterface {
             long totalTime = dateTo - dateFrom;
 
             double months = totalTime / 2592000000L;
-            double weeks  = totalTime / 604800000L;
-            double days   = totalTime / 86400000L;
+            double weeks = totalTime / 604800000L;
+            double days = totalTime / 86400000L;
 
             double totalHours = totalDuration / 3600000L;
 
             double hoursPerMonthTime = months == 0 ? totalHours : totalHours / months;
-            double hoursPerWeekTime  = weeks  == 0 ? totalHours : totalHours / weeks;
-            double hoursPerDayTime   = days   == 0 ? totalHours : totalHours / days;
+            double hoursPerWeekTime = weeks == 0 ? totalHours : totalHours / weeks;
+            double hoursPerDayTime = days == 0 ? totalHours : totalHours / days;
 
             hoursPerMonth.setText(String.valueOf(hoursPerMonthTime));
             hoursPerWeek.setText(String.valueOf(hoursPerWeekTime));
             hoursPerDay.setText(String.valueOf(hoursPerDayTime));
         }
-
-
     }
 }

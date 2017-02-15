@@ -10,7 +10,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.brandon.habitlogger.HabitActivity.StartingDateDialog;
-import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
@@ -23,7 +22,7 @@ import java.util.Locale;
 
 /**
  * Created by Brandon on 1/29/2017.
- *
+ * Manages the functionality of the date range widget.
  */
 
 public class FloatingDateRangeWidgetManager {
@@ -32,19 +31,15 @@ public class FloatingDateRangeWidgetManager {
 
     private ViewHolder viewHolder;
     private PreferenceChecker preferenceChecker;
-    private HabitDatabase database;
 
     private long dateFromTime, dateToTime, minimumTime;
-    private List<SessionEntry> sessionEntries;
 
     private DateRangeChangeListener listener;
-    private long totalDuration;
-    private int numberOfEntries;
     public boolean isShown = true;
 
 
     public interface DateRangeChangeListener{
-        public void dateRangeChanged(long dateFrom, long dateTo);
+        void dateRangeChanged(long dateFrom, long dateTo);
     }
 
     public class ViewHolder{
@@ -204,19 +199,18 @@ public class FloatingDateRangeWidgetManager {
     }
 
     public void updateSessionEntries(List<SessionEntry> sessionEntries) {
-        this.sessionEntries = sessionEntries;
-        this.numberOfEntries = sessionEntries.size();
+        int numberOfEntries = sessionEntries.size();
 
         this.minimumTime = sessionEntries.isEmpty()? 0 :
                 sessionEntries.get(0).getStartTime();
 
-        this.totalDuration = 0;
+        long totalDuration = 0;
         for (SessionEntry entry : sessionEntries) {
-            this.totalDuration += entry.getDuration();
+            totalDuration += entry.getDuration();
         }
 
-        viewHolder.entriesCountText.setText(String.valueOf(this.numberOfEntries));
-        String totalTimeString = new SessionManager.TimeDisplay(this.totalDuration).toString();
+        viewHolder.entriesCountText.setText(String.valueOf(numberOfEntries));
+        String totalTimeString = new SessionManager.TimeDisplay(totalDuration).toString();
         viewHolder.totalTimeText.setText(totalTimeString);
     }
 

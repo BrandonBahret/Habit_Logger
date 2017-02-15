@@ -19,53 +19,71 @@ import java.util.Locale;
  * This is a class that defines the habit object.
  */
 
-public class Habit implements Serializable, Parcelable{
+@SuppressWarnings("WeakerAccess")
+public class Habit implements Serializable, Parcelable {
 
     @NonNull private String name;
     @NonNull private String description;
     @NonNull private HabitCategory category;
-    @Nullable private SessionEntry[] entries;
     @NonNull private String iconResId;
-    private int isArchived = 0;
+    @Nullable private SessionEntry[] entries;
 
+    private int isArchived = 0;
     private long databaseId = -1;
 
-    public Habit(Parcel in) {
-        Habit habit = (Habit)in.readSerializable();
-
-        this.name        = habit.name;
-        this.description = habit.description;
-        this.category    = habit.category;
-        this.entries     = habit.entries;
-        this.iconResId   = habit.iconResId;
-        this.databaseId  = habit.databaseId;
-        this.isArchived  = habit.isArchived;
-    }
-
     public Habit(@NonNull String name, @NonNull String description, @NonNull HabitCategory category,
-          @Nullable SessionEntry[] entries, @NonNull String iconResId){
+                 @Nullable SessionEntry[] entries, @NonNull String iconResId) {
 
-        this.name        = name;
+        this.name = name;
         this.description = description;
-        this.category    = category;
-        this.entries     = entries;
-        this.iconResId   = iconResId;
+        this.category = category;
+        this.entries = entries;
+        this.iconResId = iconResId;
     }
 
-    public static Comparator<Habit> CategoryNameComparator = new Comparator<Habit>() {
+    public Habit(Parcel in) {
+        Habit habit = (Habit) in.readSerializable();
+
+        this.name = habit.name;
+        this.description = habit.description;
+        this.category = habit.category;
+        this.entries = habit.entries;
+        this.iconResId = habit.iconResId;
+        this.databaseId = habit.databaseId;
+        this.isArchived = habit.isArchived;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeSerializable(this);
+    }
+
+    public static final Creator<Habit> CREATOR = new Creator<Habit>() {
         @Override
-        public int compare(Habit itemOne, Habit itemTwo) {
-            return itemOne.getCategory().getName().compareTo(itemTwo.getCategory().getName());
+        public Habit createFromParcel(Parcel in) {
+            return new Habit(in);
+        }
+
+        @Override
+        public Habit[] newArray(int size) {
+            return new Habit[size];
         }
     };
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof Habit){
-            Habit compare = (Habit)obj;
+        if (obj instanceof Habit) {
+            Habit compare = (Habit) obj;
 
             SessionEntry[] compareEntries = compare.getEntries();
-            boolean entriesEqual = !((this.entries != null) && (compare.getEntries() != null)) || Arrays.equals(compareEntries, getEntries());
+            boolean entriesEqual =
+                    !((this.entries != null) && (compare.getEntries() != null)) ||
+                            Arrays.equals(compareEntries, getEntries());
 
             return (compare.getIsArchived() == getIsArchived()) &&
                     compare.getName().equals(getName()) &&
@@ -79,58 +97,12 @@ public class Habit implements Serializable, Parcelable{
         }
     }
 
-    public String toString(){
-        int entriesLength = 0;
-        if(getEntries() != null) {
-            entriesLength = getEntries().length;
-        }
-
-        HabitCategory category = getCategory();
-
-        String format = "%s{\n\tDescription: %s\n\tCategory: {\n\t\tName: %s,\n\t\tColor: %s\n\t}\n\tIconResId: %s\n\t" +
-                "Number of entries: %d\n\tIsArchived: %b\n}\n";
-        return String.format(Locale.US, format, getName(), getDescription(), category.getName(),
-                getCategory().getColor(), getIconResId(), entriesLength, getIsArchived());
-    }
-
-    /**
-     * @return A csv form of the habit
-     */
-    public String toCSV(){
-        StringBuilder csv = new StringBuilder();
-
-        String habitFormat = "ARCHIVED,NAME,DESCRIPTION,CATEGORY_NAME,CATEGORY_COLOR,ICON_ID,NUMBER_OF_ENTRIES\n" +
-                "%b,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d\n" +
-                "\n";
-
-        String habit = String.format(Locale.US, habitFormat,
-                getIsArchived(), getName(), getDescription(), getCategory().getName(),
-                getCategory().getColor(), getIconResId(), getEntriesLength());
-
-        csv.append(habit);
-        csv.append("START_TIME,DURATION,COMMENT\n");
-
-        String entryFormat = "%d,%d,\"%s\"\n";
-
-        SessionEntry entries[] = getEntries();
-        if(entries != null) {
-            for (SessionEntry eachEntry : entries) {
-                String appendEntry = String.format(Locale.US, entryFormat,
-                        eachEntry.getStartTime(), eachEntry.getDuration(), eachEntry.getNote());
-
-                csv.append(appendEntry);
-            }
-        }
-
-        return csv.toString();
-    }
-
     /**
      * @param CSV The CSV form of a habit
      * @return a habit object created from the csv
      */
     @Nullable
-    public static Habit fromCSV(String CSV){
+    public static Habit fromCSV(String CSV) {
 
         Habit habit = null;
 
@@ -156,7 +128,7 @@ public class Habit implements Serializable, Parcelable{
 
             SessionEntry entries[] = new SessionEntry[numberOfEntries];
 
-            for(int entryIndex = 0; entryIndex < numberOfEntries; entryIndex++){
+            for (int entryIndex = 0; entryIndex < numberOfEntries; entryIndex++) {
                 String[] entryArray = reader.readNext();
                 long entryStartTime = Long.parseLong(entryArray[0]);
                 long entryDuration = Long.parseLong(entryArray[1]);
@@ -175,15 +147,67 @@ public class Habit implements Serializable, Parcelable{
         return habit;
     }
 
+    public static Comparator<Habit> CategoryNameComparator = new Comparator<Habit>() {
+        @Override
+        public int compare(Habit itemOne, Habit itemTwo) {
+            return itemOne.getCategory().getName().compareTo(itemTwo.getCategory().getName());
+        }
+    };
+
+    public String toString() {
+        int entriesLength = 0;
+        if (getEntries() != null) {
+            entriesLength = getEntries().length;
+        }
+
+        HabitCategory category = getCategory();
+
+        String format = "%s{\n\tDescription: %s\n\tCategory: {\n\t\tName: %s,\n\t\tColor: %s\n\t}\n\tIconResId: %s\n\t" +
+                "Number of entries: %d\n\tIsArchived: %b\n}\n";
+        return String.format(Locale.US, format, getName(), getDescription(), category.getName(),
+                getCategory().getColor(), getIconResId(), entriesLength, getIsArchived());
+    }
+
+    /**
+     * @return A csv form of the habit
+     */
+    public String toCSV() {
+        StringBuilder csv = new StringBuilder();
+
+        String habitFormat = "ARCHIVED,NAME,DESCRIPTION,CATEGORY_NAME,CATEGORY_COLOR,ICON_ID,NUMBER_OF_ENTRIES\n" +
+                "%b,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d\n" +
+                "\n";
+
+        String habit = String.format(Locale.US, habitFormat,
+                getIsArchived(), getName(), getDescription(), getCategory().getName(),
+                getCategory().getColor(), getIconResId(), getEntriesLength());
+
+        csv.append(habit);
+        csv.append("START_TIME,DURATION,COMMENT\n");
+
+        String entryFormat = "%d,%d,\"%s\"\n";
+
+        SessionEntry entries[] = getEntries();
+        if (entries != null) {
+            for (SessionEntry eachEntry : entries) {
+                String appendEntry = String.format(Locale.US, entryFormat,
+                        eachEntry.getStartTime(), eachEntry.getDuration(), eachEntry.getNote());
+
+                csv.append(appendEntry);
+            }
+        }
+
+        return csv.toString();
+    }
+
     /**
      * @return Get the number of entries
      */
-    public long getEntriesLength(){
-        SessionEntry[] entries = getEntries();
-        if(entries != null){
-            return entries.length;
+    public long getEntriesLength() {
+        if (getEntries() != null) {
+            return getEntries().length;
         }
-        else{
+        else {
             return 0;
         }
     }
@@ -202,12 +226,6 @@ public class Habit implements Serializable, Parcelable{
      */
     public void setIconResId(@NonNull String iconResId) {
         this.iconResId = iconResId;
-    }
-
-    public int calculateStreakCount(){
-        // TODO implement streak counter
-
-        return 0;
     }
 
     /**
@@ -248,8 +266,8 @@ public class Habit implements Serializable, Parcelable{
         return category;
     }
 
-    public int getColor(){
-        return getIsArchived()? 0xFFCCCCCC : category.getColorAsInt();
+    public int getColor() {
+        return getIsArchived() ? 0xFFCCCCCC : category.getColorAsInt();
     }
 
     /**
@@ -291,36 +309,14 @@ public class Habit implements Serializable, Parcelable{
     /**
      * @param state 1 if archived, else 0.
      */
-    public void setIsArchived(boolean state){
+    public void setIsArchived(boolean state) {
         this.isArchived = state ? 1 : 0;
     }
 
     /**
      * @return True if archived, else false.
      */
-    public boolean getIsArchived(){
+    public boolean getIsArchived() {
         return (this.isArchived == 1);
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeSerializable(this);
-    }
-
-    public static final Creator<Habit> CREATOR = new Creator<Habit>() {
-        @Override
-        public Habit createFromParcel(Parcel in) {
-            return new Habit(in);
-        }
-
-        @Override
-        public Habit[] newArray(int size) {
-            return new Habit[size];
-        }
-    };
 }

@@ -23,6 +23,7 @@ import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.List;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class EntriesFragment extends Fragment implements UpdateEntriesInterface {
 
     private static final String HABIT_ID = "HABIT_ID";

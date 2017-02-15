@@ -8,8 +8,10 @@ import java.util.List;
 
 /**
  * Created by Brandon on 2/6/2017.
+ * A simple data model to hold a category and all of it's habits.
  */
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class CategoryHabitsContainer extends ExpandableGroup<Habit>  {
 
     HabitCategory category;

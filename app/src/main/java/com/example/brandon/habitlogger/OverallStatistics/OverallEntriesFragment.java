@@ -1,7 +1,5 @@
 package com.example.brandon.habitlogger.OverallStatistics;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -24,18 +22,8 @@ import com.example.brandon.habitlogger.RecyclerVIewAdapters.EntryViewAdapter;
 
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OverallEntriesFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link OverallEntriesFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class OverallEntriesFragment extends Fragment {
-
-    private OverallEntriesFragment.OnFragmentInteractionListener listener;
-
     HabitDatabase habitDatabase;
     RecyclerView entriesContainer;
     List<SessionEntry> sessionEntries;
@@ -47,13 +35,6 @@ public class OverallEntriesFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment EntriesFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static OverallEntriesFragment newInstance() {
         return new OverallEntriesFragment();
     }
@@ -136,13 +117,6 @@ public class OverallEntriesFragment extends Fragment {
         return v;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (listener != null) {
-            listener.onFragmentInteraction(uri);
-        }
-    }
-
     private int getSessionEntryIndex(long entryId){
         int index = 0;
 
@@ -175,37 +149,5 @@ public class OverallEntriesFragment extends Fragment {
         int index = getSessionEntryIndex(databaseId);
         sessionEntries.set(index, entry);
         entryAdapter.notifyItemChanged(index);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            listener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 }

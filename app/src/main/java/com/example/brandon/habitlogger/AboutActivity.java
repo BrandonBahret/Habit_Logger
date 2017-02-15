@@ -19,7 +19,7 @@ public class AboutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_about);
 
         ActionBar toolbar = getSupportActionBar();
-        if(toolbar != null){
+        if (toolbar != null) {
             toolbar.setDisplayHomeAsUpEnabled(true);
         }
 
@@ -32,27 +32,30 @@ public class AboutActivity extends AppCompatActivity {
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             return "v" + pInfo.versionName;
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return "Version Number Not Found";
         }
     }
 
     public void linkButtonClicked(View view) {
-        String tag = (String)view.getTag();
+        String tag = (String) view.getTag();
 
-        switch (tag){
-            case "Github":{
+        switch (tag) {
+            case "Github": {
                 openLink("https://github.com/BrandonBahret");
-            }break;
+            }
+            break;
 
-            case "LinkedIn":{
+            case "LinkedIn": {
                 openLink("https://www.linkedin.com/in/brandon-bahret-436012125");
-            }break;
+            }
+            break;
 
-            case "Freelancer":{
+            case "Freelancer": {
                 openLink("https://www.freelancer.com/u/brandonbahretfre.html");
-            }break;
+            }
+            break;
         }
     }
 
@@ -71,7 +74,7 @@ public class AboutActivity extends AppCompatActivity {
             shareIntent.putExtra(Intent.EXTRA_TEXT, message);
 
             startActivity(Intent.createChooser(shareIntent, "Share with..."));
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -86,14 +89,16 @@ public class AboutActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        switch(id){
-            case(R.id.share):{
+        switch (id) {
+            case (R.id.share): {
                 share();
-            }break;
+            }
+            break;
 
-            case(android.R.id.home):{
+            case (android.R.id.home): {
                 finish();
-            }break;
+            }
+            break;
         }
 
         return super.onOptionsItemSelected(item);

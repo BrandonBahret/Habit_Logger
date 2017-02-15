@@ -1,9 +1,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/statistics_fragment_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.example.brandon.habitlogger.HabitActivity.StatisticsFragment">
 
 
@@ -14,7 +14,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <Space
                 android:layout_width="match_parent"
@@ -22,25 +22,25 @@
 
 
             <fragment
+                android:id="@+id/time_averages"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.TimeAverages"
-                android:id="@+id/time_averages"
                 tools:layout="@layout/fragment_time_averages" />
 
 
             <fragment
+                android:id="@+id/fragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.StreaksFragment"
-                android:id="@+id/fragment"
                 tools:layout="@layout/fragment_streaks" />
 
             <fragment
+                android:id="@+id/pie_graph_completion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.PieGraphCompletion"
-                android:id="@+id/pie_graph_completion"
                 tools:layout="@layout/fragment_pie_graph_completion" />
 
             <Space

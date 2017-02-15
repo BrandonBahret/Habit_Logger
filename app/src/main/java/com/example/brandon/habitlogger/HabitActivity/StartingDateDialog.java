@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.HabitActivity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.widget.DatePicker;
 
@@ -11,12 +12,13 @@ import java.util.Calendar;
 
 /**
  * Created by Brandon on 1/16/2017.
+ * Dialog to set dates
  */
 
 public class StartingDateDialog extends DialogFragment implements
         DatePickerDialog.OnDateSetListener {
 
-    private ArrayList<OnFinishedListener> onFinishedListeners = new ArrayList<OnFinishedListener>();
+    private ArrayList<OnFinishedListener> onFinishedListeners = new ArrayList<>();
 
     public void setOnFinishedListener(OnFinishedListener listener){
         onFinishedListeners.add(listener);
@@ -28,6 +30,7 @@ public class StartingDateDialog extends DialogFragment implements
 
     int year, month, day, hour, minute, second;
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current date as the default date in the picker

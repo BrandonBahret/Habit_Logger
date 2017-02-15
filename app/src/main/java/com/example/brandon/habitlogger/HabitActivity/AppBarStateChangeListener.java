@@ -4,6 +4,7 @@ import android.support.design.widget.AppBarLayout;
 
 /**
  * Created by Brandon on 1/30/2017.
+ * Class to detect when an appbar has either expanded, collapsed, or has gone idle.
  */
 
 public abstract class AppBarStateChangeListener implements AppBarLayout.OnOffsetChangedListener {
@@ -23,12 +24,14 @@ public abstract class AppBarStateChangeListener implements AppBarLayout.OnOffset
                 onStateChanged(appBarLayout, State.EXPANDED);
             }
             mCurrentState = State.EXPANDED;
-        } else if (Math.abs(i) >= appBarLayout.getTotalScrollRange()) {
+        }
+        else if (Math.abs(i) >= appBarLayout.getTotalScrollRange()) {
             if (mCurrentState != State.COLLAPSED) {
                 onStateChanged(appBarLayout, State.COLLAPSED);
             }
             mCurrentState = State.COLLAPSED;
-        } else {
+        }
+        else {
             if (mCurrentState != State.IDLE) {
                 onStateChanged(appBarLayout, State.IDLE);
             }

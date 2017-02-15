@@ -21,14 +21,14 @@ import java.util.Locale;
 
 public class StreaksFragment extends Fragment implements UpdateEntriesInterface {
 
-    private TextView title, value;
+    private TextView value;
     CallbackInterface callbackInterface;
 
     public StreaksFragment() {
         // Required empty public constructor
     }
 
-    public static StreaksFragment newInstance(String param1, String param2) {
+    public static StreaksFragment newInstance() {
         return new StreaksFragment();
     }
 
@@ -37,8 +37,6 @@ public class StreaksFragment extends Fragment implements UpdateEntriesInterface 
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_streaks, container, false);
-
-        title = (TextView) view.findViewById(R.id.title);
         value = (TextView) view.findViewById(R.id.value);
 
         return view;
@@ -61,71 +59,7 @@ public class StreaksFragment extends Fragment implements UpdateEntriesInterface 
 
     @Override
     public void updateEntries(List<SessionEntry> sessionEntries, long dateFrom, long dateTo) {
-        value.setText(Streak.listToString(getWeekStreaks(sessionEntries)));
-    }
-
-    public static List<StreaksFragment.Streak> getWeekStreaks(List<SessionEntry> sessionEntries) {
-        List<Streak> streaks = new ArrayList<>();
-
-        if(!sessionEntries.isEmpty()) {
-            Collections.sort(sessionEntries, SessionEntry.StartingTimeComparator);
-
-            int size = sessionEntries.size();
-            long targetDate = sessionEntries.get(0).getStartingTimeDate();
-
-            long interval = DateUtils.WEEK_IN_MILLIS;
-            long endOfWeek = targetDate + interval - DateUtils.DAY_IN_MILLIS;
-
-            Streak currentStreak = new Streak(targetDate, endOfWeek, 0);
-
-            for (SessionEntry entry : sessionEntries) {
-                long currentDate = entry.getStartingTimeDate();
-                boolean endOfList = sessionEntries.indexOf(entry) == (size - 1);
-
-                if (currentDate == targetDate) {
-                    currentStreak.streakLength++;
-
-                    if(currentDate >= endOfWeek) {
-                        streaks.add(currentStreak);
-                        endOfWeek = currentDate + interval;
-                        currentStreak = new Streak(currentDate + DateUtils.DAY_IN_MILLIS, endOfWeek, 0);
-                        targetDate = currentDate + DateUtils.DAY_IN_MILLIS;
-                    }
-                    else if (endOfList) {
-                        streaks.add(currentStreak);
-                        break;
-                    }else{
-                        targetDate += DateUtils.DAY_IN_MILLIS;
-                    }
-
-                } else if (currentDate > targetDate) {
-
-                    currentStreak.streakLength++;
-
-                    if(currentDate >= endOfWeek) {
-                        streaks.add(currentStreak);
-                        endOfWeek  = currentDate + interval;
-                        currentStreak = new Streak(currentDate + DateUtils.DAY_IN_MILLIS, endOfWeek, 0);
-                        targetDate = currentDate + DateUtils.DAY_IN_MILLIS;
-                    }
-
-                    else if (endOfList) {
-                        streaks.add(currentStreak);
-                        break;
-                    }
-                    else{
-                        targetDate = currentDate + DateUtils.DAY_IN_MILLIS;
-                    }
-                }
-
-                else if (endOfList) {
-                    streaks.add(currentStreak);
-                    break;
-                }
-            }
-        }
-
-        return streaks;
+        value.setText(Streak.listToString(getStreaks(sessionEntries)));
     }
 
     public static List<Streak> getStreaks(List<SessionEntry> sessionEntries) {

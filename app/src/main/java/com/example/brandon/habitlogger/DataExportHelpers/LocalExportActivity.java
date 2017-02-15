@@ -8,6 +8,7 @@ import com.example.brandon.habitlogger.HabitDatabase.Habit;
 
 /**
  * Created by Brandon on 1/23/2017.
+ * Empty activity to process broadcast receiver commands to export data via intent picker.
  */
 
 public class LocalExportActivity extends AppCompatActivity {

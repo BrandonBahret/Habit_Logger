@@ -9,18 +9,20 @@
     tools:context="com.example.brandon.habitlogger.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <include layout="@layout/current_sessions_card" android:id="@+id/current_sessions_card" />
+    <include
+        android:id="@+id/current_sessions_card"
+        layout="@layout/current_sessions_card" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/habit_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
+        android:layout_below="@+id/current_sessions_card"
         android:clipToPadding="false"
+        android:paddingLeft="8dp"
 
-        android:scrollbars="none"
-        android:layout_below="@+id/current_sessions_card"/>
+        android:paddingRight="8dp"
+        android:scrollbars="none" />
 
 
 </RelativeLayout>

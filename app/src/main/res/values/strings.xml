@@ -35,7 +35,7 @@
     <string name="no">no</string>
     <string name="active_sessions">active sessions</string>
     <string name="one">1</string>
-    <string name="links">Links</string>
+    <string name="links">Author\'s Links</string>
     <string name="app_icon_about_content_description">Image of the app icon.</string>
     <string name="github_link_content_description">Link to the author\'s GitHub.</string>
     <string name="linkedin_link_content_description">Link to the author\'s LinkedIn.</string>

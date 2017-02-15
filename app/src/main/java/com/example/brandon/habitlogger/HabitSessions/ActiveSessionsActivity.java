@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -23,13 +24,13 @@ import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.ActiveSessionViewAdapter;
-import com.example.brandon.habitlogger.RecyclerVIewAdapters.ActiveSessionViewAdapterWithSections;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class ActiveSessionsActivity extends AppCompatActivity {
 
     List<SessionEntry> sessionEntriesUndoStack = new ArrayList<>();
@@ -37,7 +38,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
     SessionManager sessionManager;
     HabitDatabase habitDatabase;
 
-    ActiveSessionViewAdapterWithSections sessionViewAdapter;
+    ActiveSessionViewAdapter sessionViewAdapter;
     RecyclerView sessionViewContainer;
 
     Snackbar snackbar;
@@ -51,7 +52,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_active_sessions);
 
         ActionBar toolbar = getSupportActionBar();
-        if(toolbar != null)
+        if (toolbar != null)
             toolbar.setDisplayHomeAsUpEnabled(true);
 
         sessionManager = new SessionManager(this);
@@ -59,7 +60,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
             @Override
             public void sessionPauseStateChanged(long habitId, boolean isPaused) {
                 for (SessionEntry entry : sessionEntries) {
-                    if(entry.getHabitId() == habitId){
+                    if (entry.getHabitId() == habitId) {
                         int position = sessionEntries.indexOf(entry);
                         sessionViewAdapter.notifyItemChanged(position);
                         break;
@@ -73,23 +74,24 @@ public class ActiveSessionsActivity extends AppCompatActivity {
             }
         });
 
-        habitDatabase  = new HabitDatabase(this);
+        habitDatabase = new HabitDatabase(this);
         sessionEntries = sessionManager.getActiveSessionList();
 
         sessionViewContainer = (RecyclerView) findViewById(R.id.session_view_container);
-        sessionViewAdapter = new ActiveSessionViewAdapterWithSections(sessionEntries, this, new ActiveSessionViewAdapterWithSections.OnClickListeners() {
-            @Override
-            public void onRootClick(long habitId) {
-                startSession(habitId);
-            }
+        sessionViewAdapter = new ActiveSessionViewAdapter(sessionEntries, this,
+                new ActiveSessionViewAdapter.OnClickListeners() {
+                    @Override
+                    public void onRootClick(long habitId) {
+                        startSession(habitId);
+                    }
 
-            @Override
-            public void onPauseClick(ActiveSessionViewAdapterWithSections.ViewHolder holder, long habitId) {
-                boolean isPaused = sessionManager.getIsPaused(habitId);
-                sessionManager.setPauseState(habitId, !isPaused);
-                sessionViewAdapter.notifyItemChanged(holder.getAdapterPosition());
-            }
-        });
+                    @Override
+                    public void onPauseClick(ActiveSessionViewAdapter.ViewHolder holder, long habitId) {
+                        boolean isPaused = sessionManager.getIsPaused(habitId);
+                        sessionManager.setPauseState(habitId, !isPaused);
+                        sessionViewAdapter.notifyItemChanged(holder.getAdapterPosition());
+                    }
+                });
 
         ItemTouchHelper touchHelper = new ItemTouchHelper(createItemTouchCallback());
         touchHelper.attachToRecyclerView(sessionViewContainer);
@@ -105,15 +107,15 @@ public class ActiveSessionsActivity extends AppCompatActivity {
             public void run() {
                 int size = sessionEntries.size();
 
-                for(int i = 0; i < size; i++){
+                for (int i = 0; i < size; i++) {
                     long habitId = sessionEntries.get(i).getHabitId();
-                    if(sessionManager.isSessionActive(habitId)) {
+                    if (sessionManager.isSessionActive(habitId)) {
                         SessionEntry entry = sessionManager.getSession(habitId);
                         sessionEntries.set(i, entry);
 
                         View item = sessionViewContainer.getChildAt(i);
 
-                        if(item != null) {
+                        if (item != null) {
                             TextView timeTextView = (TextView) item.findViewById(R.id.active_habit_time);
 
                             String timeText =
@@ -122,7 +124,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
                             timeTextView.setText(timeText);
                         }
                     }
-                    else{
+                    else {
                         sessionEntries.remove(i);
                         sessionViewAdapter.notifyItemRemoved(i);
                         size--;
@@ -130,8 +132,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
                 }
 
 
-
-                if(sessionManager.getSessionCount() == 0 && !isSnackBarShown())
+                if (sessionManager.getSessionCount() == 0 && !isSnackBarShown())
                     finish();
 
                 handler.postDelayed(updateCards, 1000);
@@ -140,9 +141,9 @@ public class ActiveSessionsActivity extends AppCompatActivity {
         handler.post(updateCards);
     }
 
-    private boolean isSnackBarShown(){
+    private boolean isSnackBarShown() {
         boolean snackBarVisible = false;
-        if(snackbar != null){
+        if (snackbar != null) {
             snackBarVisible = snackbar.isShownOrQueued();
         }
 
@@ -166,9 +167,9 @@ public class ActiveSessionsActivity extends AppCompatActivity {
                 sessionEntries.remove(position);
                 sessionViewAdapter.notifyItemRemoved(position);
 
-                if(!isSnackBarShown()) {
+                if (!isSnackBarShown()) {
                     snackbar = Snackbar.make(findViewById(R.id.activity_active_sessions), "Session canceled", Snackbar.LENGTH_LONG)
-                            .setCallback(new Snackbar.Callback() {
+                            .addCallback(new Snackbar.Callback() {
                                 @Override
                                 public void onDismissed(Snackbar snackbar, int event) {
                                     super.onDismissed(snackbar, event);
@@ -194,20 +195,22 @@ public class ActiveSessionsActivity extends AppCompatActivity {
                                     sessionViewAdapter.notifyDataSetChanged();
                                 }
                             })
-                            .setActionTextColor(getResources().getColor(R.color.colorAccent));
+                            .setActionTextColor(ContextCompat.getColor(ActiveSessionsActivity.this, R.color.colorAccent));
 
                     snackbar.show();
-                }else{
+                }
+                else {
                     snackbar.show();
                 }
             }
         };
     }
 
-    private void sortEntries(){
+    private void sortEntries() {
         Collections.sort(this.sessionEntries, SessionEntry.Alphabetical);
         Collections.sort(this.sessionEntries, SessionEntry.CategoryComparator);
     }
+
     private void sortEntries(List<SessionEntry> sessionEntries) {
         Collections.sort(sessionEntries, SessionEntry.Alphabetical);
         Collections.sort(sessionEntries, SessionEntry.CategoryComparator);
@@ -229,7 +232,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.active_sessions_menu, menu);
 
-        SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setOnQueryTextListener(
                 new SearchView.OnQueryTextListener() {
                     @Override
@@ -266,7 +269,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_CANCELED){
+        if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_CANCELED) {
             if (requestCode == SessionActivity.RESULT_SESSION_FINISH) {
                 handler = new Handler();
                 handler.post(updateCards);
@@ -280,7 +283,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
     public void processUserQuery(String query) {
         List<SessionEntry> entries = sessionManager.queryActiveSessionList(query);
 
-        if(entries == null){
+        if (entries == null) {
             entries = sessionManager.getActiveSessionList();
         }
 
@@ -291,7 +294,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
         sessionViewAdapter.notifyDataSetChanged();
     }
 
-    public TextView getCategoricalSectioningView(String categoryName){
+    public TextView getCategoricalSectioningView(String categoryName) {
 
         TextView categorySection = new TextView(ActiveSessionsActivity.this);
         categorySection.setBackgroundResource(R.drawable.underline_background);
@@ -302,12 +305,12 @@ public class ActiveSessionsActivity extends AppCompatActivity {
         return categorySection;
     }
 
-    public void startSession(long habitId){
+    public void startSession(long habitId) {
         Habit habit = habitDatabase.getHabit(habitId);
 
         handler.removeCallbacks(updateCards);
         Intent startSession = new Intent(this, SessionActivity.class);
-        startSession.putExtra("habit", (Serializable)habit);
+        startSession.putExtra("habit", (Serializable) habit);
         startActivityForResult(startSession, SessionActivity.RESULT_SESSION_FINISH);
     }
 }

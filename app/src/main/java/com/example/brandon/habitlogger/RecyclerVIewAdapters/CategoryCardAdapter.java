@@ -14,6 +14,7 @@ import java.util.List;
 
 /**
  * Created by Brandon on 2/6/2017.
+ * RecyclerView adapter for category cards.
  */
 
 public class CategoryCardAdapter extends ExpandableRecyclerViewAdapter<CategoryViewHolder, HabitViewHolder> {

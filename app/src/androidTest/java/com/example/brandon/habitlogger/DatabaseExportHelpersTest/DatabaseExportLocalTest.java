@@ -15,7 +15,7 @@ import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 
-public class DatabaseExportLocalTest extends AndroidTestCase{
+public class DatabaseExportLocalTest extends AndroidTestCase {
 
     private HabitDatabase db;
     private LocalDataExportManager dataExportManager;
@@ -33,11 +33,11 @@ public class DatabaseExportLocalTest extends AndroidTestCase{
 
         SessionEntry entries[] = new SessionEntry[10];
 
-        for(int i = 0; i < entries.length; i++){
+        for (int i = 0; i < entries.length; i++) {
             entries[i] = new SessionEntry(0, 0, "note");
         }
 
-        for(int i = 0; i < 10; i++){
+        for (int i = 0; i < 10; i++) {
             db.addHabitAndCategory(new Habit("name " + i, "description", mainCategory, entries, "none"));
         }
     }
@@ -48,7 +48,7 @@ public class DatabaseExportLocalTest extends AndroidTestCase{
     }
 
 
-    public void testBackupDatabase(){
+    public void testBackupDatabase() {
         int numberOfCategories = db.getNumberOfCategories();
         dataExportManager.exportDatabase(true);
 
@@ -68,7 +68,7 @@ public class DatabaseExportLocalTest extends AndroidTestCase{
         assertEquals(numberOfCategories, db.getNumberOfCategories());
     }
 
-    public void testRestoreDatabase(){
+    public void testRestoreDatabase() {
         // Public storage
         dataExportManager.exportDatabase(true);
 
@@ -88,7 +88,7 @@ public class DatabaseExportLocalTest extends AndroidTestCase{
         assertNotSame(0, db.getNumberOfCategories());
     }
 
-    public void testBackupRestoreHabit(){
+    public void testBackupRestoreHabit() {
         Habit expectedHabit = db.getHabit(
                 db.getHabitIdFromIndex(
                         db.getCategoryIdFromIndex(0), 0
@@ -121,7 +121,7 @@ public class DatabaseExportLocalTest extends AndroidTestCase{
         assertEquals(expectedHabit.toString(), actualHabit.toString());
     }
 
-    public void testDeleteHabit(){
+    public void testDeleteHabit() {
         Habit habit = db.getHabit(
                 db.getHabitIdFromIndex(
                         db.getCategoryIdFromIndex(0), 0

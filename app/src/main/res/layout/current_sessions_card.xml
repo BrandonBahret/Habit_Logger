@@ -13,51 +13,51 @@
         android:background="@color/cardBackgroundColor">
 
         <ImageView
+            android:id="@+id/card_accent"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:background="@color/colorAccent"
+            android:contentDescription="@string/card_view_accent_description"
             android:elevation="4dp"
             android:padding="5dp"
             android:src="@drawable/ic_timer_black_24px"
-            android:tint="@android:color/white"
-            android:background="@color/colorAccent"
-            android:layout_alignParentTop="true"
-            android:id="@+id/card_accent"
-            android:contentDescription="@string/card_view_accent_description" />
+            android:tint="@android:color/white" />
 
         <TextView
-            android:text="@string/current_sessions"
+            android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/card_accent"
             android:layout_toEndOf="@+id/card_accent"
-            android:id="@+id/title"
-            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+            android:layout_toRightOf="@+id/card_accent"
             android:paddingEnd="5dp"
             android:paddingRight="5dp"
             android:paddingStart="5dp"
-            android:paddingTop="5dp" />
+            android:paddingTop="5dp"
+            android:text="@string/current_sessions"
+            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large" />
 
         <TextView
-            android:text="@string/value_placeholder"
+            android:id="@+id/active_session_value_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/title"
+            android:layout_toEndOf="@+id/card_accent"
+            android:layout_toRightOf="@+id/card_accent"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:paddingStart="5dp"
-            android:id="@+id/active_session_value_text"
-            android:layout_below="@+id/title"
-            android:layout_toRightOf="@+id/card_accent"
-            android:layout_toEndOf="@+id/card_accent" />
+            android:text="@string/value_placeholder" />
 
         <TextView
-            android:text="@string/active_session_placeholder"
+            android:id="@+id/active_session_description_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/active_session_description_text"
             android:layout_alignBaseline="@+id/active_session_value_text"
             android:layout_alignBottom="@+id/active_session_value_text"
+            android:layout_toEndOf="@+id/active_session_value_text"
             android:layout_toRightOf="@+id/active_session_value_text"
-            android:layout_toEndOf="@+id/active_session_value_text" />
+            android:text="@string/active_session_placeholder" />
     </RelativeLayout>
 </android.support.v7.widget.CardView>

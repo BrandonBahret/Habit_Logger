@@ -41,7 +41,6 @@ import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeLis
 
 public class HabitActivity extends AppCompatActivity implements CallbackInterface {
 
-    private SectionsPagerAdapter sectionsPagerAdapter;
     private ViewPager viewPager;
 
     HabitDatabase habitDatabase;
@@ -106,9 +105,9 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
             }
         });
 
-        sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        if(preferenceChecker.getTheme() == PreferenceChecker.DARK_THEME)
+        if(preferenceChecker.isNightMode())
             toolbar.setPopupTheme(R.style.PopupMenu);
 
         appBar.addOnOffsetChangedListener(new AppBarStateChangeListener() {

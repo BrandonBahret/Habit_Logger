@@ -16,8 +16,10 @@ import java.util.List;
 
 /**
  * Created by Brandon on 2/12/2017.
+ * Adapter class for category spinner.
  */
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class CategorySpinnerAdapter extends BaseAdapter implements SpinnerAdapter {
 
     private Context mContext;

@@ -6,6 +6,7 @@ import java.util.List;
 
 /**
  * Created by Brandon on 2/9/2017.
+ * Interface to update entries on fragments
  */
 
 public interface UpdateEntriesInterface {

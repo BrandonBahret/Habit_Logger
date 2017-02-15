@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
-
     android:id="@+id/card_view"
-    card_view:cardCornerRadius="4dp"
-    card_view:cardBackgroundColor="@color/habitCard"
-    android:foreground="?android:attr/selectableItemBackground"
-    android:clickable="true"
 
-    card_view:layout_collapseParallaxMultiplier="1.0"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    card_view:cardBackgroundColor="@color/habitCard"
+
+    card_view:cardCornerRadius="4dp"
     card_view:cardElevation="4dp"
-    android:layout_height="wrap_content">
+    card_view:layout_collapseParallaxMultiplier="1.0">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -21,12 +20,12 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:contentDescription="@string/card_view_accent_description"
+            android:id="@+id/category_accent"
             android:layout_width="@dimen/accent_strip_width"
             android:layout_height="match_parent"
-            android:elevation="4dp"
             android:background="@color/colorAccent"
-            android:id="@+id/category_accent" />
+            android:contentDescription="@string/card_view_accent_description"
+            android:elevation="4dp" />
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -36,37 +35,35 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-
-                android:gravity="center"
-                android:layout_below="@+id/card_toolbar"
                 android:layout_alignParentLeft="true"
+
                 android:layout_alignParentStart="true"
+                android:layout_below="@+id/card_toolbar"
                 android:layout_marginBottom="5dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginStart="5dp">
+                android:layout_marginStart="5dp"
+                android:gravity="center"
+                android:orientation="horizontal">
 
                 <ImageButton
                     android:id="@+id/session_control_button"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
 
-                    android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:tint="@color/habitCardButtonColor"
-                    android:scaleType="centerCrop"
                     android:contentDescription="@string/session_control_button_content_description"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:scaleType="fitXY"
 
                     android:src="@drawable/ic_play_circle_outline_black_24dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginLeft="5dp" />
+                    android:tint="@color/habitCardButtonColor" />
 
                 <TextView
-                    android:text="@string/time_display_placeholder"
-                    android:textSize="16sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:id="@+id/habit_card_time_display"
-                    android:layout_weight="1"/>
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:layout_weight="1"
+                    android:text="@string/time_display_placeholder"
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -77,12 +74,10 @@
 
                 android:background="@color/habitCard"
 
-                card_view:contentInsetLeft="8dp"
-                card_view:contentInsetStart="8dp"
-
-                card_view:contentInsetRight="0dp"
                 card_view:contentInsetEnd="0dp"
-
+                card_view:contentInsetLeft="8dp"
+                card_view:contentInsetRight="0dp"
+                card_view:contentInsetStart="8dp"
 
                 card_view:title="@string/habit_name"
                 card_view:titleTextAppearance="@style/card_title" />

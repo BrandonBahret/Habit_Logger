@@ -5,9 +5,9 @@
     tools:context="com.example.brandon.habitlogger.OverallStatistics.OverallEntriesFragment">
 
     <!-- TODO: Update blank fragment layout -->
-
     <android.support.v7.widget.RecyclerView
+        android:id="@+id/entries_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/entries_container" />
+        android:layout_height="match_parent" />
+
 </FrameLayout>

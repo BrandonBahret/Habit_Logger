@@ -20,14 +20,14 @@ import java.util.List;
 
 public class PieGraphCompletion extends Fragment implements UpdateEntriesInterface {
 
-    private TextView title, value;
+    private TextView value;
     CallbackInterface callbackInterface;
 
     public PieGraphCompletion() {
         // Required empty public constructor
     }
 
-    public static PieGraphCompletion newInstance(List<SessionEntry> sessionEntries) {
+    public static PieGraphCompletion newInstance() {
         return new PieGraphCompletion();
     }
 
@@ -36,8 +36,6 @@ public class PieGraphCompletion extends Fragment implements UpdateEntriesInterfa
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_pie_graph_completion, container, false);
-
-        title = (TextView) view.findViewById(R.id.title);
         value = (TextView) view.findViewById(R.id.value);
 
         return view;

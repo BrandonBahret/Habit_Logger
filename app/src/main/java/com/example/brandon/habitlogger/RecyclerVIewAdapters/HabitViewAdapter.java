@@ -13,8 +13,10 @@ import java.util.List;
 
 /**
  * Created by Brandon on 12/26/2016.
+ * RecyclerView adapter for displaying habit cards.
  */
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
 
     List<Habit> habitsList;
@@ -74,10 +76,7 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
         for(SessionEntry entry : entries){
             long habitId = entry.getHabitId();
 
-            HabitViewHolder vh = null;
-
-            if(vh != null)
-                vh.setEntry(entry);
+            // Todo get viewholder from position and .setEntry(entry);
         }
     }
 

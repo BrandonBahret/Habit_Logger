@@ -8,8 +8,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 /**
  * Created by Brandon on 12/4/2016.
+ * Database helper/schema for active sessions.
  */
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 class DatabaseHelper extends SQLiteOpenHelper {
 
     protected static final String DATABASE_NAME = "habit_session_database";

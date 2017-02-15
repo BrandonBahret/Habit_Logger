@@ -6,6 +6,7 @@ import java.util.List;
 
 /**
  * Created by Brandon on 2/9/2017.
+ * Interface to communicate with fragments in the habit activity
  */
 
 public interface CallbackInterface {

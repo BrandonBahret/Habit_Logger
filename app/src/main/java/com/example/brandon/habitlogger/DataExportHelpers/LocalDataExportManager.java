@@ -21,6 +21,7 @@ import java.util.Locale;
  * This class is used to manage local data back-ups
  */
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class LocalDataExportManager {
 
     static public String backupPathPublic = Environment.getExternalStorageDirectory() + File.separator + "Habit_Logger_Export_Data";
