@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         preferenceChecker = new PreferenceChecker(this);
         AppCompatDelegate.setDefaultNightMode(
-                preferenceChecker.isNightMode()? AppCompatDelegate.MODE_NIGHT_YES :
+                preferenceChecker.isNightMode() ? AppCompatDelegate.MODE_NIGHT_YES :
                         AppCompatDelegate.MODE_NIGHT_NO
         );
 

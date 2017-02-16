@@ -22,19 +22,19 @@ import java.util.List;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class CategorySpinnerAdapter extends BaseAdapter implements SpinnerAdapter {
 
-    private Context mContext;
     private List<HabitCategory> mCategories;
+    private LayoutInflater mInflater;
 
     public CategorySpinnerAdapter(Context context, List<HabitCategory> categories) {
         mCategories = categories;
-        mContext = context;
+        mInflater = LayoutInflater.from(context);
     }
 
-    public class ViewHolder{
+    public class ViewHolder {
         public TextView title;
         public ImageView color;
 
-        public ViewHolder(View view){
+        public ViewHolder(View view) {
             title = (TextView) view.findViewById(R.id.title);
             color = (ImageView) view.findViewById(R.id.color);
         }
@@ -52,13 +52,15 @@ public class CategorySpinnerAdapter extends BaseAdapter implements SpinnerAdapte
         return mCategories.get(i).getDatabaseId();
     }
 
+    public int getItemPosition(HabitCategory category){
+        return mCategories.indexOf(category);
+    }
+
     public View getCustomView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater= LayoutInflater.from(mContext);
-        View row = inflater.inflate(R.layout.spinner_category_layout, parent, false);
-
-        ViewHolder viewHolder = new ViewHolder(row);
-
         HabitCategory category = mCategories.get(position);
+
+        View row = mInflater.inflate(R.layout.spinner_category_layout, parent, false);
+        ViewHolder viewHolder = new ViewHolder(row);
         viewHolder.title.setText(category.getName());
         viewHolder.color.setColorFilter(category.getColorAsInt());
 
@@ -74,5 +76,4 @@ public class CategorySpinnerAdapter extends BaseAdapter implements SpinnerAdapte
     public View getView(int position, View convertView, ViewGroup parent) {
         return getCustomView(position, convertView, parent);
     }
-
 }
