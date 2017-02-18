@@ -8,32 +8,21 @@ import android.database.sqlite.SQLiteStatement;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.CategoryHabitsContainer;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.CategoriesTableSchema;
+import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.DatabaseSchema;
+import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.EntriesTableSchema;
+import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.HabitsTableSchema;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.CATEGORIES_TABLE_NAME;
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.CATEGORY_COLOR;
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.CATEGORY_ID;
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.CATEGORY_NAME;
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.ENTRIES_TABLE_NAME;
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.ENTRY_DURATION;
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.ENTRY_HABIT_ID;
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.ENTRY_ID;
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.ENTRY_NOTE;
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.ENTRY_START_TIME;
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.HABITS_TABLE_NAME;
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.HABIT_CATEGORY;
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.HABIT_DESCRIPTION;
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.HABIT_ICON_RES_ID;
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.HABIT_ID;
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.HABIT_IS_ARCHIVED;
-import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.HABIT_NAME;
 
 /**
  * Created by Brandon on 10/26/2016.
@@ -42,106 +31,15 @@ import static com.example.brandon.habitlogger.HabitDatabase.DatabaseHelper.HABIT
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class HabitDatabase {
-
-    private DatabaseHelper databaseHelper;
+    public DatabaseSchema databaseHelper;
     private SQLiteDatabase writableDatabase;
     private SQLiteDatabase readableDatabase;
 
-    private SQLiteStatement insertHabitStatement;
-    private SQLiteStatement insertEntryStatement;
-    private SQLiteStatement insertCategoryStatement;
-
-    private OnDatabaseChange changeListener;
-
     public HabitDatabase(Context context) {
-        databaseHelper = new DatabaseHelper(context);
+        databaseHelper = new DatabaseSchema(context);
 
         writableDatabase = databaseHelper.getWritableDatabase();
         readableDatabase = databaseHelper.getReadableDatabase();
-
-        insertHabitStatement = getHabitInsertStatement();
-        insertEntryStatement = getEntryInsertStatement();
-        insertCategoryStatement = getCategoryInsertStatement();
-    }
-
-    public void setOnDatabaseChangeListener(OnDatabaseChange listener) {
-        changeListener = listener;
-    }
-
-    public interface OnDatabaseChange {
-        void onDatabaseChanged();
-
-        void onDatabaseClear();
-    }
-
-    /**
-     * Run the call back method set on the database.
-     */
-    public void notifyChange() {
-        if (changeListener != null) {
-            changeListener.onDatabaseChanged();
-        }
-    }
-
-    /**
-     * Run the call back method set on the database.
-     */
-    public void notifyDatabaseClear() {
-        if (changeListener != null) {
-            changeListener.onDatabaseClear();
-        }
-    }
-
-    /**
-     * Delete everything from the database.
-     */
-    public void resetDatabase() {
-        databaseHelper.resetDatabase(writableDatabase);
-        notifyDatabaseClear();
-    }
-
-    /**
-     * @return The name of the database stored in memory.
-     */
-    public String getDatabaseName() {
-        return DatabaseHelper.DATABASE_NAME;
-    }
-
-    /**
-     * @return A byte array representation of the database.
-     */
-    public byte[] getBytes() {
-        try {
-            FileChannel src = databaseHelper.getInputChannel();
-
-            ByteBuffer buffer = ByteBuffer.allocate((int) src.size());
-            src.read(buffer);
-            return buffer.array();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * @param bytes A byte array representation of the database.
-     * @return True if success, false if failure.
-     */
-    public boolean setBytes(ByteBuffer bytes) {
-        try {
-            FileChannel dst = databaseHelper.getOutputChannel();
-
-            dst.write(bytes);
-            dst.close();
-
-            notifyChange();
-            return true;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
     }
 
     /**
@@ -233,20 +131,15 @@ public class HabitDatabase {
     // ---- categories methods ----
 
     private SQLiteStatement getCategoryInsertStatement() {
-        String sql = "INSERT INTO " + CATEGORIES_TABLE_NAME +
-                " (" + CATEGORY_NAME +
-                ", " + CATEGORY_COLOR +
-                ") VALUES(?, ?)";
-
-        return writableDatabase.compileStatement(sql);
+        return writableDatabase.compileStatement(CategoriesTableSchema.getInsertStatement());
     }
 
     /**
      * @return The total number of categories stored in the database.
      */
     public int getNumberOfCategories() {
-        return getNumberOfRows(CATEGORIES_TABLE_NAME,
-                new String[]{CATEGORY_ID}, null, null);
+        return getNumberOfRows(CategoriesTableSchema.TABLE_NAME,
+                new String[]{CategoriesTableSchema.CATEGORY_ID}, null, null);
     }
 
     private void addCategories(HabitCategory categories[], boolean whenExists) {
@@ -280,12 +173,15 @@ public class HabitDatabase {
      * @return The row id for the new row, -1 if error.
      */
     public long addCategory(HabitCategory category) {
-        insertCategoryStatement.bindString(1, category.getName());
-        insertCategoryStatement.bindString(2, category.getColor());
+        SQLiteStatement insert = getCategoryInsertStatement();
 
-        long id = insertCategoryStatement.executeInsert();
+        insert.bindString(1, category.getName());
+        insert.bindString(2, category.getColor());
+
+        long id = insert.executeInsert();
         category.setDatabaseId(id);
 
+        insert.close();
         return id;
     }
 
@@ -308,8 +204,8 @@ public class HabitDatabase {
      * @return The unique category id of the row.
      */
     public long getCategoryIdFromIndex(int index) {
-        return getRowIdByIndex(index, CATEGORIES_TABLE_NAME,
-                CATEGORY_ID, null, null);
+        return getRowIdByIndex(index, CategoriesTableSchema.TABLE_NAME,
+                CategoriesTableSchema.CATEGORY_ID, null, null);
     }
 
     /**
@@ -320,12 +216,12 @@ public class HabitDatabase {
         long rowId = category.getDatabaseId();
 
         if (rowId < 0) {
-            String whereClause = CATEGORY_NAME + " =? AND " +
-                    CATEGORY_COLOR + " =?";
+            String whereClause = CategoriesTableSchema.CATEGORY_NAME + " =? AND " +
+                    CategoriesTableSchema.CATEGORY_COLOR + " =?";
             String selectionArgs[] = {category.getName(), category.getColor()};
 
-            rowId = getRowIdByIndex(0, CATEGORIES_TABLE_NAME,
-                    CATEGORY_ID, whereClause, selectionArgs);
+            rowId = getRowIdByIndex(0, CategoriesTableSchema.TABLE_NAME,
+                    CategoriesTableSchema.CATEGORY_ID, whereClause, selectionArgs);
 
             category.setDatabaseId(rowId);
         }
@@ -339,11 +235,11 @@ public class HabitDatabase {
      */
     @Nullable
     public HabitCategory getCategory(long categoryId) {
-        String columns[] = {CATEGORY_NAME, CATEGORY_COLOR};
+        String columns[] = {CategoriesTableSchema.CATEGORY_NAME, CategoriesTableSchema.CATEGORY_COLOR};
         String selectionArgs[] = {String.valueOf(categoryId)};
 
-        Cursor c = readableDatabase.query(CATEGORIES_TABLE_NAME, columns,
-                CATEGORY_ID + "=?", selectionArgs, null, null, null);
+        Cursor c = readableDatabase.query(CategoriesTableSchema.TABLE_NAME, columns,
+                CategoriesTableSchema.CATEGORY_ID + "=?", selectionArgs, null, null, null);
 
         HabitCategory category = null;
 
@@ -381,12 +277,12 @@ public class HabitDatabase {
      */
     public long updateCategoryName(long categoryId, String name) {
         ContentValues values = new ContentValues(1);
-        values.put(CATEGORY_NAME, name);
+        values.put(CategoriesTableSchema.CATEGORY_NAME, name);
 
-        String whereClause = CATEGORY_ID + "=?";
+        String whereClause = CategoriesTableSchema.CATEGORY_ID + "=?";
         String whereArgs[] = {String.valueOf(categoryId)};
 
-        return writableDatabase.update(CATEGORIES_TABLE_NAME, values,
+        return writableDatabase.update(CategoriesTableSchema.TABLE_NAME, values,
                 whereClause, whereArgs);
     }
 
@@ -397,12 +293,12 @@ public class HabitDatabase {
      */
     public long updateCategoryColor(long categoryId, String color) {
         ContentValues values = new ContentValues(1);
-        values.put(CATEGORY_COLOR, color);
+        values.put(CategoriesTableSchema.CATEGORY_COLOR, color);
 
-        String whereClause = CATEGORY_ID + "=?";
+        String whereClause = CategoriesTableSchema.CATEGORY_ID + "=?";
         String whereArgs[] = {String.valueOf(categoryId)};
 
-        return writableDatabase.update(CATEGORIES_TABLE_NAME, values,
+        return writableDatabase.update(CategoriesTableSchema.TABLE_NAME, values,
                 whereClause, whereArgs);
     }
 
@@ -426,25 +322,24 @@ public class HabitDatabase {
      * @return Returns the number of rows removed, -1 if failed.
      */
     public long deleteCategory(long categoryId) {
-        String whereClause = CATEGORY_ID + "=?";
+        String whereClause = CategoriesTableSchema.CATEGORY_ID + "=?";
         String whereArgs[] = {String.valueOf(categoryId)};
 
-        return writableDatabase.delete(CATEGORIES_TABLE_NAME,
+        return writableDatabase.delete(CategoriesTableSchema.TABLE_NAME,
                 whereClause, whereArgs);
     }
 
     // ---- Entries methods ----
 
     private SQLiteStatement getEntryInsertStatement() {
-        return writableDatabase.compileStatement("INSERT INTO ENTRIES_TABLE " +
-                "(HABIT_ID, START_TIME, DURATION, NOTE) VALUES(?, ?, ?, ?);");
+        return writableDatabase.compileStatement(EntriesTableSchema.getInsertStatement());
     }
 
-    private void bindValuesForEntryObject(long habitId, SessionEntry entry) {
-        insertEntryStatement.bindLong(1, habitId);
-        insertEntryStatement.bindLong(2, entry.getStartTime());
-        insertEntryStatement.bindLong(3, entry.getDuration());
-        insertEntryStatement.bindString(4, entry.getNote());
+    private void bindValuesForEntryObject(SQLiteStatement insert, SessionEntry entry, long habitId) {
+        insert.bindLong(1, habitId);
+        insert.bindLong(2, entry.getStartTime());
+        insert.bindLong(3, entry.getDuration());
+        insert.bindString(4, entry.getNote());
     }
 
     /**
@@ -453,26 +348,32 @@ public class HabitDatabase {
      * @return Row id of the new row, -1 if error.
      */
     public long addEntry(long habitId, SessionEntry entry) {
-        bindValuesForEntryObject(habitId, entry);
+        SQLiteStatement insert = getEntryInsertStatement();
+        bindValuesForEntryObject(insert, entry, habitId);
 
-        long id = insertEntryStatement.executeInsert();
-
+        long id = insert.executeInsert();
         entry.setDatabaseId(id);
         entry.setHabitId(habitId);
+
+        insert.close();
         return id;
     }
 
     public void addEntries(long habitId, @NonNull SessionEntry entries[]) {
 
+        SQLiteStatement insert = getEntryInsertStatement();
         writableDatabase.beginTransaction();
 
-        for (SessionEntry entry : entries) {
-            bindValuesForEntryObject(habitId, entry);
-            insertEntryStatement.execute();
 
+        for (SessionEntry entry : entries) {
+            bindValuesForEntryObject(insert, entry, habitId);
+
+            long id = insert.executeInsert();
+            entry.setDatabaseId(id);
             entry.setHabitId(habitId);
         }
 
+        insert.close();
         writableDatabase.setTransactionSuccessful();
         writableDatabase.endTransaction();
     }
@@ -483,8 +384,8 @@ public class HabitDatabase {
      * @return The id of the entry.
      */
     public long getEntryIdFromIndex(long habitId, int index) {
-        return getRowIdByIndex(index, ENTRIES_TABLE_NAME, ENTRY_ID,
-                ENTRY_HABIT_ID + "=?", new String[]{String.valueOf(habitId)});
+        return getRowIdByIndex(index, EntriesTableSchema.TABLE_NAME, EntriesTableSchema.ENTRY_ID,
+                EntriesTableSchema.ENTRY_HABIT_ID + "=?", new String[]{String.valueOf(habitId)});
     }
 
     /**
@@ -492,13 +393,13 @@ public class HabitDatabase {
      * @return The row id of the entry found, -1 if it failed to locate a category.
      */
     public long getEntryIdByObject(SessionEntry entry) {
-        String whereClause = ENTRY_START_TIME + " =? AND " +
-                ENTRY_DURATION + " =? AND " +
-                ENTRY_NOTE + "=?";
+        String whereClause = EntriesTableSchema.ENTRY_START_TIME + " =? AND " +
+                EntriesTableSchema.ENTRY_DURATION + " =? AND " +
+                EntriesTableSchema.ENTRY_NOTE + "=?";
         String selectionArgs[] = new String[]{String.valueOf(entry.getStartTime()),
                 String.valueOf(entry.getDuration()), entry.getNote()};
 
-        long rowId = getRowIdByIndex(0, ENTRIES_TABLE_NAME, ENTRY_ID,
+        long rowId = getRowIdByIndex(0, EntriesTableSchema.TABLE_NAME, EntriesTableSchema.ENTRY_ID,
                 whereClause, selectionArgs);
 
         entry.setDatabaseId(rowId);
@@ -513,22 +414,22 @@ public class HabitDatabase {
     @Nullable
     public Set<Long> searchEntryIdsByComment(long habitId, String query) {
         return searchTableForIdsByName(
-                "SELECT " + ENTRY_ID + " FROM " +
-                        ENTRIES_TABLE_NAME + " WHERE " +
-                        ENTRY_NOTE + " LIKE ? AND " +
-                        ENTRY_HABIT_ID + "=?",
+                "SELECT " + EntriesTableSchema.ENTRY_ID + " FROM " +
+                        EntriesTableSchema.TABLE_NAME + " WHERE " +
+                        EntriesTableSchema.ENTRY_NOTE + " LIKE ? AND " +
+                        EntriesTableSchema.ENTRY_HABIT_ID + "=?",
 
-                new String[]{"%" + query + "%", String.valueOf(habitId)}, ENTRY_ID
+                new String[]{"%" + query + "%", String.valueOf(habitId)}, EntriesTableSchema.ENTRY_ID
         );
     }
 
     public Set<Long> searchEntryIdsByComment(String query) {
         return searchTableForIdsByName(
-                "SELECT " + ENTRY_ID + " FROM " +
-                        ENTRIES_TABLE_NAME + " WHERE " +
-                        ENTRY_NOTE + " LIKE ? ",
+                "SELECT " + EntriesTableSchema.ENTRY_ID + " FROM " +
+                        EntriesTableSchema.TABLE_NAME + " WHERE " +
+                        EntriesTableSchema.ENTRY_NOTE + " LIKE ? ",
 
-                new String[]{"%" + query + "%"}, ENTRY_ID
+                new String[]{"%" + query + "%"}, EntriesTableSchema.ENTRY_ID
         );
     }
 
@@ -542,11 +443,11 @@ public class HabitDatabase {
     public Set<Long> searchEntriesWithTimeRangeForAHabit(long habitId, long beginTime, long endTime) {
         // SELECT ENTRY_ID FROM ENTRIES_TABLE WHERE HABIT_ID=habitId
         // AND START_TIME >= BEGIN AND START_TIME <= END
-        String SQL = "SELECT " + ENTRY_ID +
-                " FROM " + ENTRIES_TABLE_NAME + " WHERE " +
-                ENTRY_HABIT_ID + "=? AND " +
-                ENTRY_START_TIME + ">=? AND " +
-                ENTRY_START_TIME + "<=?";
+        String SQL = "SELECT " + EntriesTableSchema.ENTRY_ID +
+                " FROM " + EntriesTableSchema.TABLE_NAME + " WHERE " +
+                EntriesTableSchema.ENTRY_HABIT_ID + "=? AND " +
+                EntriesTableSchema.ENTRY_START_TIME + ">=? AND " +
+                EntriesTableSchema.ENTRY_START_TIME + "<=?";
 
         String[] values = new String[]{
                 String.valueOf(habitId),
@@ -554,7 +455,7 @@ public class HabitDatabase {
                 String.valueOf(endTime)
         };
 
-        return searchTableForIdsByName(SQL, values, ENTRY_ID);
+        return searchTableForIdsByName(SQL, values, EntriesTableSchema.ENTRY_ID);
     }
 
     /**
@@ -564,17 +465,17 @@ public class HabitDatabase {
      */
     public Set<Long> searchAllEntriesWithTimeRange(long beginTime, long endTime) {
         // SELECT ENTRY_ID FROM ENTRIES_TABLE WHERE START_TIME >= BEGIN AND START_TIME <= END
-        String SQL = "SELECT " + ENTRY_ID +
-                " FROM " + ENTRIES_TABLE_NAME + " WHERE " +
-                ENTRY_START_TIME + ">=? AND " +
-                ENTRY_START_TIME + "<=?";
+        String SQL = "SELECT " + EntriesTableSchema.ENTRY_ID +
+                " FROM " + EntriesTableSchema.TABLE_NAME + " WHERE " +
+                EntriesTableSchema.ENTRY_START_TIME + ">=? AND " +
+                EntriesTableSchema.ENTRY_START_TIME + "<=?";
 
         String[] values = new String[]{
                 String.valueOf(beginTime),
                 String.valueOf(endTime)
         };
 
-        return searchTableForIdsByName(SQL, values, ENTRY_ID);
+        return searchTableForIdsByName(SQL, values, EntriesTableSchema.ENTRY_ID);
     }
 
     public List<SessionEntry> lookUpEntries(Set<Long> ids) {
@@ -595,15 +496,13 @@ public class HabitDatabase {
      */
     @Nullable
     private SessionEntry getEntryFromCursor(Cursor c) {
-        SessionEntry entry;
+        long databaseId = c.getLong(0);
+        long entryHabitId = c.getLong(1);
+        long startTime = c.getLong(2);
+        long duration = c.getLong(3);
+        String note = c.getString(4);
 
-        long databaseId = c.getLong(0);   // c.getColumnIndex(ENTRY_START_TIME);
-        long entryHabitId = c.getLong(1);   // c.getColumnIndex(ENTRY_DURATION);
-        long startTime = c.getLong(2);   // c.getColumnIndex(ENTRY_HABIT_ID);
-        long duration = c.getLong(3);   // c.getColumnIndex(ENTRY_NOTE);
-        String note = c.getString(4); // c.getColumnIndex(ENTRY_ID);
-
-        entry = new SessionEntry(startTime, duration, note);
+        SessionEntry entry = new SessionEntry(startTime, duration, note);
         entry.setHabitId(entryHabitId);
         entry.setDatabaseId(databaseId);
 
@@ -616,16 +515,16 @@ public class HabitDatabase {
      * @return The found session entry row id.
      */
     public long getEntryId(long habitId, int entryIndex) {
-        String selection = ENTRY_HABIT_ID + "=?";
+        String selection = EntriesTableSchema.ENTRY_HABIT_ID + "=?";
         String selectionArgs[] = {String.valueOf(habitId)};
 
-        Cursor c = readableDatabase.query(ENTRIES_TABLE_NAME, null, selection,
+        Cursor c = readableDatabase.query(EntriesTableSchema.TABLE_NAME, null, selection,
                 selectionArgs, null, null, null);
 
         long entryId = -1;
         if (c != null) {
             if (c.move(entryIndex + 1)) {
-                int idInd = c.getColumnIndex(ENTRY_ID);
+                int idInd = c.getColumnIndex(EntriesTableSchema.ENTRY_ID);
                 entryId = c.getLong(idInd);
             }
             c.close();
@@ -640,10 +539,10 @@ public class HabitDatabase {
      */
     @Nullable
     public SessionEntry getEntry(long entryId) {
-        String selection = ENTRY_ID + "=?";
+        String selection = EntriesTableSchema.ENTRY_ID + "=?";
         String selectionArgs[] = {String.valueOf(entryId)};
 
-        Cursor c = readableDatabase.query(ENTRIES_TABLE_NAME, null, selection,
+        Cursor c = readableDatabase.query(EntriesTableSchema.TABLE_NAME, null, selection,
                 selectionArgs, null, null, null);
 
         SessionEntry entry = null;
@@ -678,12 +577,12 @@ public class HabitDatabase {
      */
     public long updateEntryStartTime(long entryId, long startTime) {
         ContentValues values = new ContentValues(1);
-        values.put(ENTRY_START_TIME, startTime);
+        values.put(EntriesTableSchema.ENTRY_START_TIME, startTime);
 
-        String whereClause = ENTRY_ID + " =?";
+        String whereClause = EntriesTableSchema.ENTRY_ID + " =?";
         String whereArgs[] = {String.valueOf(entryId)};
 
-        return writableDatabase.update(ENTRIES_TABLE_NAME, values,
+        return writableDatabase.update(EntriesTableSchema.TABLE_NAME, values,
                 whereClause, whereArgs);
     }
 
@@ -694,12 +593,12 @@ public class HabitDatabase {
      */
     public long updateEntryDuration(long entryId, long duration) {
         ContentValues values = new ContentValues(1);
-        values.put(ENTRY_DURATION, duration);
+        values.put(EntriesTableSchema.ENTRY_DURATION, duration);
 
-        String whereClause = ENTRY_ID + " =?";
+        String whereClause = EntriesTableSchema.ENTRY_ID + " =?";
         String whereArgs[] = {String.valueOf(entryId)};
 
-        return writableDatabase.update(ENTRIES_TABLE_NAME, values,
+        return writableDatabase.update(EntriesTableSchema.TABLE_NAME, values,
                 whereClause, whereArgs);
     }
 
@@ -710,12 +609,12 @@ public class HabitDatabase {
      */
     public long updateEntryNote(long entryId, String note) {
         ContentValues values = new ContentValues(1);
-        values.put(ENTRY_NOTE, note);
+        values.put(EntriesTableSchema.ENTRY_NOTE, note);
 
-        String whereClause = ENTRY_ID + " =?";
+        String whereClause = EntriesTableSchema.ENTRY_ID + " =?";
         String whereArgs[] = {String.valueOf(entryId)};
 
-        return writableDatabase.update(ENTRIES_TABLE_NAME, values,
+        return writableDatabase.update(EntriesTableSchema.TABLE_NAME, values,
                 whereClause, whereArgs);
     }
 
@@ -740,10 +639,10 @@ public class HabitDatabase {
      * @return The number of rows removed, -1 if error.
      */
     public long deleteEntry(long entryId) {
-        String whereClause = ENTRY_ID + " =?";
+        String whereClause = EntriesTableSchema.ENTRY_ID + " =?";
         String whereArgs[] = {String.valueOf(entryId)};
 
-        return writableDatabase.delete(ENTRIES_TABLE_NAME,
+        return writableDatabase.delete(EntriesTableSchema.TABLE_NAME,
                 whereClause, whereArgs);
     }
 
@@ -752,24 +651,17 @@ public class HabitDatabase {
      * @return The number of rows removed, -1 if error.
      */
     public long deleteEntriesForHabit(long habitId) {
-        String whereClause = ENTRY_HABIT_ID + " =?";
+        String whereClause = EntriesTableSchema.ENTRY_HABIT_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId)};
 
-        return writableDatabase.delete(ENTRIES_TABLE_NAME,
+        return writableDatabase.delete(EntriesTableSchema.TABLE_NAME,
                 whereClause, whereArgs);
     }
 
     // ---- habits methods ----
 
     private SQLiteStatement getHabitInsertStatement() {
-        String sql = "INSERT INTO " + HABITS_TABLE_NAME +
-                " (" + HABIT_IS_ARCHIVED +
-                ", " + HABIT_NAME +
-                ", " + HABIT_DESCRIPTION +
-                ", " + HABIT_ICON_RES_ID +
-                ", " + HABIT_CATEGORY + ") VALUES(?, ?, ?, ?, ?)";
-
-        return writableDatabase.compileStatement(sql);
+        return writableDatabase.compileStatement(HabitsTableSchema.getInsertStatement());
     }
 
     /**
@@ -786,26 +678,30 @@ public class HabitDatabase {
         return habitId;
     }
 
+    private void bindValuesForHabitObject(SQLiteStatement insert, Habit habit) {
+        long categoryId = habit.getCategory().getDatabaseId();
+        if (categoryId == -1) {
+            throw new IllegalArgumentException("Category database id is -1.");
+        }
+
+        insert.bindLong(1, habit.getIsArchived() ? 1 : 0);
+        insert.bindString(2, habit.getName());
+        insert.bindString(3, habit.getDescription());
+        insert.bindString(4, habit.getIconResId());
+        insert.bindLong(5, habit.getCategory().getDatabaseId());
+    }
+
     /**
      * @param habit The habit to be added to the database.
      * @return The row id of the new habit.
      */
     public long addHabit(Habit habit) {
-        HabitCategory category = habit.getCategory();
-        long categoryId = category.getDatabaseId();
+        SQLiteStatement insert = getHabitInsertStatement();
+        bindValuesForHabitObject(insert, habit);
 
-        if (categoryId == -1) {
-            throw new IllegalArgumentException("Category database id is -1.");
-        }
-
-        insertHabitStatement.bindLong(1, habit.getIsArchived() ? 1 : 0);
-        insertHabitStatement.bindString(2, habit.getName());
-        insertHabitStatement.bindString(3, habit.getDescription());
-        insertHabitStatement.bindString(4, habit.getIconResId());
-        insertHabitStatement.bindLong(5, categoryId);
-
-        long habitId = insertHabitStatement.executeInsert();
+        long habitId = insert.executeInsert();
         habit.setDatabaseId(habitId);
+        insert.close();
 
         // Add entries to the new habit
         SessionEntry entries[] = habit.getEntries();
@@ -828,16 +724,16 @@ public class HabitDatabase {
     }
 
     public int getNumberOfHabits(long categoryId) {
-        return getNumberOfRows(HABITS_TABLE_NAME,
-                new String[]{HABIT_ID},
-                HABIT_CATEGORY + "=?",
+        return getNumberOfRows(HabitsTableSchema.TABLE_NAME,
+                new String[]{HabitsTableSchema.HABIT_ID},
+                HabitsTableSchema.HABIT_CATEGORY + "=?",
                 new String[]{String.valueOf(categoryId)});
     }
 
     public int getNumberOfEntries(long habitId) {
-        return getNumberOfRows(ENTRIES_TABLE_NAME,
-                new String[]{ENTRY_HABIT_ID},
-                ENTRY_HABIT_ID + "=?",
+        return getNumberOfRows(EntriesTableSchema.TABLE_NAME,
+                new String[]{EntriesTableSchema.ENTRY_HABIT_ID},
+                EntriesTableSchema.ENTRY_HABIT_ID + "=?",
                 new String[]{String.valueOf(habitId)});
     }
 
@@ -846,8 +742,8 @@ public class HabitDatabase {
      * @return The unique habit id of the row.
      */
     public long getHabitIdFromIndex(long categoryId, int index) {
-        return getRowIdByIndex(index, HABITS_TABLE_NAME, HABIT_ID,
-                HABIT_CATEGORY + "=?", new String[]{String.valueOf(categoryId)});
+        return getRowIdByIndex(index, HabitsTableSchema.TABLE_NAME, HabitsTableSchema.HABIT_ID,
+                HabitsTableSchema.HABIT_CATEGORY + "=?", new String[]{String.valueOf(categoryId)});
     }
 
     /**
@@ -860,12 +756,12 @@ public class HabitDatabase {
         if (habitId == -1) {
             long categoryId = getCategoryIdByObject(habit.getCategory());
 
-            String whereClause = HABIT_NAME + "=? AND " +
-                    HABIT_CATEGORY + "=?";
+            String whereClause = HabitsTableSchema.HABIT_NAME + "=? AND " +
+                    HabitsTableSchema.HABIT_CATEGORY + "=?";
 
             String selectionArgs[] = {habit.getName(), String.valueOf(categoryId)};
 
-            habitId = getRowIdByIndex(0, HABITS_TABLE_NAME, HABIT_ID,
+            habitId = getRowIdByIndex(0, HabitsTableSchema.TABLE_NAME, HabitsTableSchema.HABIT_ID,
                     whereClause, selectionArgs);
 
             habit.setDatabaseId(habitId);
@@ -879,11 +775,11 @@ public class HabitDatabase {
      * @return The found habit ids.
      */
     public Set<Long> searchHabitIdsByName(String name) {
-        return searchTableForIdsByName("SELECT " + HABIT_ID + " FROM " +
-                        HABITS_TABLE_NAME + " WHERE " +
-                        HABIT_NAME + " LIKE  ?",
+        return searchTableForIdsByName("SELECT " + HabitsTableSchema.HABIT_ID + " FROM " +
+                        HabitsTableSchema.TABLE_NAME + " WHERE " +
+                        HabitsTableSchema.HABIT_NAME + " LIKE  ?",
 
-                new String[]{"%" + name + "%"}, HABIT_ID);
+                new String[]{"%" + name + "%"}, HabitsTableSchema.HABIT_ID);
     }
 
     /**
@@ -892,11 +788,11 @@ public class HabitDatabase {
      */
     public Set<Long> searchCategoryIdsByName(String name) {
         return searchTableForIdsByName(
-                "SELECT " + CATEGORY_ID + " FROM " +
-                        CATEGORIES_TABLE_NAME + " WHERE " +
-                        CATEGORY_NAME + " LIKE  ?",
+                "SELECT " + CategoriesTableSchema.CATEGORY_ID + " FROM " +
+                        CategoriesTableSchema.TABLE_NAME + " WHERE " +
+                        CategoriesTableSchema.CATEGORY_NAME + " LIKE  ?",
 
-                new String[]{"%" + name + "%"}, CATEGORY_ID
+                new String[]{"%" + name + "%"}, CategoriesTableSchema.CATEGORY_ID
         );
     }
 
@@ -921,14 +817,14 @@ public class HabitDatabase {
     }
 
     public String getHabitName(long id) {
-        Cursor c = readableDatabase.query(HABITS_TABLE_NAME, new String[]{HABIT_NAME},
-                HABIT_ID + "=?", new String[]{String.valueOf(id)}, null, null, null);
+        Cursor c = readableDatabase.query(HabitsTableSchema.TABLE_NAME, new String[]{HabitsTableSchema.HABIT_NAME},
+                HabitsTableSchema.HABIT_ID + "=?", new String[]{String.valueOf(id)}, null, null, null);
 
         String name = null;
 
         if (c != null) {
             if (c.moveToFirst()) {
-                int nameInd = c.getColumnIndex(HABIT_NAME);
+                int nameInd = c.getColumnIndex(HabitsTableSchema.HABIT_NAME);
                 name = c.getString(nameInd);
                 c.close();
             }
@@ -940,12 +836,12 @@ public class HabitDatabase {
     private Habit getHabitFromCursor(Cursor c) {
         Habit habit = null;
 
-        long habitId = c.getLong(0);       // c.getColumnIndex(HABIT_ID);
-        boolean isArchived = (c.getInt(1) == 1); // c.getColumnIndex(HABIT_IS_ARCHIVED);
-        String name = c.getString(2);     // c.getColumnIndex(HABIT_NAME);
-        String description = c.getString(3);     // c.getColumnIndex(HABIT_DESCRIPTION);
-        long categoryId = c.getLong(4);       // c.getColumnIndex(HABIT_CATEGORY);
-        String iconResId = c.getString(5);     // c.getColumnIndex(HABIT_ICON_RES_ID);
+        long habitId = c.getLong(0);       // c.getColumnIndex(HabitsTableSchema.HABIT_ID);
+        boolean isArchived = (c.getInt(1) == 1); // c.getColumnIndex(HabitsTableSchema.HABIT_IS_ARCHIVED);
+        String name = c.getString(2);     // c.getColumnIndex(HabitsTableSchema.HABIT_NAME);
+        String description = c.getString(3);     // c.getColumnIndex(HabitsTableSchema.HABIT_DESCRIPTION);
+        long categoryId = c.getLong(4);       // c.getColumnIndex(HabitsTableSchema.HABIT_CATEGORY);
+        String iconResId = c.getString(5);     // c.getColumnIndex(HabitsTableSchema.HABIT_ICON_RES_ID);
 
         HabitCategory category = getCategory(categoryId);
 
@@ -956,7 +852,7 @@ public class HabitDatabase {
         }
 
         if (category != null) {
-            habit = new Habit(name, description, category, entries, iconResId);
+            habit = new Habit(name, description, category, iconResId, entries);
             habit.setDatabaseId(habitId);
             habit.setIsArchived(isArchived);
         }
@@ -973,7 +869,7 @@ public class HabitDatabase {
         String selectionArgs[] = {String.valueOf(habitId)};
 
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
-        Cursor c = db.query(HABITS_TABLE_NAME, null, HABIT_ID + "=?",
+        Cursor c = db.query(HabitsTableSchema.TABLE_NAME, null, HabitsTableSchema.HABIT_ID + "=?",
                 selectionArgs, null, null, null);
 
         Habit habit = null;
@@ -988,14 +884,14 @@ public class HabitDatabase {
     }
 
     public long getHabitCategoryId(long habitId) {
-        Cursor c = readableDatabase.query(HABITS_TABLE_NAME, new String[]{HABIT_CATEGORY},
-                HABIT_ID + "=?", new String[]{String.valueOf(habitId)}, null, null, null);
+        Cursor c = readableDatabase.query(HabitsTableSchema.TABLE_NAME, new String[]{HabitsTableSchema.HABIT_CATEGORY},
+                HabitsTableSchema.HABIT_ID + "=?", new String[]{String.valueOf(habitId)}, null, null, null);
 
         long categoryId = -1;
 
         if (c != null) {
             if (c.moveToFirst()) {
-                int categoryInd = c.getColumnIndex(HABIT_CATEGORY);
+                int categoryInd = c.getColumnIndex(HabitsTableSchema.HABIT_CATEGORY);
                 categoryId = c.getLong(categoryInd);
                 c.close();
             }
@@ -1016,10 +912,10 @@ public class HabitDatabase {
     }
 
     public Set<Long> getHabitIds(long categoryId) {
-        return searchTableForIdsByName("SELECT " + HABIT_ID + " FROM " +
-                        HABITS_TABLE_NAME + " WHERE " +
-                        HABIT_CATEGORY + " =?",
-                new String[]{String.valueOf(categoryId)}, HABIT_ID);
+        return searchTableForIdsByName("SELECT " + HabitsTableSchema.HABIT_ID + " FROM " +
+                        HabitsTableSchema.TABLE_NAME + " WHERE " +
+                        HabitsTableSchema.HABIT_CATEGORY + " =?",
+                new String[]{String.valueOf(categoryId)}, HabitsTableSchema.HABIT_ID);
     }
 
     /**
@@ -1030,8 +926,8 @@ public class HabitDatabase {
         int numberOfHabits = getNumberOfHabits(categoryId);
         Habit[] habits = new Habit[numberOfHabits];
 
-        Cursor c = readableDatabase.query(HABITS_TABLE_NAME, null,
-                HABIT_CATEGORY + " =?", new String[]{String.valueOf(categoryId)},
+        Cursor c = readableDatabase.query(HabitsTableSchema.TABLE_NAME, null,
+                HabitsTableSchema.HABIT_CATEGORY + " =?", new String[]{String.valueOf(categoryId)},
                 null, null, null);
 
         int habitIndex = 0;
@@ -1087,8 +983,8 @@ public class HabitDatabase {
     }
 
     public boolean getIsHabitArchived(long habitId) {
-        Cursor c = readableDatabase.query(HABITS_TABLE_NAME, new String[]{HABIT_IS_ARCHIVED},
-                HABIT_ID + "=?", new String[]{String.valueOf(habitId)}, null, null, null);
+        Cursor c = readableDatabase.query(HabitsTableSchema.TABLE_NAME, new String[]{HabitsTableSchema.HABIT_IS_ARCHIVED},
+                HabitsTableSchema.HABIT_ID + "=?", new String[]{String.valueOf(habitId)}, null, null, null);
 
         boolean isArchived = false;
 
@@ -1109,12 +1005,12 @@ public class HabitDatabase {
      */
     public long updateHabitIsArchived(long habitId, boolean state) {
         ContentValues values = new ContentValues(1);
-        values.put(HABIT_IS_ARCHIVED, state);
+        values.put(HabitsTableSchema.HABIT_IS_ARCHIVED, state);
 
-        String whereClause = HABIT_ID + " =?";
+        String whereClause = HabitsTableSchema.HABIT_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId)};
 
-        return writableDatabase.update(HABITS_TABLE_NAME, values,
+        return writableDatabase.update(HabitsTableSchema.TABLE_NAME, values,
                 whereClause, whereArgs);
     }
 
@@ -1125,12 +1021,12 @@ public class HabitDatabase {
      */
     public long updateHabitName(long habitId, String name) {
         ContentValues values = new ContentValues(1);
-        values.put(HABIT_NAME, name);
+        values.put(HabitsTableSchema.HABIT_NAME, name);
 
-        String whereClause = HABIT_ID + " =?";
+        String whereClause = HabitsTableSchema.HABIT_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId)};
 
-        return writableDatabase.update(HABITS_TABLE_NAME, values,
+        return writableDatabase.update(HabitsTableSchema.TABLE_NAME, values,
                 whereClause, whereArgs);
     }
 
@@ -1141,12 +1037,12 @@ public class HabitDatabase {
      */
     public long updateHabitDescription(long habitId, String description) {
         ContentValues values = new ContentValues(1);
-        values.put(HABIT_DESCRIPTION, description);
+        values.put(HabitsTableSchema.HABIT_DESCRIPTION, description);
 
-        String whereClause = HABIT_ID + " =?";
+        String whereClause = HabitsTableSchema.HABIT_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId)};
 
-        return writableDatabase.update(HABITS_TABLE_NAME, values,
+        return writableDatabase.update(HabitsTableSchema.TABLE_NAME, values,
                 whereClause, whereArgs);
     }
 
@@ -1157,12 +1053,12 @@ public class HabitDatabase {
      */
     public long updateHabitCategory(long habitId, @Nullable Long categoryId) {
         ContentValues values = new ContentValues(1);
-        values.put(HABIT_CATEGORY, categoryId);
+        values.put(HabitsTableSchema.HABIT_CATEGORY, categoryId);
 
-        String whereClause = HABIT_ID + " =?";
+        String whereClause = HabitsTableSchema.HABIT_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId)};
 
-        return writableDatabase.update(HABITS_TABLE_NAME, values,
+        return writableDatabase.update(HabitsTableSchema.TABLE_NAME, values,
                 whereClause, whereArgs);
     }
 
@@ -1173,12 +1069,12 @@ public class HabitDatabase {
      */
     public long updateHabitIconResId(long habitId, String iconResId) {
         ContentValues values = new ContentValues(1);
-        values.put(HABIT_ICON_RES_ID, iconResId);
+        values.put(HabitsTableSchema.HABIT_ICON_RES_ID, iconResId);
 
-        String whereClause = HABIT_ID + " =?";
+        String whereClause = HabitsTableSchema.HABIT_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId)};
 
-        return writableDatabase.update(HABITS_TABLE_NAME, values,
+        return writableDatabase.update(HabitsTableSchema.TABLE_NAME, values,
                 whereClause, whereArgs);
     }
 
@@ -1215,10 +1111,10 @@ public class HabitDatabase {
         deleteEntriesForHabit(habitId);
 
         // Delete the habit itself
-        String whereClause = HABIT_ID + "=?";
+        String whereClause = HabitsTableSchema.HABIT_ID + "=?";
         String whereArgs[] = {String.valueOf(habitId)};
 
-        return writableDatabase.delete(HABITS_TABLE_NAME,
+        return writableDatabase.delete(HabitsTableSchema.TABLE_NAME,
                 whereClause, whereArgs);
     }
 }

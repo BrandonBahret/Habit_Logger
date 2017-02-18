@@ -2,13 +2,12 @@ package com.example.brandon.habitlogger;
 
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -18,7 +17,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,8 +27,8 @@ import android.widget.Toast;
 import com.example.brandon.habitlogger.DataExportHelpers.GoogleDriveDataExportManager;
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.HabitActivity.HabitActivity;
-import com.example.brandon.habitlogger.HabitDatabase.CategoryHabitsContainer;
-import com.example.brandon.habitlogger.HabitDatabase.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.CategoryHabitsContainer;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitSessions.ActiveSessionsActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
@@ -41,6 +39,7 @@ import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.Preferences.SettingsActivity;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.CategoryCardAdapter;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.HabitViewAdapter;
+import com.example.brandon.habitlogger.databinding.ActivityMainBinding;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -54,28 +53,29 @@ import static com.example.brandon.habitlogger.R.menu.main;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-
     PreferenceChecker preferenceChecker;
     SessionManager sessionManager;
 
     CardView currentSession;
+    RecyclerView habitCardContainer;
+
     HabitDatabase habitDatabase;
-
     LocalDataExportManager exportManager;
+
     GoogleDriveDataExportManager googleDrive;
-
     List<Habit> habitList = new ArrayList<>();
-    List<CategoryHabitsContainer> categoryContainers = new ArrayList<>();
 
+    List<CategoryHabitsContainer> categoryContainers = new ArrayList<>();
     Runnable updateCards;
     Handler handler = new Handler();
-    RecyclerView habitCardContainer;
     private ComplexDecoration itemDecoration;
 
     HabitViewAdapter habitAdapter;
     CategoryCardAdapter categoryAdapter;
     HabitViewAdapter.MenuItemClickListener menuItemClickListener;
     HabitViewAdapter.ButtonClickListener buttonClickListener;
+
+    ActivityMainBinding binding;
 
     final int NO_ARCHIVED_HABITS = 0, ONLY_ARCHIVED_HABITS = 1;
     int habitDisplayMode = NO_ARCHIVED_HABITS;
@@ -89,29 +89,27 @@ public class MainActivity extends AppCompatActivity
         );
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        currentSession = binding.mainInclude.contentMain.currentSessionsCard.itemRoot;
+        habitCardContainer = binding.mainInclude.contentMain.habitRecyclerView;
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (preferenceChecker.isNightMode())
-            toolbar.setPopupTheme(R.style.PopupMenu);
-        setSupportActionBar(toolbar);
+            binding.mainInclude.toolbar.setPopupTheme(R.style.PopupMenu);
+        setSupportActionBar(binding.mainInclude.toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        binding.mainInclude.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startNewHabitActivity();
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
+                this, binding.drawerLayout, binding.mainInclude.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        binding.drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        binding.navView.setNavigationItemSelectedListener(this);
 
         habitDatabase = new HabitDatabase(MainActivity.this);
         sessionManager = new SessionManager(this);
@@ -143,22 +141,6 @@ public class MainActivity extends AppCompatActivity
         exportManager = new LocalDataExportManager(MainActivity.this);
         googleDrive = new GoogleDriveDataExportManager(MainActivity.this);
         googleDrive.connect();
-
-        habitDatabase.setOnDatabaseChangeListener(new HabitDatabase.OnDatabaseChange() {
-            @Override
-            public void onDatabaseChanged() {
-                showDatabase();
-            }
-
-            @Override
-            public void onDatabaseClear() {
-                habitList.clear();
-                habitAdapter.notifyDataSetChanged();
-            }
-        });
-
-        currentSession = (CardView) findViewById(R.id.current_sessions_card);
-        habitCardContainer = (RecyclerView) findViewById(R.id.habit_recycler_view);
 
         menuItemClickListener = new HabitViewAdapter.MenuItemClickListener() {
             @Override
@@ -321,9 +303,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.drawerLayout.closeDrawer(GravityCompat.START);
         }
         else {
             super.onBackPressed();
@@ -372,7 +353,7 @@ public class MainActivity extends AppCompatActivity
 
             case (R.id.menu_database_restore): {
                 exportManager.importDatabase(true);
-                habitDatabase.notifyChange();
+                showDatabase();
             }
             break;
 
@@ -434,8 +415,7 @@ public class MainActivity extends AppCompatActivity
             break;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        binding.drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
 
@@ -618,8 +598,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void updateCurrentSessionCard() {
-        TextView countText = (TextView) currentSession.findViewById(R.id.active_session_value_text);
-        TextView countLabelText = (TextView) currentSession.findViewById(R.id.active_session_description_text);
+
+        TextView countText = binding.mainInclude.contentMain.currentSessionsCard.activeSessionValueText;
+        TextView countLabelText = binding.mainInclude.contentMain.currentSessionsCard.activeSessionDescriptionText;
 
         int count = sessionManager.getSessionCount();
         currentSession.setAlpha(count == 0 ? 0.5f : 1.0f);

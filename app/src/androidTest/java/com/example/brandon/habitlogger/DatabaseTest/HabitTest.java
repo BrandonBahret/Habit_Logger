@@ -3,9 +3,9 @@ package com.example.brandon.habitlogger.DatabaseTest;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
-import com.example.brandon.habitlogger.HabitDatabase.Habit;
-import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
-import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +32,7 @@ public class HabitTest {
 
     @Test
     public void testToString() throws Exception{
-        Habit test = new Habit("Name", "description", new HabitCategory("color", "name"), null, "icon");
+        Habit test = new Habit("Name", "description", new HabitCategory("color", "name"), "icon", null);
 
         String testString = test.toString();
         String expected   = "Name{\n\tDescription: description\n\tCategory: {\n\t\tName: name,\n\t\tColor: color\n\t}" +
@@ -46,7 +46,7 @@ public class HabitTest {
 
         Habit expectedHabit = new Habit("Name", "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                 new HabitCategory("color", "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-                getDummyEntries(), "icon");
+                "icon", getDummyEntries());
 
         String csv = expectedHabit.toCSV();
         Log.d("csv", csv);

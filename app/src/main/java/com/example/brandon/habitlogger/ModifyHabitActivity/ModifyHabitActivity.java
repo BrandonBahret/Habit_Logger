@@ -10,8 +10,8 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.example.brandon.habitlogger.HabitDatabase.Habit;
-import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.R;
 
@@ -110,7 +110,7 @@ public class ModifyHabitActivity extends AppCompatActivity {
         HabitCategory category = (HabitCategory) vh.categorySpinner.getSelectedItem();
 
         if (oldHabit == null) {
-            return new Habit(name, description, category, null, "icon res");
+            return new Habit(name, description, category, "icon res", null);
         }
         else {
             oldHabit.setName(name);

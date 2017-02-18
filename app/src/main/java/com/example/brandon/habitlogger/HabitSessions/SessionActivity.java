@@ -2,6 +2,7 @@ package com.example.brandon.habitlogger.HabitSessions;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -13,16 +14,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.TextView;
 
-import com.example.brandon.habitlogger.HabitDatabase.Habit;
-import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.databinding.ActivitySessionBinding;
 
 import java.util.Locale;
 
@@ -43,22 +41,15 @@ public class SessionActivity extends AppCompatActivity {
     private long habitId;
     private int position = RecyclerView.NO_POSITION;
 
-    private ImageButton playButton;
-    private Button cancelButton;
-    private TextView hoursView, minutesView, secondsView;
     private ActionBar actionBar;
-    private EditText noteArea;
+
+    ActivitySessionBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_session);
 
-        playButton  = (ImageButton) findViewById(R.id.session_pause_play);
-        hoursView   = (TextView)    findViewById(R.id.session_hours_view);
-        minutesView = (TextView)    findViewById(R.id.session_minutes_view);
-        secondsView = (TextView)    findViewById(R.id.session_seconds_view);
-        noteArea    = (EditText)    findViewById(R.id.session_note);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_session);
         actionBar = getSupportActionBar();
 
         Intent data = getIntent();
@@ -91,8 +82,7 @@ public class SessionActivity extends AppCompatActivity {
             actionBar.setTitle(habit.getName());
         }
 
-        cancelButton = (Button)findViewById(R.id.session_cancel);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
+        binding.sessionCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 handler.removeCallbacks(updateTimeDisplayRunnable);
@@ -106,7 +96,7 @@ public class SessionActivity extends AppCompatActivity {
             }
         });
 
-        playButton.setOnClickListener(new View.OnClickListener() {
+        binding.sessionPausePlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 boolean isPaused = !sessionManager.getIsPaused(habitId);
@@ -139,7 +129,7 @@ public class SessionActivity extends AppCompatActivity {
                 handler.removeCallbacks(updateTimeDisplayRunnable);
                 SessionEntry entry = sessionManager.finishSession(habitId);
 
-                String note = noteArea.getText().toString();
+                String note = binding.sessionNote.getText().toString();
                 entry.setNote(note);
 
                 HabitDatabase database = new HabitDatabase(this);
@@ -168,7 +158,7 @@ public class SessionActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        sessionManager.setNote(habitId, noteArea.getText().toString());
+        sessionManager.setNote(habitId, binding.sessionNote.getText().toString());
     }
 
     @Override
@@ -178,7 +168,6 @@ public class SessionActivity extends AppCompatActivity {
     }
 
     public void setColorTheme(){
-        // TODO create this method
         int color = 0xFFCCCCCC;
         int darkerColor = 0xFFBBBBBB;
 
@@ -188,11 +177,11 @@ public class SessionActivity extends AppCompatActivity {
         }
 
         getWindow().setStatusBarColor(darkerColor);
-        cancelButton.getBackground().setColorFilter(color, PorterDuff.Mode.SRC);
+        binding.sessionCancel.getBackground().setColorFilter(color, PorterDuff.Mode.SRC);
 
-        Drawable drawable = noteArea.getBackground(); // get current EditText drawable
+        Drawable drawable = binding.sessionNote.getBackground(); // get current EditText drawable
         drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP); // change the drawable color
-        noteArea.setBackground(drawable);
+        binding.sessionNote.setBackground(drawable);
 
         actionBar.setBackgroundDrawable(new ColorDrawable(color));
     }
@@ -203,15 +192,15 @@ public class SessionActivity extends AppCompatActivity {
         long time = entry.getDuration();
         SessionManager.TimeDisplay display = new SessionManager.TimeDisplay(time);
 
-        hoursView.setText  (String.format(Locale.US, "%02d", display.hours));
-        minutesView.setText(String.format(Locale.US, "%02d", display.minutes));
-        secondsView.setText(String.format(Locale.US, "%02d", display.seconds));
+        binding.sessionHoursView.setText  (String.format(Locale.US, "%02d", display.hours));
+        binding.sessionMinutesView.setText(String.format(Locale.US, "%02d", display.minutes));
+        binding.sessionSecondsView.setText(String.format(Locale.US, "%02d", display.seconds));
     }
 
     public void reloadNote(){
         String note = sessionManager.getNote(habitId);
         if(!note.equals("")){
-            noteArea.setText(note);
+            binding.sessionNote.setText(note);
         }
     }
 
@@ -226,6 +215,6 @@ public class SessionActivity extends AppCompatActivity {
         int resourceId = isPaused ? ic_play_circle_filled_black_24dp :
                 R.drawable.ic_play_circle_outline_black_24dp;
 
-        playButton.setImageResource(resourceId);
+        binding.sessionPausePlay.setImageResource(resourceId);
     }
 }

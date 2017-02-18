@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.HabitDatabase;
+package com.example.brandon.habitlogger.HabitDatabase.DataModels;
 
 import android.os.Parcel;
 

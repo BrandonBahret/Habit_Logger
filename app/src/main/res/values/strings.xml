@@ -70,5 +70,10 @@
     <string name="title_activity_overall_statistics">Overall Statistics</string>
     <string name="choose_color">Choose color</string>
     <string name="choose_icon">Choose Icon</string>
+    <string name="first_letter_of_hours">H</string>
+    <string name="colon_to_separate_time">:</string>
+    <string name="first_letter_of_minutes">M</string>
+    <string name="first_letter_of_seconds">S</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

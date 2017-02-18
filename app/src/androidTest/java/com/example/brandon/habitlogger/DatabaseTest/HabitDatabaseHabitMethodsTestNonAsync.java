@@ -3,10 +3,10 @@ package com.example.brandon.habitlogger.DatabaseTest;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 
-import com.example.brandon.habitlogger.HabitDatabase.Habit;
-import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,11 +22,11 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
     private HabitDatabase db;
 
     public Habit getDummyHabit(){
-        return new Habit("dummy", "I am a dummy", new HabitCategory("#ffffffff", "dummy"), null, "");
+        return new Habit("dummy", "I am a dummy", new HabitCategory("#ffffffff", "dummy"), "", null);
     }
 
     public Habit getDummyHabit2(){
-        return new Habit("dummy2", "I am a dummy2", new HabitCategory("#ffffffff", "dummy"), null, "");
+        return new Habit("dummy2", "I am a dummy2", new HabitCategory("#ffffffff", "dummy"), "", null);
     }
 
 
@@ -91,10 +91,10 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
 
         Set<Long> expectedIds = new HashSet<>(2);
 
-        db.addHabitAndCategory(new Habit("one", "", getDummyHabit().getCategory(), null, ""));
-        expectedIds.add(db.addHabitAndCategory(new Habit("two", "", getDummyHabit().getCategory(), null, "")));
-        expectedIds.add(db.addHabitAndCategory(new Habit("three", "", getDummyHabit().getCategory(), null, "")));
-        db.addHabitAndCategory(new Habit("four", "", getDummyHabit().getCategory(), null, ""));
+        db.addHabitAndCategory(new Habit("one", "", getDummyHabit().getCategory(), "", null));
+        expectedIds.add(db.addHabitAndCategory(new Habit("two", "", getDummyHabit().getCategory(), "", null)));
+        expectedIds.add(db.addHabitAndCategory(new Habit("three", "", getDummyHabit().getCategory(), "", null)));
+        db.addHabitAndCategory(new Habit("four", "", getDummyHabit().getCategory(), "", null));
 
         assertTrue(expectedIds.equals(db.searchHabitIdsByName("t")));
     }

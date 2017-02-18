@@ -10,7 +10,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.brandon.habitlogger.HabitActivity.StartingDateDialog;
-import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 

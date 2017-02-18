@@ -4,7 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
 
-import com.example.brandon.habitlogger.HabitDatabase.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.DatabaseSchema;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 
 import java.io.BufferedReader;
@@ -86,7 +87,7 @@ public class LocalDataExportManager {
                 File sd = new File(exportPath);
 
                 if (sd.canWrite()) {
-                    String currentDBPath = context.getDatabasePath(habitDatabase.getDatabaseName()).getPath();
+                    String currentDBPath = context.getDatabasePath(DatabaseSchema.DATABASE_NAME).getPath();
 
                     File currentDB = new File(currentDBPath);
                     File backupDB  = new File(sd, dbBackupFilename);
@@ -121,7 +122,7 @@ public class LocalDataExportManager {
                 File backupDB = new File(databasePath);
 
                 if (backupDB.canRead()) {
-                    String currentDBPath = context.getDatabasePath(habitDatabase.getDatabaseName()).getPath();
+                    String currentDBPath = context.getDatabasePath(DatabaseSchema.DATABASE_NAME).getPath();
 
                     File currentDB = new File(currentDBPath);
 

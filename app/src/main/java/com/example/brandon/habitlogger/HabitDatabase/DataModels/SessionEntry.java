@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.HabitDatabase;
+package com.example.brandon.habitlogger.HabitDatabase.DataModels;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -248,7 +248,7 @@ public class SessionEntry implements Serializable, Parcelable {
     /**
      * @param databaseId The row id of the entry object in the database
      */
-    protected void setDatabaseId(long databaseId) {
+    public void setDatabaseId(long databaseId) {
         this.databaseId = databaseId;
     }
 

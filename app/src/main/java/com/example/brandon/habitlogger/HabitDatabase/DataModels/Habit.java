@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.HabitDatabase;
+package com.example.brandon.habitlogger.HabitDatabase.DataModels;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -21,24 +21,40 @@ import java.util.Locale;
 
 @SuppressWarnings("WeakerAccess")
 public class Habit implements Serializable, Parcelable {
-
     @NonNull private String name;
-    @NonNull private String description;
     @NonNull private HabitCategory category;
-    @NonNull private String iconResId;
+    @Nullable private String description;
+    @Nullable private String iconResId;
     @Nullable private SessionEntry[] entries;
 
     private int isArchived = 0;
     private long databaseId = -1;
 
-    public Habit(@NonNull String name, @NonNull String description, @NonNull HabitCategory category,
-                 @Nullable SessionEntry[] entries, @NonNull String iconResId) {
+    public Habit(@NonNull String name, @NonNull HabitCategory category) {
+        this.name = name;
+        this.category = category;
+    }
 
+    public Habit(@NonNull String name, @Nullable String description, @NonNull HabitCategory category,
+                 @Nullable String iconResId, @Nullable SessionEntry[] entries) {
         this.name = name;
         this.description = description;
         this.category = category;
-        this.entries = entries;
         this.iconResId = iconResId;
+        this.entries = entries;
+    }
+
+    public Habit(@NonNull String name, @Nullable String description, @NonNull HabitCategory category,
+                 @Nullable String iconResId, @Nullable SessionEntry[] entries,
+                 int isArchived, long databaseId) {
+
+        this.name = name;
+        this.category = category;
+        this.description = description;
+        this.iconResId = iconResId;
+        this.entries = entries;
+        this.isArchived = isArchived;
+        this.databaseId = databaseId;
     }
 
     public Habit(Parcel in) {
@@ -112,7 +128,7 @@ public class Habit implements Serializable, Parcelable {
             reader.readNext(); // Skip line
             String[] habitArray = reader.readNext();
 
-            boolean isArchived = Boolean.parseBoolean(habitArray[0]);
+            int isArchived = Boolean.parseBoolean(habitArray[0]) ? 1 : 0;
             String habitName = habitArray[1];
             String habitDescription = habitArray[2];
 
@@ -137,8 +153,9 @@ public class Habit implements Serializable, Parcelable {
                 entries[entryIndex] = new SessionEntry(entryStartTime, entryDuration, comment);
             }
 
-            habit = new Habit(habitName, habitDescription, new HabitCategory(categoryColor, categoryName), entries, habitIconResId);
-            habit.setIsArchived(isArchived);
+            HabitCategory category = new HabitCategory(categoryColor, categoryName);
+            habit = new Habit(habitName, habitDescription, category,
+                    habitIconResId, entries, isArchived, -1);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -215,7 +232,7 @@ public class Habit implements Serializable, Parcelable {
     /**
      * @return the resource id for a drawable as a string. Ex: R.id.ic_launcher becomes "ic_launcher"
      */
-    @NonNull
+    @Nullable
     public String getIconResId() {
         return iconResId;
     }
@@ -246,7 +263,7 @@ public class Habit implements Serializable, Parcelable {
     /**
      * @return the habit description
      */
-    @NonNull
+    @Nullable
     public String getDescription() {
         return description;
     }

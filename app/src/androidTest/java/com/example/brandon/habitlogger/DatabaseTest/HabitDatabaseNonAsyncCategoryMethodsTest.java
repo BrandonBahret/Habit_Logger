@@ -3,7 +3,7 @@ package com.example.brandon.habitlogger.DatabaseTest;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 
-import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 
 import java.util.Set;

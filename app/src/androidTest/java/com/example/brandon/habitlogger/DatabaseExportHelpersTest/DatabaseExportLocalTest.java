@@ -4,10 +4,10 @@ import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
-import com.example.brandon.habitlogger.HabitDatabase.Habit;
-import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 
 /**
  * Instrumentation test, which will execute on an Android device.
@@ -38,7 +38,7 @@ public class DatabaseExportLocalTest extends AndroidTestCase {
         }
 
         for (int i = 0; i < 10; i++) {
-            db.addHabitAndCategory(new Habit("name " + i, "description", mainCategory, entries, "none"));
+            db.addHabitAndCategory(new Habit("name " + i, "description", mainCategory, "none", entries));
         }
     }
 
@@ -52,7 +52,7 @@ public class DatabaseExportLocalTest extends AndroidTestCase {
         int numberOfCategories = db.getNumberOfCategories();
         dataExportManager.exportDatabase(true);
 
-        db.resetDatabase();
+        db.databaseHelper.resetDatabase();
         assertEquals(0, db.getNumberOfCategories());
 
         dataExportManager.importDatabase(true);
@@ -61,7 +61,7 @@ public class DatabaseExportLocalTest extends AndroidTestCase {
         numberOfCategories = db.getNumberOfCategories();
         dataExportManager.exportDatabase(false);
 
-        db.resetDatabase();
+        db.databaseHelper.resetDatabase();
         assertEquals(0, db.getNumberOfCategories());
 
         dataExportManager.importDatabase(false);
@@ -72,7 +72,7 @@ public class DatabaseExportLocalTest extends AndroidTestCase {
         // Public storage
         dataExportManager.exportDatabase(true);
 
-        db.resetDatabase();
+        db.databaseHelper.resetDatabase();
         assertEquals(0, db.getNumberOfCategories());
         dataExportManager.importDatabase(true);
 
@@ -81,7 +81,7 @@ public class DatabaseExportLocalTest extends AndroidTestCase {
         // Private storage
         dataExportManager.exportDatabase(false);
 
-        db.resetDatabase();
+        db.databaseHelper.resetDatabase();
         assertEquals(0, db.getNumberOfCategories());
         dataExportManager.importDatabase(false);
 

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.DatabaseSchema;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -84,7 +85,7 @@ public class GoogleDriveDataExportManager implements GoogleApiClient.ConnectionC
 
     public void doesDatabaseExist(ResultCallback<DriveApi.MetadataBufferResult> callback) {
         Query query = new Query.Builder()
-                .addFilter(Filters.eq(SearchableField.TITLE, mHabitDatabase.getDatabaseName()))
+                .addFilter(Filters.eq(SearchableField.TITLE, DatabaseSchema.DATABASE_NAME))
                 .build();
 
         Drive.DriveApi.getAppFolder(mGoogleApiClient).queryChildren(mGoogleApiClient, query)
@@ -113,11 +114,11 @@ public class GoogleDriveDataExportManager implements GoogleApiClient.ConnectionC
                         try {
                             DriveContents contents = driveContentsResult.getDriveContents();
                             OutputStream outputStream = contents.getOutputStream();
-                            outputStream.write(mHabitDatabase.getBytes());
+                            outputStream.write(mHabitDatabase.databaseHelper.getBytes().array());
                             outputStream.close();
 
                             MetadataChangeSet metadata = new MetadataChangeSet.Builder()
-                                    .setTitle(mHabitDatabase.getDatabaseName())
+                                    .setTitle(DatabaseSchema.DATABASE_NAME)
                                     .build();
 
                             Drive.DriveApi.getAppFolder(mGoogleApiClient)
@@ -157,7 +158,7 @@ public class GoogleDriveDataExportManager implements GoogleApiClient.ConnectionC
                                                 read += inputStream.read(bytes.array());
                                             }
 
-                                            mHabitDatabase.setBytes(bytes);
+                                            mHabitDatabase.databaseHelper.setBytes(bytes);
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }

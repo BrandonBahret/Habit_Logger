@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.example.brandon.habitlogger.HabitDatabase.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 
 /**
  * Created by Brandon on 1/23/2017.

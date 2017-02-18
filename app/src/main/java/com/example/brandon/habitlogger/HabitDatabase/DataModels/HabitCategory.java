@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.HabitDatabase;
+package com.example.brandon.habitlogger.HabitDatabase.DataModels;
 
 import android.graphics.Color;
 import android.support.annotation.NonNull;
@@ -105,7 +105,7 @@ public class HabitCategory implements Serializable {
     /**
      * @param databaseId The row id of the category in the database, -1 if not available.
      */
-    protected void setDatabaseId(long databaseId) {
+    public void setDatabaseId(long databaseId) {
         this.databaseId = databaseId;
     }
 

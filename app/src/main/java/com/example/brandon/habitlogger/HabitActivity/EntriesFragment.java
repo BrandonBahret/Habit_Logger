@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.ComplexDecoration;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.EntryViewAdapter;

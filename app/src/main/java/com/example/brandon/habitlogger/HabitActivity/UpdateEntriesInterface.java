@@ -1,6 +1,6 @@
 package com.example.brandon.habitlogger.HabitActivity;
 
-import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 
 import java.util.List;
 

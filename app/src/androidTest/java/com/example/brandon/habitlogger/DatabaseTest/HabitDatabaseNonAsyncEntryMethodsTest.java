@@ -3,10 +3,10 @@ package com.example.brandon.habitlogger.DatabaseTest;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 
-import com.example.brandon.habitlogger.HabitDatabase.Habit;
-import com.example.brandon.habitlogger.HabitDatabase.HabitCategory;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.HabitDatabase.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,7 +28,7 @@ public class HabitDatabaseNonAsyncEntryMethodsTest extends AndroidTestCase {
         db = new HabitDatabase(context);
 
         HabitCategory mainCategory = new HabitCategory("color", "name");
-        Habit mainHabit = new Habit("name", "", mainCategory, null, "");
+        Habit mainHabit = new Habit("name", "", mainCategory, "", null);
         mainHabitId = db.addHabitAndCategory(mainHabit);
     }
 
@@ -96,7 +96,7 @@ public class HabitDatabaseNonAsyncEntryMethodsTest extends AndroidTestCase {
     public void testSearchAllEntriesWithTimeRange(){
         Set<Long> expectedIds = new HashSet<>(4);
 
-        long newHabitId = db.addHabitAndCategory(new Habit("new habit", "", new HabitCategory("color", "name"), null, ""));
+        long newHabitId = db.addHabitAndCategory(new Habit("new habit", "", new HabitCategory("color", "name"), "", null));
 
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "1"));
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "2"));
