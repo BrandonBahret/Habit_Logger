@@ -10,10 +10,11 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.TimeFormatUtils.TimeDisplay;
 
 import java.util.List;
 
@@ -92,8 +93,7 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
 
             holder.name.setText(item.getName());
 
-            SessionManager.TimeDisplay time = new SessionManager.TimeDisplay(item.getDuration());
-            holder.time.setText(time.toString());
+            holder.time.setText(TimeDisplay.getDisplay(item.getDuration()));
 
             holder.timeStarted.setText(item.getStartTimeAsString("h:mm a"));
 

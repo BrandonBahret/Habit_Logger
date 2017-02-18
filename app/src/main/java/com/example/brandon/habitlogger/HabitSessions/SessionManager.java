@@ -4,20 +4,24 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
-import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
+import com.example.brandon.habitlogger.HabitSessions.DatabaseSchema.DatabaseSchema;
+import com.example.brandon.habitlogger.HabitSessions.DatabaseSchema.SessionsTableSchema;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.TimeFormatUtils.TimeDisplay;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,9 +29,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import static com.example.brandon.habitlogger.HabitSessions.DatabaseHelper.HABIT_ID;
-import static com.example.brandon.habitlogger.HabitSessions.DatabaseHelper.SESSIONS_TABLE;
-import static com.example.brandon.habitlogger.HabitSessions.DatabaseHelper.STARTING_TIME;
+import static android.database.Cursor.FIELD_TYPE_FLOAT;
+import static android.database.Cursor.FIELD_TYPE_INTEGER;
+import static android.database.Cursor.FIELD_TYPE_STRING;
 
 /**
  * Created by Brandon on 12/4/2016.
@@ -36,11 +40,11 @@ import static com.example.brandon.habitlogger.HabitSessions.DatabaseHelper.START
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class SessionManager {
-    DatabaseHelper dbHelper;
+    DatabaseSchema databaseHelper;
+    private SQLiteDatabase writableDatabase;
+    private SQLiteDatabase readableDatabase;
 
-    private SQLiteStatement insertSessionStatement;
     private Context context;
-
     private PreferenceChecker preferenceChecker;
     private HabitDatabase habitDatabase;
     private NotificationManager notificationManager;
@@ -59,8 +63,9 @@ public class SessionManager {
 
     public SessionManager(Context context) {
         this.context = context;
-        dbHelper = new DatabaseHelper(context);
-        insertSessionStatement = getInsertSessionStatement();
+        databaseHelper = new DatabaseSchema(context);
+        writableDatabase = databaseHelper.getWritableDatabase();
+        readableDatabase = databaseHelper.getReadableDatabase();
 
         notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -69,24 +74,100 @@ public class SessionManager {
         this.habitDatabase = new HabitDatabase(context);
     }
 
+    public int getDatabaseLength() {
+        Cursor c = readableDatabase.query(
+                SessionsTableSchema.TABLE_NAME,
+                new String[]{SessionsTableSchema.HABIT_ID},
+                null, null, null, null, null);
+
+        int length = c.getCount();
+        c.close();
+        return length;
+    }
+
+    /**
+     * @param habitId     The id of the habit for the session.
+     * @param valueColumn The column in the database to be set.
+     * @param object      The value to be set at "valueColumn"
+     * @return the number of rows affected
+     */
+    public int setAttribute(long habitId, String valueColumn, Object object) {
+        ContentValues value = new ContentValues(1);
+
+        if (object instanceof String) {
+            value.put(valueColumn, (String) object);
+        }
+        else if (object instanceof Long) {
+            value.put(valueColumn, (Long) object);
+        }
+        else if (object instanceof Boolean) {
+            value.put(valueColumn, (Boolean) object ? 1 : 0);
+        }
+
+        return writableDatabase.update(SessionsTableSchema.TABLE_NAME, value,
+                SessionsTableSchema.HABIT_ID + " =?", new String[]{String.valueOf(habitId)});
+    }
+
+    /**
+     * @param habitId The id of the habit for the session.
+     * @return The result of the query as a cursor.
+     */
+    public <Type> Type getAttribute(long habitId, String column, Class<Type> clazz) {
+        Cursor c = readableDatabase.query(
+                SessionsTableSchema.TABLE_NAME,
+                new String[]{column},
+                SessionsTableSchema.HABIT_ID + " =?",
+                new String[]{String.valueOf(habitId)},
+                null, null, null
+        );
+
+        Object result = null;
+        if (c.moveToFirst()) {
+            final int type = c.getType(0);
+            switch (type) {
+                case (FIELD_TYPE_STRING): {
+                    result = c.getString(0);
+                }
+                break;
+                case (FIELD_TYPE_INTEGER): {
+                    result = c.getLong(0);
+                    if (clazz == Boolean.class) {
+                        result = ((long) result == 1);
+                    }
+                }
+                break;
+                case (FIELD_TYPE_FLOAT): {
+                    result = c.getDouble(0);
+                }
+                break;
+            }
+        }
+
+        c.close();
+        return clazz.cast(result);
+    }
+
     /**
      * Get a sqlite statement for creating new sessions.
      */
     public SQLiteStatement getInsertSessionStatement() {
-        String sql = "INSERT INTO " + SESSIONS_TABLE +
-                " (" +
-                HABIT_ID +
-                ", " + DatabaseHelper.HABIT_NAME +
-                ", " + DatabaseHelper.HABIT_CATEGORY +
-                ", " + DatabaseHelper.DURATION +
-                ", " + STARTING_TIME +
-                ", " + DatabaseHelper.LAST_TIME_PAUSED +
-                ", " + DatabaseHelper.TOTAL_PAUSE_TIME +
-                ", " + DatabaseHelper.IS_PAUSED +
-                ", " + DatabaseHelper.NOTE +
-                ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        final String insertStatement = SessionsTableSchema.getInsertStatement();
+        return writableDatabase.compileStatement(insertStatement);
+    }
 
-        return dbHelper.writableDatabase.compileStatement(sql);
+    private void bindSessionObject(SQLiteStatement statement, SessionEntry entry,
+                                   String habitName, String habitCategoryName) {
+
+        statement.bindLong(1, entry.getHabitId());            // HABIT_ID
+        statement.bindString(2, habitName);                   // HABIT_NAME
+        statement.bindString(3, habitCategoryName);           // HABIT_CATEGORY
+        statement.bindLong(4, entry.getDuration());           // DURATION
+        statement.bindLong(5, entry.getStartTime());          // STARTING_TIME
+        statement.bindLong(6, entry.getLastTimePaused());     // LAST_TIME_PAUSED
+        statement.bindLong(7, entry.getTotalPauseTime());     // TOTAL_PAUSE_TIME
+        statement.bindLong(8, entry.getIsPaused() ? 1L : 0L); // IS_PAUSED
+        statement.bindString(9, entry.getNote());             // NOTE
+
     }
 
     /**
@@ -94,63 +175,25 @@ public class SessionManager {
      * @return the row ID of the last row inserted, if this insert is successful. -1 otherwise.
      */
     public long startSession(long habitId) {
-        Habit habit = habitDatabase.getHabit(habitId);
-
-        if (habit != null) {
-            String habitName = habit.getName();
-            HabitCategory category = habit.getCategory();
-            String habitCategoryName = category.getName();
-
-            insertSessionStatement.bindLong(1, habitId);             // HABIT_ID
-            insertSessionStatement.bindString(2, habitName);         // HABIT_NAME
-            insertSessionStatement.bindString(3, habitCategoryName); // HABIT_CATEGORY
-            insertSessionStatement.bindLong(4, 0);                   // DURATION
-            insertSessionStatement.bindLong(5, getCurrentTime());    // STARTING_TIME
-            insertSessionStatement.bindLong(6, 0);                   // LAST_TIME_PAUSED
-            insertSessionStatement.bindLong(7, 0);                   // TOTAL_PAUSE_TIME
-            insertSessionStatement.bindLong(8, 0);                   // IS_PAUSED
-            insertSessionStatement.bindString(9, "");                // NOTE
-
-            long result = insertSessionStatement.executeInsert();
-
-            if (preferenceChecker.doShowNotificationsAutomatically()) {
-                createSessionNotification(habit);
-            }
-
-            return result;
-        }
-
-        return -1;
+        SessionEntry entry = new SessionEntry(getCurrentTime(), 0, "");
+        entry.setHabitId(habitId);
+        return insertSession(entry);
     }
 
     public long insertSession(SessionEntry entry) {
         Habit habit = habitDatabase.getHabit(entry.getHabitId());
+        String habitName = habit.getName();
+        String habitCategoryName = habit.getCategory().getName();
 
-        if (habit != null) {
-            String habitName = habit.getName();
-            HabitCategory category = habit.getCategory();
-            String habitCategoryName = category.getName();
+        SQLiteStatement insert = getInsertSessionStatement();
+        bindSessionObject(insert, entry, habitName, habitCategoryName);
+        long result = insert.executeInsert();
 
-            insertSessionStatement.bindLong(1, entry.getHabitId());        // HABIT_ID
-            insertSessionStatement.bindString(2, habitName);               // HABIT_NAME
-            insertSessionStatement.bindString(3, habitCategoryName);       // HABIT_CATEGORY
-            insertSessionStatement.bindLong(4, entry.getDuration());       // DURATION
-            insertSessionStatement.bindLong(5, entry.getStartTime());      // STARTING_TIME
-            insertSessionStatement.bindLong(6, entry.getLastTimePaused()); // LAST_TIME_PAUSED
-            insertSessionStatement.bindLong(7, entry.getTotalPauseTime()); // TOTAL_PAUSE_TIME
-            insertSessionStatement.bindLong(8, entry.getIsPaused() ? 1L : 0L);   // IS_PAUSED
-            insertSessionStatement.bindString(9, entry.getNote());         // NOTE
-
-            long result = insertSessionStatement.executeInsert();
-
-            if (preferenceChecker.doShowNotificationsAutomatically()) {
-                createSessionNotification(habit);
-            }
-
-            return result;
+        if (preferenceChecker.doShowNotificationsAutomatically()) {
+            createSessionNotification(habit);
         }
 
-        return -1;
+        return result;
     }
 
     public void createSessionNotification(long habitId) {
@@ -172,7 +215,7 @@ public class SessionManager {
                     R.layout.notification_layout);
 
             remoteViews.setTextViewText(R.id.active_session_habit_name, habit.getName());
-            int categoryColor = habit.getIsArchived() ? 0xFFCCCCCC : habit.getCategory().getColorAsInt();
+            int categoryColor = habit.getColor();
             remoteViews.setInt(R.id.card_accent, "setBackgroundColor", categoryColor);
             remoteViews.setInt(R.id.session_pause_play, "setImageResource",
                     getResourceIdForPauseButton(getIsPaused(habitId)));
@@ -290,7 +333,7 @@ public class SessionManager {
     @Nullable
     private long[] searchTableForIdsByName(String SQL, String idColumnString) {
 
-        Cursor c = dbHelper.readableDatabase.rawQuery(SQL, null);
+        Cursor c = readableDatabase.rawQuery(SQL, null);
 
         if (c != null) {
             long ids[] = new long[c.getCount()];
@@ -308,16 +351,16 @@ public class SessionManager {
     }
 
     public void setPauseState(long habitId, boolean pause) {
+        if (pause)
+            pauseSession(habitId);
+        else
+            playSession(habitId);
+
         if (sessionChangeListeners != null) {
             for (SessionChangeListener listener : sessionChangeListeners) {
                 listener.sessionPauseStateChanged(habitId, pause);
             }
         }
-
-        if (pause)
-            pauseSession(habitId);
-        else
-            playSession(habitId);
     }
 
     /**
@@ -358,9 +401,9 @@ public class SessionManager {
             }
         }
 
-        return dbHelper.writableDatabase.delete(
-                SESSIONS_TABLE,
-                HABIT_ID + " =?",
+        return writableDatabase.delete(
+                SessionsTableSchema.TABLE_NAME,
+                SessionsTableSchema.HABIT_ID + " =?",
                 new String[]{String.valueOf(habitId)}
         );
     }
@@ -373,7 +416,7 @@ public class SessionManager {
      */
     public SessionEntry finishSession(long habitId) {
         if (getIsPaused(habitId)) {
-            playSession(habitId);
+            setPauseState(habitId, false);
         }
 
         if (sessionChangeListeners != null) {
@@ -384,7 +427,6 @@ public class SessionManager {
 
         SessionEntry entry = getSession(habitId);
         entry.setDuration(calculateDuration(habitId));
-
         cancelSession(habitId);
 
         return entry;
@@ -397,10 +439,7 @@ public class SessionManager {
      * @return True if active, otherwise false.
      */
     public boolean isSessionActive(long habitId) {
-        Cursor c = dbHelper.getAttribute(habitId, HABIT_ID);
-        boolean result = c.getCount() != 0;
-        c.close();
-        return result;
+        return getAttribute(habitId, SessionsTableSchema.HABIT_ID, Long.class) != null;
     }
 
 
@@ -409,8 +448,8 @@ public class SessionManager {
     public List<SessionEntry> getActiveSessionList() {
         List<SessionEntry> sessions = new ArrayList<>();
 
-        Cursor c = dbHelper.getReadableDatabase()
-                .query(SESSIONS_TABLE, new String[]{HABIT_ID},
+        Cursor c = databaseHelper.getReadableDatabase()
+                .query(SessionsTableSchema.TABLE_NAME, new String[]{SessionsTableSchema.HABIT_ID},
                         null, null, null, null, null);
 
         if (c.moveToFirst()) {
@@ -437,10 +476,10 @@ public class SessionManager {
 
         List<SessionEntry> sessions = new ArrayList<>();
 
-        Cursor c = dbHelper.readableDatabase.rawQuery("SELECT " + HABIT_ID + " FROM " +
-                SESSIONS_TABLE + " WHERE " +
-                DatabaseHelper.HABIT_NAME + " LIKE  '%" + query + "%' OR " +
-                DatabaseHelper.HABIT_CATEGORY + " LIKE  '%" + query + "%'", null);
+        Cursor c = readableDatabase.rawQuery("SELECT " + SessionsTableSchema.HABIT_ID + " FROM " +
+                SessionsTableSchema.TABLE_NAME + " WHERE " +
+                SessionsTableSchema.HABIT_NAME + " LIKE  '%" + query + "%' OR " +
+                SessionsTableSchema.HABIT_CATEGORY + " LIKE  '%" + query + "%'", null);
 
         if (c.moveToFirst()) {
             do {
@@ -463,7 +502,7 @@ public class SessionManager {
     }
 
     public int getSessionCount() {
-        return dbHelper.length();
+        return getDatabaseLength();
     }
 
     /**
@@ -510,7 +549,7 @@ public class SessionManager {
      * @return The number of rows affected.
      */
     public int setDuration(long habitId, Long duration) {
-        return dbHelper.setAttribute(habitId, DatabaseHelper.DURATION, duration);
+        return setAttribute(habitId, SessionsTableSchema.DURATION, duration);
     }
 
     /**
@@ -518,16 +557,14 @@ public class SessionManager {
      * @return The duration last set on the session.
      */
     public long getDuration(long habitId) {
-        Cursor c = dbHelper.getAttribute(habitId, DatabaseHelper.DURATION);
-        long duration = c.getLong(0);
-        c.close();
-        return duration;
+        return getAttribute(habitId, SessionsTableSchema.DURATION, Long.class);
     }
 
     public String getDurationAsString(long habitId) {
         long duration = getDuration(habitId) / 1000;
 
-        SessionManager.TimeDisplay time = new SessionManager.TimeDisplay(duration);
+
+        TimeDisplay time = new TimeDisplay(duration);
         return String.format(Locale.US, "%02d:%02d:%02d", time.hours, time.minutes, time.seconds);
     }
 
@@ -537,7 +574,7 @@ public class SessionManager {
      * @return The number of rows affected.
      */
     public int setNote(long habitId, String note) {
-        return dbHelper.setAttribute(habitId, DatabaseHelper.NOTE, note);
+        return setAttribute(habitId, SessionsTableSchema.NOTE, note);
     }
 
     /**
@@ -545,10 +582,7 @@ public class SessionManager {
      * @return The note set on the session.
      */
     public String getNote(long habitId) {
-        Cursor c = dbHelper.getAttribute(habitId, DatabaseHelper.NOTE);
-        String note = c.getString(0);
-        c.close();
-        return note;
+        return getAttribute(habitId, SessionsTableSchema.NOTE, String.class);
     }
 
     /**
@@ -556,10 +590,7 @@ public class SessionManager {
      * @return The note set on the session.
      */
     public String getCategoryName(long habitId) {
-        Cursor c = dbHelper.getAttribute(habitId, DatabaseHelper.HABIT_CATEGORY);
-        String name = c.getString(0);
-        c.close();
-        return name;
+        return getAttribute(habitId, SessionsTableSchema.HABIT_CATEGORY, String.class);
     }
 
     /**
@@ -568,7 +599,7 @@ public class SessionManager {
      * @return The number of rows affected.
      */
     public int setTotalPauseTime(long habitId, Long time) {
-        return dbHelper.setAttribute(habitId, DatabaseHelper.TOTAL_PAUSE_TIME, time);
+        return setAttribute(habitId, SessionsTableSchema.TOTAL_PAUSE_TIME, time);
     }
 
     /**
@@ -576,11 +607,7 @@ public class SessionManager {
      * @return Total time paused
      */
     public long getTotalPauseTime(long habitId) {
-        Cursor c = dbHelper.getAttribute(habitId, DatabaseHelper.TOTAL_PAUSE_TIME);
-        long totalPauseTime = c.getLong(0);
-        c.close();
-
-        return totalPauseTime;
+        return getAttribute(habitId, SessionsTableSchema.TOTAL_PAUSE_TIME, Long.class);
     }
 
     /**
@@ -589,7 +616,7 @@ public class SessionManager {
      * @return The number of rows affected.
      */
     private int setLastPauseTime(long habitId, long time) {
-        return dbHelper.setAttribute(habitId, DatabaseHelper.LAST_TIME_PAUSED, time);
+        return setAttribute(habitId, SessionsTableSchema.LAST_TIME_PAUSED, time);
     }
 
     /**
@@ -597,70 +624,21 @@ public class SessionManager {
      * @return total time paused
      */
     public long getLastPauseTime(long habitId) {
-        Cursor c = dbHelper.getAttribute(habitId, DatabaseHelper.LAST_TIME_PAUSED);
-        long lastPauseTime = c.getLong(0);
-        c.close();
-        return lastPauseTime;
+        return getAttribute(habitId, SessionsTableSchema.LAST_TIME_PAUSED, Long.class);
     }
 
     /**
-     * @param habitId The id of the habit for the session.
      * @return The time in ms which the session was started.
      */
     public long getStartingTime(long habitId) {
-        Cursor c = dbHelper.getAttribute(habitId, STARTING_TIME);
-        long startingTime = c.getLong(0);
-        c.close();
-        return startingTime;
+        return getAttribute(habitId, SessionsTableSchema.STARTING_TIME, Long.class);
     }
 
-    /**
-     * @param habitId The id of the habit for the session.
-     * @param state   True if paused, false if not.
-     * @return The number of rows affected.
-     */
     private int setIsPaused(long habitId, boolean state) {
-        Long stateConversion = state ? (long) 1 : (long) 0;
-        return dbHelper.setAttribute(habitId, DatabaseHelper.IS_PAUSED, stateConversion);
+        return setAttribute(habitId, SessionsTableSchema.IS_PAUSED, state);
     }
 
-    /**
-     * @param habitId The id of the habit for the session.
-     * @return True if paused, false if not.
-     */
     public boolean getIsPaused(long habitId) {
-        Cursor c = dbHelper.getAttribute(habitId, DatabaseHelper.IS_PAUSED);
-        boolean isPaused = c.getLong(0) == 1;
-        c.close();
-        return isPaused;
-    }
-
-    public static class TimeDisplay {
-        public long hours, minutes, seconds;
-
-        public TimeDisplay(long time) {
-            updateTime(time);
-        }
-
-        public void updateTime(long time) {
-            time /= 1000;
-
-            this.hours = (time - (time % 3600)) / 3600;
-            time -= this.hours * 3600;
-
-            this.minutes = (time - (time % 60)) / 60;
-            time -= this.minutes * 60;
-
-            this.seconds = time;
-        }
-
-        @Override
-        public String toString() {
-            return String.format(Locale.US, "%02d:%02d:%02d", this.hours, this.minutes, this.seconds);
-        }
-
-        public static String getDisplay(long duration) {
-            return new TimeDisplay(duration).toString();
-        }
+        return getAttribute(habitId, SessionsTableSchema.IS_PAUSED, Boolean.class);
     }
 }

@@ -17,9 +17,10 @@ import android.view.View;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
-import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.TimeFormatUtils.TimeDisplay;
 import com.example.brandon.habitlogger.databinding.ActivitySessionBinding;
 
 import java.util.Locale;
@@ -53,11 +54,11 @@ public class SessionActivity extends AppCompatActivity {
         actionBar = getSupportActionBar();
 
         Intent data = getIntent();
-        habit = (Habit)data.getSerializableExtra("habit");
+        habit = (Habit) data.getSerializableExtra("habit");
 
         habitId = habit.getDatabaseId();
 
-        if(data.hasExtra("position"))
+        if (data.hasExtra("position"))
             position = data.getIntExtra("position", RecyclerView.NO_POSITION);
 
         sessionManager = new SessionManager(this);
@@ -73,12 +74,12 @@ public class SessionActivity extends AppCompatActivity {
             }
         });
 
-        if(!sessionManager.isSessionActive(habitId)){
+        if (!sessionManager.isSessionActive(habitId)) {
             sessionManager.startSession(habitId);
         }
 
         ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null){
+        if (actionBar != null) {
             actionBar.setTitle(habit.getName());
         }
 
@@ -135,7 +136,8 @@ public class SessionActivity extends AppCompatActivity {
                 HabitDatabase database = new HabitDatabase(this);
                 database.addEntry(habitId, entry);
                 finish();
-            }break;
+            }
+            break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -167,11 +169,11 @@ public class SessionActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    public void setColorTheme(){
+    public void setColorTheme() {
         int color = 0xFFCCCCCC;
         int darkerColor = 0xFFBBBBBB;
 
-        if(!habit.getIsArchived()){
+        if (!habit.getIsArchived()) {
             color = habit.getCategory().getColorAsInt();
             darkerColor = HabitCategory.darkenColor(color, 0.7f);
         }
@@ -186,25 +188,23 @@ public class SessionActivity extends AppCompatActivity {
         actionBar.setBackgroundDrawable(new ColorDrawable(color));
     }
 
-    public void updateTimeDisplay(){
+    public void updateTimeDisplay() {
         SessionEntry entry = sessionManager.getSession(habitId);
+        TimeDisplay display = new TimeDisplay(entry.getDuration());
 
-        long time = entry.getDuration();
-        SessionManager.TimeDisplay display = new SessionManager.TimeDisplay(time);
-
-        binding.sessionHoursView.setText  (String.format(Locale.US, "%02d", display.hours));
+        binding.sessionHoursView.setText(String.format(Locale.US, "%02d", display.hours));
         binding.sessionMinutesView.setText(String.format(Locale.US, "%02d", display.minutes));
         binding.sessionSecondsView.setText(String.format(Locale.US, "%02d", display.seconds));
     }
 
-    public void reloadNote(){
+    public void reloadNote() {
         String note = sessionManager.getNote(habitId);
-        if(!note.equals("")){
+        if (!note.equals("")) {
             binding.sessionNote.setText(note);
         }
     }
 
-    public void prepareTimerDisplay(){
+    public void prepareTimerDisplay() {
         updateSessionPlayButton(sessionManager.getIsPaused(habitId));
         updateTimeDisplay();
         reloadNote();

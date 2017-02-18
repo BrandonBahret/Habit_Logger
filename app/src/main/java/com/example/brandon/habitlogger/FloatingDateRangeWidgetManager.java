@@ -11,8 +11,8 @@ import android.widget.TextView;
 
 import com.example.brandon.habitlogger.HabitActivity.StartingDateDialog;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
+import com.example.brandon.habitlogger.TimeFormatUtils.TimeDisplay;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -210,7 +210,7 @@ public class FloatingDateRangeWidgetManager {
         }
 
         viewHolder.entriesCountText.setText(String.valueOf(numberOfEntries));
-        String totalTimeString = new SessionManager.TimeDisplay(totalDuration).toString();
+        String totalTimeString = TimeDisplay.getDisplay(totalDuration);
         viewHolder.totalTimeText.setText(totalTimeString);
     }
 

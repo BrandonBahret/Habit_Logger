@@ -13,6 +13,7 @@ import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.TimeFormatUtils.TimeDisplay;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class NewEntryForm extends DialogFragment {
@@ -113,7 +114,7 @@ public class NewEntryForm extends DialogFragment {
         startingTime.setText(entry.getStartTimeAsString("h:mm a"));
         date.setText(entry.getStartTimeAsString(new PreferenceChecker(getContext()).stringGetDateFormat()));
 
-        SessionManager.TimeDisplay time = new SessionManager.TimeDisplay(entry.getDuration());
+        TimeDisplay time = new TimeDisplay(entry.getDuration());
         hours.setText(String.valueOf(time.hours));
         minutes.setText(String.valueOf(time.minutes));
         seconds.setText(String.valueOf(time.seconds));

@@ -24,6 +24,7 @@ import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.ActiveSessionViewAdapter;
+import com.example.brandon.habitlogger.TimeFormatUtils.TimeDisplay;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -118,8 +119,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
                         if (item != null) {
                             TextView timeTextView = (TextView) item.findViewById(R.id.active_habit_time);
 
-                            String timeText =
-                                    new SessionManager.TimeDisplay(entry.getDuration()).toString();
+                            String timeText = TimeDisplay.getDisplay(entry.getDuration());
 
                             timeTextView.setText(timeText);
                         }

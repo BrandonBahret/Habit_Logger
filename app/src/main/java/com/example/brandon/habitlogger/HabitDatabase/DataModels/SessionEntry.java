@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.example.brandon.habitlogger.HabitSessions.SessionManager;
+import com.example.brandon.habitlogger.TimeFormatUtils.TimeDisplay;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -33,7 +33,7 @@ public class SessionEntry implements Serializable, Parcelable {
 
     /**
      * @param startTime a time in milliseconds for the time the session was started.
-     * @param duration  a time in milliseconds for the length of the session.
+     * @param duration  a time in milliseconds for the getDatabaseLength of the session.
      * @param note      an optional note to be associated with the session.
      */
     public SessionEntry(long startTime, long duration, @NonNull String note) {
@@ -203,14 +203,14 @@ public class SessionEntry implements Serializable, Parcelable {
     }
 
     /**
-     * @param duration a time in milliseconds for the length of the session.
+     * @param duration a time in milliseconds for the getDatabaseLength of the session.
      */
     public void setDuration(long duration) {
         this.mDuration = duration;
     }
 
     /**
-     * @return a time in milliseconds for the length of the session.
+     * @return a time in milliseconds for the getDatabaseLength of the session.
      */
     public long getDuration() {
         return this.mDuration;
@@ -276,7 +276,7 @@ public class SessionEntry implements Serializable, Parcelable {
     }
 
     public String getDurationAsString() {
-        return new SessionManager.TimeDisplay(getDuration()).toString();
+        return TimeDisplay.getDisplay(getDuration());
     }
 
     public String getStartTimeAsString(String dateFormat) {

@@ -864,8 +864,7 @@ public class HabitDatabase {
      * @param habitId The row id of the habit you wish to receive.
      * @return The habit object found.
      */
-    @Nullable
-    public Habit getHabit(long habitId) {
+    public Habit getHabit(long habitId) throws RuntimeException {
         String selectionArgs[] = {String.valueOf(habitId)};
 
         SQLiteDatabase db = databaseHelper.getReadableDatabase();

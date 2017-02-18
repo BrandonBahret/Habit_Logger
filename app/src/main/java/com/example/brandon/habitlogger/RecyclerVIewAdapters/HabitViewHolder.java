@@ -12,6 +12,7 @@ import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.TimeFormatUtils.TimeDisplay;
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder;
 
 /**
@@ -118,7 +119,7 @@ public class HabitViewHolder extends ChildViewHolder {
     }
 
     public void setEntry(SessionEntry entry){
-        time.setText(new SessionManager.TimeDisplay(entry.getDuration()).toString());
+        time.setText(TimeDisplay.getDisplay(entry.getDuration()));
         playButton.setImageResource(
                 SessionManager.getResourceIdForPauseButton(entry.getIsPaused())
         );
