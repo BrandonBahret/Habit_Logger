@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger;
+package com.example.brandon.habitlogger.RecyclerVIewAdapters;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -12,6 +12,8 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.view.View;
+
+import com.example.brandon.habitlogger.R;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class ComplexDecoration extends RecyclerView.ItemDecoration {

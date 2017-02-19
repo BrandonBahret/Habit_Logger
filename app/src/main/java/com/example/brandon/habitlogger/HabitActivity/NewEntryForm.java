@@ -10,10 +10,9 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.TimeFormatUtils.TimeDisplay;
+import com.example.brandon.habitlogger.common.TimeDisplay;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class NewEntryForm extends DialogFragment {
@@ -40,7 +39,7 @@ public class NewEntryForm extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.entry = new SessionEntry(SessionManager.getCurrentTime(), 0, "");
+        this.entry = new SessionEntry(System.currentTimeMillis(), 0, "");
 
         if (getArguments() != null) {
             if(getArguments().containsKey(ENTRY)) {

@@ -24,7 +24,7 @@ import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.ActiveSessionViewAdapter;
-import com.example.brandon.habitlogger.TimeFormatUtils.TimeDisplay;
+import com.example.brandon.habitlogger.common.TimeDisplay;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -73,6 +73,11 @@ public class ActiveSessionsActivity extends AppCompatActivity {
             public void sessionEnded(long habitId, boolean wasCanceled) {
 
             }
+
+            @Override
+            public void sessionStarted(long habitId) {
+
+            }
         });
 
         habitDatabase = new HabitDatabase(this);
@@ -110,7 +115,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
 
                 for (int i = 0; i < size; i++) {
                     long habitId = sessionEntries.get(i).getHabitId();
-                    if (sessionManager.isSessionActive(habitId)) {
+                    if (sessionManager.getIsSessionActive(habitId)) {
                         SessionEntry entry = sessionManager.getSession(habitId);
                         sessionEntries.set(i, entry);
 

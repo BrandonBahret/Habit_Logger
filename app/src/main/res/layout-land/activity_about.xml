@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
-    tools:context="com.example.brandon.habitlogger.AboutActivity">
+    tools:context="com.example.brandon.habitlogger.ui.AboutActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

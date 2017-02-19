@@ -17,7 +17,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
-import com.example.brandon.habitlogger.FloatingDateRangeWidgetManager;
+import com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager;
 import com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener;
 import com.example.brandon.habitlogger.HabitActivity.CalendarFragment;
 import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;

@@ -12,7 +12,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.ComplexDecoration;
+import com.example.brandon.habitlogger.RecyclerVIewAdapters.ComplexDecoration;
 import com.example.brandon.habitlogger.HabitActivity.NewEntryForm;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;

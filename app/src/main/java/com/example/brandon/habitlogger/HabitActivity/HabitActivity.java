@@ -17,7 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
-import com.example.brandon.habitlogger.FloatingDateRangeWidgetManager;
+import com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
@@ -286,7 +286,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
             }break;
 
             case(R.id.menu_delete_habit):{
-                if (sessionManager.isSessionActive(habitId)) {
+                if (sessionManager.getIsSessionActive(habitId)) {
                     sessionManager.cancelSession(habitId);
                 }
 

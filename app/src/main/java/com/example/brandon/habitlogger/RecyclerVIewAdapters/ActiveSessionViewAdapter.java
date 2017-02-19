@@ -14,7 +14,7 @@ import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.TimeFormatUtils.TimeDisplay;
+import com.example.brandon.habitlogger.common.TimeDisplay;
 
 import java.util.List;
 
@@ -88,13 +88,10 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
         final SessionEntry item = sessionEntries.get(position);
         long habitId = item.getHabitId();
 
-        if (sessionManager.isSessionActive(habitId)) {
+        if (sessionManager.getIsSessionActive(habitId)) {
             holder.habitId = habitId;
-
             holder.name.setText(item.getName());
-
             holder.time.setText(TimeDisplay.getDisplay(item.getDuration()));
-
             holder.timeStarted.setText(item.getStartTimeAsString("h:mm a"));
 
             if(habitDatabase.getIsHabitArchived(habitId)){

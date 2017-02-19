@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.example.brandon.habitlogger.TimeFormatUtils.TimeDisplay;
+import com.example.brandon.habitlogger.common.TimeDisplay;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -26,7 +26,7 @@ public class SessionEntry implements Serializable, Parcelable {
     private long lastTimePaused;
     private long totalPauseTime;
     @NonNull private String note;
-    private String category;
+    private String categoryName;
 
     private long habitId = -1;
     private long databaseId = -1;
@@ -73,7 +73,7 @@ public class SessionEntry implements Serializable, Parcelable {
         this.databaseId = entry.databaseId;
         this.habitId = entry.habitId;
         this.mName = entry.mName;
-        this.category = entry.category;
+        this.categoryName = entry.categoryName;
         this.mIsPaused = entry.mIsPaused;
         this.lastTimePaused = entry.lastTimePaused;
         this.totalPauseTime = entry.totalPauseTime;
@@ -89,10 +89,10 @@ public class SessionEntry implements Serializable, Parcelable {
     public static Comparator<SessionEntry> CategoryComparator = new Comparator<SessionEntry>() {
         @Override
         public int compare(SessionEntry sessionOne, SessionEntry sessionTwo) {
-            if (sessionOne.category == null || sessionTwo.category == null) {
+            if (sessionOne.categoryName == null || sessionTwo.categoryName == null) {
                 throw new IllegalArgumentException("SessionEntry.CategoryComparator requires entries to have categories set.");
             }
-            return sessionOne.category.compareTo(sessionTwo.category);
+            return sessionOne.categoryName.compareTo(sessionTwo.categoryName);
         }
     };
 
@@ -263,6 +263,10 @@ public class SessionEntry implements Serializable, Parcelable {
         this.mName = mName;
     }
 
+    public String getCategoryName(){
+        return this.categoryName;
+    }
+
     public String getName() {
         return this.mName;
     }
@@ -296,7 +300,7 @@ public class SessionEntry implements Serializable, Parcelable {
     }
 
     public void setCategoryName(String categoryName) {
-        this.category = categoryName;
+        this.categoryName = categoryName;
     }
 
 }

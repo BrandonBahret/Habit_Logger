@@ -20,7 +20,7 @@ import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.TimeFormatUtils.TimeDisplay;
+import com.example.brandon.habitlogger.common.TimeDisplay;
 import com.example.brandon.habitlogger.databinding.ActivitySessionBinding;
 
 import java.util.Locale;
@@ -72,10 +72,15 @@ public class SessionActivity extends AppCompatActivity {
             public void sessionEnded(long habitId, boolean wasCanceled) {
 
             }
+
+            @Override
+            public void sessionStarted(long habitId) {
+
+            }
         });
 
-        if (!sessionManager.isSessionActive(habitId)) {
-            sessionManager.startSession(habitId);
+        if (!sessionManager.getIsSessionActive(habitId)) {
+            sessionManager.startSession(habit);
         }
 
         ActionBar actionBar = getSupportActionBar();

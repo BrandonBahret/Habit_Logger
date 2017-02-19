@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger;
+package com.example.brandon.habitlogger.ui;
 
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -10,6 +10,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+
+import com.example.brandon.habitlogger.R;
 
 public class AboutActivity extends AppCompatActivity {
 

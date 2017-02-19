@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.TimeFormatUtils;
+package com.example.brandon.habitlogger.common;
 
 import java.util.Locale;
 

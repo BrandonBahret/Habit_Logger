@@ -1,7 +1,14 @@
 package com.example.brandon.habitlogger.HabitSessions.DatabaseSchema;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteStatement;
+
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.HabitSessions.SessionManager;
+
 /**
  * Created by Brandon on 2/18/2017.
+ *
  */
 
 public class SessionsTableSchema {
@@ -47,5 +54,51 @@ public class SessionsTableSchema {
                 IS_PAUSED + ", " +
                 NOTE +
                 ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    }
+
+    public static String getSearchRecordsByHabitOrCategoryNameStatement(String query) {
+        return "SELECT " + SessionsTableSchema.HABIT_ID + " FROM " +
+                SessionsTableSchema.TABLE_NAME + " WHERE " +
+                SessionsTableSchema.HABIT_NAME + " LIKE  '%" + query + "%' OR " +
+                SessionsTableSchema.HABIT_CATEGORY + " LIKE  '%" + query + "%'";
+    }
+
+
+    public static SessionEntry objectFromContentValues(ContentValues contentValues) {
+        long lastPausedTime = contentValues.getAsLong(LAST_TIME_PAUSED);
+        long totalPausedTime = contentValues.getAsLong(TOTAL_PAUSE_TIME);
+        boolean isPaused = contentValues.getAsInteger(IS_PAUSED) == 1;
+        long startingTime = contentValues.getAsLong(STARTING_TIME);
+        String note = contentValues.getAsString(NOTE);
+        long habitId = contentValues.getAsLong(HABIT_ID);
+        String habitName = contentValues.getAsString(HABIT_NAME);
+        String categoryName = contentValues.getAsString(HABIT_CATEGORY);
+
+        SessionEntry entry = new SessionEntry(startingTime, -1, note);
+        entry.setLastTimePaused(lastPausedTime);
+        entry.setTotalPauseTime(totalPausedTime);
+        entry.setIsPaused(isPaused);
+        entry.setHabitId(habitId);
+        entry.setCategoryName(categoryName);
+        entry.setName(habitName);
+
+        // Set duration, this is done here since we may need to calculate the duration.
+        long duration = isPaused ? contentValues.getAsLong(DURATION) : SessionManager.calculateElapsedTimeForEntry(entry);
+        entry.setDuration(duration);
+
+        return entry;
+    }
+
+    public static void bindObjectToStatement(SQLiteStatement statement, SessionEntry entry) {
+
+        statement.bindLong(1, entry.getHabitId());            // HABIT_ID
+        statement.bindString(2, entry.getName());             // HABIT_NAME
+        statement.bindString(3, entry.getCategoryName());     // HABIT_CATEGORY
+        statement.bindLong(4, entry.getDuration());           // DURATION
+        statement.bindLong(5, entry.getStartTime());          // STARTING_TIME
+        statement.bindLong(6, entry.getLastTimePaused());     // LAST_TIME_PAUSED
+        statement.bindLong(7, entry.getTotalPauseTime());     // TOTAL_PAUSE_TIME
+        statement.bindLong(8, entry.getIsPaused() ? 1L : 0L); // IS_PAUSED
+        statement.bindString(9, entry.getNote());             // NOTE
     }
 }

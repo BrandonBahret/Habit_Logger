@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger;
+package com.example.brandon.habitlogger.ui;
 
 
 import android.content.Intent;
@@ -24,6 +24,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.brandon.habitlogger.RecyclerVIewAdapters.ComplexDecoration;
 import com.example.brandon.habitlogger.DataExportHelpers.GoogleDriveDataExportManager;
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.HabitActivity.HabitActivity;
@@ -33,10 +34,12 @@ import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitSessions.ActiveSessionsActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
+import com.example.brandon.habitlogger.HabitSessions.SessionNotificationManager;
 import com.example.brandon.habitlogger.ModifyHabitActivity.ModifyHabitActivity;
 import com.example.brandon.habitlogger.OverallStatistics.OverallStatisticsActivity;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.Preferences.SettingsActivity;
+import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.CategoryCardAdapter;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.HabitViewAdapter;
 import com.example.brandon.habitlogger.databinding.ActivityMainBinding;
@@ -55,6 +58,7 @@ public class MainActivity extends AppCompatActivity
 
     PreferenceChecker preferenceChecker;
     SessionManager sessionManager;
+    SessionNotificationManager sessionNotificationManager;
 
     CardView currentSession;
     RecyclerView habitCardContainer;
@@ -112,6 +116,7 @@ public class MainActivity extends AppCompatActivity
         binding.navView.setNavigationItemSelectedListener(this);
 
         habitDatabase = new HabitDatabase(MainActivity.this);
+        sessionNotificationManager = new SessionNotificationManager(this);
         sessionManager = new SessionManager(this);
         sessionManager.addSessionChangedListener(new SessionManager.SessionChangeListener() {
             @Override
@@ -121,6 +126,8 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void sessionEnded(long habitId, boolean wasCanceled) {
+                sessionNotificationManager.cancel(habitId);
+
                 for (int i = 0; i < habitList.size(); i++) {
                     if (habitList.get(i).getDatabaseId() == habitId) {
                         View item = habitCardContainer.getChildAt(i);
@@ -133,6 +140,13 @@ public class MainActivity extends AppCompatActivity
                         }
                         break;
                     }
+                }
+            }
+
+            @Override
+            public void sessionStarted(long habitId) {
+                if (preferenceChecker.doShowNotificationsAutomatically()) {
+                    sessionNotificationManager.createSessionNotification(habitId);
                 }
             }
         });
@@ -150,7 +164,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onDeleteClick(long habitId) {
-                if (sessionManager.isSessionActive(habitId)) {
+                if (sessionManager.getIsSessionActive(habitId)) {
                     sessionManager.cancelSession(habitId);
                     updateCurrentSessionCard();
                 }
@@ -187,7 +201,7 @@ public class MainActivity extends AppCompatActivity
         buttonClickListener = new HabitViewAdapter.ButtonClickListener() {
             @Override
             public void onPlayButtonClicked(long habitId) {
-                if (!sessionManager.isSessionActive(habitId)) {
+                if (!sessionManager.getIsSessionActive(habitId)) {
                     startSession(habitDatabase.getHabit(habitId));
                 }
                 else {
@@ -477,7 +491,7 @@ public class MainActivity extends AppCompatActivity
         super.onStart();
 
         if (preferenceChecker.doShowNotificationsAutomatically()) {
-            sessionManager.createAllSessionNotifications();
+            sessionNotificationManager.createAllSessionNotifications();
         }
 
         handler.post(updateCards);
@@ -543,7 +557,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startActiveSessionsActivity() {
-        int count = sessionManager.getSessionCount();
+        long count = sessionManager.getSessionCount();
         if (count != 0) {
             Intent startTargetActivity = new Intent(this, ActiveSessionsActivity.class);
             startActivity(startTargetActivity);
@@ -602,7 +616,7 @@ public class MainActivity extends AppCompatActivity
         TextView countText = binding.mainInclude.contentMain.currentSessionsCard.activeSessionValueText;
         TextView countLabelText = binding.mainInclude.contentMain.currentSessionsCard.activeSessionDescriptionText;
 
-        int count = sessionManager.getSessionCount();
+        long count = (int) sessionManager.getSessionCount();
         currentSession.setAlpha(count == 0 ? 0.5f : 1.0f);
 
         if ((count != 0 || preferenceChecker.doAlwaysShowCurrentSessions()) && preferenceChecker.doShowCurrentSessions()
@@ -613,28 +627,20 @@ public class MainActivity extends AppCompatActivity
             currentSession.setVisibility(View.GONE);
         }
 
-        switch (count) {
-            case (0): {
-                countText.setText(R.string.no);
-                countLabelText.setText(R.string.active_sessions);
+        if (count == 0) {
+            countText.setText(R.string.no);
+            countLabelText.setText(R.string.active_sessions);
 
-                if (!preferenceChecker.doAlwaysShowCurrentSessions()) {
-                    currentSession.setVisibility(View.GONE);
-                }
-            }
-            break;
-
-            case (1): {
-                countText.setText(R.string.one);
-                countLabelText.setText(R.string.active_session);
-            }
-            break;
-
-            default: {
-                countText.setText(String.valueOf(count));
-                countLabelText.setText(R.string.active_sessions);
-            }
-            break;
+            if (!preferenceChecker.doAlwaysShowCurrentSessions())
+                currentSession.setVisibility(View.GONE);
+        }
+        else if (count == 1) {
+            countText.setText(R.string.one);
+            countLabelText.setText(R.string.active_session);
+        }
+        else {
+            countText.setText(String.valueOf(count));
+            countLabelText.setText(R.string.active_sessions);
         }
     }
 

@@ -899,15 +899,16 @@ public class HabitDatabase {
         return categoryId;
     }
 
-    public int getHabitColor(long habitId) {
-        HabitCategory category = getCategory(getHabitCategoryId(habitId));
-
-        int color = -1;
-        if (category != null) {
-            color = category.getColorAsInt();
+    public int getHabitColor(long habitId){
+        if (getIsHabitArchived(habitId)) return 0xFFCCCCCC;
+        else {
+            HabitCategory category = getCategory(getHabitCategoryId(habitId));
+            if(category != null){
+                return category.getColorAsInt();
+            }
         }
 
-        return color;
+        return -1;
     }
 
     public Set<Long> getHabitIds(long categoryId) {

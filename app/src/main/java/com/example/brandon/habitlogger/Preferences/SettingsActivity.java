@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatDelegate;
 import android.view.MenuItem;
 
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
+import com.example.brandon.habitlogger.HabitSessions.SessionNotificationManager;
 import com.example.brandon.habitlogger.R;
 
 public class SettingsActivity extends AppCompatActivity
@@ -19,6 +20,7 @@ public class SettingsActivity extends AppCompatActivity
 
     PreferenceChecker preferenceChecker;
     SessionManager sessionManager;
+    SessionNotificationManager sessionNotificationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,7 @@ public class SettingsActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         sessionManager = new SessionManager(this);
+        sessionNotificationManager = new SessionNotificationManager(this);
 
         ActionBar toolbar = getSupportActionBar();
         if(toolbar != null){
@@ -83,14 +86,14 @@ public class SettingsActivity extends AppCompatActivity
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         preferenceChecker.checkPreferences();
         if (key.equals("do_show_notifications") && !preferenceChecker.doShowNotifications()) {
-            sessionManager.clearAllNotifications();
+            sessionNotificationManager.clearAllNotifications();
         }
         else if (key.equals("do_show_notifications") && preferenceChecker.doShowNotifications()) {
             if(preferenceChecker.doShowNotificationsAutomatically())
-                sessionManager.createAllSessionNotifications();
+                sessionNotificationManager.createAllSessionNotifications();
         }
         else if (key.equals("do_automatically_show_notifications") && preferenceChecker.doShowNotificationsAutomatically()) {
-            sessionManager.createAllSessionNotifications();
+            sessionNotificationManager.createAllSessionNotifications();
         }
 
         if(key.equals("is_night_mode")){

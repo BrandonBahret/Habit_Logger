@@ -10,9 +10,8 @@ import android.widget.TextView;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.TimeFormatUtils.TimeDisplay;
+import com.example.brandon.habitlogger.common.TimeDisplay;
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder;
 
 /**
@@ -118,10 +117,15 @@ public class HabitViewHolder extends ChildViewHolder {
         });
     }
 
+    public static int getResourceIdForPauseButton(boolean isPaused) {
+        return isPaused ? R.drawable.ic_play_circle_filled_black_24dp :
+                R.drawable.ic_play_circle_outline_black_24dp;
+    }
+
     public void setEntry(SessionEntry entry){
         time.setText(TimeDisplay.getDisplay(entry.getDuration()));
         playButton.setImageResource(
-                SessionManager.getResourceIdForPauseButton(entry.getIsPaused())
+                getResourceIdForPauseButton(entry.getIsPaused())
         );
     }
 }
