@@ -300,7 +300,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
     public void startSession() {
         Intent startSession = new Intent(this, SessionActivity.class);
-        startSession.putExtra("habit", (Serializable)habit);
+        startSession.putExtra(SessionActivity.BundleKeys.SERIALIZED_HABIT, (Serializable)habit);
         startActivity(startSession);
     }
 

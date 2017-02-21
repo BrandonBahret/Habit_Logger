@@ -45,6 +45,10 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         sessionChangeListeners.add(listener);
     }
 
+    public void removeSessionChangedListener(SessionChangeListener listener) {
+        sessionChangeListeners.remove(listener);
+    }
+
     public SessionManager(Context context) {
         databaseHelper = new DatabaseSchema(context);
         writableDatabase = databaseHelper.getWritableDatabase();
@@ -61,7 +65,7 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         long result = insert.executeInsert();
         insert.close();
 
-        long habitId = entry.getHabitId();
+        long habitId = entry.getHabit().getDatabaseId();
         for (SessionChangeListener listener : sessionChangeListeners) {
             listener.sessionStarted(habitId);
         }
@@ -83,9 +87,7 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
      */
     public long startSession(Habit habit) {
         SessionEntry entry = new SessionEntry(System.currentTimeMillis(), 0, "");
-        entry.setHabitId(habit.getDatabaseId());
-        entry.setName(habit.getName());
-        entry.setCategoryName(habit.getCategory().getName());
+        entry.setHabit(habit);
 
         return insertSession(entry);
     }
@@ -246,17 +248,15 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         return entry;
     }
 
-    @Nullable
     public List<SessionEntry> getActiveSessionList() {
-        List<SessionEntry> sessions = null;
         Cursor cursor = readableDatabase.query(
                 SessionsTableSchema.TABLE_NAME,
                 null, null, null, null, null, null
         );
 
-        if (cursor.moveToFirst()) {
-            sessions = new ArrayList<>(cursor.getCount());
+        List<SessionEntry> sessions = new ArrayList<>(cursor.getCount());
 
+        if (cursor.moveToFirst()) {
             // Load all the entries in the database into the ArrayList.
             do sessions.add(getSessionEntryFromCursor(cursor)); while (cursor.moveToNext());
 

@@ -11,6 +11,8 @@ import com.example.brandon.habitlogger.R;
 
 import java.util.List;
 
+import static android.R.attr.id;
+
 /**
  * Created by Brandon on 12/26/2016.
  * RecyclerView adapter for displaying habit cards.
@@ -74,11 +76,24 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
 
     public void updateHabitViews(List<SessionEntry> entries) {
         for(SessionEntry entry : entries){
+            // Todo get viewholder from position then .setEntry(entry);
             long habitId = entry.getHabitId();
+            int adapterPosition = this.getAdapterItemPosition(habitId);
 
-            // Todo get viewholder from position and .setEntry(entry);
+            HabitViewHolder vh = onCreateViewHolder(null, 0);
+            vh.setEntry(entry);
+
+            onBindViewHolder(vh, adapterPosition);
         }
     }
+
+    private int getAdapterItemPosition(long habitId) {
+        for (int position=0; position<getItemCount(); position++)
+            if (this.habitsList.get(position).getDatabaseId() == id)
+                return position;
+        return 0;
+    }
+
 
     @Override
     public int getItemCount() {

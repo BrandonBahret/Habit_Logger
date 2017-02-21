@@ -86,11 +86,11 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final SessionEntry item = sessionEntries.get(position);
-        long habitId = item.getHabitId();
+        long habitId = item.getHabit().getDatabaseId();
 
         if (sessionManager.getIsSessionActive(habitId)) {
             holder.habitId = habitId;
-            holder.name.setText(item.getName());
+            holder.name.setText(item.getHabit().getName());
             holder.time.setText(TimeDisplay.getDisplay(item.getDuration()));
             holder.timeStarted.setText(item.getStartTimeAsString("h:mm a"));
 

@@ -497,13 +497,13 @@ public class HabitDatabase {
     @Nullable
     private SessionEntry getEntryFromCursor(Cursor c) {
         long databaseId = c.getLong(0);
-        long entryHabitId = c.getLong(1);
+        long habitId = c.getLong(1);
         long startTime = c.getLong(2);
         long duration = c.getLong(3);
         String note = c.getString(4);
 
         SessionEntry entry = new SessionEntry(startTime, duration, note);
-        entry.setHabitId(entryHabitId);
+        entry.setHabitId(habitId);
         entry.setDatabaseId(databaseId);
 
         return entry;
@@ -845,14 +845,8 @@ public class HabitDatabase {
 
         HabitCategory category = getCategory(categoryId);
 
-
-        SessionEntry entries[] = new SessionEntry[getNumberOfEntries(habitId)];
-        for (int i = 0; i < getNumberOfEntries(habitId); i++) {
-            entries[i] = getEntry(getEntryId(habitId, i));
-        }
-
         if (category != null) {
-            habit = new Habit(name, description, category, iconResId, entries);
+            habit = new Habit(name, description, category, iconResId, null);
             habit.setDatabaseId(habitId);
             habit.setIsArchived(isArchived);
         }
@@ -899,11 +893,11 @@ public class HabitDatabase {
         return categoryId;
     }
 
-    public int getHabitColor(long habitId){
+    public int getHabitColor(long habitId) {
         if (getIsHabitArchived(habitId)) return 0xFFCCCCCC;
         else {
             HabitCategory category = getCategory(getHabitCategoryId(habitId));
-            if(category != null){
+            if (category != null) {
                 return category.getColorAsInt();
             }
         }

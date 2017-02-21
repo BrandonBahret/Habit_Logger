@@ -21,15 +21,14 @@ import java.util.Locale;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class SessionEntry implements Serializable, Parcelable {
     private long mStartTime, mDuration;
-    private String mName = "NAME_NOT_SET";
     private boolean mIsPaused = false;
     private long lastTimePaused;
     private long totalPauseTime;
-    @NonNull private String note;
-    private String categoryName;
-
-    private long habitId = -1;
     private long databaseId = -1;
+    @NonNull private String note;
+
+    private Habit habit;
+    private long habitId;
 
     /**
      * @param startTime a time in milliseconds for the time the session was started.
@@ -71,12 +70,10 @@ public class SessionEntry implements Serializable, Parcelable {
         this.mDuration = entry.mDuration;
         this.note = entry.note;
         this.databaseId = entry.databaseId;
-        this.habitId = entry.habitId;
-        this.mName = entry.mName;
-        this.categoryName = entry.categoryName;
         this.mIsPaused = entry.mIsPaused;
         this.lastTimePaused = entry.lastTimePaused;
         this.totalPauseTime = entry.totalPauseTime;
+        this.habit = entry.habit;
     }
 
     public static Comparator<SessionEntry> StartingTimeComparator = new Comparator<SessionEntry>() {
@@ -89,17 +86,17 @@ public class SessionEntry implements Serializable, Parcelable {
     public static Comparator<SessionEntry> CategoryComparator = new Comparator<SessionEntry>() {
         @Override
         public int compare(SessionEntry sessionOne, SessionEntry sessionTwo) {
-            if (sessionOne.categoryName == null || sessionTwo.categoryName == null) {
-                throw new IllegalArgumentException("SessionEntry.CategoryComparator requires entries to have categories set.");
+            if (sessionOne.habit == null || sessionTwo.habit == null) {
+                throw new IllegalArgumentException("SessionEntry.CategoryComparator requires entries to have habit set.");
             }
-            return sessionOne.categoryName.compareTo(sessionTwo.categoryName);
+            return sessionOne.getCategoryName().compareTo(sessionTwo.getCategoryName());
         }
     };
 
     public static Comparator<SessionEntry> Alphabetical = new Comparator<SessionEntry>() {
         @Override
         public int compare(SessionEntry sessionOne, SessionEntry sessionTwo) {
-            return sessionOne.getName().compareTo(sessionTwo.getName());
+            return sessionOne.habit.getName().compareTo(sessionTwo.habit.getName());
         }
     };
 
@@ -109,7 +106,7 @@ public class SessionEntry implements Serializable, Parcelable {
         if (obj instanceof SessionEntry) {
             SessionEntry compare = (SessionEntry) obj;
 
-            return compare.getHabitId().equals(getHabitId()) &&
+            return (compare.getHabitId() == this.getHabitId()) &&
                     String.valueOf(compare.getNote()).equals(String.valueOf(getNote())) &&
                     compare.getDuration() == getDuration() &&
                     compare.getStartTime() == getStartTime();
@@ -202,6 +199,10 @@ public class SessionEntry implements Serializable, Parcelable {
         totalPauseTime = milliseconds;
     }
 
+    public long getHabitId() {
+        return habitId;
+    }
+
     /**
      * @param duration a time in milliseconds for the getDatabaseLength of the session.
      */
@@ -232,20 +233,6 @@ public class SessionEntry implements Serializable, Parcelable {
     }
 
     /**
-     * @param habitId The row id of the habitd associated with this entry.
-     */
-    public void setHabitId(Long habitId) {
-        this.habitId = habitId;
-    }
-
-    /**
-     * @return The row id of the habitd associated with this entry.
-     */
-    public Long getHabitId() {
-        return habitId;
-    }
-
-    /**
      * @param databaseId The row id of the entry object in the database
      */
     public void setDatabaseId(long databaseId) {
@@ -259,16 +246,8 @@ public class SessionEntry implements Serializable, Parcelable {
         return databaseId;
     }
 
-    public void setName(String mName) {
-        this.mName = mName;
-    }
-
-    public String getCategoryName(){
-        return this.categoryName;
-    }
-
-    public String getName() {
-        return this.mName;
+    public String getCategoryName() {
+        return this.habit.getCategory().getName();
     }
 
     public void setIsPaused(boolean isPaused) {
@@ -299,8 +278,16 @@ public class SessionEntry implements Serializable, Parcelable {
         return formatter.format(new Date(milliSeconds));
     }
 
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
+
+    public Habit getHabit() {
+        return habit;
     }
 
+    public void setHabit(Habit habit) {
+        this.habit = habit;
+    }
+
+    public void setHabitId(long habitId) {
+        this.habitId = habitId;
+    }
 }

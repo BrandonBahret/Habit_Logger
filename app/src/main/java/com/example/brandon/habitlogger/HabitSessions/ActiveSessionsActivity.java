@@ -1,6 +1,5 @@
 package com.example.brandon.habitlogger.HabitSessions;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,8 +19,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.ActiveSessionViewAdapter;
 import com.example.brandon.habitlogger.common.TimeDisplay;
@@ -61,7 +60,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
             @Override
             public void sessionPauseStateChanged(long habitId, boolean isPaused) {
                 for (SessionEntry entry : sessionEntries) {
-                    if (entry.getHabitId() == habitId) {
+                    if (entry.getHabit().getDatabaseId() == habitId) {
                         int position = sessionEntries.indexOf(entry);
                         sessionViewAdapter.notifyItemChanged(position);
                         break;
@@ -114,7 +113,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
                 int size = sessionEntries.size();
 
                 for (int i = 0; i < size; i++) {
-                    long habitId = sessionEntries.get(i).getHabitId();
+                    long habitId = sessionEntries.get(i).getHabit().getDatabaseId();
                     if (sessionManager.getIsSessionActive(habitId)) {
                         SessionEntry entry = sessionManager.getSession(habitId);
                         sessionEntries.set(i, entry);
@@ -165,7 +164,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                long habitId = sessionEntries.get(position).getHabitId();
+                long habitId = sessionEntries.get(position).getHabit().getDatabaseId();
                 sessionEntriesUndoStack.add(sessionManager.getSession(habitId));
 
                 sessionManager.cancelSession(habitId);
@@ -223,7 +222,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
 
     private void cancelSession(int adapterPosition) {
         SessionEntry entry = sessionEntries.get(adapterPosition);
-        sessionManager.cancelSession(entry.getHabitId());
+        sessionManager.cancelSession(entry.getHabit().getDatabaseId());
         handler.post(updateCards);
     }
 
@@ -271,18 +270,12 @@ public class ActiveSessionsActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    protected void onResume() {
+        super.onResume();
+        handler.post(updateCards);
 
-        if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_CANCELED) {
-            if (requestCode == SessionActivity.RESULT_SESSION_FINISH) {
-                handler = new Handler();
-                handler.post(updateCards);
-
-                // Just in case the user paused/resumed the session, notify "changes."
-                sessionViewAdapter.notifyDataSetChanged();
-            }
-        }
+        // Just in case the user paused/resumed the session, notify "changes."
+        sessionViewAdapter.notifyDataSetChanged();
     }
 
     public void processUserQuery(String query) {
@@ -315,7 +308,7 @@ public class ActiveSessionsActivity extends AppCompatActivity {
 
         handler.removeCallbacks(updateCards);
         Intent startSession = new Intent(this, SessionActivity.class);
-        startSession.putExtra("habit", (Serializable) habit);
-        startActivityForResult(startSession, SessionActivity.RESULT_SESSION_FINISH);
+        startSession.putExtra(SessionActivity.BundleKeys.SERIALIZED_HABIT, (Serializable) habit);
+        startActivity(startSession);
     }
 }

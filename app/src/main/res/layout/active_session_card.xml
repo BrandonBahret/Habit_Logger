@@ -24,13 +24,13 @@
         <ImageButton
             android:id="@+id/session_pause_play"
             android:layout_width="60dp"
-            android:layout_height="match_parent"
+            android:layout_height="60dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:padding="3dp"
-            android:scaleType="centerCrop"
+            android:scaleType="fitXY"
             android:src="@drawable/ic_play_circle_outline_black_24dp"
             android:tint="@color/habitCardButtonColor" />
 

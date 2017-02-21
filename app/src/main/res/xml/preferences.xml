@@ -38,12 +38,6 @@
             android:key="do_automatically_show_notifications"
             android:summary="Have the app automatically display notifications."
             android:title="Automatically Show Notifications" />
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:dependency="do_show_notifications"
-            android:key="show_ticker"
-            android:summary="Show the header in the status bar when a notification is made."
-            android:title="Show Ticker" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Appearance">

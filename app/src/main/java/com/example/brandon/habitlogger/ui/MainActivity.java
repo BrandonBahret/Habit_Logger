@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void sessionEnded(long habitId, boolean wasCanceled) {
-                sessionNotificationManager.cancel(habitId);
+                sessionNotificationManager.cancel((int)habitId);
 
                 for (int i = 0; i < habitList.size(); i++) {
                     if (habitList.get(i).getDatabaseId() == habitId) {
@@ -145,8 +145,9 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void sessionStarted(long habitId) {
-                if (preferenceChecker.doShowNotificationsAutomatically()) {
-                    sessionNotificationManager.createSessionNotification(habitId);
+                if (preferenceChecker.doShowNotificationsAutomatically() && preferenceChecker.doShowNotifications()) {
+                    Habit habit = habitDatabase.getHabit(habitId);
+                    sessionNotificationManager.updateNotification(habit);
                 }
             }
         });
@@ -491,7 +492,7 @@ public class MainActivity extends AppCompatActivity
         super.onStart();
 
         if (preferenceChecker.doShowNotificationsAutomatically()) {
-            sessionNotificationManager.createAllSessionNotifications();
+            sessionNotificationManager.launchNotificationsForAllActiveSessions();
         }
 
         handler.post(updateCards);
@@ -552,8 +553,8 @@ public class MainActivity extends AppCompatActivity
 
     public void startSession(Habit habit) {
         Intent startSession = new Intent(this, SessionActivity.class);
-        startSession.putExtra("habit", (Serializable) habit);
-        startActivityForResult(startSession, SessionActivity.RESULT_SESSION_FINISH);
+        startSession.putExtra(SessionActivity.BundleKeys.SERIALIZED_HABIT, (Serializable) habit);
+        startActivity(startSession);
     }
 
     public void startActiveSessionsActivity() {

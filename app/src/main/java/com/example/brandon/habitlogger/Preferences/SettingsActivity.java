@@ -86,14 +86,14 @@ public class SettingsActivity extends AppCompatActivity
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         preferenceChecker.checkPreferences();
         if (key.equals("do_show_notifications") && !preferenceChecker.doShowNotifications()) {
-            sessionNotificationManager.clearAllNotifications();
+            sessionNotificationManager.cancelAllNotifications();
         }
         else if (key.equals("do_show_notifications") && preferenceChecker.doShowNotifications()) {
             if(preferenceChecker.doShowNotificationsAutomatically())
-                sessionNotificationManager.createAllSessionNotifications();
+                sessionNotificationManager.launchNotificationsForAllActiveSessions();
         }
         else if (key.equals("do_automatically_show_notifications") && preferenceChecker.doShowNotificationsAutomatically()) {
-            sessionNotificationManager.createAllSessionNotifications();
+            sessionNotificationManager.launchNotificationsForAllActiveSessions();
         }
 
         if(key.equals("is_night_mode")){

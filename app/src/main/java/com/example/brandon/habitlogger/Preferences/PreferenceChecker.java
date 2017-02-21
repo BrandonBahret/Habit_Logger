@@ -29,7 +29,7 @@ public class PreferenceChecker {
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    // Main Screen Settings
+    //region // Main Screen Settings
     public int howToDisplayCategories(){
         String displayCategories = preferences.getString("category_preference", String.valueOf(AS_SECTIONS));
         return parseInt(displayCategories);
@@ -42,8 +42,9 @@ public class PreferenceChecker {
     public boolean doAlwaysShowCurrentSessions(){
         return preferences.getBoolean("display_current_sessions_at_zero", true);
     }
+    //endregion
 
-    // Notifications
+    //region // Notifications
     public boolean doShowNotifications(){
         return preferences.getBoolean("do_show_notifications", true);
     }
@@ -51,12 +52,10 @@ public class PreferenceChecker {
     public boolean doShowNotificationsAutomatically(){
         return preferences.getBoolean("do_automatically_show_notifications", true);
     }
+    //endregion
 
-    public boolean doShowTicker(){
-        return preferences.getBoolean("show_ticker", false);
-    }
+    //region // Appearances
 
-    // Appearances
     public boolean isNightMode(){
         return preferences.getBoolean("is_night_mode", false);
     }
@@ -66,5 +65,6 @@ public class PreferenceChecker {
         int optionIndex = Integer.parseInt(preferences.getString("date_format", "0"));
         return dateOptions[optionIndex];
     }
+    //endregion
 
 }
