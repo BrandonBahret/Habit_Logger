@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
@@ -31,22 +30,22 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
     private SQLiteDatabase writableDatabase;
     private SQLiteDatabase readableDatabase;
 
-    private static ArrayList<SessionChangeListener> sessionChangeListeners = new ArrayList<>();
+    private static ArrayList<SessionChangeListeners> sessionChangeListeners = new ArrayList<>();
 
-    public interface SessionChangeListener {
-        void sessionPauseStateChanged(long habitId, boolean isPaused);
+    public interface SessionChangeListeners {
+        void onSessionPauseStateChanged(long habitId, boolean isPaused);
 
-        void sessionEnded(long habitId, boolean wasCanceled);
+        void onSessionEnded(long habitId, boolean wasCanceled);
 
-        void sessionStarted(long habitId);
+        void onSessionStarted(long habitId);
     }
 
-    public void addSessionChangedListener(SessionChangeListener listener) {
-        sessionChangeListeners.add(listener);
+    public void addSessionChangedCallback(SessionChangeListeners callback) {
+        sessionChangeListeners.add(callback);
     }
 
-    public void removeSessionChangedListener(SessionChangeListener listener) {
-        sessionChangeListeners.remove(listener);
+    public void removeSessionChangedCallback(SessionChangeListeners callback) {
+        sessionChangeListeners.remove(callback);
     }
 
     public SessionManager(Context context) {
@@ -66,8 +65,8 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         insert.close();
 
         long habitId = entry.getHabit().getDatabaseId();
-        for (SessionChangeListener listener : sessionChangeListeners) {
-            listener.sessionStarted(habitId);
+        for (SessionChangeListeners listener : sessionChangeListeners) {
+            listener.onSessionStarted(habitId);
         }
 
         return result;
@@ -98,8 +97,8 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
      */
     public long cancelSession(long habitId) {
         if (sessionChangeListeners != null) {
-            for (SessionChangeListener listener : sessionChangeListeners) {
-                listener.sessionEnded(habitId, true);
+            for (SessionChangeListeners listener : sessionChangeListeners) {
+                listener.onSessionEnded(habitId, true);
             }
         }
 
@@ -158,8 +157,8 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
             playSession(habitId);
 
         if (sessionChangeListeners != null) {
-            for (SessionChangeListener listener : sessionChangeListeners) {
-                listener.sessionPauseStateChanged(habitId, pause);
+            for (SessionChangeListeners listener : sessionChangeListeners) {
+                listener.onSessionPauseStateChanged(habitId, pause);
             }
         }
     }
@@ -176,8 +175,8 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         }
 
         if (sessionChangeListeners != null) {
-            for (SessionChangeListener listener : sessionChangeListeners) {
-                listener.sessionEnded(habitId, false);
+            for (SessionChangeListeners listener : sessionChangeListeners) {
+                listener.onSessionEnded(habitId, false);
             }
         }
 
@@ -188,17 +187,17 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         return entry;
     }
 
-    @Nullable
     public List<SessionEntry> queryActiveSessionList(String query) {
+        List<SessionEntry> sessions = new ArrayList<>();
+
         if (query.isEmpty()) { // If the query is an empty string return null;
-            return null;
+            return sessions;
         }
 
         Cursor c = readableDatabase.rawQuery(
                 SessionsTableSchema.getSearchRecordsByHabitOrCategoryNameStatement(query), null
         );
 
-        List<SessionEntry> sessions = null;
         if (c.moveToFirst()) {
             sessions = new ArrayList<>(c.getCount());
             do sessions.add(getSessionEntryFromCursor(c)); while (c.moveToNext());

@@ -56,12 +56,19 @@
         <activity
             android:name=".HabitSessions.ActiveSessionsActivity"
             android:label="Active Habits"
+            android:parentActivityName=".ui.MainActivity"
             android:theme="@style/AppTheme"/>
+
         <activity
             android:name=".ui.AboutActivity"
             android:label="About"
+            android:parentActivityName=".ui.MainActivity"
             android:theme="@style/AppTheme"/>
-        <activity android:name=".Preferences.SettingsActivity"/>
+
+        <activity
+            android:name=".Preferences.SettingsActivity"
+            android:parentActivityName=".ui.MainActivity"/>
+
         <activity
             android:name=".HabitActivity.HabitActivity"
             android:label="@string/title_activity_habit"

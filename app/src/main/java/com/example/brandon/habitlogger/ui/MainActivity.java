@@ -24,7 +24,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.brandon.habitlogger.RecyclerVIewAdapters.ComplexDecoration;
 import com.example.brandon.habitlogger.DataExportHelpers.GoogleDriveDataExportManager;
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.HabitActivity.HabitActivity;
@@ -41,7 +40,10 @@ import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.Preferences.SettingsActivity;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.CategoryCardAdapter;
+import com.example.brandon.habitlogger.RecyclerVIewAdapters.ComplexDecoration;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.HabitViewAdapter;
+import com.example.brandon.habitlogger.common.RequestCodes;
+import com.example.brandon.habitlogger.common.ResultCodes;
 import com.example.brandon.habitlogger.databinding.ActivityMainBinding;
 
 import java.io.Serializable;
@@ -118,14 +120,12 @@ public class MainActivity extends AppCompatActivity
         habitDatabase = new HabitDatabase(MainActivity.this);
         sessionNotificationManager = new SessionNotificationManager(this);
         sessionManager = new SessionManager(this);
-        sessionManager.addSessionChangedListener(new SessionManager.SessionChangeListener() {
+        sessionManager.addSessionChangedCallback(new SessionManager.SessionChangeListeners() {
             @Override
-            public void sessionPauseStateChanged(long habitId, boolean isPaused) {
-
-            }
+            public void onSessionPauseStateChanged(long habitId, boolean isPaused) {}
 
             @Override
-            public void sessionEnded(long habitId, boolean wasCanceled) {
+            public void onSessionEnded(long habitId, boolean wasCanceled) {
                 sessionNotificationManager.cancel((int)habitId);
 
                 for (int i = 0; i < habitList.size(); i++) {
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             @Override
-            public void sessionStarted(long habitId) {
+            public void onSessionStarted(long habitId) {
                 if (preferenceChecker.doShowNotificationsAutomatically() && preferenceChecker.doShowNotifications()) {
                     Habit habit = habitDatabase.getHabit(habitId);
                     sessionNotificationManager.updateNotification(habit);
@@ -438,11 +438,7 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == SettingsActivity.REQUEST_SETTINGS) {
-            applyItemDecorationToRecyclerView();
-            recreate();
-        }
-        else if (resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case ModifyHabitActivity.NEW_HABIT_RESULT_CODE: {
                     Habit newHabit = (Habit) data.getSerializableExtra("new_habit");
@@ -466,6 +462,9 @@ public class MainActivity extends AppCompatActivity
                 }
                 break;
             }
+        }
+        else if (requestCode == RequestCodes.SETTINGS_ACTIVITY && resultCode == ResultCodes.SETTINGS_CHANGED) {
+            recreate();
         }
     }
 
@@ -586,7 +585,7 @@ public class MainActivity extends AppCompatActivity
 
     public void startSettingsActivity() {
         Intent startSettings = new Intent(MainActivity.this, SettingsActivity.class);
-        startActivityForResult(startSettings, SettingsActivity.REQUEST_SETTINGS);
+        startActivityForResult(startSettings, RequestCodes.SETTINGS_ACTIVITY);
     }
 
     public void startNewHabitActivity() {

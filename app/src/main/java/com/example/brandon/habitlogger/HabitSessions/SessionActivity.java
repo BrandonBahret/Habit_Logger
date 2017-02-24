@@ -25,7 +25,7 @@ import java.util.Locale;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class SessionActivity extends AppCompatActivity implements
-        SessionManager.SessionChangeListener, View.OnClickListener {
+        SessionManager.SessionChangeListeners, View.OnClickListener {
 
     public static class BundleKeys {
         public static final String SERIALIZED_HABIT = "SERIALIZED_HABIT_KEY";
@@ -43,12 +43,8 @@ public class SessionActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         ui = DataBindingUtil.setContentView(this, R.layout.activity_session);
-        ActionBar toolbar = getSupportActionBar();
-        if (toolbar != null) {
-            toolbar.setDisplayHomeAsUpEnabled(true);
-        }
+        mHabit = (Habit) getIntent().getSerializableExtra(BundleKeys.SERIALIZED_HABIT);
     }
 
     @Override
@@ -60,19 +56,17 @@ public class SessionActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        mHabit = (Habit) getIntent().getSerializableExtra(BundleKeys.SERIALIZED_HABIT);
-
         mSessionManager = new SessionManager(this);
         if (!mSessionManager.getIsSessionActive(mHabit.getDatabaseId())) {
             mSessionManager.startSession(mHabit);
         }
 
-        ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null){
-            actionBar.setTitle(mHabit.getName());
+        if(getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle(mHabit.getName());
         }
 
-        mSessionManager.addSessionChangedListener(this);
+        mSessionManager.addSessionChangedCallback(this);
 
         ui.sessionCancel.setOnClickListener(this);
         ui.sessionPausePlay.setOnClickListener(this);
@@ -110,7 +104,7 @@ public class SessionActivity extends AppCompatActivity implements
     @Override
     protected void onStop() {
         super.onStop();
-        mSessionManager.removeSessionChangedListener(this);
+        mSessionManager.removeSessionChangedCallback(this);
     }
     //endregion // Tear-down activity
 
@@ -224,19 +218,19 @@ public class SessionActivity extends AppCompatActivity implements
 
     //region // Handle SessionManager events
     @Override
-    public void sessionPauseStateChanged(long habitId, boolean isPaused) {
+    public void onSessionPauseStateChanged(long habitId, boolean isPaused) {
         if (habitId == this.mHabit.getDatabaseId())
             updateSessionPlayButton(isPaused);
     }
 
     @Override
-    public void sessionEnded(long habitId, boolean wasCanceled) {
+    public void onSessionEnded(long habitId, boolean wasCanceled) {
         if (habitId == this.mHabit.getDatabaseId() && wasCanceled)
             finish();
     }
 
     @Override
-    public void sessionStarted(long habitId) {}
+    public void onSessionStarted(long habitId) {}
     //endregion // Handle SessionManager events
 
     //endregion // Methods responsible for handling events

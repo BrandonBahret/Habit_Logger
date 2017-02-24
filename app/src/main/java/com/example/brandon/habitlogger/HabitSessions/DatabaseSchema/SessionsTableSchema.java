@@ -2,6 +2,7 @@ package com.example.brandon.habitlogger.HabitSessions.DatabaseSchema;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteStatement;
+import android.support.annotation.NonNull;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
@@ -61,13 +62,13 @@ public class SessionsTableSchema {
     }
 
     public static String getSearchRecordsByHabitOrCategoryNameStatement(String query) {
-        return "SELECT " + SessionsTableSchema.HABIT_ID + " FROM " +
+        return "SELECT * FROM " +
                 SessionsTableSchema.TABLE_NAME + " WHERE " +
                 SessionsTableSchema.HABIT_NAME + " LIKE  '%" + query + "%' OR " +
                 SessionsTableSchema.HABIT_CATEGORY + " LIKE  '%" + query + "%'";
     }
 
-    public static SessionEntry objectFromContentValues(ContentValues contentValues) {
+    public static SessionEntry objectFromContentValues(@NonNull ContentValues contentValues) {
         long lastPausedTime = contentValues.getAsLong(LAST_TIME_PAUSED);
         long totalPausedTime = contentValues.getAsLong(TOTAL_PAUSE_TIME);
         boolean isPaused = contentValues.getAsInteger(IS_PAUSED) == 1;
@@ -95,7 +96,7 @@ public class SessionsTableSchema {
 
     public static void bindObjectToStatement(SQLiteStatement statement, SessionEntry entry) {
 
-        statement.bindLong(1, entry.getHabit().getDatabaseId()); // HABIT_ID
+        statement.bindLong(1, entry.getHabitId());               // HABIT_ID
         statement.bindString(2, entry.getHabit().getName());     // HABIT_NAME
         statement.bindString(3, entry.getCategoryName());        // HABIT_CATEGORY
         statement.bindString(4, entry.getHabit().getCategory().getColor());        // HABIT_COLOR

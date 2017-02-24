@@ -73,6 +73,7 @@ public class SessionEntry implements Serializable, Parcelable {
         this.mIsPaused = entry.mIsPaused;
         this.lastTimePaused = entry.lastTimePaused;
         this.totalPauseTime = entry.totalPauseTime;
+        this.habitId = entry.habitId;
         this.habit = entry.habit;
     }
 
@@ -285,6 +286,7 @@ public class SessionEntry implements Serializable, Parcelable {
 
     public void setHabit(Habit habit) {
         this.habit = habit;
+        setHabitId(habit.getDatabaseId());
     }
 
     public void setHabitId(long habitId) {

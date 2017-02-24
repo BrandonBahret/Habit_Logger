@@ -1,27 +1,34 @@
 package com.example.brandon.habitlogger.Preferences;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
-import android.support.v7.app.ActionBar;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.view.MenuItem;
 
-import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.HabitSessions.SessionNotificationManager;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.ResultCodes;
 
 public class SettingsActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public static final int REQUEST_SETTINGS = 105;
-
     PreferenceChecker preferenceChecker;
-    SessionManager sessionManager;
     SessionNotificationManager sessionNotificationManager;
 
+    public static class SettingsFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            // Load the preferences from an XML resource
+            addPreferencesFromResource(R.xml.preferences);
+        }
+    }
+
+    //region // Activity lifecycle methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         preferenceChecker = new PreferenceChecker(this);
@@ -33,12 +40,8 @@ public class SettingsActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
 
-        sessionManager = new SessionManager(this);
-        sessionNotificationManager = new SessionNotificationManager(this);
-
-        ActionBar toolbar = getSupportActionBar();
-        if(toolbar != null){
-            toolbar.setDisplayHomeAsUpEnabled(true);
+        if(getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
         // Display the fragment as the main content.
@@ -48,71 +51,59 @@ public class SettingsActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if(id == android.R.id.home){
-            Intent data = getIntent();
-            data.putExtra("set-theme", true);
-            setResult(RESULT_OK, data);
-            finish();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent data = getIntent();
-        data.putExtra("set-theme", true);
-        setResult(RESULT_OK, data);
-        finish();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         preferenceChecker.preferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
-    public void onPause() {
+    protected void onStart() {
+        super.onStart();
+        sessionNotificationManager = new SessionNotificationManager(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
         preferenceChecker.preferences.unregisterOnSharedPreferenceChangeListener(this);
-        super.onPause();
+    }
+
+    //endregion // Activity lifecycle methods
+
+    //region // Methods to handle events
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == android.R.id.home){
+            NavUtils.navigateUpFromSameTask(this);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        preferenceChecker.checkPreferences();
-        if (key.equals("do_show_notifications") && !preferenceChecker.doShowNotifications()) {
-            sessionNotificationManager.cancelAllNotifications();
-        }
-        else if (key.equals("do_show_notifications") && preferenceChecker.doShowNotifications()) {
-            if(preferenceChecker.doShowNotificationsAutomatically())
+        setResult(ResultCodes.SETTINGS_CHANGED);
+
+        if (key.equals(getString(R.string.pref_do_show_notifications))){
+
+            if(preferenceChecker.doShowNotifications())
                 sessionNotificationManager.launchNotificationsForAllActiveSessions();
+
+            else
+                sessionNotificationManager.cancelAllNotifications();
         }
-        else if (key.equals("do_automatically_show_notifications") && preferenceChecker.doShowNotificationsAutomatically()) {
+
+        else if (key.equals(getString(R.string.pref_do_show_notifications_auto)) && preferenceChecker.doShowNotificationsAutomatically()) {
             sessionNotificationManager.launchNotificationsForAllActiveSessions();
         }
 
-        if(key.equals("is_night_mode")){
-            AppCompatDelegate.setDefaultNightMode(
-                    preferenceChecker.isNightMode()? AppCompatDelegate.MODE_NIGHT_YES :
-                            AppCompatDelegate.MODE_NIGHT_NO
-            );
-
+        else if(key.equals(getString(R.string.pref_is_night_mode))){
             recreate();
         }
     }
+    //endregion // Methods to handle events
 
-    public static class SettingsFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-
-            // Load the preferences from an XML resource
-            addPreferencesFromResource(R.xml.preferences);
-        }
-    }
 }

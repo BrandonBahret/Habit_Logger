@@ -14,57 +14,66 @@ import static java.lang.Integer.parseInt;
  */
 
 public class PreferenceChecker {
-
     public SharedPreferences preferences;
-    private Context context;
+    private Context mContext;
 
     public static final int AS_CARDS = 0, AS_SECTIONS = 1, WITHOUT_CATEGORIES = 2;
 
     public PreferenceChecker(Context context){
-        this.context = context;
-        checkPreferences();
-    }
-
-    public void checkPreferences(){
+        mContext = context;
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     //region // Main Screen Settings
     public int howToDisplayCategories(){
-        String displayCategories = preferences.getString("category_preference", String.valueOf(AS_SECTIONS));
+        String displayCategories = preferences.getString(
+                mContext.getString(R.string.pref_show_categories), String.valueOf(AS_SECTIONS)
+        );
+
         return parseInt(displayCategories);
     }
 
     public boolean doShowCurrentSessions(){
-        return preferences.getBoolean("display_current_sessions_card", true);
+        return preferences.getBoolean(
+                mContext.getString(R.string.pref_display_current_sessions_card), true
+        );
     }
 
     public boolean doAlwaysShowCurrentSessions(){
-        return preferences.getBoolean("display_current_sessions_at_zero", true);
+        return preferences.getBoolean(
+                mContext.getString(R.string.pref_display_current_sessions_card_at_zero), true
+        );
     }
     //endregion
 
     //region // Notifications
     public boolean doShowNotifications(){
-        return preferences.getBoolean("do_show_notifications", true);
+        return preferences.getBoolean(
+                mContext.getString(R.string.pref_do_show_notifications), true
+        );
     }
 
     public boolean doShowNotificationsAutomatically(){
-        return preferences.getBoolean("do_automatically_show_notifications", true);
+        return preferences.getBoolean(
+                mContext.getString(R.string.pref_do_show_notifications_auto), true
+        );
     }
     //endregion
 
     //region // Appearances
 
     public boolean isNightMode(){
-        return preferences.getBoolean("is_night_mode", false);
+        return preferences.getBoolean(
+                mContext.getString(R.string.pref_is_night_mode), false
+        );
     }
 
     public String stringGetDateFormat(){
-        String[] dateOptions = context.getResources().getStringArray(R.array.date_format_options);
-        int optionIndex = Integer.parseInt(preferences.getString("date_format", "0"));
+        String[] dateOptions = mContext.getResources().getStringArray(R.array.date_format_options);
+        int optionIndex = Integer.parseInt(
+                preferences.getString(mContext.getString(R.string.pref_date_format), "0")
+        );
         return dateOptions[optionIndex];
     }
     //endregion
-
 }

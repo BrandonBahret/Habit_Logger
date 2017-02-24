@@ -124,7 +124,16 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
     }
 
     @Override
+    public long getItemId(int position) {
+        return sessionEntries.get(position).getDatabaseId();
+    }
+
+    @Override
     public int getItemCount() {
         return sessionEntries.size();
+    }
+
+    public List<SessionEntry> getSessionEntries(){
+        return sessionEntries;
     }
 }

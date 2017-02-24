@@ -3,7 +3,6 @@ package com.example.brandon.habitlogger.ModifyHabitActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -52,6 +51,12 @@ public class ModifyHabitActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_modify_habit);
+
+        if(getSupportActionBar() != null){
+            boolean isEditMode = getIntent().hasExtra("edit");
+            getSupportActionBar().setTitle(isEditMode ? R.string.edit_habit_title : R.string.new_habit_title);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
@@ -64,12 +69,6 @@ public class ModifyHabitActivity extends AppCompatActivity {
         vh = new ViewHolder();
         vh.setAdapter(adapter);
         fillInFields(vh);
-
-        ActionBar toolbar = getSupportActionBar();
-        if(toolbar != null){
-            boolean isEditMode = getIntent().hasExtra("edit");
-            toolbar.setTitle(isEditMode ? R.string.edit_habit_title : R.string.new_habit_title);
-        }
     }
 
     @Override
@@ -89,6 +88,10 @@ public class ModifyHabitActivity extends AppCompatActivity {
                 setResult(RESULT_OK, data);
                 finish();
             }break;
+
+            case(android.R.id.home):{
+                finish();
+            }
         }
 
         return super.onOptionsItemSelected(item);
