@@ -15,6 +15,7 @@
     <string name="value_placeholder">\'value\'</string>
     <string name="habit_name_placeholder">\'Habit Name\'</string>
 
+    <string name="spinner_prompt_categories">Select category</string>
     <string name="habit_name_content_description">Habit Name</string>
     <string name="streak_count_content_description">Streak Count</string>
     <string name="streak_count_value_content_description">Streak count value.</string>
@@ -84,5 +85,6 @@
     <string name="pref_do_show_notifications_auto">preference_do_automatically_show_notifications</string>
     <string name="pref_is_night_mode">preference_is_night_mode</string>
     <string name="pref_date_format">preference_date_format</string>
+    <string name="uncategorized">Uncategorized</string>
 
 </resources>

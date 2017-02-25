@@ -17,16 +17,17 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
-import com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
-import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.ModifyHabitActivity.ModifyHabitActivity;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.RequestCodes;
+import com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
@@ -199,7 +200,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
-                case ModifyHabitActivity.EDIT_HABIT_RESULT_CODE: {
+                case RequestCodes.EDIT_HABIT_REQUEST_CODE: {
                     Habit editHabit = (Habit) data.getSerializableExtra("new_habit");
                     habit = editHabit;
                     habitDatabase.updateHabit(editHabit.getDatabaseId(), editHabit);
@@ -306,9 +307,8 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
     private void startModifyHabitActivity() {
         Intent startTargetActivity = new Intent(HabitActivity.this, ModifyHabitActivity.class);
-        startTargetActivity.putExtra("edit", true);
-        startTargetActivity.putExtra("habit", (Serializable)habit);
-        startActivityForResult(startTargetActivity, ModifyHabitActivity.EDIT_HABIT_RESULT_CODE);
+        startTargetActivity.putExtra(ModifyHabitActivity.InputBundleKeys.HABIT_TO_EDIT, (Serializable)habit);
+        startActivityForResult(startTargetActivity, RequestCodes.EDIT_HABIT_REQUEST_CODE);
     }
 
     private void updateActivity() {

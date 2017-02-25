@@ -1,18 +1,20 @@
 package com.example.brandon.habitlogger.ModifyHabitActivity;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
-import android.widget.Spinner;
+import android.view.View;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.databinding.ActivityModifyHabitBinding;
 
 import java.io.Serializable;
 import java.util.List;
@@ -24,51 +26,52 @@ import java.util.List;
 
 public class ModifyHabitActivity extends AppCompatActivity {
 
-    public static final int NEW_HABIT_RESULT_CODE = 100;
-    public static final int EDIT_HABIT_RESULT_CODE = 101;
+    Habit habitResult;
 
-    Habit oldHabit = null;
-    CategorySpinnerAdapter adapter;
+    ActivityModifyHabitBinding ui;
+    private CategorySpinnerAdapter adapter;
 
-    ViewHolder vh;
-
-    class ViewHolder{
-        public EditText habitName, habitDescription;
-        public Spinner categorySpinner;
-
-        ViewHolder(){
-            categorySpinner = (Spinner) findViewById(R.id.spinner_category_selector);
-            habitName = (EditText) findViewById(R.id.habit_name);
-            habitDescription = (EditText) findViewById(R.id.habit_description);
-        }
-
-        void setAdapter(CategorySpinnerAdapter adapter){
-            categorySpinner.setAdapter(adapter);
-        }
+    public static class OutputBundleKeys {
+        public static final String RESULT_HABIT = "RESULT_HABIT";
     }
+
+    public static class InputBundleKeys {
+        public static final String HABIT_TO_EDIT = "HABIT_TO_EDIT";
+    }
+
+    //region // Methods responsible for handling the lifecycle of the activity.
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_modify_habit);
-
-        if(getSupportActionBar() != null){
-            boolean isEditMode = getIntent().hasExtra("edit");
-            getSupportActionBar().setTitle(isEditMode ? R.string.edit_habit_title : R.string.new_habit_title);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
+        ui = DataBindingUtil.setContentView(this, R.layout.activity_modify_habit);
 
         List<HabitCategory> categories = new HabitDatabase(this).getCategories();
         adapter = new CategorySpinnerAdapter(this, categories);
+        ui.spinnerCategorySelector.setAdapter(adapter);
 
-        vh = new ViewHolder();
-        vh.setAdapter(adapter);
-        fillInFields(vh);
+        ui.test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CategorySelectorDialog dialog = CategorySelectorDialog.getInstance();
+
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                dialog.show(ft, "dialog");
+            }
+        });
+
+        if (getSupportActionBar() != null) {
+            boolean isEditMode = getIntent().hasExtra(InputBundleKeys.HABIT_TO_EDIT);
+            if (isEditMode) {
+                habitResult = (Habit) getIntent().getSerializableExtra(InputBundleKeys.HABIT_TO_EDIT);
+                updateUI(habitResult);
+            }
+            else {
+                habitResult = new Habit(ModifyHabitActivity.this);
+            }
+            getSupportActionBar().setTitle(isEditMode ? R.string.edit_habit_title : R.string.new_habit_title);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
@@ -77,6 +80,20 @@ public class ModifyHabitActivity extends AppCompatActivity {
         return true;
     }
 
+    //endregion // Methods responsible for handling the lifecycle of the activity.
+
+    //region // Methods responsible for updating the ui.
+
+    public void updateUI(Habit habit) {
+        ui.habitName.setText(habit.getName());
+        ui.habitDescription.setText(habit.getDescription());
+        ui.spinnerCategorySelector.setSelection(adapter.getItemPosition(habit.getCategory()));
+    }
+
+    //endregion // Methods responsible for updating the ui.
+
+    //region // Methods responsible for handling events.
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         final int id = item.getItemId();
@@ -84,43 +101,31 @@ public class ModifyHabitActivity extends AppCompatActivity {
         switch (id) {
             case (R.id.new_habit_confirm): {
                 Intent data = new Intent();
-                data.putExtra("new_habit", (Serializable) getHabit());
+                data.putExtra(OutputBundleKeys.RESULT_HABIT, (Serializable) getHabit());
                 setResult(RESULT_OK, data);
                 finish();
-            }break;
+            }
+            break;
 
-            case(android.R.id.home):{
+            case (android.R.id.home): {
                 finish();
             }
+            break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public void fillInFields(ViewHolder vh) {
-        if(getIntent().hasExtra("habit")) {
-            oldHabit = (Habit) getIntent().getSerializableExtra("habit");
-            vh.habitName.setText(oldHabit.getName());
-            vh.habitDescription.setText(oldHabit.getDescription());
+    //endregion // Methods responsible for handling events.
 
-            vh.categorySpinner.setSelection(adapter.getItemPosition(oldHabit.getCategory()));
-        }
-    }
+    private Habit getHabit() {
+        String name = ui.habitName.getText().toString();
+        String description = ui.habitDescription.getText().toString();
+        HabitCategory category = (HabitCategory) ui.spinnerCategorySelector.getSelectedItem();
 
-    public Habit getHabit() {
-        String name = vh.habitName.getText().toString();
-        String description = vh.habitDescription.getText().toString();
-        HabitCategory category = (HabitCategory) vh.categorySpinner.getSelectedItem();
-
-        if (oldHabit == null) {
-            return new Habit(name, description, category, "icon res", null);
-        }
-        else {
-            oldHabit.setName(name);
-            oldHabit.setDescription(description);
-            oldHabit.setCategory(category);
-
-            return oldHabit;
-        }
+        habitResult.setName(name);
+        habitResult.setDescription(description);
+        habitResult.setCategory(category);
+        return habitResult;
     }
 }

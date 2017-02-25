@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.HabitDatabase;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.support.annotation.NonNull;
@@ -34,10 +35,12 @@ public class HabitDatabase {
     public DatabaseSchema databaseHelper;
     private SQLiteDatabase writableDatabase;
     private SQLiteDatabase readableDatabase;
+    private Context mContext;
 
     public HabitDatabase(Context context) {
         databaseHelper = new DatabaseSchema(context);
 
+        mContext = context;
         writableDatabase = databaseHelper.getWritableDatabase();
         readableDatabase = databaseHelper.getReadableDatabase();
     }
@@ -259,15 +262,27 @@ public class HabitDatabase {
     }
 
     public List<HabitCategory> getCategories() {
-        int size = getNumberOfCategories();
+        Cursor cursor = readableDatabase.query(CategoriesTableSchema.TABLE_NAME,
+                null, null, null, null, null, null);
+
+        int size = cursor.getCount();
         List<HabitCategory> categories = new ArrayList<>(size);
 
-        for (int i = 0; i < size; i++) {
-            long categoryId = getCategoryIdFromIndex(i);
-            categories.add(getCategory(categoryId));
-        }
+        cursor.moveToFirst();
+        do categories.add(getHabitCategoryFromCursor(cursor)); while(cursor.moveToNext());
+
+        cursor.close();
+
+        categories.add(0, HabitCategory.getUncategorizedCategory(mContext));
 
         return categories;
+    }
+
+    private HabitCategory getHabitCategoryFromCursor(Cursor cursor) {
+        ContentValues contentValues = new ContentValues(cursor.getColumnCount());
+        DatabaseUtils.cursorRowToContentValues(cursor, contentValues);
+
+        return CategoriesTableSchema.getObjectFromContentValues(contentValues);
     }
 
     /**

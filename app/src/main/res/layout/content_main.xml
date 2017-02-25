@@ -23,7 +23,9 @@
             android:paddingLeft="8dp"
 
             android:paddingRight="8dp"
-            android:scrollbars="none"/>
+            android:scrollbars="none"
+            android:requiresFadingEdge="vertical"
+            android:fadingEdgeLength="8dp"/>
 
     </RelativeLayout>
 </layout>

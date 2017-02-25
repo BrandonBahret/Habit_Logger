@@ -10,4 +10,7 @@ public final class RequestCodes {
 
     public static final int SETTINGS_ACTIVITY = 100;
 
+    public static final int NEW_HABIT_REQUEST_CODE = 101;
+    public static final int EDIT_HABIT_REQUEST_CODE = 102;
+
 }

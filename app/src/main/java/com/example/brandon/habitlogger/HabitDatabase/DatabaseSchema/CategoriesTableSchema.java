@@ -1,5 +1,9 @@
 package com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema;
 
+import android.content.ContentValues;
+import android.support.annotation.NonNull;
+
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.DatabaseSchema.SQL_TYPES;
 
 /**
@@ -31,5 +35,16 @@ public class CategoriesTableSchema {
                 " (" + CategoriesTableSchema.CATEGORY_NAME +
                 ", " + CategoriesTableSchema.CATEGORY_COLOR +
                 ") VALUES(?, ?)";
+    }
+
+    public static HabitCategory getObjectFromContentValues(@NonNull ContentValues contentValues) {
+        String categoryName = contentValues.getAsString(CATEGORY_NAME);
+        String categoryColor = contentValues.getAsString(CATEGORY_COLOR);
+        long databaseId = contentValues.getAsLong(CATEGORY_ID);
+
+        HabitCategory category = new HabitCategory(categoryColor, categoryName);
+        category.setDatabaseId(databaseId);
+
+        return category;
     }
 }

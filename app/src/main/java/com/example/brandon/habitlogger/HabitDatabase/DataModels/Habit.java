@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.HabitDatabase.DataModels;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -67,6 +68,15 @@ public class Habit implements Serializable, Parcelable {
         this.iconResId = habit.iconResId;
         this.databaseId = habit.databaseId;
         this.isArchived = habit.isArchived;
+    }
+
+    public Habit(Context context) {
+        this.name = "";
+        this.description = "";
+        this.category = HabitCategory.getUncategorizedCategory(context);
+        this.iconResId = "";
+        this.databaseId = -1;
+        this.isArchived = 0;
     }
 
     @Override

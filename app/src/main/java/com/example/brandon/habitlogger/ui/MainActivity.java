@@ -440,15 +440,15 @@ public class MainActivity extends AppCompatActivity
 
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
-                case ModifyHabitActivity.NEW_HABIT_RESULT_CODE: {
-                    Habit newHabit = (Habit) data.getSerializableExtra("new_habit");
+                case RequestCodes.NEW_HABIT_REQUEST_CODE: {
+                    Habit newHabit = (Habit) data.getSerializableExtra(ModifyHabitActivity.OutputBundleKeys.RESULT_HABIT);
                     habitDatabase.addHabitAndCategory(newHabit);
                     showDatabase();
                 }
                 break;
 
-                case ModifyHabitActivity.EDIT_HABIT_RESULT_CODE: {
-                    Habit editHabit = (Habit) data.getSerializableExtra("new_habit");
+                case RequestCodes.EDIT_HABIT_REQUEST_CODE: {
+                    Habit editHabit = (Habit) data.getSerializableExtra(ModifyHabitActivity.OutputBundleKeys.RESULT_HABIT);
                     habitDatabase.updateHabit(editHabit.getDatabaseId(), editHabit);
 
                     int position = getHabitPositionInList(editHabit.getDatabaseId());
@@ -590,14 +590,13 @@ public class MainActivity extends AppCompatActivity
 
     public void startNewHabitActivity() {
         Intent newHabit = new Intent(MainActivity.this, ModifyHabitActivity.class);
-        startActivityForResult(newHabit, ModifyHabitActivity.NEW_HABIT_RESULT_CODE);
+        startActivityForResult(newHabit, RequestCodes.NEW_HABIT_REQUEST_CODE);
     }
 
     public void startModifyHabitActivity(Habit habit) {
         Intent editHabit = new Intent(MainActivity.this, ModifyHabitActivity.class);
-        editHabit.putExtra("edit", true);
-        editHabit.putExtra("habit", (Serializable) habit);
-        startActivityForResult(editHabit, ModifyHabitActivity.EDIT_HABIT_RESULT_CODE);
+        editHabit.putExtra(ModifyHabitActivity.InputBundleKeys.HABIT_TO_EDIT, (Serializable) habit);
+        startActivityForResult(editHabit, RequestCodes.EDIT_HABIT_REQUEST_CODE);
     }
 
     public void startHabitActivity(long habitId) {

@@ -1,7 +1,10 @@
 package com.example.brandon.habitlogger.HabitDatabase.DataModels;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+
+import com.example.brandon.habitlogger.R;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -114,5 +117,9 @@ public class HabitCategory implements Serializable {
      */
     public long getDatabaseId() {
         return databaseId;
+    }
+
+    public static HabitCategory getUncategorizedCategory(Context context) {
+        return new HabitCategory("#ff000000", context.getString(R.string.uncategorized));
     }
 }

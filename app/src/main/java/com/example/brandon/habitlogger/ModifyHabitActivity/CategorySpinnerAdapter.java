@@ -40,10 +40,7 @@ public class CategorySpinnerAdapter extends BaseAdapter implements SpinnerAdapte
         }
     }
 
-    public int getCount() {
-        return mCategories.size();
-    }
-
+    //region // Methods responsible for exposing the data set.
     public Object getItem(int i) {
         return mCategories.get(i);
     }
@@ -56,6 +53,12 @@ public class CategorySpinnerAdapter extends BaseAdapter implements SpinnerAdapte
         return mCategories.indexOf(category);
     }
 
+    public int getCount() {
+        return mCategories.size();
+    }
+    //endregion
+
+    //region // Methods responsible for binding categories to rows
     public View getCustomView(int position, View convertView, ViewGroup parent) {
         HabitCategory category = mCategories.get(position);
 
@@ -76,4 +79,6 @@ public class CategorySpinnerAdapter extends BaseAdapter implements SpinnerAdapte
     public View getView(int position, View convertView, ViewGroup parent) {
         return getCustomView(position, convertView, parent);
     }
+    //endregion
+
 }
