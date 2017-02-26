@@ -20,6 +20,7 @@
         android:layout_gravity="center"
 
         android:layout_margin="8dp"
-        android:text="@string/value_placeholder"/>
+        android:text="@string/value_placeholder"
+        android:textSize="12sp"/>
 
 </LinearLayout>

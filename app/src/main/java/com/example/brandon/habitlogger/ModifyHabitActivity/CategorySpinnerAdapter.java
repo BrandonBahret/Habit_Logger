@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
@@ -20,7 +19,7 @@ import java.util.List;
  */
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class CategorySpinnerAdapter extends BaseAdapter implements SpinnerAdapter {
+public class CategorySpinnerAdapter extends BaseAdapter {
 
     private List<HabitCategory> mCategories;
     private LayoutInflater mInflater;
@@ -41,7 +40,7 @@ public class CategorySpinnerAdapter extends BaseAdapter implements SpinnerAdapte
     }
 
     //region // Methods responsible for exposing the data set.
-    public Object getItem(int i) {
+    public HabitCategory getItem(int i) {
         return mCategories.get(i);
     }
 
@@ -59,10 +58,15 @@ public class CategorySpinnerAdapter extends BaseAdapter implements SpinnerAdapte
     //endregion
 
     //region // Methods responsible for binding categories to rows
-    public View getCustomView(int position, View convertView, ViewGroup parent) {
-        HabitCategory category = mCategories.get(position);
 
-        View row = mInflater.inflate(R.layout.spinner_category_layout, parent, false);
+    @Override
+    public View getView(int position, View row, ViewGroup parent) {
+        HabitCategory category = getItem(position);
+
+        if(row == null) {
+            row = mInflater.inflate(R.layout.spinner_category_layout, parent, false);
+        }
+
         ViewHolder viewHolder = new ViewHolder(row);
         viewHolder.title.setText(category.getName());
         viewHolder.color.setColorFilter(category.getColorAsInt());
@@ -70,15 +74,6 @@ public class CategorySpinnerAdapter extends BaseAdapter implements SpinnerAdapte
         return row;
     }
 
-    @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        return getCustomView(position, convertView, parent);
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        return getCustomView(position, convertView, parent);
-    }
     //endregion
 
 }

@@ -63,4 +63,8 @@
         <item name="android:layout_marginRight">4dp</item>
     </style>
 
+    <style name="Editable">
+        <item name="android:background">@android:drawable/spinner_background</item>
+    </style>
+
 </resources>

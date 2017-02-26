@@ -4,11 +4,9 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
@@ -49,16 +47,6 @@ public class ModifyHabitActivity extends AppCompatActivity {
         List<HabitCategory> categories = new HabitDatabase(this).getCategories();
         adapter = new CategorySpinnerAdapter(this, categories);
         ui.spinnerCategorySelector.setAdapter(adapter);
-
-        ui.test.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CategorySelectorDialog dialog = CategorySelectorDialog.getInstance();
-
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                dialog.show(ft, "dialog");
-            }
-        });
 
         if (getSupportActionBar() != null) {
             boolean isEditMode = getIntent().hasExtra(InputBundleKeys.HABIT_TO_EDIT);
