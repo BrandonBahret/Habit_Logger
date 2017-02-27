@@ -55,6 +55,11 @@ public class CategorySpinnerAdapter extends BaseAdapter {
     public int getCount() {
         return mCategories.size();
     }
+
+    public void addCategory(HabitCategory category){
+        mCategories.add(category);
+        notifyDataSetChanged();
+    }
     //endregion
 
     //region // Methods responsible for binding categories to rows

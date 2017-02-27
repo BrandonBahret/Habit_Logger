@@ -11,6 +11,7 @@ import android.widget.ListAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.databinding.DialogCategorySelectorBinding;
 
@@ -18,7 +19,7 @@ import com.example.brandon.habitlogger.databinding.DialogCategorySelectorBinding
  * Created by Brandon on 2/25/2017.
  */
 
-public class CategorySpinner extends Spinner implements AdapterView.OnItemClickListener, View.OnClickListener {
+public class CategorySpinner extends Spinner implements AdapterView.OnItemClickListener, View.OnClickListener, NewCategoryDialogFactory.OnFinishedListener {
     private AlertDialog dialog;
     private DialogCategorySelectorBinding ui;
 
@@ -59,8 +60,13 @@ public class CategorySpinner extends Spinner implements AdapterView.OnItemClickL
         int id = v.getId();
 
         if(id == ui.newCategoryButton.getId()){
-            Toast.makeText(getContext(), "Make New Category", Toast.LENGTH_SHORT).show();
+            NewCategoryDialogFactory dialog = new NewCategoryDialogFactory(getContext(), this);
+            dialog.createBuilder().show();
         }
     }
 
+    @Override
+    public void onFinishedWithResult(HabitCategory category) {
+        ((CategorySpinnerAdapter)getAdapter()).addCategory(category);
+    }
 }
