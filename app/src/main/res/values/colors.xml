@@ -5,6 +5,8 @@
     <color name="colorPrimaryDark">#37b493</color>
     <color name="colorAccent">#4cefc3</color>
 
+    <color name="completed">#69f0ae</color>
+    <color name="skipped">#ff5252</color>
 
     <color name="habitCard">#fdfdfd</color>
     <color name="habitCardButtonColor">#4e4d4d</color>

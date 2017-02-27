@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.R;
