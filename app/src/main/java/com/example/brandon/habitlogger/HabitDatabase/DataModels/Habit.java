@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -27,6 +28,7 @@ public class Habit implements Serializable, Parcelable {
     @Nullable private String description;
     @Nullable private String iconResId;
     @Nullable private SessionEntry[] entries;
+    private long entriesDuration;
 
     private int isArchived = 0;
     private long databaseId = -1;
@@ -42,7 +44,10 @@ public class Habit implements Serializable, Parcelable {
         this.description = description;
         this.category = category;
         this.iconResId = iconResId;
-        this.entries = entries;
+        if(entries != null) {
+            this.entries = entries;
+            this.entriesDuration = calculateEntriesDurationSum();
+        }
     }
 
     public Habit(@NonNull String name, @Nullable String description, @NonNull HabitCategory category,
@@ -53,9 +58,12 @@ public class Habit implements Serializable, Parcelable {
         this.category = category;
         this.description = description;
         this.iconResId = iconResId;
-        this.entries = entries;
         this.isArchived = isArchived;
         this.databaseId = databaseId;
+        if(entries != null) {
+            this.entries = entries;
+            this.entriesDuration = calculateEntriesDurationSum();
+        }
     }
 
     public Habit(Parcel in) {
@@ -64,10 +72,13 @@ public class Habit implements Serializable, Parcelable {
         this.name = habit.name;
         this.description = habit.description;
         this.category = habit.category;
-        this.entries = habit.entries;
         this.iconResId = habit.iconResId;
         this.databaseId = habit.databaseId;
         this.isArchived = habit.isArchived;
+        if(entries != null) {
+            this.entries = entries;
+            this.entriesDuration = calculateEntriesDurationSum();
+        }
     }
 
     public Habit(Context context) {
@@ -181,6 +192,13 @@ public class Habit implements Serializable, Parcelable {
         }
     };
 
+    public static Comparator<Habit> DurationComparator = new Comparator<Habit>() {
+        @Override
+        public int compare(Habit itemOne, Habit itemTwo) {
+            return Long.compare(itemTwo.getEntriesDuration(), itemOne.getEntriesDuration());
+        }
+    };
+
     public String toString() {
         int entriesLength = 0;
         if (getEntries() != null) {
@@ -236,6 +254,25 @@ public class Habit implements Serializable, Parcelable {
         }
         else {
             return 0;
+        }
+    }
+
+    public long getEntriesDuration(){
+        return this.entriesDuration;
+    }
+
+    private long calculateEntriesDurationSum(){
+        long duration = 0;
+
+        if(entries != null) {
+            for (SessionEntry entry : entries) {
+                duration += entry.getDuration();
+            }
+
+            return duration;
+        }
+        else{
+            throw new RuntimeException("SessionEntries was null in " + this.getClass().getName());
         }
     }
 
@@ -317,6 +354,17 @@ public class Habit implements Serializable, Parcelable {
      */
     public void setEntries(@NonNull SessionEntry[] newEntries) {
         this.entries = newEntries;
+        this.entriesDuration = calculateEntriesDurationSum();
+    }
+
+    /**
+     * @param newEntries The new entry array to replace the old entries.
+     */
+    public void setEntries(@NonNull List<SessionEntry> newEntries) {
+        SessionEntry[] entries = new SessionEntry[newEntries.size()];
+        newEntries.toArray(entries);
+        this.entries = entries;
+        this.entriesDuration = calculateEntriesDurationSum();
     }
 
     /**

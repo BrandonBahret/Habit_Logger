@@ -19,7 +19,6 @@ import com.example.brandon.habitlogger.databinding.FragmentPieGraphCompletionBin
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.PercentFormatter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -133,8 +132,6 @@ public class PieGraphCompletion extends Fragment implements UpdateEntriesInterfa
 
         PieData data = new PieData(dataSet);
         data.setValueTextColor(Color.TRANSPARENT);
-        data.setValueFormatter(new PercentFormatter());
-        data.setValueTextSize(12f);
 
         ui.chart.setData(data);
         ui.chart.getLegend().setEnabled(false);

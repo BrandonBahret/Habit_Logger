@@ -43,6 +43,13 @@
                 android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.PieGraphCompletion"
                 tools:layout="@layout/fragment_pie_graph_completion" />
 
+            <fragment
+                android:id="@+id/pie_graph_duration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.PieGraphDuration"
+                tools:layout="@layout/fragment_pie_graph_duration" />
+
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="75dp" />

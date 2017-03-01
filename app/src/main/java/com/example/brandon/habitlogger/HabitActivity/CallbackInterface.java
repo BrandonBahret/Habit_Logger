@@ -1,6 +1,7 @@
 package com.example.brandon.habitlogger.HabitActivity;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.CategoryDataSample;
 
 import java.util.List;
 
@@ -12,8 +13,10 @@ import java.util.List;
 public interface CallbackInterface {
 
     void addCallback(UpdateEntriesInterface callback);
+    void addOnNewCategoryDataSampleCallback(UpdateCategorySampleInterface callback);
 
     SessionEntriesSample getSessionEntries();
+    CategoryDataSample getCategoryDataSample();
 
     class SessionEntriesSample{
         public List<SessionEntry> sessionEntries;

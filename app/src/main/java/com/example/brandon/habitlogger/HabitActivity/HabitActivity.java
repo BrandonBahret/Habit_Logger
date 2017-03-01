@@ -27,6 +27,7 @@ import com.example.brandon.habitlogger.ModifyHabitActivity.ModifyHabitActivity;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.RequestCodes;
+import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -59,6 +60,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     FloatingDateRangeWidgetManager dateRangeManager;
 
     List<UpdateEntriesInterface> callbacks = new ArrayList<>();
+    List<UpdateCategorySampleInterface> newCategoryDataSampleCallbacks = new ArrayList<>();
 
     @Override
     public void addCallback(UpdateEntriesInterface callback) {
@@ -68,6 +70,28 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     @Override
     public SessionEntriesSample getSessionEntries() {
         return new SessionEntriesSample(sessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+    }
+
+    @Override
+    public void addOnNewCategoryDataSampleCallback(UpdateCategorySampleInterface callback) {
+        newCategoryDataSampleCallbacks.add(callback);
+    }
+
+    @Override
+    public CategoryDataSample getCategoryDataSample() {
+        long categoryId = habit.getCategory().getDatabaseId();
+        Habit[] habits = habitDatabase.getHabits(categoryId);
+        long dateFrom = dateRangeManager.getDateFrom();
+        long dateTo = dateRangeManager.getDateTo();
+
+        for (Habit habit : habits) {
+            long habitId = habit.getDatabaseId();
+            Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo);
+            List<SessionEntry> entries = habitDatabase.lookUpEntries(ids);
+            habit.setEntries(entries);
+        }
+
+        return new CategoryDataSample(habit.getCategory(), habits, dateFrom, dateTo);
     }
 
     @Override

@@ -17,6 +17,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
+import com.example.brandon.habitlogger.HabitActivity.UpdateCategorySampleInterface;
+import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager;
 import com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener;
 import com.example.brandon.habitlogger.HabitActivity.CalendarFragment;
@@ -56,6 +58,16 @@ public class OverallStatisticsActivity extends AppCompatActivity implements Call
     @Override
     public SessionEntriesSample getSessionEntries() {
         return new SessionEntriesSample(sessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+    }
+
+    @Override
+    public void addOnNewCategoryDataSampleCallback(UpdateCategorySampleInterface callback) {
+
+    }
+
+    @Override
+    public CategoryDataSample getCategoryDataSample() {
+        return null;
     }
 
 
