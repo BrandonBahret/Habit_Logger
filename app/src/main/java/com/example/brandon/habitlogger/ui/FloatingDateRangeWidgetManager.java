@@ -160,7 +160,17 @@ public class FloatingDateRangeWidgetManager {
     }
 
     private long getCurrentTime(){
-        return System.currentTimeMillis();
+        Calendar c = Calendar.getInstance();
+
+        c.setTimeInMillis(System.currentTimeMillis());
+
+        c.set(Calendar.AM_PM, 0);
+        c.set(Calendar.HOUR, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+
+        return c.getTimeInMillis();
     }
 
     public static String getDate(long milliSeconds, String dateFormat) {
@@ -242,6 +252,13 @@ public class FloatingDateRangeWidgetManager {
         Calendar c = Calendar.getInstance();
         c.set(year, month, dayOfMonth);
 
+        c.set(Calendar.AM_PM, 0);
+        c.set(Calendar.HOUR, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+
+
         dateToTime = c.getTimeInMillis();
         dateFromTime = dateToTime - 86400000L;
 
@@ -249,10 +266,28 @@ public class FloatingDateRangeWidgetManager {
     }
 
     public long getDateFrom(){
-        return this.dateFromTime;
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(this.dateFromTime);
+
+        c.set(Calendar.AM_PM, 0);
+        c.set(Calendar.HOUR, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+
+        return c.getTimeInMillis();
     }
 
     public long getDateTo(){
-        return this.dateToTime;
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(this.dateToTime);
+
+        c.set(Calendar.AM_PM, 0);
+        c.set(Calendar.HOUR, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+
+        return c.getTimeInMillis();
     }
 }

@@ -18,6 +18,8 @@ public interface CallbackInterface {
     SessionEntriesSample getSessionEntries();
     CategoryDataSample getCategoryDataSample();
 
+    int getDefaultColor();
+
     class SessionEntriesSample{
         public List<SessionEntry> sessionEntries;
         public long dateFromTime;

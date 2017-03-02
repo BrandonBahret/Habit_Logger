@@ -1,10 +1,10 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/statistics_fragment_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.example.brandon.habitlogger.HabitActivity.StatisticsFragment">
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:id="@+id/statistics_fragment_layout"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context="com.example.brandon.habitlogger.HabitActivity.StatisticsFragment">
 
 
     <android.support.v4.widget.NestedScrollView
@@ -18,41 +18,33 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="100dp" />
-
-
-            <fragment
-                android:id="@+id/time_averages"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.TimeAverages"
-                tools:layout="@layout/fragment_time_averages" />
-
-
-            <fragment
-                android:id="@+id/fragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.StreaksFragment"
-                tools:layout="@layout/fragment_streaks" />
+                android:layout_height="50dp"/>
 
             <fragment
                 android:id="@+id/pie_graph_completion"
+                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.PieGraphCompletion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.PieGraphCompletion"
-                tools:layout="@layout/fragment_pie_graph_completion" />
+                tools:layout="@layout/fragment_pie_graph_completion"/>
+
+            <fragment
+                android:id="@+id/line_graph_completion"
+                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.LineGraphCompletion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:layout="@layout/fragment_line_graph_completion"/>
+
 
             <fragment
                 android:id="@+id/pie_graph_duration"
+                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.PieGraphDuration"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.PieGraphDuration"
-                tools:layout="@layout/fragment_pie_graph_duration" />
+                tools:layout="@layout/fragment_pie_graph_duration"/>
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="75dp" />
+                android:layout_height="50dp"/>
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

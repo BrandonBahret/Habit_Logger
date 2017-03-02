@@ -70,6 +70,11 @@ public class OverallStatisticsActivity extends AppCompatActivity implements Call
         return null;
     }
 
+    @Override
+    public int getDefaultColor() {
+        return ContextCompat.getColor(this, R.color.colorAccent);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

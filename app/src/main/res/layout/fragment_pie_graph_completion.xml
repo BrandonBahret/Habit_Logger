@@ -24,7 +24,7 @@
                     style="@style/card_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Days Completed vs. Total Days ratio"/>
+                    android:text="Habit Score"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"

@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity
                 else {
                     boolean isPaused = sessionManager.getIsPaused(habitId);
                     sessionManager.setPauseState(habitId, !isPaused);
-                    handler.post(updateCards);
+//                    handler.post(updateCards);
                 }
             }
 
@@ -232,7 +232,7 @@ public class MainActivity extends AppCompatActivity
                 handler.postDelayed(updateCards, 1000);
             }
         };
-        handler.post(updateCards);
+//        handler.post(updateCards);
 
         applyItemDecorationToRecyclerView();
 
@@ -494,7 +494,7 @@ public class MainActivity extends AppCompatActivity
             sessionNotificationManager.launchNotificationsForAllActiveSessions();
         }
 
-        handler.post(updateCards);
+//        handler.post(updateCards);
     }
 
     @Override
@@ -503,7 +503,7 @@ public class MainActivity extends AppCompatActivity
 
         updateCurrentSessionCard();
         showDatabase();
-        handler.post(updateCards);
+//        handler.post(updateCards);
     }
 
     public void processUserQuery(String query) {

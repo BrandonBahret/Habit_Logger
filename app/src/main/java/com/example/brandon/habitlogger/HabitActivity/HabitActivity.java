@@ -95,6 +95,11 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     }
 
     @Override
+    public int getDefaultColor() {
+        return habit.getColor();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_habit);
