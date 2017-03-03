@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -24,7 +25,7 @@
                 android:layout_weight="0"
                 android:text="Entries: "
 
-                android:textSize="12sp" />
+                android:textSize="12sp"/>
 
             <TextView
                 android:id="@+id/entries_count_text"
@@ -33,19 +34,19 @@
                 android:layout_weight="0"
 
                 android:text="0"
-                android:textSize="12sp" />
+                android:textSize="12sp"/>
 
             <Space
                 android:layout_width="20dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0" />
+                android:layout_weight="0"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 android:text="Total Time: "
-                android:textSize="12sp" />
+                android:textSize="12sp"/>
 
             <TextView
                 android:id="@+id/total_time_text"
@@ -53,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="00:00:00"
-                android:textSize="12sp" />
+                android:textSize="12sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -69,7 +70,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
-                android:text="From" />
+                android:text="From"/>
 
             <EditText
                 android:id="@+id/date_from"
@@ -78,14 +79,14 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:enabled="false"
-                android:focusable="false" />
+                android:focusable="false"/>
 
             <TextView
                 android:id="@+id/textView9"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
-                android:text="To" />
+                android:text="To"/>
 
             <EditText
                 android:id="@+id/date_to"
@@ -94,7 +95,7 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:enabled="false"
-                android:focusable="false" />
+                android:focusable="false"/>
         </LinearLayout>
 
         <LinearLayout
@@ -110,14 +111,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
-                android:text="Date Range Type" />
+                android:text="Date Range Type"/>
 
             <Spinner
                 android:id="@+id/date_range_type_spinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:entries="@array/date_range_type_options" />
+                android:entries="@array/date_range_type_options"/>
 
         </LinearLayout>
 

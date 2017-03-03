@@ -28,6 +28,7 @@ import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.RequestCodes;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
+import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -127,7 +128,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), sessionEntries);
         dateRangeManager.setDateRangeChangeListener(new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
             @Override
-            public void dateRangeChanged(long dateFrom, long dateTo) {
+            public void onDateRangeChanged(long dateFrom, long dateTo) {
                 Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo);
                 HabitActivity.this.sessionEntries = habitDatabase.lookUpEntries(ids);
                 dateRangeManager.updateSessionEntries(HabitActivity.this.sessionEntries);
@@ -136,9 +137,6 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         });
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        if(preferenceChecker.isNightMode())
-            toolbar.setPopupTheme(R.style.PopupMenu);
 
         appBar.addOnOffsetChangedListener(new AppBarStateChangeListener() {
             @Override

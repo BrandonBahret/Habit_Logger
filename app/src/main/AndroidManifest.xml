@@ -81,7 +81,7 @@
         </activity>
 
         <activity
-            android:name=".OverallStatistics.OverallStatisticsActivity"
+            android:name=".OverviewActivity.DataOverviewActivity"
             android:label="@string/title_activity_overall_statistics"
             android:parentActivityName=".ui.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">

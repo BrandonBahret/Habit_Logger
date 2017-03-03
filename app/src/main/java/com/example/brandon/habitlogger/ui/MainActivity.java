@@ -35,7 +35,7 @@ import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.HabitSessions.SessionNotificationManager;
 import com.example.brandon.habitlogger.ModifyHabitActivity.ModifyHabitActivity;
-import com.example.brandon.habitlogger.OverallStatistics.OverallStatisticsActivity;
+import com.example.brandon.habitlogger.OverviewActivity.DataOverviewActivity;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.Preferences.SettingsActivity;
 import com.example.brandon.habitlogger.R;
@@ -99,8 +99,6 @@ public class MainActivity extends AppCompatActivity
         currentSession = binding.mainInclude.contentMain.currentSessionsCard.itemRoot;
         habitCardContainer = binding.mainInclude.contentMain.habitRecyclerView;
 
-        if (preferenceChecker.isNightMode())
-            binding.mainInclude.toolbar.setPopupTheme(R.style.PopupMenu);
         setSupportActionBar(binding.mainInclude.toolbar);
 
         binding.mainInclude.fab.setOnClickListener(new View.OnClickListener() {
@@ -606,7 +604,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void startOverallStatisticsActivity() {
-        Intent startTargetActivity = new Intent(MainActivity.this, OverallStatisticsActivity.class);
+        Intent startTargetActivity = new Intent(MainActivity.this, DataOverviewActivity.class);
         startActivity(startTargetActivity);
     }
 

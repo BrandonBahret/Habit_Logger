@@ -15,6 +15,7 @@ import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
 import com.example.brandon.habitlogger.HabitActivity.UpdateEntriesInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.databinding.FragmentPieGraphCompletionBinding;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -59,7 +60,7 @@ public class PieGraphCompletion extends Fragment implements UpdateEntriesInterfa
     @Override
     public void onStart() {
         super.onStart();
-        CallbackInterface.SessionEntriesSample sample = callbackInterface.getSessionEntries();
+        SessionEntriesSample sample = callbackInterface.getSessionEntries();
         updateEntries(sample.sessionEntries, sample.dateFromTime, sample.dateToTime);
     }
 

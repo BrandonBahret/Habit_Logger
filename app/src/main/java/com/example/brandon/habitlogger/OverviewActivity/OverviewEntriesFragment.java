@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.OverallStatistics;
+package com.example.brandon.habitlogger.OverviewActivity;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,7 +23,7 @@ import com.example.brandon.habitlogger.RecyclerVIewAdapters.EntryViewAdapter;
 import java.util.List;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class OverallEntriesFragment extends Fragment {
+public class OverviewEntriesFragment extends Fragment {
     HabitDatabase habitDatabase;
     RecyclerView entriesContainer;
     List<SessionEntry> sessionEntries;
@@ -31,12 +31,12 @@ public class OverallEntriesFragment extends Fragment {
 
     PreferenceChecker preferenceChecker;
 
-    public OverallEntriesFragment() {
+    public OverviewEntriesFragment() {
         // Required empty public constructor
     }
 
-    public static OverallEntriesFragment newInstance() {
-        return new OverallEntriesFragment();
+    public static OverviewEntriesFragment newInstance() {
+        return new OverviewEntriesFragment();
     }
 
     @Override

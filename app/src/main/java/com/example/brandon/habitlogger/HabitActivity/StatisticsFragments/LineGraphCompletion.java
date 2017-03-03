@@ -23,6 +23,7 @@ import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
 import com.example.brandon.habitlogger.HabitActivity.UpdateEntriesInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.databinding.FragmentLineGraphCompletionBinding;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
@@ -70,7 +71,7 @@ public class LineGraphCompletion extends Fragment implements UpdateEntriesInterf
     @Override
     public void onStart() {
         super.onStart();
-        CallbackInterface.SessionEntriesSample sample = callbackInterface.getSessionEntries();
+        SessionEntriesSample sample = callbackInterface.getSessionEntries();
         updateEntries(sample.sessionEntries, sample.dateFromTime, sample.dateToTime);
     }
 

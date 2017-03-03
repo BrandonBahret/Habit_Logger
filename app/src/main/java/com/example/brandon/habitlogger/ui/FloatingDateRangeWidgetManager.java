@@ -39,93 +39,87 @@ public class FloatingDateRangeWidgetManager {
     public boolean isShown = true;
 
 
-    public interface DateRangeChangeListener{
-        void dateRangeChanged(long dateFrom, long dateTo);
+    public interface DateRangeChangeListener {
+        void onDateRangeChanged(long dateFrom, long dateTo);
     }
 
-    public class ViewHolder{
+    public class ViewHolder {
         public Spinner rangeType;
         public EditText dateFrom, dateTo;
         public TextView entriesCountText, totalTimeText;
         public CardView view;
 
-        public ViewHolder(View view){
-            rangeType = (Spinner)view.findViewById(R.id.date_range_type_spinner);
-            dateFrom  = (EditText)view.findViewById(R.id.date_from);
-            dateTo    = (EditText)view.findViewById(R.id.date_to);
-            entriesCountText = (TextView)view.findViewById(R.id.entries_count_text);
-            totalTimeText = (TextView)view.findViewById(R.id.total_time_text);
-            this.view = (CardView)view;
+        public ViewHolder(View view) {
+            rangeType = (Spinner) view.findViewById(R.id.date_range_type_spinner);
+            dateFrom = (EditText) view.findViewById(R.id.date_from);
+            dateTo = (EditText) view.findViewById(R.id.date_to);
+            entriesCountText = (TextView) view.findViewById(R.id.entries_count_text);
+            totalTimeText = (TextView) view.findViewById(R.id.total_time_text);
+            this.view = (CardView) view;
         }
     }
 
     public FloatingDateRangeWidgetManager(AppCompatActivity activity_, View floatingDateRangeCardView,
-                                          List<SessionEntry> sessionEntries){
+                                          List<SessionEntry> sessionEntries) {
 
-        if(floatingDateRangeCardView instanceof CardView) {
-            this.viewHolder = new ViewHolder(floatingDateRangeCardView);
-            this.activity = activity_;
-            this.preferenceChecker = new PreferenceChecker(activity);
+        this.viewHolder = new ViewHolder(floatingDateRangeCardView);
+        this.activity = activity_;
+        this.preferenceChecker = new PreferenceChecker(activity);
 
-            viewHolder.dateFrom.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    showDialog(true, dateFromTime);
+        viewHolder.dateFrom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDialog(true, dateFromTime);
+            }
+        });
+
+        viewHolder.dateTo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDialog(false, dateToTime);
+            }
+        });
+
+        viewHolder.rangeType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                // Time presets: Year, Month, Week, Day in milliseconds
+                long timePresets[] = new long[]{31536000000L, 2592000000L, 604800000L, 86400000L};
+                if (i != 0 && i < 5) {
+                    setPresetDateRange(timePresets[i - 1]);
                 }
-            });
 
-            viewHolder.dateTo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    showDialog(false, dateToTime);
-                }
-            });
-
-            viewHolder.rangeType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-                    // Time presets: Year, Month, Week, Day in milliseconds
-                    long timePresets[] = new long[]{31536000000L, 2592000000L, 604800000L, 86400000L};
-                    if(i !=0 && i < 5){
-                        setPresetDateRange(timePresets[i - 1]);
-                    }
-
-                    else{
-                        switch(i){
-                            case 0:{
-                                setStartRange();
-                            }break;
-
-                            case 5:{
-                                setCustomRange();
-                            }break;
+                else {
+                    switch (i) {
+                        case 0: {
+                            setStartRange();
                         }
+                        break;
+
+                        case 5: {
+                            setCustomRange();
+                        }
+                        break;
                     }
                 }
+            }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> adapterView) {
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
 
-                }
-            });
-            updateSessionEntries(sessionEntries);
-        }
-
-        else {
-            throw new IllegalArgumentException(
-                    "FloatingDateRangeWidgetManager wasn't given a card view"
-            );
-        }
+            }
+        });
+        updateSessionEntries(sessionEntries);
     }
 
-    public void showDialog(final boolean setDateFromTime, long currentTime){
+    public void showDialog(final boolean setDateFromTime, long currentTime) {
         StartingDateDialog dialog = new StartingDateDialog();
 
         Bundle args = new Bundle();
         args.putLong("date_in_milliseconds", currentTime);
 
-        if(setDateFromTime)
+        if (setDateFromTime)
             args.putLong("date_max", dateToTime - 86400000L);
         else
             args.putLong("date_min", dateFromTime + 86400000L);
@@ -135,12 +129,12 @@ public class FloatingDateRangeWidgetManager {
         dialog.setOnFinishedListener(new StartingDateDialog.OnFinishedListener() {
             @Override
             public void onFinishedWithResult(String monthName, int day, int year, long time) {
-                if(setDateFromTime) {
-                    if(time < dateToTime)
+                if (setDateFromTime) {
+                    if (time < dateToTime)
                         dateFromTime = time;
                 }
-                else{
-                    if(time > dateFromTime)
+                else {
+                    if (time > dateFromTime)
                         dateToTime = time;
                 }
                 updateDateRangeLabels();
@@ -149,17 +143,17 @@ public class FloatingDateRangeWidgetManager {
         dialog.show(activity.getSupportFragmentManager(), "text");
     }
 
-    public void setDateRangeChangeListener(DateRangeChangeListener listener){
+    public void setDateRangeChangeListener(DateRangeChangeListener listener) {
         this.listener = listener;
     }
 
-    public void notifyDateRangeChanged(long timeFrom, long timeTo){
-        if(listener != null){
-            listener.dateRangeChanged(timeFrom, timeTo);
+    public void notifyDateRangeChanged(long timeFrom, long timeTo) {
+        if (listener != null) {
+            listener.onDateRangeChanged(timeFrom, timeTo);
         }
     }
 
-    private long getCurrentTime(){
+    private long getCurrentTime() {
         Calendar c = Calendar.getInstance();
 
         c.setTimeInMillis(System.currentTimeMillis());
@@ -178,7 +172,14 @@ public class FloatingDateRangeWidgetManager {
         return formatter.format(new Date(milliSeconds));
     }
 
-    public void hideView(){
+    public void setViewShown(boolean visible) {
+        if (visible)
+            showView();
+        else
+            hideView();
+    }
+
+    public void hideView() {
         viewHolder.view.animate()
                 .setStartDelay(0)
                 .setDuration(250)
@@ -188,7 +189,7 @@ public class FloatingDateRangeWidgetManager {
         isShown = false;
     }
 
-    public void showView(){
+    public void showView() {
         viewHolder.view.animate()
                 .setStartDelay(0)
                 .setDuration(250)
@@ -197,12 +198,12 @@ public class FloatingDateRangeWidgetManager {
         isShown = true;
     }
 
-    private void setDateRangeEnabled(boolean state){
+    private void setDateRangeEnabled(boolean state) {
         viewHolder.dateFrom.setEnabled(state);
         viewHolder.dateTo.setEnabled(state);
     }
 
-    private void updateDateRangeLabels(){
+    private void updateDateRangeLabels() {
         viewHolder.dateTo.setText(getDate(dateToTime, preferenceChecker.stringGetDateFormat()));
         viewHolder.dateFrom.setText(getDate(dateFromTime, preferenceChecker.stringGetDateFormat()));
 
@@ -212,7 +213,7 @@ public class FloatingDateRangeWidgetManager {
     public void updateSessionEntries(List<SessionEntry> sessionEntries) {
         int numberOfEntries = sessionEntries.size();
 
-        this.minimumTime = sessionEntries.isEmpty()? 0 :
+        this.minimumTime = sessionEntries.isEmpty() ? 0 :
                 sessionEntries.get(0).getStartTime();
 
         long totalDuration = 0;
@@ -225,7 +226,7 @@ public class FloatingDateRangeWidgetManager {
         viewHolder.totalTimeText.setText(totalTimeString);
     }
 
-    public void setPresetDateRange(long time){
+    public void setPresetDateRange(long time) {
         setDateRangeEnabled(false);
 
         dateToTime = getCurrentTime();
@@ -233,7 +234,7 @@ public class FloatingDateRangeWidgetManager {
         updateDateRangeLabels();
     }
 
-    public void setStartRange(){
+    public void setStartRange() {
         setDateRangeEnabled(false);
 
         dateToTime = getCurrentTime();
@@ -241,7 +242,7 @@ public class FloatingDateRangeWidgetManager {
         updateDateRangeLabels();
     }
 
-    public void setCustomRange(){
+    public void setCustomRange() {
         setDateRangeEnabled(true);
         updateDateRangeLabels();
     }
@@ -265,7 +266,7 @@ public class FloatingDateRangeWidgetManager {
         updateDateRangeLabels();
     }
 
-    public long getDateFrom(){
+    public long getDateFrom() {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(this.dateFromTime);
 
@@ -278,7 +279,7 @@ public class FloatingDateRangeWidgetManager {
         return c.getTimeInMillis();
     }
 
-    public long getDateTo(){
+    public long getDateTo() {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(this.dateToTime);
 
