@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.OverviewActivity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -12,24 +13,26 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.RecyclerVIewAdapters.ComplexDecoration;
 import com.example.brandon.habitlogger.HabitActivity.NewEntryForm;
-import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.RecyclerVIewAdapters.ComplexDecoration;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.EntryViewAdapter;
+import com.example.brandon.habitlogger.data.HabitDataSample;
 
 import java.util.List;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class OverviewEntriesFragment extends Fragment {
+public class OverviewEntriesFragment extends Fragment implements UpdateHabitDataSampleInterface {
     HabitDatabase habitDatabase;
     RecyclerView entriesContainer;
     List<SessionEntry> sessionEntries;
     EntryViewAdapter entryAdapter;
 
     PreferenceChecker preferenceChecker;
+    private CallbackInterface callbackInterface;
 
     public OverviewEntriesFragment() {
         // Required empty public constructor
@@ -39,16 +42,10 @@ public class OverviewEntriesFragment extends Fragment {
         return new OverviewEntriesFragment();
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_overall_statistcs, menu);
-    }
-
+    //region // On create methods
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         preferenceChecker = new PreferenceChecker(getContext());
     }
 
@@ -117,37 +114,59 @@ public class OverviewEntriesFragment extends Fragment {
         return v;
     }
 
-    private int getSessionEntryIndex(long entryId){
-        int index = 0;
-
-        for(SessionEntry entry : sessionEntries){
-            if(entry.getDatabaseId() == entryId){
-                break;
-            }
-            index++;
-        }
-
-        return index;
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_overall_statistcs, menu);
     }
 
+    //endregion
+
+    //region // onAttach - onDetach
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        callbackInterface = (CallbackInterface)context;
+        callbackInterface.addCallback(this);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callbackInterface.removeCallback(this);
+    }
+    //endregion
+
+    //region // Methods responsible for updating the ui
     public void removeSessionEntryById(long databaseId) {
         int index = getSessionEntryIndex(databaseId);
         sessionEntries.remove(index);
         entryAdapter.notifyItemRemoved(index);
     }
 
-    public void updateEntries(List<SessionEntry> sessionEntries) {
-        if(entryAdapter != null) {
-            this.sessionEntries = sessionEntries;
+    public void updateSessionEntryById(long databaseId, SessionEntry entry){
+        int index = getSessionEntryIndex(databaseId);
+        sessionEntries.set(index, entry);
+        entryAdapter.notifyItemChanged(index);
+    }
+    //endregion
 
+    @Override
+    public void updateDataSample(HabitDataSample data) {
+        if(entryAdapter != null) {
+            this.sessionEntries = data.getSessionEntriesSample().getSessionEntries();
             entryAdapter = new EntryViewAdapter(this.sessionEntries, getContext(), entryAdapter.getListener());
             entriesContainer.setAdapter(entryAdapter);
         }
     }
 
-    public void updateSessionEntryById(long databaseId, SessionEntry entry){
-        int index = getSessionEntryIndex(databaseId);
-        sessionEntries.set(index, entry);
-        entryAdapter.notifyItemChanged(index);
+    private int getSessionEntryIndex(long entryId){
+        int index = 0;
+        for(SessionEntry entry : sessionEntries){
+            if(entry.getDatabaseId() == entryId) break;
+            index++;
+        }
+
+        return index;
     }
 }

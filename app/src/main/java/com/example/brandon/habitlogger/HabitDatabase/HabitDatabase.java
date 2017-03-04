@@ -17,6 +17,8 @@ import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.CategoriesTa
 import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.DatabaseSchema;
 import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.EntriesTableSchema;
 import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.HabitsTableSchema;
+import com.example.brandon.habitlogger.data.CategoryDataSample;
+import com.example.brandon.habitlogger.data.HabitDataSample;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1125,5 +1127,28 @@ public class HabitDatabase {
 
         return writableDatabase.delete(HabitsTableSchema.TABLE_NAME,
                 whereClause, whereArgs);
+    }
+
+    public CategoryDataSample getCategoryDataSample(HabitCategory category, long dateFrom, long dateTo){
+        Habit[] habits = getHabits(category.getDatabaseId());
+
+        for (Habit habit : habits) {
+            long habitId = habit.getDatabaseId();
+            Set<Long> ids = searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo);
+            List<SessionEntry> entries = lookUpEntries(ids);
+            habit.setEntries(entries);
+        }
+
+        return new CategoryDataSample(category, habits, dateFrom, dateTo);
+    }
+
+    public HabitDataSample getHabitDataSample(long dateFrom, long dateTo) {
+        List<CategoryDataSample> data = new ArrayList<>();
+
+        for (HabitCategory category : getCategories()) {
+            data.add(getCategoryDataSample(category, dateFrom, dateTo));
+        }
+
+        return new HabitDataSample(data, dateFrom, dateTo);
     }
 }

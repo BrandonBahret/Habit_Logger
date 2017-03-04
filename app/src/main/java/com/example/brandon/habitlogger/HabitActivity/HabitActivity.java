@@ -80,19 +80,10 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
     @Override
     public CategoryDataSample getCategoryDataSample() {
-        long categoryId = habit.getCategory().getDatabaseId();
-        Habit[] habits = habitDatabase.getHabits(categoryId);
         long dateFrom = dateRangeManager.getDateFrom();
         long dateTo = dateRangeManager.getDateTo();
 
-        for (Habit habit : habits) {
-            long habitId = habit.getDatabaseId();
-            Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo);
-            List<SessionEntry> entries = habitDatabase.lookUpEntries(ids);
-            habit.setEntries(entries);
-        }
-
-        return new CategoryDataSample(habit.getCategory(), habits, dateFrom, dateTo);
+        return habitDatabase.getCategoryDataSample(habit.getCategory(), dateFrom, dateTo);
     }
 
     @Override

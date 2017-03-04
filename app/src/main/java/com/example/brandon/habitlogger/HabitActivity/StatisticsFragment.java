@@ -45,7 +45,7 @@ public class StatisticsFragment extends Fragment{
         try {
             view = inflater.inflate(R.layout.fragment_statistics, container, false);
         } catch (InflateException e) {
-        /* map is already there, just return view as it is */
+            // empty stub
         }
         return view;
     }

@@ -28,14 +28,13 @@ public class DataOverviewActivity extends AppCompatActivity implements
         FloatingDateRangeWidgetManager.DateRangeChangeListener {
 
     private FloatingDateRangeWidgetManager dateRangeManager;
-
     private HabitDatabase habitDatabase;
-    private List<SessionEntry> sessionEntries = new ArrayList<>();
     private LocalDataExportManager exportManager;
 
     //region // Methods responsible for handling the activity lifecycle
 
     //region // Entire lifecycle (onCreate - onDestroy)
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,31 +44,37 @@ public class DataOverviewActivity extends AppCompatActivity implements
         int statusColor = ContextCompat.getColor(DataOverviewActivity.this, R.color.colorPrimaryDark);
         getWindow().setStatusBarColor(statusColor);
 
-        // Gather dependencies
+        //region // Gather dependencies
         exportManager = new LocalDataExportManager(this);
         habitDatabase = new HabitDatabase(this);
-        sessionEntries = habitDatabase.lookUpEntries(habitDatabase.searchAllEntriesWithTimeRange(0, Long.MAX_VALUE));
+        List<SessionEntry> sessionEntries = habitDatabase.lookUpEntries(habitDatabase.searchAllEntriesWithTimeRange(0, Long.MAX_VALUE));
         dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), sessionEntries);
+        //endregion
 
+        //region // Set-up views
+        ui.tabs.setupWithViewPager(ui.container);
+        ui.container.setAdapter(new SectionsPagerAdapter(getSupportFragmentManager()));
         setSupportActionBar(ui.toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+        //endregion
 
-        ui.container.setAdapter(new SectionsPagerAdapter(getSupportFragmentManager()));
-        ui.container.addOnPageChangeListener(this);
+        //region // Include listeners
         dateRangeManager.setDateRangeChangeListener(this);
-        ui.tabs.setupWithViewPager(ui.container);
+        ui.container.addOnPageChangeListener(this);
         ui.appbar.addOnOffsetChangedListener(new AppBarStateChangeListener() {
             @Override
             public void onStateChanged(AppBarLayout appBarLayout, State state) {
                 dateRangeManager.setViewShown(state == State.EXPANDED);
             }
         });
+        //endregion
 
         updateEntries();
     }
-    //endregion
+
+    //endregion // Entire lifecycle (onCreate - onDestroy)
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -80,7 +85,8 @@ public class DataOverviewActivity extends AppCompatActivity implements
 
         return super.onPrepareOptionsMenu(menu);
     }
-    //endregion
+
+    //endregion // Methods responsible for handling the activity lifecycle
 
     //region // Methods responsible for handling events
     //region // On query in SearchView events
@@ -95,8 +101,8 @@ public class DataOverviewActivity extends AppCompatActivity implements
                 habitDatabase.searchEntryIdsByComment(query)
         );
 
-        updateEntries();
         dateRangeManager.updateSessionEntries(entries);
+        updateEntries();
         return true;
     }
     //endregion
@@ -151,22 +157,22 @@ public class DataOverviewActivity extends AppCompatActivity implements
 
     @Override
     public void onDateRangeChanged(long dateFrom, long dateTo) {
-        DataOverviewActivity.this.sessionEntries =
-                habitDatabase.lookUpEntries(
-                        habitDatabase.searchAllEntriesWithTimeRange(dateFrom, dateTo)
-                );
-
-        dateRangeManager.updateSessionEntries(DataOverviewActivity.this.sessionEntries);
         updateEntries();
     }
     //endregion
 
     //region // Allow fragments to interface with this activity
+
     List<UpdateHabitDataSampleInterface> callbacks = new ArrayList<>();
 
     public void updateEntries() {
+        HabitDataSample dataSample = getDataSample();
+
+        List<SessionEntry> sessionEntries = dataSample.getSessionEntriesSample().getSessionEntries();
+        dateRangeManager.updateSessionEntries(sessionEntries);
+
         for (UpdateHabitDataSampleInterface callback : callbacks) {
-            callback.updateDataSample(new HabitDataSample());
+            callback.updateDataSample(dataSample);
         }
     }
 
@@ -176,9 +182,15 @@ public class DataOverviewActivity extends AppCompatActivity implements
     }
 
     @Override
-    public HabitDataSample getDataSample() {
-        return new HabitDataSample();
+    public void removeCallback(UpdateHabitDataSampleInterface callback) {
+        callbacks.remove(callback);
     }
+
+    @Override
+    public HabitDataSample getDataSample() {
+        return habitDatabase.getHabitDataSample(dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+    }
+
     //endregion
 
 }

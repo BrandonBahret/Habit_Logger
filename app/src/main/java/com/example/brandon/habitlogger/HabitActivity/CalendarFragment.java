@@ -81,8 +81,4 @@ public class CalendarFragment extends Fragment implements UpdateEntriesInterface
     public void updateEntries(List<SessionEntry> sessionEntries, long dateFrom, long dateTo) {
 
     }
-
-    public void setMenuRes(int menuRes) {
-        mMenuRes = menuRes;
-    }
 }

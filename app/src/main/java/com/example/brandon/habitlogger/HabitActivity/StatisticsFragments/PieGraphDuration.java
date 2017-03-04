@@ -79,7 +79,7 @@ public class PieGraphDuration extends Fragment implements UpdateCategorySampleIn
         float[] durationRatios = new float[dataSample.getNumberOfHabits()];
 
         for (int i = 0; i < durationRatios.length; i++) {
-            durationRatios[i] = dataSample.getHabitDuration(i) / (float) dataSample.getTotalDuration() * 100;
+            durationRatios[i] = dataSample.getHabitDuration(i) / (float) dataSample.calculateTotalDuration() * 100;
         }
 
         setPieData(durationRatios, dataSample);
@@ -121,21 +121,6 @@ public class PieGraphDuration extends Fragment implements UpdateCategorySampleIn
 
         ui.chart.setEntryLabelColor(Color.TRANSPARENT);
     }
-
-//    public class MyValueFormatter implements IValueFormatter {
-//
-//        private DecimalFormat mFormat;
-//
-//        public MyValueFormatter() {
-//            mFormat = new DecimalFormat("###,###,###,##0.0");
-//        }
-//
-//        @Override
-//        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-//            if(value < 5) return "";
-//            else return mFormat.format(value) + " %";
-//        }
-//    }
 
     private int[] genColors(int color, int length) {
         int[] colors = new int[length];

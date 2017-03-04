@@ -10,36 +10,38 @@ import android.support.v4.app.FragmentPagerAdapter;
  */
 
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
-    public OverviewEntriesFragment entriesFragment = OverviewEntriesFragment.newInstance();
-    public OverviewCalendarFragment calendarFragment = OverviewCalendarFragment.newInstance();
-    public OverviewStatisticsFragment statisticsFragment = OverviewStatisticsFragment.newInstance();
+
+    final String[] TITLES = {"ENTRIES", "CALENDAR", "STATISTICS"};
 
     public SectionsPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 
-    //<editor-fold desc="// Create fragments">
+    //region // Create fragments
     @Override
     public Fragment getItem(int position) {
         switch (position) {
             case (0):
+                OverviewEntriesFragment entriesFragment = OverviewEntriesFragment.newInstance();
                 entriesFragment.setHasOptionsMenu(true);
                 return entriesFragment;
 
             case (1):
+                OverviewCalendarFragment calendarFragment = OverviewCalendarFragment.newInstance();
                 calendarFragment.setHasOptionsMenu(true);
                 return calendarFragment;
 
             case (2):
+                OverviewStatisticsFragment statisticsFragment = OverviewStatisticsFragment.newInstance();
                 statisticsFragment.setHasOptionsMenu(true);
                 return statisticsFragment;
         }
 
         return null;
     }
-    //</editor-fold>
+    //endregion
 
-    //<editor-fold desc="// Get data for the tabs">
+    //region // Get data for tabs
     @Override
     public int getCount() {
         return 3;
@@ -47,15 +49,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        switch (position) {
-            case 0:
-                return "Entries";
-            case 1:
-                return "Calendar";
-            case 2:
-                return "Statistics";
-        }
-        return null;
+        return TITLES[position];
     }
-    //</editor-fold>
+    //endregion
+
 }

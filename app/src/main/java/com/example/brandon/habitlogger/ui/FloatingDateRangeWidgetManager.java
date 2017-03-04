@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.ui;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -85,7 +86,8 @@ public class FloatingDateRangeWidgetManager {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
                 // Time presets: Year, Month, Week, Day in milliseconds
-                long timePresets[] = new long[]{31536000000L, 2592000000L, 604800000L, 86400000L};
+                final long MONTH_IN_MILLIS = DateUtils.YEAR_IN_MILLIS / 12;
+                long timePresets[] = new long[]{DateUtils.YEAR_IN_MILLIS, MONTH_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, DateUtils.DAY_IN_MILLIS};
                 if (i != 0 && i < 5) {
                     setPresetDateRange(timePresets[i - 1]);
                 }

@@ -43,4 +43,10 @@
         <item name="fab_colorPressed">?attr/colorPrimaryDark</item>
     </style>
 
+    <style name="AppTheme.Card">
+        <item name="android:layout_margin">4dp</item>
+        <item name="contentPadding">8dp</item>
+        <item name="cardBackgroundColor">@color/habitCard</item>
+    </style>
+
 </resources>

@@ -10,4 +10,6 @@ import com.example.brandon.habitlogger.data.HabitDataSample;
 public interface CallbackInterface {
     void addCallback(UpdateHabitDataSampleInterface callback);
     HabitDataSample getDataSample();
+
+    void removeCallback(UpdateHabitDataSampleInterface callback);
 }

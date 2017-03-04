@@ -10,13 +10,29 @@ import java.util.List;
  */
 
 public class SessionEntriesSample{
-    public List<SessionEntry> sessionEntries;
-    public long dateFromTime;
-    public long dateToTime;
+    public final List<SessionEntry> sessionEntries;
+    public final long dateFromTime;
+    public final long dateToTime;
+    private long mDuration = -1;
 
     public SessionEntriesSample(List<SessionEntry> sessionEntries, long dateFromTime, long dateToTime){
         this.sessionEntries = sessionEntries;
         this.dateFromTime = dateFromTime;
         this.dateToTime = dateToTime;
+    }
+
+    public List<SessionEntry> getSessionEntries(){
+        return sessionEntries;
+    }
+
+    public long calculateDuration(){
+        if(mDuration == -1){
+            mDuration = 0;
+            for(SessionEntry entry : sessionEntries){
+                mDuration += entry.getDuration();
+            }
+        }
+
+        return mDuration;
     }
 }

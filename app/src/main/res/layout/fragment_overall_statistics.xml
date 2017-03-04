@@ -1,11 +1,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:app="http://schemas.android.com/apk/res-auto"
              xmlns:tools="http://schemas.android.com/tools"
              android:id="@+id/statistics_fragment_layout"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              tools:context="com.example.brandon.habitlogger.HabitActivity.StatisticsFragment">
-
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -20,7 +18,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"/>
 
-
+            <fragment
+                android:id="@+id/pie_chart_overview_time_breakdown"
+                android:name="com.example.brandon.habitlogger.OverviewActivity.OverviewStatisticsFragments.PieChartCategoriesDuration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:layout="@layout/fragment_pie_chart_categories_duration"/>
 
             <Space
                 android:layout_width="match_parent"
@@ -28,6 +31,4 @@
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
-
-
 </FrameLayout>

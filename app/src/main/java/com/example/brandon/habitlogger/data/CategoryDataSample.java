@@ -2,8 +2,11 @@ package com.example.brandon.habitlogger.data;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Brandon on 2/28/2017.
@@ -17,7 +20,7 @@ public class CategoryDataSample {
     private final int mNumberOfHabits;
     private final long mDateFromTime;
     private final long mDateToTime;
-    private final long mTotalDuration;
+    private long mDuration = -1;
 
     public CategoryDataSample(HabitCategory category, Habit[] habits,
                               long dateFromTime, long dateToTime) {
@@ -26,17 +29,19 @@ public class CategoryDataSample {
         mHabits = habits;
         Arrays.sort(mHabits, Habit.DurationComparator);
         mNumberOfHabits = habits.length;
-        mTotalDuration = calculateTotalDuration();
         mDateFromTime = dateFromTime;
         mDateToTime = dateToTime;
     }
 
-    private long calculateTotalDuration() {
-        long totalDuration = 0;
-        for(Habit habit : mHabits){
-            totalDuration += habit.getEntriesDuration();
+    public long calculateTotalDuration() {
+        if (mDuration == -1) {
+            mDuration = 0;
+            for(Habit habit : mHabits){
+                mDuration += habit.getEntriesDuration();
+            }
         }
-        return totalDuration;
+
+        return mDuration;
     }
 
     //region // Getters
@@ -56,16 +61,29 @@ public class CategoryDataSample {
         return mDateToTime;
     }
 
-    public long getTotalDuration() {
-        return mTotalDuration;
-    }
-
     public long getHabitDuration(int i){
         return mHabits[i].getEntriesDuration();
     }
 
     public Habit getHabit(int i) {
         return mHabits[i];
+    }
+
+    public List<SessionEntry> getSessionEntries() {
+        List<SessionEntry> sessionEntries = new ArrayList<>();
+
+        for (Habit habit : mHabits) {
+            SessionEntry[] entries = habit.getEntries();
+            if(entries != null){
+                sessionEntries.addAll(Arrays.asList(entries));
+            }
+        }
+
+        return sessionEntries;
+    }
+
+    public String getName() {
+        return mCategory.getName();
     }
     //endregion
 }
