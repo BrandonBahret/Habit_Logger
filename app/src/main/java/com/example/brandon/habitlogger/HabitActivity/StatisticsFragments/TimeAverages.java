@@ -64,8 +64,7 @@ public class TimeAverages extends Fragment implements UpdateEntriesInterface {
     @Override
     public void onStart() {
         super.onStart();
-        SessionEntriesSample sample = callbackInterface.getSessionEntries();
-        updateEntries(sample.sessionEntries, sample.dateFromTime, sample.dateToTime);
+        updateEntries(callbackInterface.getSessionEntries());
     }
 
     public static List<StreaksFragment.Streak> getWeekStreaks(List<SessionEntry> sessionEntries) {
@@ -135,10 +134,10 @@ public class TimeAverages extends Fragment implements UpdateEntriesInterface {
     }
 
     @Override
-    public void updateEntries(List<SessionEntry> sessionEntries, long dateFrom, long dateTo) {
+    public void updateEntries(SessionEntriesSample dataSample) {
 
-        if (!sessionEntries.isEmpty()) {
-            List<StreaksFragment.Streak> streaks = getWeekStreaks(sessionEntries);
+        if (!dataSample.isEmpty()) {
+            List<StreaksFragment.Streak> streaks = getWeekStreaks(dataSample.getSessionEntries());
 
             int amount = 0;
             for (StreaksFragment.Streak streak : streaks) {
@@ -153,11 +152,11 @@ public class TimeAverages extends Fragment implements UpdateEntriesInterface {
 
 
             long totalDuration = 0;
-            for (SessionEntry entry : sessionEntries) {
+            for (SessionEntry entry : dataSample.getSessionEntries()) {
                 totalDuration += entry.getDuration();
             }
 
-            long totalTime = dateTo - dateFrom;
+            long totalTime = dataSample.dateToTime - dataSample.dateFromTime;
 
             double months = totalTime / 2592000000L;
             double weeks = totalTime / 604800000L;

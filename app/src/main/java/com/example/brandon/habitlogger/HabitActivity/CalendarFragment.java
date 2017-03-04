@@ -11,10 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
 
-import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
-
-import java.util.List;
+import com.example.brandon.habitlogger.data.SessionEntriesSample;
 
 public class CalendarFragment extends Fragment implements UpdateEntriesInterface {
     private Listener listener;
@@ -78,7 +76,7 @@ public class CalendarFragment extends Fragment implements UpdateEntriesInterface
     }
 
     @Override
-    public void updateEntries(List<SessionEntry> sessionEntries, long dateFrom, long dateTo) {
+    public void updateEntries(SessionEntriesSample dataSample) {
 
     }
 }

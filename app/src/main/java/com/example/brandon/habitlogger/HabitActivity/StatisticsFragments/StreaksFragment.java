@@ -54,13 +54,12 @@ public class StreaksFragment extends Fragment implements UpdateEntriesInterface 
     @Override
     public void onStart() {
         super.onStart();
-        SessionEntriesSample sample = callbackInterface.getSessionEntries();
-        updateEntries(sample.sessionEntries, sample.dateFromTime, sample.dateToTime);
+        updateEntries(callbackInterface.getSessionEntries());
     }
 
     @Override
-    public void updateEntries(List<SessionEntry> sessionEntries, long dateFrom, long dateTo) {
-        value.setText(Streak.listToString(getStreaks(sessionEntries)));
+    public void updateEntries(SessionEntriesSample dataSample) {
+        value.setText(Streak.listToString(getStreaks(dataSample.getSessionEntries())));
     }
 
     public static List<Streak> getStreaks(List<SessionEntry> sessionEntries) {

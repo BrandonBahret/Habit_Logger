@@ -71,14 +71,13 @@ public class LineGraphCompletion extends Fragment implements UpdateEntriesInterf
     @Override
     public void onStart() {
         super.onStart();
-        SessionEntriesSample sample = callbackInterface.getSessionEntries();
-        updateEntries(sample.sessionEntries, sample.dateFromTime, sample.dateToTime);
+        updateEntries(callbackInterface.getSessionEntries());
     }
 
     @Override
-    public void updateEntries(List<SessionEntry> sessionEntries, long dateFrom, long dateTo) {
-        if (!sessionEntries.isEmpty()) {
-            setLineChartData(calculateDataSet(sessionEntries, dateFrom, dateTo));
+    public void updateEntries(SessionEntriesSample dataSample) {
+        if (!dataSample.isEmpty()) {
+            setLineChartData(calculateDataSet(dataSample));
         }
     }
 
@@ -115,7 +114,10 @@ public class LineGraphCompletion extends Fragment implements UpdateEntriesInterf
         yAxis.setValueFormatter(new PercentFormatter());
     }
 
-    List<Entry> calculateDataSet(List<SessionEntry> sessionEntries, long dateFrom, long dateTo) {
+    List<Entry> calculateDataSet(SessionEntriesSample dataSample) {
+        long dateTo = dataSample.dateToTime;
+        long dateFrom = dataSample.dateFromTime;
+
         int totalDays = (int) ((dateTo - dateFrom) / DateUtils.DAY_IN_MILLIS);
         List<Entry> values = new ArrayList<>(totalDays);
         int dayCount = 0; // The number of days performed.
@@ -123,7 +125,7 @@ public class LineGraphCompletion extends Fragment implements UpdateEntriesInterf
         long targetDate = dateFrom;
 
         for (int dateIndex = 0; dateIndex < totalDays; dateIndex++) {
-            int index = findIndexForDate(sessionEntries, targetDate, entryIndex);
+            int index = findIndexForDate(dataSample.getSessionEntries(), targetDate, entryIndex);
             if (index != -1) {
                 entryIndex = index;
                 dayCount++;

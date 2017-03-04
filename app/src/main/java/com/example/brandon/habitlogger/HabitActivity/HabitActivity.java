@@ -69,6 +69,11 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     }
 
     @Override
+    public void removeCallback(UpdateEntriesInterface callback) {
+        callbacks.remove(callback);
+    }
+
+    @Override
     public SessionEntriesSample getSessionEntries() {
         return new SessionEntriesSample(sessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
     }
@@ -96,18 +101,18 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_habit);
 
-        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        AppBarLayout appBar = (AppBarLayout)findViewById(R.id.appbar);
-        tabLayout    = (TabLayout) findViewById(R.id.tabs);
-        fabMenu      = (FloatingActionMenu) findViewById(R.id.menu_fab);
+        AppBarLayout appBar = (AppBarLayout) findViewById(R.id.appbar);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        fabMenu = (FloatingActionMenu) findViewById(R.id.menu_fab);
         enterSession = (FloatingActionButton) findViewById(R.id.enter_session_fab);
-        createEntry  = (FloatingActionButton) findViewById(R.id.create_entry_fab);
-        viewPager    = (ViewPager) findViewById(R.id.container);
+        createEntry = (FloatingActionButton) findViewById(R.id.create_entry_fab);
+        viewPager = (ViewPager) findViewById(R.id.container);
 
         preferenceChecker = new PreferenceChecker(this);
-        habitDatabase  = new HabitDatabase(this);
+        habitDatabase = new HabitDatabase(this);
         sessionManager = new SessionManager(this);
         exportManager = new LocalDataExportManager(this);
 
@@ -132,24 +137,25 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         appBar.addOnOffsetChangedListener(new AppBarStateChangeListener() {
             @Override
             public void onStateChanged(AppBarLayout appBarLayout, State state) {
-                if(state == COLLAPSED){
+                if (state == COLLAPSED) {
                     dateRangeManager.hideView();
-                    if(viewPager.getCurrentItem() == 0)
+                    if (viewPager.getCurrentItem() == 0)
                         fabMenu.hideMenu(true);
                 }
-                else if(state == EXPANDED){
-                    if(viewPager.getCurrentItem() != 1)
+                else if (state == EXPANDED) {
+                    if (viewPager.getCurrentItem() != 1)
                         dateRangeManager.showView();
 
-                    if(viewPager.getCurrentItem() == 0)
+                    if (viewPager.getCurrentItem() == 0)
                         fabMenu.showMenu(true);
                 }
             }
         });
 
         viewPager.setAdapter(sectionsPagerAdapter);
-        viewPager.addOnPageChangeListener (new ViewPager.OnPageChangeListener() {
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             public void onPageScrollStateChanged(int state) {}
+
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
             public void onPageSelected(int position) {
@@ -191,7 +197,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
                 dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
                     @Override
                     public void onFinishedWithResult(SessionEntry entry) {
-                        if(entry != null){
+                        if (entry != null) {
                             habitDatabase.addEntry(habitId, entry);
                             sessionEntries.add(entry);
                             updateEntries(sessionEntries);
@@ -224,7 +230,8 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
                     habitDatabase.updateHabit(editHabit.getDatabaseId(), editHabit);
 
                     updateActivity();
-                }break;
+                }
+                break;
             }
         }
     }
@@ -233,10 +240,11 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem archive = menu.findItem(R.id.menu_toggle_archive);
 
-        if(archive != null) {
+        if (archive != null) {
             if (habit.getIsArchived()) {
                 archive.setTitle("Unarchive");
-            } else {
+            }
+            else {
                 archive.setTitle("Archive");
             }
         }
@@ -244,7 +252,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
         MenuItem search = menu.findItem(R.id.search);
 
-        if(search != null){
+        if (search != null) {
             SearchView searchView = (SearchView) search.getActionView();
             searchView.setOnQueryTextListener(
                     new SearchView.OnQueryTextListener() {
@@ -266,7 +274,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         return super.onPrepareOptionsMenu(menu);
     }
 
-    public void processQuery(String query){
+    public void processQuery(String query) {
         List<SessionEntry> entries = habitDatabase.lookUpEntries(
                 habitDatabase.searchEntryIdsByComment(habitId, query)
         );
@@ -278,40 +286,46 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        switch(id){
-            case(android.R.id.home):{
+        switch (id) {
+            case (android.R.id.home): {
                 finish();
-            }break;
+            }
+            break;
 
-            case(R.id.menu_habit_edit):{
+            case (R.id.menu_habit_edit): {
                 startModifyHabitActivity();
-            }break;
+            }
+            break;
 
-            case(R.id.menu_enter_session):{
+            case (R.id.menu_enter_session): {
                 startSession();
-            }break;
+            }
+            break;
 
-            case(R.id.menu_toggle_archive):{
+            case (R.id.menu_toggle_archive): {
                 boolean archivedState = !habitDatabase.getIsHabitArchived(habitId);
                 habitDatabase.updateHabitIsArchived(habitId, archivedState);
                 habit.setIsArchived(archivedState);
                 updateColorTheme();
 
-            }break;
+            }
+            break;
 
-            case(R.id.menu_export_habit):{
+            case (R.id.menu_export_habit): {
                 Habit habit = habitDatabase.getHabit(habitId);
                 exportManager.shareExportHabit(habit);
-            }break;
+            }
+            break;
 
-            case(R.id.menu_delete_habit):{
+            case (R.id.menu_delete_habit): {
                 if (sessionManager.getIsSessionActive(habitId)) {
                     sessionManager.cancelSession(habitId);
                 }
 
                 habitDatabase.deleteHabit(habitId);
                 finish();
-            }break;
+            }
+            break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -319,13 +333,13 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
     public void startSession() {
         Intent startSession = new Intent(this, SessionActivity.class);
-        startSession.putExtra(SessionActivity.BundleKeys.SERIALIZED_HABIT, (Serializable)habit);
+        startSession.putExtra(SessionActivity.BundleKeys.SERIALIZED_HABIT, (Serializable) habit);
         startActivity(startSession);
     }
 
     private void startModifyHabitActivity() {
         Intent startTargetActivity = new Intent(HabitActivity.this, ModifyHabitActivity.class);
-        startTargetActivity.putExtra(ModifyHabitActivity.InputBundleKeys.HABIT_TO_EDIT, (Serializable)habit);
+        startTargetActivity.putExtra(ModifyHabitActivity.InputBundleKeys.HABIT_TO_EDIT, (Serializable) habit);
         startActivityForResult(startTargetActivity, RequestCodes.EDIT_HABIT_REQUEST_CODE);
     }
 
@@ -345,7 +359,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         int color = 0xFFCCCCCC;
         int darkerColor = 0xFFBBBBBB;
 
-        if(!habit.getIsArchived()){
+        if (!habit.getIsArchived()) {
             color = habit.getCategory().getColorAsInt();
             darkerColor = HabitCategory.darkenColor(color, 0.7f);
         }
@@ -365,8 +379,11 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     }
 
     public void updateEntries(List<SessionEntry> sessionEntries) {
+        SessionEntriesSample dataSample = new SessionEntriesSample
+                (sessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+
         for (UpdateEntriesInterface callback : callbacks) {
-            callback.updateEntries(sessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+            callback.updateEntries(dataSample);
         }
     }
 

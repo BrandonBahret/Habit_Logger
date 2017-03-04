@@ -11,6 +11,8 @@ import com.example.brandon.habitlogger.data.SessionEntriesSample;
 public interface CallbackInterface {
 
     void addCallback(UpdateEntriesInterface callback);
+    void removeCallback(UpdateEntriesInterface callback);
+
     void addOnNewCategoryDataSampleCallback(UpdateCategorySampleInterface callback);
 
     SessionEntriesSample getSessionEntries();

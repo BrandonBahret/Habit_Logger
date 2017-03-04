@@ -13,12 +13,13 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.RecyclerVIewAdapters.ComplexDecoration;
-import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.RecyclerVIewAdapters.ComplexDecoration;
 import com.example.brandon.habitlogger.RecyclerVIewAdapters.EntryViewAdapter;
+import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.List;
@@ -170,9 +171,9 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
     }
 
     @Override
-    public void updateEntries(List<SessionEntry> sessionEntries, long dateFrom, long dateTo) {
+    public void updateEntries(SessionEntriesSample dataSample) {
         if(entryAdapter != null) {
-            this.sessionEntries = sessionEntries;
+            this.sessionEntries = dataSample.getSessionEntries();
 
             entryAdapter = new EntryViewAdapter(this.sessionEntries, getContext(), entryAdapter.getListener());
             entriesContainer.setAdapter(entryAdapter);

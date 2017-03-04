@@ -60,28 +60,28 @@ public class PieGraphCompletion extends Fragment implements UpdateEntriesInterfa
     @Override
     public void onStart() {
         super.onStart();
-        SessionEntriesSample sample = callbackInterface.getSessionEntries();
-        updateEntries(sample.sessionEntries, sample.dateFromTime, sample.dateToTime);
+        updateEntries(callbackInterface.getSessionEntries());
     }
 
     @Override
-    public void updateEntries(List<SessionEntry> sessionEntries, long dateFrom, long dateTo) {
+    public void updateEntries(SessionEntriesSample dataSample) {
 
-        if (!sessionEntries.isEmpty()) {
+        if (!dataSample.isEmpty()) {
             float ratio = 1.0f;
             int dayCount = 0;
             int totalDays = 0;
 
-            Collections.sort(sessionEntries, SessionEntry.StartingTimeComparator);
+            List<SessionEntry> entries = dataSample.getSessionEntries();
+            Collections.sort(entries, SessionEntry.StartingTimeComparator);
             final long DAY_IN_MILLI = 86400000L;
 
-            long totalTime = dateTo - dateFrom;
+            long totalTime = dataSample.dateToTime - dataSample.dateFromTime;
             totalDays = (int) (totalTime / DAY_IN_MILLI);
 
             if (totalDays > 0) {
-                long targetDate = dateFrom;
+                long targetDate = dataSample.dateFromTime;
 
-                for (SessionEntry entry : sessionEntries) {
+                for (SessionEntry entry : entries) {
                     long currentDate = entry.getStartingTimeDate();
 
                     if (currentDate == targetDate) {

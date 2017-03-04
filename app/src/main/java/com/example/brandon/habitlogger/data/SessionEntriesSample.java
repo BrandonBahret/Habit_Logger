@@ -10,7 +10,7 @@ import java.util.List;
  */
 
 public class SessionEntriesSample{
-    public final List<SessionEntry> sessionEntries;
+    private final List<SessionEntry> sessionEntries;
     public final long dateFromTime;
     public final long dateToTime;
     private long mDuration = -1;
@@ -34,5 +34,9 @@ public class SessionEntriesSample{
         }
 
         return mDuration;
+    }
+
+    public boolean isEmpty() {
+        return sessionEntries.isEmpty();
     }
 }

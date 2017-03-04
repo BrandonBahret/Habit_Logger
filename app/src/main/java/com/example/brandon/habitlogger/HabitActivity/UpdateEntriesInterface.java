@@ -1,8 +1,6 @@
 package com.example.brandon.habitlogger.HabitActivity;
 
-import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
-
-import java.util.List;
+import com.example.brandon.habitlogger.data.SessionEntriesSample;
 
 /**
  * Created by Brandon on 2/9/2017.
@@ -10,5 +8,5 @@ import java.util.List;
  */
 
 public interface UpdateEntriesInterface {
-    void updateEntries(List<SessionEntry> sessionEntries, long dateFrom, long dateTo);
+    void updateEntries(SessionEntriesSample dataSample);
 }

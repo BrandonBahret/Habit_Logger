@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.HabitDatabase.DataModels;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.text.format.DateUtils;
 
 import com.example.brandon.habitlogger.common.TimeDisplay;
 
@@ -162,6 +163,21 @@ public class SessionEntry implements Serializable, Parcelable {
         c.setTimeInMillis(getStartTime());
 
         return c.get(Calendar.MINUTE);
+    }
+
+    /**
+     * @return The time portion of the timestamp.
+     * Ex: (Jan/20/2017 5:60 PM) returns 5:60 PM in millis
+     */
+    public long getStartingTimePortion() {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(getStartTime());
+
+        long hours = c.get(Calendar.HOUR_OF_DAY) * DateUtils.HOUR_IN_MILLIS;
+        long minutes = c.get(Calendar.MINUTE) * DateUtils.MINUTE_IN_MILLIS;
+        long seconds = c.get(Calendar.SECOND) * DateUtils.SECOND_IN_MILLIS;
+
+        return hours + minutes + seconds;
     }
 
     public void setStartingHour(int hour) {
