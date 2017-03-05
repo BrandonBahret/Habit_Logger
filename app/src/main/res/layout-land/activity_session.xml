@@ -14,6 +14,8 @@
             android:id="@+id/session_time_display_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             android:background="@drawable/underline_background"
 
             android:gravity="center_horizontal"
@@ -31,7 +33,7 @@
 
                 android:contentDescription="@string/session_pause_play_content_description"
                 android:scaleType="fitXY"
-                android:src="@drawable/ic_play_circle_outline_black_24dp"
+                android:src="@drawable/ic_play_black"
                 android:tint="@color/habitCardButtonColor"/>
 
             <LinearLayout
@@ -45,7 +47,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-condensed"
 
-                    android:text="@string/value_placeholder"
+                    android:text="@string/_0"
                     android:textSize="@dimen/land_time_display"/>
 
             </LinearLayout>
@@ -69,7 +71,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-condensed"
 
-                    android:text="@string/value_placeholder"
+                    android:text="@string/_0"
                     android:textSize="@dimen/land_time_display"/>
 
             </LinearLayout>
@@ -93,7 +95,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-condensed"
 
-                    android:text="@string/value_placeholder"
+                    android:text="@string/_0"
                     android:textSize="@dimen/land_time_display"/>
 
             </LinearLayout>

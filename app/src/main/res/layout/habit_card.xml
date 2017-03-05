@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_view"
 
@@ -53,7 +52,7 @@
                     android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:scaleType="fitXY"
 
-                    android:src="@drawable/ic_play_circle_outline_black_24dp"
+                    android:src="@drawable/ic_play_black"
                     android:tint="@color/habitCardButtonColor" />
 
                 <TextView

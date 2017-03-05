@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.RecyclerVIewAdapters;
+package com.example.brandon.habitlogger.RecyclerViewAdapters;
 
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
@@ -31,8 +31,8 @@ public class HabitViewHolder extends ChildViewHolder {
         this.categoryAccent = (ImageView) view.findViewById(R.id.category_accent);
         this.toolbar = (Toolbar) view.findViewById(R.id.card_toolbar);
         this.playButton = (ImageButton) view.findViewById(R.id.session_control_button);
-        this.time = (TextView)view.findViewById(R.id.habit_card_time_display);
-        this.rootView = (CardView)view;
+        this.time = (TextView) view.findViewById(R.id.habit_card_time_display);
+        this.rootView = (CardView) view;
     }
 
     public void bindItem(final Habit item,
@@ -41,10 +41,11 @@ public class HabitViewHolder extends ChildViewHolder {
 
         // Make sure menu hasn't been inflated yet.
         int menuSize = toolbar.getMenu().size();
-        if(menuSize == 0) {
+        if (menuSize == 0) {
             if (item.getIsArchived()) {
                 toolbar.inflateMenu(R.menu.menu_archived_habit_card);
-            } else {
+            }
+            else {
                 toolbar.inflateMenu(R.menu.menu_habit_card);
             }
         }
@@ -65,9 +66,10 @@ public class HabitViewHolder extends ChildViewHolder {
                     }
                     break;
 
-                    case(R.id.menu_enter_session):{
+                    case (R.id.menu_enter_session): {
                         menuItemClickListener.onStartSession(habitId);
-                    }break;
+                    }
+                    break;
 
                     case (R.id.habit_menu_delete): {
                         menuItemClickListener.onDeleteClick(habitId);
@@ -118,11 +120,11 @@ public class HabitViewHolder extends ChildViewHolder {
     }
 
     public static int getResourceIdForPauseButton(boolean isPaused) {
-        return isPaused ? R.drawable.ic_play_circle_filled_black_24dp :
-                R.drawable.ic_play_circle_outline_black_24dp;
+        return isPaused ? R.drawable.ic_play_black :
+                R.drawable.ic_pause_black;
     }
 
-    public void setEntry(SessionEntry entry){
+    public void setEntry(SessionEntry entry) {
         time.setText(TimeDisplay.getDisplay(entry.getDuration()));
         playButton.setImageResource(
                 getResourceIdForPauseButton(entry.getIsPaused())

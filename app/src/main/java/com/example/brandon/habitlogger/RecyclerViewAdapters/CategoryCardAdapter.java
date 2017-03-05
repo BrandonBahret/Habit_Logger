@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.RecyclerVIewAdapters;
+package com.example.brandon.habitlogger.RecyclerViewAdapters;
 
 import android.view.LayoutInflater;
 import android.view.View;

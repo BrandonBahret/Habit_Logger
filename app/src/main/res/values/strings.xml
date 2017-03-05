@@ -87,5 +87,6 @@
     <string name="pref_date_format">preference_date_format</string>
     <string name="uncategorized">Uncategorized</string>
     <string name="create_new_category_button">Create new category button</string>
+    <string name="_0">0</string>
 
 </resources>

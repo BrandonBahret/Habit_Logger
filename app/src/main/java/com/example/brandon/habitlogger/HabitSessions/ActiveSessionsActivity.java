@@ -21,7 +21,7 @@ import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.RecyclerVIewAdapters.ActiveSessionViewAdapter;
+import com.example.brandon.habitlogger.RecyclerViewAdapters.ActiveSessionViewAdapter;
 import com.example.brandon.habitlogger.common.TimeDisplay;
 import com.example.brandon.habitlogger.databinding.ActivityActiveSessionsBinding;
 

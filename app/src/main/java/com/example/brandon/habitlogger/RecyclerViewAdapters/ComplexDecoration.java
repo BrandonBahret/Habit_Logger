@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.RecyclerVIewAdapters;
+package com.example.brandon.habitlogger.RecyclerViewAdapters;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -6,42 +6,57 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.support.annotation.DimenRes;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextPaint;
-import android.text.TextUtils;
 import android.view.View;
 
 import com.example.brandon.habitlogger.R;
+
+import static android.support.v4.content.ContextCompat.getColor;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class ComplexDecoration extends RecyclerView.ItemDecoration {
 
     private final Callback callback;
     private final TextPaint textPaint;
+    private final Paint linePaint;
     private final int topGap;
     private final int bottomGap;
+    private final int lineInset;
+    private final float lineWidth;
+    private final int textVerticalOffset;
     private Paint.FontMetrics fontMetrics;
 
-    public ComplexDecoration(Context context, Callback callback) {
+    public ComplexDecoration(Context context, @DimenRes int textSizeRes, Callback callback) {
         super();
-        final Resources res = context.getResources();
-        textPaint = new TextPaint();
-        Paint paint = new Paint();
         this.callback = callback;
+        final Resources res = context.getResources();
 
-        textPaint.setTypeface(Typeface.DEFAULT_BOLD);
-        textPaint.setAntiAlias(true);
-        textPaint.setTextSize(46);
-        textPaint.setColor(ContextCompat.getColor(context, R.color.headerTextColor));
-        textPaint.getFontMetrics(fontMetrics);
-        textPaint.setTextAlign(Paint.Align.LEFT);
-        paint.setColor(ContextCompat.getColor(context, R.color.colorAccent));
+        int textSize = res.getDimensionPixelSize(textSizeRes);
+        lineWidth = res.getDimensionPixelSize(R.dimen.line_width);
+        topGap = res.getDimensionPixelSize(R.dimen.indent_pad_top);
+        bottomGap = res.getDimensionPixelSize(R.dimen.indent_pad_bottom_of_group);
+        lineInset = res.getDimensionPixelSize(R.dimen.line_inset);
+        textVerticalOffset = 20;
+        int color = getColor(context, R.color.headerTextColor);
+        int shadowColor = getColor(context, R.color.shadow_black);
+
+        linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        linePaint.setStrokeWidth(lineWidth);
+        linePaint.setColor(color);
+
+        textPaint = new TextPaint();
         fontMetrics = new Paint.FontMetrics();
 
-        topGap = res.getDimensionPixelSize(R.dimen.indent_pad_top);
-        bottomGap = res.getDimensionPixelSize(R.dimen.indent_pad_bottom);
+        textPaint.setTextSize(textSize);
+        textPaint.setColor(color);
+        textPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        textPaint.setAntiAlias(true);
+        textPaint.getFontMetrics(fontMetrics);
+        textPaint.setTextAlign(Paint.Align.CENTER);
+        textPaint.setShadowLayer(8f, 0f, 0f, shadowColor);
     }
 
     @Override
@@ -66,12 +81,14 @@ public class ComplexDecoration extends RecyclerView.ItemDecoration {
     }
 
     @Override
-    public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
-        super.onDrawOver(c, parent, state);
+    public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+        super.onDraw(c, parent, state);
 
         final int totalItemCount = state.getItemCount();
         final int childCount = parent.getChildCount();
-        final float left = parent.getPaddingLeft();
+        final float width = parent.getWidth();
+        final float left = width / 2;
+
         final float lineHeight = textPaint.getTextSize() + fontMetrics.descent;
 
         long prevGroupId, groupId = -1;
@@ -83,11 +100,11 @@ public class ComplexDecoration extends RecyclerView.ItemDecoration {
             groupId = callback.getGroupId(position);
             if (groupId < 0 || groupId == prevGroupId) continue;
 
-            final String textLine = callback.getGroupFirstLine(position).toUpperCase();
-            if (TextUtils.isEmpty(textLine)) continue;
+            final String textLine = callback.getGroupFirstLine(position);
+            if (textLine.isEmpty()) continue;
 
             final int viewBottom = view.getBottom() + view.getPaddingBottom();
-            float textY = view.getTop() + view.getPaddingTop() - 15;
+            float textY = view.getTop() + view.getPaddingTop() - textVerticalOffset;
             if (position + 1 < totalItemCount) {
                 long nextGroupId = callback.getGroupId(position + 1);
                 if (nextGroupId != groupId && viewBottom < textY + lineHeight) {
@@ -95,8 +112,20 @@ public class ComplexDecoration extends RecyclerView.ItemDecoration {
                 }
             }
 
+            Rect textRect = new Rect();
+            textPaint.getTextBounds(textLine, 0, textLine.length() - 1, textRect);
+
+            final float lineY = view.getTop() + view.getPaddingTop() - textVerticalOffset - textRect.height()/2.0f + lineWidth / 4.0f;
+
+            float lineX1 = width / 2 - textRect.width()/2.0f - lineInset;// width - lineInset;
+            float lineX2 = width / 2 + textRect.width()/2.0f + lineInset;// width - lineInset;
+
+            c.drawLine(lineInset, lineY, lineX1, lineY, linePaint);
+            c.drawLine(lineX2, lineY, width - lineInset, lineY, linePaint);
+
             c.drawText(textLine, left, textY, textPaint);
         }
+
     }
 
     private boolean isFirstInGroup(int position) {

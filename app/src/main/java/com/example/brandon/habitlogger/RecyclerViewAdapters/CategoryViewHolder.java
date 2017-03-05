@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.RecyclerVIewAdapters;
+package com.example.brandon.habitlogger.RecyclerViewAdapters;
 
 import android.support.v7.widget.CardView;
 import android.view.View;

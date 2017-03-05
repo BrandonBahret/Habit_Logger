@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.RecyclerVIewAdapters;
+package com.example.brandon.habitlogger.RecyclerViewAdapters;
 
 import android.content.Context;
 import android.content.res.Resources;

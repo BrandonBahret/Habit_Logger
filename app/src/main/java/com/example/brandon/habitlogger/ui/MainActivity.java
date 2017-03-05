@@ -39,9 +39,10 @@ import com.example.brandon.habitlogger.OverviewActivity.DataOverviewActivity;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.Preferences.SettingsActivity;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.RecyclerVIewAdapters.CategoryCardAdapter;
-import com.example.brandon.habitlogger.RecyclerVIewAdapters.ComplexDecoration;
-import com.example.brandon.habitlogger.RecyclerVIewAdapters.HabitViewAdapter;
+import com.example.brandon.habitlogger.RecyclerViewAdapters.SpaceOffsetDecoration;
+import com.example.brandon.habitlogger.RecyclerViewAdapters.CategoryCardAdapter;
+import com.example.brandon.habitlogger.RecyclerViewAdapters.ComplexDecoration;
+import com.example.brandon.habitlogger.RecyclerViewAdapters.HabitViewAdapter;
 import com.example.brandon.habitlogger.common.RequestCodes;
 import com.example.brandon.habitlogger.common.ResultCodes;
 import com.example.brandon.habitlogger.databinding.ActivityMainBinding;
@@ -134,7 +135,7 @@ public class MainActivity extends AppCompatActivity
                             timeTextView.setText(getString(R.string.time_display_placeholder));
 
                             ImageButton pauseButton = (ImageButton) item.findViewById(R.id.session_control_button);
-                            pauseButton.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
+                            pauseButton.setImageResource(R.drawable.ic_play_black);
                         }
                         break;
                     }
@@ -268,7 +269,7 @@ public class MainActivity extends AppCompatActivity
             break;
 
             case PreferenceChecker.AS_SECTIONS: {
-                itemDecoration = new ComplexDecoration(this, new ComplexDecoration.Callback() {
+                itemDecoration = new ComplexDecoration(this, R.dimen.category_section_text_size, new ComplexDecoration.Callback() {
                     @Override
                     public long getGroupId(int position) {
                         if (position >= 0 && position < habitList.size()) {
@@ -300,6 +301,11 @@ public class MainActivity extends AppCompatActivity
             }
             break;
         }
+
+        int bottomOffset = (int) getResources().getDimension(R.dimen.bottom_offset_dp);
+        int topOffset = (int) getResources().getDimension(R.dimen.top_offset_dp);
+        SpaceOffsetDecoration bottomOffsetDecoration = new SpaceOffsetDecoration(bottomOffset, topOffset);
+        habitCardContainer.addItemDecoration(bottomOffsetDecoration);
     }
 
     public int getItemPosition(long habitId) {

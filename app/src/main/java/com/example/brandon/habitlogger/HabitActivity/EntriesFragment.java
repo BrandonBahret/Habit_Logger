@@ -17,8 +17,9 @@ import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.RecyclerVIewAdapters.ComplexDecoration;
-import com.example.brandon.habitlogger.RecyclerVIewAdapters.EntryViewAdapter;
+import com.example.brandon.habitlogger.RecyclerViewAdapters.ComplexDecoration;
+import com.example.brandon.habitlogger.RecyclerViewAdapters.EntryViewAdapter;
+import com.example.brandon.habitlogger.RecyclerViewAdapters.SpaceOffsetDecoration;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.github.clans.fab.FloatingActionMenu;
 
@@ -104,7 +105,7 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
                     }
                 });
 
-        entriesContainer.addItemDecoration(new ComplexDecoration(getContext(), new ComplexDecoration.Callback() {
+        entriesContainer.addItemDecoration(new ComplexDecoration(getContext(), R.dimen.entries_section_text_size, new ComplexDecoration.Callback() {
             @Override
             public long getGroupId(int position) {
                 if(position >= 0 && position < sessionEntries.size()) {
@@ -129,6 +130,11 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
         entriesContainer.setLayoutManager(layoutManager);
         entriesContainer.setItemAnimator(new DefaultItemAnimator());
         entriesContainer.setAdapter(entryAdapter);
+
+        int bottomOffset = (int) getResources().getDimension(R.dimen.bottom_offset_dp);
+        int topOffset = (int) getResources().getDimension(R.dimen.top_offset_dp);
+        SpaceOffsetDecoration bottomOffsetDecoration = new SpaceOffsetDecoration(bottomOffset, topOffset);
+        entriesContainer.addItemDecoration(bottomOffsetDecoration);
 
         return v;
     }

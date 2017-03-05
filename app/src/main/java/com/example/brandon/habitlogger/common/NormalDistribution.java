@@ -19,7 +19,7 @@ public class NormalDistribution {
         this.standardDeviation = calculateStandardDeviation(values);
     }
 
-    public static List<Entry> getLineEntries(List<BarEntry> data, int entriesCount) {
+    public static List<Entry> getLineEntries(List<BarEntry> data) {
         List<Double> values = new ArrayList<>(data.size());
         for (int i = 0; i < data.size(); i++) {
             values.add((double) data.get(i).getY());
@@ -33,7 +33,7 @@ public class NormalDistribution {
         for (BarEntry entry : data) {
             float x = entry.getX();
             float value = entry.getY();
-            float y = size * (float)normalDistribution.curveFormula(value);
+            float y = size * (float) normalDistribution.curveFormula(value);
             entries.add(new Entry(x, y));
         }
 
@@ -44,11 +44,8 @@ public class NormalDistribution {
         final double SD_TIMES_SQRT_TWO_PI = this.standardDeviation * Math.sqrt(2 * Math.PI);
         final double VALUE_MINUS_MEAN_SQUARED = Math.pow((value - this.mean), 2);
         final double TWO_TIMES_SD_SQUARED = 2 * Math.pow(this.standardDeviation, 2);
-        final double E_POW_PORTION = Math.pow(Math.E, -(VALUE_MINUS_MEAN_SQUARED / TWO_TIMES_SD_SQUARED));
-
 
         return (1 / SD_TIMES_SQRT_TWO_PI) * Math.pow(Math.E, -(VALUE_MINUS_MEAN_SQUARED / TWO_TIMES_SD_SQUARED));
-//        return (1 / SD_TIMES_SQRT_TWO_PI) * E_POW_PORTION;
     }
 
     /**
@@ -61,28 +58,23 @@ public class NormalDistribution {
      * @return standard deviation
      */
     private Double calculateStandardDeviation(List<Double> values) {
-        List<Double> workingValues = new ArrayList<>(values.size());
+        double sumOfDeviationsFromTheMean = 0;
+        for (Double value : values)
+            sumOfDeviationsFromTheMean += Math.pow((value - this.mean), 2);
 
-        for (Double value : values) {
-            double valueMinusMean = Math.abs(value - this.mean);
-            workingValues.add(Math.pow(valueMinusMean, 2));
-        }
-
-        double meanOfWorkingValues = calculateMean(workingValues);
-
-        return Math.sqrt(meanOfWorkingValues);
+        double meanOfDeviations = sumOfDeviationsFromTheMean / (float) values.size();
+        return Math.sqrt(meanOfDeviations);
     }
 
     private Double calculateMean(List<Double> values) {
-        double sum = calculateSum(values);
-        return sum / (double) values.size();
+        return calculateSum(values) / (double) values.size();
     }
 
     private Double calculateSum(List<Double> values) {
         double sum = 0;
-        for (Double value : values) {
+        for (Double value : values)
             sum += value;
-        }
+
         return sum;
     }
 }

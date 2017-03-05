@@ -17,6 +17,7 @@
     <color name="black_semi_transparent">#b2000000</color>
     <color name="shadow_black">#42000000</color>
     <color name="background">#eaeaea</color>
+
     <color name="headerTextColor">@color/colorPrimaryDark</color>
 
     <integer-array name="colors">

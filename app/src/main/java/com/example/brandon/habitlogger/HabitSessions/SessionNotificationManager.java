@@ -13,7 +13,7 @@ import android.widget.RemoteViews;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.RecyclerVIewAdapters.HabitViewHolder;
+import com.example.brandon.habitlogger.RecyclerViewAdapters.HabitViewHolder;
 import com.example.brandon.habitlogger.common.TimeDisplay;
 
 import java.io.Serializable;

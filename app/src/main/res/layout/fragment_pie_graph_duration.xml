@@ -1,6 +1,5 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.TimeAverages">
 
@@ -11,9 +10,7 @@
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
-            app:cardBackgroundColor="@color/habitCard"
-            app:contentPadding="8dp">
+            style="@style/AppTheme.Card">
 
             <LinearLayout
                 android:orientation="vertical"

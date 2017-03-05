@@ -31,7 +31,7 @@
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:padding="3dp"
             android:scaleType="fitXY"
-            android:src="@drawable/ic_play_circle_outline_black_24dp"
+            android:src="@drawable/ic_play_black"
             android:tint="@color/habitCardButtonColor" />
 
         <TextView

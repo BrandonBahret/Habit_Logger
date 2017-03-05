@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.RecyclerVIewAdapters;
+package com.example.brandon.habitlogger.RecyclerViewAdapters;
 
 import android.content.Context;
 import android.support.v7.widget.CardView;
@@ -94,18 +94,11 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
             holder.time.setText(TimeDisplay.getDisplay(item.getDuration()));
             holder.timeStarted.setText(item.getStartTimeAsString("h:mm a"));
 
-            if(habitDatabase.getIsHabitArchived(habitId)){
-                holder.accent.setColorFilter(0xFFCCCCCC);
-            }
-            else{
-                holder.accent.setColorFilter(habitDatabase.getHabitColor(habitId));
-            }
+            int color = habitDatabase.getHabitColor(habitId);
+            holder.accent.setColorFilter(color);
 
-            if (sessionManager.getIsPaused(habitId)) {
-                holder.pauseButton.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
-            } else {
-                holder.pauseButton.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
-            }
+            int res = HabitViewHolder.getResourceIdForPauseButton(sessionManager.getIsPaused(habitId));
+            holder.pauseButton.setImageResource(res);
 
             holder.rootView.setOnClickListener(new View.OnClickListener() {
                 @Override
