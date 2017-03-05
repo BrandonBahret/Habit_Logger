@@ -16,11 +16,13 @@ import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.TimeDisplay;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.databinding.FragmentDistributionStartingTimeBinding;
+import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
@@ -34,6 +36,8 @@ import java.util.List;
 public class DistributionStartingTime extends Fragment implements UpdateEntriesInterface {
     CallbackInterface callbackInterface;
     FragmentDistributionStartingTimeBinding ui;
+
+    int totalEntriesCount;
 
     //region // Methods responsible for handling the fragment lifecycle
 
@@ -89,7 +93,7 @@ public class DistributionStartingTime extends Fragment implements UpdateEntriesI
                 entryCounter.incrementCounter(entry.getStartingTimePortion());
 
 
-            final int totalEntriesCount = dataSample.getSessionEntries().size();
+            totalEntriesCount = dataSample.getSessionEntries().size();
 
             List<BarEntry> entries = new ArrayList<>();
             for (int counterIndex = 0; counterIndex < entryCounter.COUNTERS_LENGTH; counterIndex++) {
@@ -102,27 +106,28 @@ public class DistributionStartingTime extends Fragment implements UpdateEntriesI
     }
 
     private void setDistributionData(List<BarEntry> entries, final int interval) {
-        BarDataSet dataSet = new BarDataSet(entries, "label");
-        BarData data = new BarData(dataSet);
-        data.setValueFormatter(new MyPercentFormatter());
-        ui.chart.setData(data);
 
-        // Enable features
-//        ui.chart.setPinchZoom(true);
+        //region // Disable features
 
-        // Disable features
         ui.chart.getLegend().setEnabled(false);
         ui.chart.getDescription().setEnabled(false);
         ui.chart.setHighlightFullBarEnabled(false);
 
-        // Set Axis settings
-        // Y-Axis
+        //endregion // Disable features
+
+        //region // Set Axis settings
+
+        //region // Y-Axis
+
         ui.chart.getAxisLeft().setValueFormatter(new PercentFormatter());
         ui.chart.getAxisLeft().setAxisMinimum(0.0f);
         ui.chart.getAxisRight().setEnabled(false);
 
-        // X-Axis
-        ui.chart.getXAxis().setLabelRotationAngle(-45);
+        //endregion // Y-Axis
+
+        //region // X-Axis
+
+//        ui.chart.getXAxis().setLabelRotationAngle(-45);
         ui.chart.getXAxis().setDrawGridLines(false);
         ui.chart.getXAxis().setValueFormatter(new IAxisValueFormatter() {
             @Override
@@ -132,12 +137,60 @@ public class DistributionStartingTime extends Fragment implements UpdateEntriesI
             }
         });
 
-        ui.chart.getXAxis().setSpaceMax(1f);
+//        ui.chart.getXAxis().setSpaceMax(1f);
         ui.chart.getXAxis().setGranularity(1f);
         ui.chart.getXAxis().setGranularityEnabled(true);
         ui.chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+
+        //endregion // X-Axis
+
+        //endregion // Set Axis settings
+
+        ui.chart.setDrawOrder(new CombinedChart.DrawOrder[]{
+                CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.LINE
+        });
+
+        CombinedData data = new CombinedData();
+
+        //region // Add data to CombinedData
+        BarData barData = new BarData(new BarDataSet(entries, "label"));
+        barData.setValueFormatter(new IValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+                if (value > 0)
+                    return new DecimalFormat("0.0").format(value);
+                else
+                    return "";
+            }
+        });
+
+        data.setData(barData);
+
+//        data.setData(generateBellCurveData(entries, interval));
+        //endregion
+
+        ui.chart.setData(data);
         ui.chart.invalidate();
     }
+
+//    private LineData generateBellCurveData(List<BarEntry> data, int interval) {
+//        List<Entry> entries = NormalDistribution.getLineEntries(data, interval);
+//
+//        LineDataSet dataSet = new LineDataSet(entries, "");
+//        dataSet.setDrawFilled(true);
+//        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+//        dataSet.setDrawCircles(false);
+//        dataSet.setLineWidth(2f);
+//        int color = callbackInterface.getDefaultColor();
+//        dataSet.setFillColor(color);
+//        dataSet.setColor(color);
+//
+//        LineData lineData = new LineData(dataSet);
+//        lineData.setDrawValues(false);
+//        lineData.setHighlightEnabled(false);
+//
+//        return new LineData(dataSet);
+//    }
 
     class TimeIntervalEntryCounter {
         private final int DAY_IN_MINUTES = 1439;
@@ -169,15 +222,5 @@ public class DistributionStartingTime extends Fragment implements UpdateEntriesI
             return this.counters[counterIndex];
         }
         //endregion
-    }
-
-    class MyPercentFormatter implements IValueFormatter {
-        @Override
-        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-            if (value > 0)
-                return new DecimalFormat("0.0").format(value);
-            else
-                return "";
-        }
     }
 }
