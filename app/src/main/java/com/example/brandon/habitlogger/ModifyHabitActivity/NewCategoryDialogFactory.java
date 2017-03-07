@@ -17,22 +17,22 @@ import com.example.brandon.habitlogger.databinding.DialogNewCategoryBinding;
  * Created by Brandon on 2/26/2017.
  */
 
-public class NewCategoryDialogFactory implements DialogInterface.OnClickListener{
+public class NewCategoryDialogFactory implements DialogInterface.OnClickListener {
 
     private OnFinishedListener onFinishedListener;
     private Context context;
     private DialogNewCategoryBinding ui;
 
-    public interface OnFinishedListener{
+    public interface OnFinishedListener {
         void onFinishedWithResult(HabitCategory category);
     }
 
-    public NewCategoryDialogFactory(Context context, OnFinishedListener listener){
+    public NewCategoryDialogFactory(Context context, OnFinishedListener listener) {
         this.context = context;
         this.onFinishedListener = listener;
     }
 
-    public AlertDialog.Builder createBuilder () {
+    public AlertDialog.Builder createBuilder() {
         LayoutInflater inflater = LayoutInflater.from(context);
         ui = DataBindingUtil.inflate(inflater, R.layout.dialog_new_category, null, false);
 
@@ -60,7 +60,7 @@ public class NewCategoryDialogFactory implements DialogInterface.OnClickListener
                 .setPositiveButton("Create", this);
     }
 
-    private void setColorPreview(String color){
+    private void setColorPreview(String color) {
         try {
             int convertColor = Color.parseColor(color);
             ui.colorPreview.setColorFilter(convertColor);
@@ -74,7 +74,7 @@ public class NewCategoryDialogFactory implements DialogInterface.OnClickListener
         onFinishedListener.onFinishedWithResult(getCategory());
     }
 
-    public HabitCategory getCategory(){
+    public HabitCategory getCategory() {
         String color = ui.categoryColor.getText().toString();
         String name = ui.categoryName.getText().toString();
         return new HabitCategory(color, name);

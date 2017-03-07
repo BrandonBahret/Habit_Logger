@@ -6,7 +6,7 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.ColorUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -117,19 +117,24 @@ public class PieGraphCompletion extends Fragment implements UpdateEntriesInterfa
         ui.chart.setRotationEnabled(false);
         ui.chart.setExtraOffsets(4, 3, 0, 3);
         ui.chart.setCenterText(String.format(Locale.US, "%.2f%%", ratio * 100));
-
+        ui.chart.setCenterTextSize(25);
+        ui.chart.setRotationAngle(-195f);
+        ui.chart.setHoleRadius(75f);
 
         List<PieEntry> entries = new ArrayList<>();
         entries.add(new PieEntry(ratio * 100));
         entries.add(new PieEntry((1-ratio) * 100));
 
         PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setSliceSpace(4f);
+        dataSet.setSliceSpace(0f);
         dataSet.setSelectionShift(0f);
 
-        int completedColor = ContextCompat.getColor(getContext(), R.color.completed);
-        int skippedColor = ContextCompat.getColor(getContext(), R.color.skipped);
+        int completedColor = callbackInterface.getDefaultColor();
+        int skippedColor = ColorUtils.setAlphaComponent(callbackInterface.getDefaultColor(), (int)(255 * 0.3));
+        int holeColor = ColorUtils.setAlphaComponent(callbackInterface.getDefaultColor(), (int)(255 * 0.03));
+
         dataSet.setColors(completedColor, skippedColor);
+        ui.chart.setHoleColor(holeColor);
 
         PieData data = new PieData(dataSet);
         data.setValueTextColor(Color.TRANSPARENT);

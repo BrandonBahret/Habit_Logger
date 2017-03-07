@@ -45,8 +45,7 @@ public class CategorySpinner extends AppCompatSpinner implements AdapterView.OnI
                 .setView(ui.getRoot())
                 .create();
         dialog.show();
-
-        return true;
+        return false;
     }
 
     @Override

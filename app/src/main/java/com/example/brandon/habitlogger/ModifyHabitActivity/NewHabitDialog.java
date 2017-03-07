@@ -105,8 +105,4 @@ public class NewHabitDialog extends DialogFragment implements DialogInterface.On
         habitResult.setCategory(category);
         return habitResult;
     }
-
-    public void setResultHabit(Habit resultHabit) {
-        this.resultHabit = resultHabit;
-    }
 }
