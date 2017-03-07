@@ -34,18 +34,20 @@ import com.example.brandon.habitlogger.HabitSessions.ActiveSessionsActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.HabitSessions.SessionNotificationManager;
-import com.example.brandon.habitlogger.ModifyHabitActivity.ModifyHabitActivity;
+import com.example.brandon.habitlogger.ModifyHabitActivity.EditHabitDialog;
+import com.example.brandon.habitlogger.ModifyHabitActivity.NewHabitDialog;
 import com.example.brandon.habitlogger.OverviewActivity.DataOverviewActivity;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.Preferences.SettingsActivity;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.RecyclerViewAdapters.SpaceOffsetDecoration;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.CategoryCardAdapter;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.ComplexDecoration;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.HabitViewAdapter;
+import com.example.brandon.habitlogger.RecyclerViewAdapters.SpaceOffsetDecoration;
 import com.example.brandon.habitlogger.common.RequestCodes;
 import com.example.brandon.habitlogger.common.ResultCodes;
 import com.example.brandon.habitlogger.databinding.ActivityMainBinding;
+import com.github.clans.fab.FloatingActionButton;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -82,7 +84,7 @@ public class MainActivity extends AppCompatActivity
     HabitViewAdapter.MenuItemClickListener menuItemClickListener;
     HabitViewAdapter.ButtonClickListener buttonClickListener;
 
-    ActivityMainBinding binding;
+    ActivityMainBinding ui;
 
     final int NO_ARCHIVED_HABITS = 0, ONLY_ARCHIVED_HABITS = 1;
     int habitDisplayMode = NO_ARCHIVED_HABITS;
@@ -96,25 +98,33 @@ public class MainActivity extends AppCompatActivity
         );
 
         super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        currentSession = binding.mainInclude.contentMain.currentSessionsCard.itemRoot;
-        habitCardContainer = binding.mainInclude.contentMain.habitRecyclerView;
+        ui = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        currentSession = ui.mainInclude.contentMain.currentSessionsCard.itemRoot;
+        habitCardContainer = ui.mainInclude.contentMain.habitRecyclerView;
 
-        setSupportActionBar(binding.mainInclude.toolbar);
+        setSupportActionBar(ui.mainInclude.toolbar);
 
-        binding.mainInclude.fab.setOnClickListener(new View.OnClickListener() {
+        ui.mainInclude.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startNewHabitActivity();
+                NewHabitDialog dialog = NewHabitDialog.newInstance(new NewHabitDialog.OnFinishedListener() {
+                    @Override
+                    public void onFinishedWithResult(Habit habit) {
+                        habitDatabase.addHabitAndCategory(habit);
+                        showDatabase();
+                    }
+                });
+
+                dialog.show(getSupportFragmentManager(), "new-habit");
             }
         });
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, binding.drawerLayout, binding.mainInclude.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        binding.drawerLayout.addDrawerListener(toggle);
+                this, ui.drawerLayout, ui.mainInclude.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ui.drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        binding.navView.setNavigationItemSelectedListener(this);
+        ui.navView.setNavigationItemSelectedListener(this);
 
         habitDatabase = new HabitDatabase(MainActivity.this);
         sessionNotificationManager = new SessionNotificationManager(this);
@@ -125,7 +135,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onSessionEnded(long habitId, boolean wasCanceled) {
-                sessionNotificationManager.cancel((int)habitId);
+                sessionNotificationManager.cancel((int) habitId);
 
                 for (int i = 0; i < habitList.size(); i++) {
                     if (habitList.get(i).getDatabaseId() == habitId) {
@@ -159,7 +169,20 @@ public class MainActivity extends AppCompatActivity
         menuItemClickListener = new HabitViewAdapter.MenuItemClickListener() {
             @Override
             public void onEditClick(long habitId) {
-                startModifyHabitActivity(habitDatabase.getHabit(habitId));
+                Habit habit = habitDatabase.getHabit(habitId);
+
+                EditHabitDialog dialog = EditHabitDialog.newInstance(new EditHabitDialog.OnFinishedListener() {
+                    @Override
+                    public void onFinishedWithResult(Habit habit) {
+                        habitDatabase.updateHabit(habit.getDatabaseId(), habit);
+
+                        int position = getHabitPositionInList(habit.getDatabaseId());
+                        habitList.set(position, habit);
+                        habitAdapter.notifyItemChanged(position);
+                    }
+                }, habit);
+
+                dialog.show(getSupportFragmentManager(), "edit-habit");
             }
 
             @Override
@@ -239,6 +262,35 @@ public class MainActivity extends AppCompatActivity
         habitCardContainer.setLayoutManager(layoutManager);
         habitCardContainer.setItemAnimator(new DefaultItemAnimator());
 
+        habitCardContainer.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                FloatingActionButton fab = ui.mainInclude.fab;
+                final int threshold = 5;
+
+                if (dy > threshold) {
+                    // Scroll Down
+                    if (preferenceChecker.hideFabOnScroll() && fab.isShown())
+                        fab.hide(true);
+
+                    if(preferenceChecker.doHideCurrentSessionCard()){
+                        hideCurrentSessionsCard();
+                    }
+                }
+                else if (dy < -threshold) {
+                    // Scroll Up
+                    if (preferenceChecker.hideFabOnScroll() && !fab.isShown())
+                        fab.show(true);
+
+                    if(preferenceChecker.doHideCurrentSessionCard()){
+                        showCurrentSessionsCard();
+                    }
+                }
+            }
+        });
+
         if (preferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_CARDS) {
             categoryContainers = habitDatabase.getCategoryHabitsContainers();
             categoryAdapter = new CategoryCardAdapter(categoryContainers, menuItemClickListener, buttonClickListener);
@@ -259,6 +311,26 @@ public class MainActivity extends AppCompatActivity
         });
 
         updateCurrentSessionCard();
+    }
+
+    private void showCurrentSessionsCard() {
+        View v = ui.mainInclude.contentMain.currentSessionsCard.getRoot();
+
+        v.animate()
+                .setStartDelay(0)
+                .setDuration(175)
+                .alpha(1)
+                .translationY(0);
+    }
+
+    private void hideCurrentSessionsCard() {
+        View v = ui.mainInclude.contentMain.currentSessionsCard.getRoot();
+
+        v.animate()
+                .setStartDelay(0)
+                .setDuration(250)
+                .alpha(0)
+                .translationY(-v.getHeight());
     }
 
     private void applyItemDecorationToRecyclerView() {
@@ -322,8 +394,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            binding.drawerLayout.closeDrawer(GravityCompat.START);
+        if (ui.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            ui.drawerLayout.closeDrawer(GravityCompat.START);
         }
         else {
             super.onBackPressed();
@@ -434,7 +506,7 @@ public class MainActivity extends AppCompatActivity
             break;
         }
 
-        binding.drawerLayout.closeDrawer(GravityCompat.START);
+        ui.drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
 
@@ -444,23 +516,6 @@ public class MainActivity extends AppCompatActivity
 
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
-                case RequestCodes.NEW_HABIT_REQUEST_CODE: {
-                    Habit newHabit = (Habit) data.getSerializableExtra(ModifyHabitActivity.OutputBundleKeys.RESULT_HABIT);
-                    habitDatabase.addHabitAndCategory(newHabit);
-                    showDatabase();
-                }
-                break;
-
-                case RequestCodes.EDIT_HABIT_REQUEST_CODE: {
-                    Habit editHabit = (Habit) data.getSerializableExtra(ModifyHabitActivity.OutputBundleKeys.RESULT_HABIT);
-                    habitDatabase.updateHabit(editHabit.getDatabaseId(), editHabit);
-
-                    int position = getHabitPositionInList(editHabit.getDatabaseId());
-                    habitList.set(position, editHabit);
-                    habitAdapter.notifyItemChanged(position);
-                }
-                break;
-
                 case GoogleDriveDataExportManager.REQUEST_CODE_RESOLUTION: {
                     googleDrive.connect();
                 }
@@ -592,17 +647,6 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(startSettings, RequestCodes.SETTINGS_ACTIVITY);
     }
 
-    public void startNewHabitActivity() {
-        Intent newHabit = new Intent(MainActivity.this, ModifyHabitActivity.class);
-        startActivityForResult(newHabit, RequestCodes.NEW_HABIT_REQUEST_CODE);
-    }
-
-    public void startModifyHabitActivity(Habit habit) {
-        Intent editHabit = new Intent(MainActivity.this, ModifyHabitActivity.class);
-        editHabit.putExtra(ModifyHabitActivity.InputBundleKeys.HABIT_TO_EDIT, (Serializable) habit);
-        startActivityForResult(editHabit, RequestCodes.EDIT_HABIT_REQUEST_CODE);
-    }
-
     public void startHabitActivity(long habitId) {
         Intent startTargetActivity = new Intent(MainActivity.this, HabitActivity.class);
         startTargetActivity.putExtra("habitId", habitId);
@@ -616,8 +660,8 @@ public class MainActivity extends AppCompatActivity
 
     public void updateCurrentSessionCard() {
 
-        TextView countText = binding.mainInclude.contentMain.currentSessionsCard.activeSessionValueText;
-        TextView countLabelText = binding.mainInclude.contentMain.currentSessionsCard.activeSessionDescriptionText;
+        TextView countText = ui.mainInclude.contentMain.currentSessionsCard.activeSessionValueText;
+        TextView countLabelText = ui.mainInclude.contentMain.currentSessionsCard.activeSessionDescriptionText;
 
         long count = (int) sessionManager.getSessionCount();
         currentSession.setAlpha(count == 0 ? 0.5f : 1.0f);

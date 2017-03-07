@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.HabitSessions;
 
+import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
@@ -7,7 +8,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +19,7 @@ import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
+import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.HabitViewHolder;
 import com.example.brandon.habitlogger.common.TimeDisplay;
@@ -61,7 +65,7 @@ public class SessionActivity extends AppCompatActivity implements
             mSessionManager.startSession(mHabit);
         }
 
-        if(getSupportActionBar() != null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(mHabit.getName());
         }
@@ -117,15 +121,21 @@ public class SessionActivity extends AppCompatActivity implements
         ui.sessionPausePlay.setImageResource(
                 HabitViewHolder.getResourceIdForPauseButton(isPaused)
         );
+
+        float alphaValue = isPaused ? 0.5f : 1.0f;
+
+        ui.sessionTimeDisplayLayout.setAlpha(alphaValue);
     }
 
     public void updateTimeDisplay() {
-        SessionEntry entry = mSessionManager.getSession(mHabit.getDatabaseId());
-        TimeDisplay display = new TimeDisplay(entry.getDuration());
+        if (mSessionManager.getIsSessionActive(mHabit.getDatabaseId())) {
+            SessionEntry entry = mSessionManager.getSession(mHabit.getDatabaseId());
+            TimeDisplay display = new TimeDisplay(entry.getDuration());
 
-        ui.sessionHoursView.setText(String.format(Locale.US, "%02d", display.hours));
-        ui.sessionMinutesView.setText(String.format(Locale.US, "%02d", display.minutes));
-        ui.sessionSecondsView.setText(String.format(Locale.US, "%02d", display.seconds));
+            ui.sessionHoursView.setText(String.format(Locale.US, "%02d", display.hours));
+            ui.sessionMinutesView.setText(String.format(Locale.US, "%02d", display.minutes));
+            ui.sessionSecondsView.setText(String.format(Locale.US, "%02d", display.seconds));
+        }
     }
 
     private Runnable updateTimeDisplayRunnable = new Runnable() {
@@ -169,22 +179,15 @@ public class SessionActivity extends AppCompatActivity implements
     //region // Methods responsible for handling events
 
     //region // Handle onClick events
+
+    //region // Get events
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         final int id = item.getItemId();
 
         switch (id) {
             case (R.id.finish_session_button): {
-                // Get the new SessionEntry
-                String note = ui.sessionNote.getText().toString();
-                SessionEntry entry = mSessionManager.finishSession(mHabit.getDatabaseId());
-                entry.setNote(note);
-
-                // Add the new SessionEntry to the database
-                HabitDatabase database = new HabitDatabase(this);
-                database.addEntry(mHabit.getDatabaseId(), entry);
-
-                finish();
+                onFinishSessionClicked();
             }
             break;
 
@@ -203,7 +206,7 @@ public class SessionActivity extends AppCompatActivity implements
 
         switch (id) {
             case (R.id.session_cancel): {
-                mSessionManager.cancelSession(mHabit.getDatabaseId());
+                onCancelSessionClicked();
             }
             break;
 
@@ -214,6 +217,71 @@ public class SessionActivity extends AppCompatActivity implements
             break;
         }
     }
+    //endregion
+
+    //region // Handle events
+    private void onFinishSessionClicked() {
+        boolean shouldAsk = new PreferenceChecker(this).doAskBeforeFinish();
+
+        if (shouldAsk) {
+            askForConfirmation("Finish session", "Finish this session?",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finishSession();
+                        }
+                    });
+        }
+        else {
+            finishSession();
+        }
+    }
+
+    private void finishSession() {
+        // Get the new SessionEntry
+        String note = ui.sessionNote.getText().toString();
+        SessionEntry entry = mSessionManager.finishSession(mHabit.getDatabaseId());
+        entry.setNote(note);
+
+        // Add the new SessionEntry to the database
+        HabitDatabase database = new HabitDatabase(SessionActivity.this);
+        database.addEntry(mHabit.getDatabaseId(), entry);
+
+        finish();
+    }
+
+    private void onCancelSessionClicked() {
+        boolean shouldAsk = new PreferenceChecker(this).doAskBeforeCancel();
+
+        if (shouldAsk) {
+            askForConfirmation("Cancel session", "Cancel this session?",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mSessionManager.cancelSession(mHabit.getDatabaseId());
+                        }
+                    });
+        }
+        else {
+            mSessionManager.cancelSession(mHabit.getDatabaseId());
+        }
+    }
+    //endregion
+
+    private void askForConfirmation(String title, String message, DialogInterface.OnClickListener method) {
+        boolean nightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
+        int iconRes = nightMode ? R.drawable.ic_warning_white_24px :
+                R.drawable.ic_warning_black_24dp;
+
+        new AlertDialog.Builder(this)
+                .setIcon(iconRes)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Yes", method)
+                .setNegativeButton("No", null)
+                .show();
+    }
+
     //endregion // Handle onClick events
 
     //region // Handle SessionManager events

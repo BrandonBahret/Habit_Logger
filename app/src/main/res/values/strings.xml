@@ -88,5 +88,9 @@
     <string name="uncategorized">Uncategorized</string>
     <string name="create_new_category_button">Create new category button</string>
     <string name="_0">0</string>
+    <string name="pref_hide_fab_on_scroll">preference_hide_fab_on_scroll</string>
+    <string name="pref_hide_current_sessions_card_on_scroll">preference_hide_current_sessions_card_on_scroll</string>
+    <string name="pref_ask_finish">preference_ask_before_session_finish</string>
+    <string name="pref_ask_cancel">preference_ask_before_session_cancel</string>
 
 </resources>

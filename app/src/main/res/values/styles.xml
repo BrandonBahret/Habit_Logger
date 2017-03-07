@@ -45,7 +45,7 @@
     <style name="MenuButtonsStyle">
         <item name="fab_size">mini</item>
         <item name="fab_shadowColor">@color/shadow_black</item>
-        <item name="elevation">4dp</item>
+        <item name="elevation">@dimen/fab_elevation</item>
         <item name="fab_colorNormal">?attr/colorAccent</item>
         <item name="fab_colorPressed">?attr/colorPrimaryDark</item>
     </style>

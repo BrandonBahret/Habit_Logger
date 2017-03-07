@@ -32,6 +32,7 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
     Context context;
 
     OnClickListeners listener;
+
     public interface OnClickListeners {
         void onRootClick(long habitId);
 
@@ -53,13 +54,13 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
             this.timeStarted = (TextView) view.findViewById(R.id.time_started);
             this.pauseButton = (ImageButton) view.findViewById(R.id.session_pause_play);
             this.accent = (ImageView) view.findViewById(R.id.card_accent);
-            this.rootView = (CardView)view.getRootView();
+            this.rootView = (CardView) view.getRootView();
         }
     }
 
-    public ActiveSessionViewAdapter(List<SessionEntry> sessionEntries, Context context, OnClickListeners listener){
+    public ActiveSessionViewAdapter(List<SessionEntry> sessionEntries, Context context, OnClickListeners listener) {
         this.sessionEntries = sessionEntries;
-        this.habitDatabase  = new HabitDatabase(context);
+        this.habitDatabase = new HabitDatabase(context);
         this.sessionManager = new SessionManager(context);
         this.context = context;
         this.listener = listener;
@@ -75,7 +76,7 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
         return new ViewHolder(itemView);
     }
 
-    public static void setMargins (View v, int l, int t, int r, int b) {
+    public static void setMargins(View v, int l, int t, int r, int b) {
         if (v.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
             ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
             p.setMargins(l, t, r, b);
@@ -97,8 +98,15 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
             int color = habitDatabase.getHabitColor(habitId);
             holder.accent.setColorFilter(color);
 
-            int res = HabitViewHolder.getResourceIdForPauseButton(sessionManager.getIsPaused(habitId));
+            boolean isPaused = sessionManager.getIsPaused(habitId);
+            int res = HabitViewHolder.getResourceIdForPauseButton(isPaused);
             holder.pauseButton.setImageResource(res);
+
+            float alpha = isPaused ? 0.50f : 1.0f;
+            holder.accent.setAlpha(alpha);
+            holder.name.setAlpha(alpha);
+            holder.time.setAlpha(alpha);
+            holder.timeStarted.setAlpha(alpha);
 
             holder.rootView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -126,7 +134,7 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
         return sessionEntries.size();
     }
 
-    public List<SessionEntry> getSessionEntries(){
+    public List<SessionEntry> getSessionEntries() {
         return sessionEntries;
     }
 }

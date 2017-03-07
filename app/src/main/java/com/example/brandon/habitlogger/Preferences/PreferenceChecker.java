@@ -44,6 +44,32 @@ public class PreferenceChecker {
                 mContext.getString(R.string.pref_display_current_sessions_card_at_zero), true
         );
     }
+
+    public boolean doHideCurrentSessionCard() {
+        return preferences.getBoolean(
+                mContext.getString(R.string.pref_hide_current_sessions_card_on_scroll), false
+        );
+    }
+
+    public boolean hideFabOnScroll() {
+        return preferences.getBoolean(
+                mContext.getString(R.string.pref_hide_fab_on_scroll), true
+        );
+    }
+    //endregion
+
+    //region // Session Activity Settings
+    public boolean doAskBeforeCancel(){
+        return preferences.getBoolean(
+                mContext.getString(R.string.pref_ask_cancel), true
+        );
+    }
+
+    public boolean doAskBeforeFinish(){
+        return preferences.getBoolean(
+                mContext.getString(R.string.pref_ask_finish), true
+        );
+    }
     //endregion
 
     //region // Notifications
@@ -75,5 +101,6 @@ public class PreferenceChecker {
         );
         return dateOptions[optionIndex];
     }
+
     //endregion
 }

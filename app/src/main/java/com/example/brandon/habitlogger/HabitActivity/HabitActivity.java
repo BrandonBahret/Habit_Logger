@@ -23,10 +23,10 @@ import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
-import com.example.brandon.habitlogger.ModifyHabitActivity.ModifyHabitActivity;
+import com.example.brandon.habitlogger.ModifyHabitActivity.EditHabitDialog;
+import com.example.brandon.habitlogger.ModifyHabitActivity.NewHabitDialog;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.common.RequestCodes;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager;
@@ -219,24 +219,6 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case RequestCodes.EDIT_HABIT_REQUEST_CODE: {
-                    Habit editHabit = (Habit) data.getSerializableExtra("new_habit");
-                    habit = editHabit;
-                    habitDatabase.updateHabit(editHabit.getDatabaseId(), editHabit);
-
-                    updateActivity();
-                }
-                break;
-            }
-        }
-    }
-
-    @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem archive = menu.findItem(R.id.menu_toggle_archive);
 
@@ -293,7 +275,17 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
             break;
 
             case (R.id.menu_habit_edit): {
-                startModifyHabitActivity();
+
+                EditHabitDialog dialog = EditHabitDialog.newInstance(new NewHabitDialog.OnFinishedListener() {
+                    @Override
+                    public void onFinishedWithResult(Habit habit) {
+                        HabitActivity.this.habit = habit;
+                        habitDatabase.updateHabit(habit.getDatabaseId(), habit);
+                        updateActivity();
+                    }
+                }, habit);
+
+                dialog.show(getSupportFragmentManager(), "edit-habit");
             }
             break;
 
@@ -335,12 +327,6 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         Intent startSession = new Intent(this, SessionActivity.class);
         startSession.putExtra(SessionActivity.BundleKeys.SERIALIZED_HABIT, (Serializable) habit);
         startActivity(startSession);
-    }
-
-    private void startModifyHabitActivity() {
-        Intent startTargetActivity = new Intent(HabitActivity.this, ModifyHabitActivity.class);
-        startTargetActivity.putExtra(ModifyHabitActivity.InputBundleKeys.HABIT_TO_EDIT, (Serializable) habit);
-        startActivityForResult(startTargetActivity, RequestCodes.EDIT_HABIT_REQUEST_CODE);
     }
 
     private void updateActivity() {

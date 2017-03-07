@@ -12,18 +12,47 @@
             android:summary="Set how the app displays habit categories."
             android:title="Categories"/>
 
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_hide_fab_on_scroll"
+            android:summary="Scroll the list to move the floating action button out of the way."
+            android:title="Hide new habit button on scroll"/>
+
         <SwitchPreference
             android:defaultValue="true"
             android:key="@string/pref_display_current_sessions_card"
             android:summary="Display the 'Current Sessions' card."
-            android:title="Current Sessions"/>
+            android:title="Show Current Sessions"/>
 
         <CheckBoxPreference
             android:defaultValue="true"
             android:dependency="@string/pref_display_current_sessions_card"
             android:key="@string/pref_display_current_sessions_card_at_zero"
             android:summary="Display the 'Current Sessions' card even when zero sessions are active."
-            android:title="Always Display Current Sessions"/>
+            android:title="Show at zero active sessions"/>
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:dependency="@string/pref_display_current_sessions_card"
+            android:key="@string/pref_hide_current_sessions_card_on_scroll"
+            android:summary="Scroll the list to move the 'current sessions' card out of the way."
+            android:title="Hide card on scroll"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Session Activity">
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_ask_finish"
+            android:summary="Ask for confirmation before completing sessions."
+            android:title="Confirm finish"/>
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_ask_cancel"
+            android:summary="Ask for confirmation before canceling sessions."
+            android:title="Confirm cancel"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Notifications">

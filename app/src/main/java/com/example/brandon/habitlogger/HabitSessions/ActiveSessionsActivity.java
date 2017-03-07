@@ -255,6 +255,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     @Override
     public void onPauseClick(ActiveSessionViewAdapter.ViewHolder holder, long habitId) {
         boolean isPaused = sessionManager.getIsPaused(habitId);
+
         sessionManager.setPauseState(habitId, !isPaused);
         sessionViewAdapter.notifyItemChanged(holder.getAdapterPosition());
     }

@@ -197,6 +197,7 @@ public class FloatingDateRangeWidgetManager {
                 .setDuration(250)
                 .alpha(1)
                 .translationY(0);
+
         isShown = true;
     }
 

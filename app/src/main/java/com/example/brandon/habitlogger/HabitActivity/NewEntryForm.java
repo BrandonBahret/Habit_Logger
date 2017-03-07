@@ -35,6 +35,15 @@ public class NewEntryForm extends DialogFragment {
         void onDeleteClicked(SessionEntry entry);
     }
 
+    public static NewEntryForm newInstance(SessionEntry entry){
+        NewEntryForm form = new NewEntryForm();
+        Bundle args = new Bundle();
+        args.putSerializable(ENTRY, entry);
+        form.setArguments(args);
+
+        return form;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,14 +58,6 @@ public class NewEntryForm extends DialogFragment {
         }
     }
 
-    public static NewEntryForm newInstance(SessionEntry entry){
-        NewEntryForm form = new NewEntryForm();
-        Bundle args = new Bundle();
-        args.putSerializable(ENTRY, entry);
-        form.setArguments(args);
-
-        return form;
-    }
 
     @NonNull
     @Override

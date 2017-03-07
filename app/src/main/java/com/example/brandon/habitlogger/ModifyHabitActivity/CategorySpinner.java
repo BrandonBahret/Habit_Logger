@@ -3,12 +3,12 @@ package com.example.brandon.habitlogger.ModifyHabitActivity;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatSpinner;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
-import android.widget.Spinner;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.R;
@@ -16,9 +16,10 @@ import com.example.brandon.habitlogger.databinding.DialogCategorySelectorBinding
 
 /**
  * Created by Brandon on 2/25/2017.
+ *
  */
 
-public class CategorySpinner extends Spinner implements AdapterView.OnItemClickListener, View.OnClickListener, NewCategoryDialogFactory.OnFinishedListener {
+public class CategorySpinner extends AppCompatSpinner implements AdapterView.OnItemClickListener, View.OnClickListener, NewCategoryDialogFactory.OnFinishedListener {
     private AlertDialog dialog;
     private DialogCategorySelectorBinding ui;
 
@@ -68,4 +69,5 @@ public class CategorySpinner extends Spinner implements AdapterView.OnItemClickL
     public void onFinishedWithResult(HabitCategory category) {
         ((CategorySpinnerAdapter)getAdapter()).addCategory(category);
     }
+
 }
