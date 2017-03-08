@@ -1,12 +1,15 @@
 package com.example.brandon.habitlogger.HabitSessions;
 
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -176,6 +179,31 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 return false;
+            }
+
+            @Override
+            public void onChildDrawOver(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                super.onChildDrawOver(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+
+                final CardView rootView = ((CardView) (viewHolder.itemView));
+                final float defaultElevation = getResources().getDimension(R.dimen.cardview_default_elevation);
+                final float targetElevation = getResources().getDimension(R.dimen.slide_elevation);
+
+                if (!isCurrentlyActive) {
+                    ValueAnimator anim = ValueAnimator.ofFloat(targetElevation, defaultElevation);
+                    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                            float val = (Float) valueAnimator.getAnimatedValue();
+                            rootView.setCardElevation(val);
+                        }
+                    });
+                    anim.setDuration(150);
+                    anim.start();
+                }else{
+                    rootView.setCardElevation(targetElevation);
+                }
+
             }
 
             @Override

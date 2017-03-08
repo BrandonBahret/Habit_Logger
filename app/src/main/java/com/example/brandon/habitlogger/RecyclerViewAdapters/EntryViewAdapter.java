@@ -6,20 +6,19 @@ import android.graphics.Typeface;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Layout;
-import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.ui.LayoutCheckableTextView;
 
 import java.util.List;
 
@@ -37,15 +36,18 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
     Context context;
 
     OnClickListeners listener;
+
     public interface OnClickListeners {
         void onRootClick(long habitId, long entryId);
     }
-    public OnClickListeners getListener(){
+
+    public OnClickListeners getListener() {
         return listener;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView startTimeText, durationText, noteText;
+        public LayoutCheckableTextView noteText;
+        public TextView startTimeText, durationText;
         public ImageButton expandNote;
         public ImageView accent;
         public CardView rootView;
@@ -56,17 +58,17 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         public ViewHolder(View view) {
             super(view);
             this.startTimeText = (TextView) view.findViewById(R.id.entry_start_time);
-            this.durationText  = (TextView) view.findViewById(R.id.entry_duration);
-            this.noteText      = (TextView) view.findViewById(R.id.entry_note);
-            this.expandNote    = (ImageButton) view.findViewById(R.id.expand_note);
-            this.accent   = (ImageView) view.findViewById(R.id.card_accent);
-            this.rootView = (CardView)view.getRootView();
+            this.durationText = (TextView) view.findViewById(R.id.entry_duration);
+            this.noteText = (LayoutCheckableTextView) view.findViewById(R.id.entry_note);
+            this.expandNote = (ImageButton) view.findViewById(R.id.expand_note);
+            this.accent = (ImageView) view.findViewById(R.id.card_accent);
+            this.rootView = (CardView) view.getRootView();
         }
     }
 
-    public EntryViewAdapter(List<SessionEntry> sessionEntries, Context context, OnClickListeners listener){
+    public EntryViewAdapter(List<SessionEntry> sessionEntries, Context context, OnClickListeners listener) {
         this.sessionEntries = sessionEntries;
-        this.habitDatabase  = new HabitDatabase(context);
+        this.habitDatabase = new HabitDatabase(context);
         this.sessionManager = new SessionManager(context);
         this.context = context;
         this.listener = listener;
@@ -82,7 +84,7 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         return new ViewHolder(itemView);
     }
 
-    int getDP(int value){
+    int getDP(int value) {
         Resources res = context.getResources();
         return (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
@@ -91,7 +93,7 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         );
     }
 
-    public void setMargins (View v, int l, int t, int r, int b) {
+    public void setMargins(View v, int l, int t, int r, int b) {
         if (v.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
             ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
 
@@ -117,19 +119,15 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
             holder.noteText.setTypeface(Typeface.DEFAULT);
         }
 
-        // Thanks SO http://stackoverflow.com/questions/20069895/detect-if-textview-is-ellipsized-before-layout-is-shown
-        ViewTreeObserver vto = holder.noteText.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(
-                new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-                        if(!isTextViewEllipsized(holder.noteText)
-                                && holder.noteText.getMaxLines() == context.getResources().getInteger(R.integer.entry_card_note_max_lines)){
-
-                            holder.expandNote.setVisibility(View.GONE);
-                        }
-                    }
-                });
+        final int maxLines = context.getResources().getInteger(R.integer.entry_card_note_max_lines);
+        holder.noteText.setOnLayoutListener(new LayoutCheckableTextView.OnLayoutListener() {
+            @Override
+            public void onLayoutCreated(TextView view) {
+                if (view.getLineCount() >= maxLines) {
+                    holder.expandNote.setVisibility(View.VISIBLE);
+                }
+            }
+        });
 
 
         holder.rootView.setOnClickListener(new View.OnClickListener() {
@@ -142,49 +140,33 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         holder.expandNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                boolean expand = holder.noteText.getMaxLines() == context.getResources().getInteger(R.integer.entry_card_note_max_lines);
-                holder.noteText.setMaxLines(expand? 100 : context.getResources().getInteger(R.integer.entry_card_note_max_lines));
+                boolean expand = holder.noteText.getMaxLines() == maxLines;
+                holder.noteText.setMaxLines(expand ? 100 : maxLines);
 
-                holder.expandNote.setImageResource(expand? R.drawable.ic_arrow_drop_up_black_24dp :
+                holder.expandNote.setImageResource(expand ? R.drawable.ic_arrow_drop_up_black_24dp :
                         R.drawable.ic_arrow_drop_down_black_24dp);
             }
         });
     }
-    
+
     /**
-     * Checks if the text of the supplied {@link TextView} has been ellipsized.
+     * SO http://stackoverflow.com/a/15567519/3589791
      *
-     * Thanks SO http://stackoverflow.com/a/33499057/3589791
-     *
-     * @param textView
-     *         The {@link TextView} to check its text.
-     *
-     * @return {@code True} if the text of the supplied {@code textView} has been ellipsized.
+     * @return True when TextView has been condensed, otherwise False.
      */
-    public static boolean isTextViewEllipsized(final TextView textView) {
-        // Initialize the resulting variable
-        boolean result = false;
-        // Check if the supplied TextView is not null
-        if (textView != null) {
-            // Check if ellipsizing the text is enabled
-            final TextUtils.TruncateAt truncateAt = textView.getEllipsize();
-            if (truncateAt != null && !TextUtils.TruncateAt.MARQUEE.equals(truncateAt)) {
-                // Retrieve the layout in which the text is rendered
-                final Layout layout = textView.getLayout();
-                if (layout != null) {
-                    // Iterate all lines to search for ellipsized text
-                    for (int index = 0; index < layout.getLineCount(); ++index) {
-                        // Check if characters have been ellipsized away within this line of text
-                        result = layout.getEllipsisCount(index) > 0;
-                        // Stop looping if the ellipsis character has been found
-                        if (result) {
-                            break;
-                        }
-                    }
+    public boolean isTextViewEllipsized(TextView textview) {
+        Layout layout = textview.getLayout();
+        if (layout != null) {
+            int lines = layout.getLineCount();
+            if (lines > 0) {
+                int ellipsisCount = layout.getEllipsisCount(lines - 1);
+                if (ellipsisCount > 0) {
+                    return true;
                 }
             }
         }
-        return result;
+
+        return false;
     }
 
     @Override

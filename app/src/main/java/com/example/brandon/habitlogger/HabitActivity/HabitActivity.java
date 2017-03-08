@@ -38,9 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener.State.COLLAPSED;
-import static com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener.State.EXPANDED;
-
 
 public class HabitActivity extends AppCompatActivity implements CallbackInterface {
 
@@ -134,23 +131,23 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        appBar.addOnOffsetChangedListener(new AppBarStateChangeListener() {
-            @Override
-            public void onStateChanged(AppBarLayout appBarLayout, State state) {
-                if (state == COLLAPSED) {
-                    dateRangeManager.hideView();
-                    if (viewPager.getCurrentItem() == 0)
-                        fabMenu.hideMenu(true);
-                }
-                else if (state == EXPANDED) {
-                    if (viewPager.getCurrentItem() != 1)
-                        dateRangeManager.showView();
-
-                    if (viewPager.getCurrentItem() == 0)
-                        fabMenu.showMenu(true);
-                }
-            }
-        });
+//        appBar.addOnOffsetChangedListener(new AppBarStateChangeListener() {
+//            @Override
+//            public void onStateChanged(AppBarLayout appBarLayout, State state) {
+//                if (state == COLLAPSED) {
+//                    dateRangeManager.hideView();
+//                    if (viewPager.getCurrentItem() == 0)
+//                        fabMenu.hideMenu(true);
+//                }
+//                else if (state == EXPANDED) {
+//                    if (viewPager.getCurrentItem() != 1)
+//                        dateRangeManager.showView();
+//
+//                    if (viewPager.getCurrentItem() == 0)
+//                        fabMenu.showMenu(true);
+//                }
+//            }
+//        });
 
         viewPager.setAdapter(sectionsPagerAdapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -352,6 +349,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
         getWindow().setStatusBarColor(darkerColor);
         tabLayout.setBackgroundColor(color);
+
         toolbar.setBackgroundColor(color);
 
         fabMenu.setMenuButtonColorNormal(color);

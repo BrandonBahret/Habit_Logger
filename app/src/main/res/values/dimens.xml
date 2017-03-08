@@ -26,4 +26,5 @@
     <dimen name="bottom_offset_dp">72dp</dimen>
     <dimen name="top_offset_dp">16dp</dimen>
     <dimen name="fab_elevation">4dp</dimen>
+    <dimen name="slide_elevation">8dp</dimen>
 </resources>

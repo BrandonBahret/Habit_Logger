@@ -14,6 +14,7 @@ import com.example.brandon.habitlogger.HabitActivity.StartingDateDialog;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.common.TimeDisplay;
 
 import java.text.SimpleDateFormat;
@@ -34,11 +35,10 @@ public class FloatingDateRangeWidgetManager {
     private ViewHolder viewHolder;
     private PreferenceChecker preferenceChecker;
 
-    private long dateFromTime, dateToTime, minimumTime;
+    private long dateFromTime, dateToTime, minimumTime, maximumTime;
 
     private DateRangeChangeListener listener;
     public boolean isShown = true;
-
 
     public interface DateRangeChangeListener {
         void onDateRangeChanged(long dateFrom, long dateTo);
@@ -122,9 +122,9 @@ public class FloatingDateRangeWidgetManager {
         args.putLong("date_in_milliseconds", currentTime);
 
         if (setDateFromTime)
-            args.putLong("date_max", dateToTime - 86400000L);
+            args.putLong("date_max", dateToTime - DateUtils.DAY_IN_MILLIS);
         else
-            args.putLong("date_min", dateFromTime + 86400000L);
+            args.putLong("date_min", dateFromTime + DateUtils.DAY_IN_MILLIS);
 
         dialog.setArguments(args);
 
@@ -156,17 +156,7 @@ public class FloatingDateRangeWidgetManager {
     }
 
     private long getCurrentTime() {
-        Calendar c = Calendar.getInstance();
-
-        c.setTimeInMillis(System.currentTimeMillis());
-
-        c.set(Calendar.AM_PM, 0);
-        c.set(Calendar.HOUR, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-
-        return c.getTimeInMillis();
+        return System.currentTimeMillis();
     }
 
     public static String getDate(long milliSeconds, String dateFormat) {
@@ -174,6 +164,7 @@ public class FloatingDateRangeWidgetManager {
         return formatter.format(new Date(milliSeconds));
     }
 
+    //region // Animate view
     public void setViewShown(boolean visible) {
         if (visible)
             showView();
@@ -200,6 +191,7 @@ public class FloatingDateRangeWidgetManager {
 
         isShown = true;
     }
+    //endregion // Animate view
 
     private void setDateRangeEnabled(boolean state) {
         viewHolder.dateFrom.setEnabled(state);
@@ -218,6 +210,11 @@ public class FloatingDateRangeWidgetManager {
 
         this.minimumTime = sessionEntries.isEmpty() ? 0 :
                 sessionEntries.get(0).getStartTime();
+        this.minimumTime = MyTimeUtils.setTimePortion(this.minimumTime, true, 0, 0, 0, 0);
+
+        this.maximumTime = sessionEntries.isEmpty() ? 0 :
+                sessionEntries.get(numberOfEntries - 1).getStartTime();
+        this.maximumTime = MyTimeUtils.setTimePortion(this.minimumTime, false, 11, 59, 59, 999);
 
         long totalDuration = 0;
         for (SessionEntry entry : sessionEntries) {
@@ -232,15 +229,16 @@ public class FloatingDateRangeWidgetManager {
     public void setPresetDateRange(long time) {
         setDateRangeEnabled(false);
 
-        dateToTime = getCurrentTime();
-        dateFromTime = dateToTime - time;
+        dateToTime = MyTimeUtils.setTimePortion(getCurrentTime(), false, 11, 59, 59, 999);
+        dateFromTime = MyTimeUtils.setTimePortion(dateToTime - time, true, 0, 0, 0, 0);
         updateDateRangeLabels();
     }
 
     public void setStartRange() {
         setDateRangeEnabled(false);
 
-        dateToTime = getCurrentTime();
+
+        dateToTime = MyTimeUtils.setTimePortion(getCurrentTime(), false, 11, 59, 59, 999);
         dateFromTime = minimumTime;
         updateDateRangeLabels();
     }
@@ -256,42 +254,37 @@ public class FloatingDateRangeWidgetManager {
         Calendar c = Calendar.getInstance();
         c.set(year, month, dayOfMonth);
 
-        c.set(Calendar.AM_PM, 0);
-        c.set(Calendar.HOUR, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-
-
-        dateToTime = c.getTimeInMillis();
-        dateFromTime = dateToTime - 86400000L;
+        dateToTime = MyTimeUtils.setTimePortion(c, false, 11, 59, 59, 999);
+        dateFromTime = MyTimeUtils.setTimePortion(dateToTime - DateUtils.DAY_IN_MILLIS, true, 0, 0, 0, 0);
 
         updateDateRangeLabels();
     }
 
     public long getDateFrom() {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(this.dateFromTime);
-
-        c.set(Calendar.AM_PM, 0);
-        c.set(Calendar.HOUR, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-
-        return c.getTimeInMillis();
+//        Calendar c = Calendar.getInstance();
+//        c.setTimeInMillis(this.dateFromTime);
+//
+//        c.set(Calendar.AM_PM, 0);
+//        c.set(Calendar.HOUR, 0);
+//        c.set(Calendar.MINUTE, 0);
+//        c.set(Calendar.SECOND, 0);
+//        c.set(Calendar.MILLISECOND, 0);
+//
+//        return c.getTimeInMillis();
+        return this.dateFromTime;
     }
 
     public long getDateTo() {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(this.dateToTime);
-
-        c.set(Calendar.AM_PM, 0);
-        c.set(Calendar.HOUR, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-
-        return c.getTimeInMillis();
+//        Calendar c = Calendar.getInstance();
+//        c.setTimeInMillis(this.dateToTime);
+//
+//        c.set(Calendar.AM_PM, Calendar.PM);
+//        c.set(Calendar.HOUR, 11);
+//        c.set(Calendar.MINUTE, 59);
+//        c.set(Calendar.SECOND, 59);
+//        c.set(Calendar.MILLISECOND, 999);
+//
+//        return c.getTimeInMillis();
+        return this.dateToTime;
     }
 }
