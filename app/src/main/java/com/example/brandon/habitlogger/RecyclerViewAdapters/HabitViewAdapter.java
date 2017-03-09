@@ -23,26 +23,36 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
 
     List<Habit> habitsList;
 
+    public void removeAt(int position) {
+        habitsList.remove(position);
+        notifyItemRemoved(position);
+    }
+
     private MenuItemClickListener menuItemClickListener;
     private ButtonClickListener buttonClickListener;
 
-    public interface MenuItemClickListener{
+    public interface MenuItemClickListener {
         void onEditClick(long habitId);
+
         void onDeleteClick(long habitId);
+
         void onExportClick(long habitId);
+
         void onArchiveClick(long habitId);
+
         void onStartSession(long habitId);
     }
 
-    public interface ButtonClickListener{
+    public interface ButtonClickListener {
         void onPlayButtonClicked(long habitId);
+
         void onPlayButtonLongClicked(long habitId);
 
         void onCardClicked(long habitId);
     }
 
     public HabitViewAdapter(List<Habit> habitsList, MenuItemClickListener menuItemClickListener,
-                            ButtonClickListener buttonClickListener){
+                            ButtonClickListener buttonClickListener) {
 
         this.habitsList = habitsList;
         this.menuItemClickListener = menuItemClickListener;
@@ -59,7 +69,7 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
         return new HabitViewHolder(itemView);
     }
 
-    public static void setMargins (View v, int l, int t, int r, int b) {
+    public static void setMargins(View v, int l, int t, int r, int b) {
         if (v.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
             ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
             p.setMargins(l, t, r, b);
@@ -70,12 +80,12 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
     @Override
     public void onBindViewHolder(final HabitViewHolder holder, int position) {
         Habit item = habitsList.get(position);
-
+        holder.itemView.setVisibility(View.VISIBLE);
         holder.bindItem(item, menuItemClickListener, buttonClickListener);
     }
 
     public void updateHabitViews(List<SessionEntry> entries) {
-        for(SessionEntry entry : entries){
+        for (SessionEntry entry : entries) {
             // Todo get viewholder from position then .setEntry(entry);
             long habitId = entry.getHabitId();
             int adapterPosition = this.getAdapterItemPosition(habitId);
@@ -88,12 +98,11 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
     }
 
     private int getAdapterItemPosition(long habitId) {
-        for (int position=0; position<getItemCount(); position++)
+        for (int position = 0; position < getItemCount(); position++)
             if (this.habitsList.get(position).getDatabaseId() == id)
                 return position;
         return 0;
     }
-
 
     @Override
     public int getItemCount() {

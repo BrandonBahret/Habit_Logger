@@ -1,8 +1,10 @@
 package com.example.brandon.habitlogger.HabitActivity;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,6 +20,7 @@ import com.example.brandon.habitlogger.R;
 public class StatisticsFragment extends Fragment{
 
     private static View view;
+    private GetScrollEventsFromFragmentsInterface listener;
     int menuRes = R.menu.menu_habit;
 
     public StatisticsFragment() {
@@ -44,10 +47,44 @@ public class StatisticsFragment extends Fragment{
         }
         try {
             view = inflater.inflate(R.layout.fragment_statistics, container, false);
+
+            NestedScrollView scrollView = (NestedScrollView) view.findViewById(R.id.statistics_container);
+            scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+
+                int threshold = 2;
+                boolean control = false;
+
+                @Override
+                public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+
+                    int current = scrollY - oldScrollY;
+
+                    if (current > threshold && !control) {
+                        if(StatisticsFragment.this.listener != null)
+                            StatisticsFragment.this.listener.onScrollDown();
+                        control = true;
+                    }
+                    else if (current < -threshold && control) {
+                        if(StatisticsFragment.this.listener != null)
+                            StatisticsFragment.this.listener.onScrollUp();
+                        control = false;
+                    }
+                }
+            });
+
         } catch (InflateException e) {
             // empty stub
         }
+
         return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if(context instanceof GetScrollEventsFromFragmentsInterface){
+            this.listener = (GetScrollEventsFromFragmentsInterface)context;
+        }
     }
 
     @Override

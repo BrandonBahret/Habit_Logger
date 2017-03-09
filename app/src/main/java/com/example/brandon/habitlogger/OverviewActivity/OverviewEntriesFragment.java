@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.brandon.habitlogger.HabitActivity.GetScrollEventsFromFragmentsInterface;
 import com.example.brandon.habitlogger.HabitActivity.NewEntryForm;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
@@ -22,6 +23,7 @@ import com.example.brandon.habitlogger.RecyclerViewAdapters.ComplexDecoration;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.EntryViewAdapter;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.SpaceOffsetDecoration;
 import com.example.brandon.habitlogger.data.HabitDataSample;
+import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
 
 import java.util.List;
 
@@ -34,6 +36,7 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
 
     PreferenceChecker preferenceChecker;
     private CallbackInterface callbackInterface;
+    private GetScrollEventsFromFragmentsInterface listener;
 
     public OverviewEntriesFragment() {
         // Required empty public constructor
@@ -107,6 +110,20 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
             }
         }));
 
+        entriesContainer.addOnScrollListener(new RecyclerViewScrollObserver() {
+            @Override
+            public void onScrollUp() {
+                if(OverviewEntriesFragment.this.listener != null)
+                    OverviewEntriesFragment.this.listener.onScrollUp();
+            }
+
+            @Override
+            public void onScrollDown() {
+                if(OverviewEntriesFragment.this.listener != null)
+                    OverviewEntriesFragment.this.listener.onScrollDown();
+            }
+        });
+
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         entriesContainer.setLayoutManager(layoutManager);
         entriesContainer.setItemAnimator(new DefaultItemAnimator());
@@ -134,6 +151,10 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
         super.onAttach(context);
         callbackInterface = (CallbackInterface)context;
         callbackInterface.addCallback(this);
+
+        if(context instanceof GetScrollEventsFromFragmentsInterface){
+            this.listener = (GetScrollEventsFromFragmentsInterface)context;
+        }
     }
 
     @Override

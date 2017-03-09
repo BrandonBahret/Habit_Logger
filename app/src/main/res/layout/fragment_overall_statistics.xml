@@ -6,6 +6,7 @@
              tools:context="com.example.brandon.habitlogger.HabitActivity.StatisticsFragment">
 
     <android.support.v4.widget.NestedScrollView
+        android:id="@+id/statistics_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

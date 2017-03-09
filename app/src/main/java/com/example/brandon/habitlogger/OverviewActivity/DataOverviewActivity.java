@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener;
+import com.example.brandon.habitlogger.HabitActivity.GetScrollEventsFromFragmentsInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.R;
@@ -25,7 +26,7 @@ import java.util.List;
 
 public class DataOverviewActivity extends AppCompatActivity implements
         CallbackInterface, SearchView.OnQueryTextListener, ViewPager.OnPageChangeListener,
-        FloatingDateRangeWidgetManager.DateRangeChangeListener {
+        FloatingDateRangeWidgetManager.DateRangeChangeListener, GetScrollEventsFromFragmentsInterface {
 
     private FloatingDateRangeWidgetManager dateRangeManager;
     private HabitDatabase habitDatabase;
@@ -159,6 +160,17 @@ public class DataOverviewActivity extends AppCompatActivity implements
     public void onDateRangeChanged(long dateFrom, long dateTo) {
         updateEntries();
     }
+
+    @Override
+    public void onScrollUp() {
+        dateRangeManager.showView();
+    }
+
+    @Override
+    public void onScrollDown() {
+        dateRangeManager.hideView();
+    }
+
     //endregion
 
     //region // Allow fragments to interface with this activity

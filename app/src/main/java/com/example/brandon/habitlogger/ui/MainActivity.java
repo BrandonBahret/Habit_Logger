@@ -1,6 +1,5 @@
 package com.example.brandon.habitlogger.ui;
 
-
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -262,31 +261,32 @@ public class MainActivity extends AppCompatActivity
         habitCardContainer.setLayoutManager(layoutManager);
         habitCardContainer.setItemAnimator(new DefaultItemAnimator());
 
-        habitCardContainer.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+        habitCardContainer.addOnScrollListener(new RecyclerViewScrollObserver() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
+            public void onScrollUp() {
                 FloatingActionButton fab = ui.mainInclude.fab;
-                final int threshold = 5;
 
-                if (dy > threshold) {
-                    // Scroll Down
-                    if (preferenceChecker.hideFabOnScroll() && fab.isShown())
-                        fab.hide(true);
-
-                    if(preferenceChecker.doHideCurrentSessionCard()){
-                        hideCurrentSessionsCard();
-                    }
+                // Scroll Up
+                if (preferenceChecker.hideFabOnScroll() && !fab.isShown()) {
+                    fab.show(true);
                 }
-                else if (dy < -threshold) {
-                    // Scroll Up
-                    if (preferenceChecker.hideFabOnScroll() && !fab.isShown())
-                        fab.show(true);
 
-                    if(preferenceChecker.doHideCurrentSessionCard()){
-                        showCurrentSessionsCard();
-                    }
+                if (preferenceChecker.doHideCurrentSessionCard()) {
+                    showCurrentSessionsCard();
+                }
+            }
+
+            @Override
+            public void onScrollDown() {
+                FloatingActionButton fab = ui.mainInclude.fab;
+
+                // Scroll Down
+                if (preferenceChecker.hideFabOnScroll() && fab.isShown())
+                    fab.hide(true);
+
+                if (preferenceChecker.doHideCurrentSessionCard()) {
+                    hideCurrentSessionsCard();
                 }
             }
         });
@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity
 
         v.animate()
                 .setStartDelay(0)
-                .setDuration(175)
+                .setDuration(300)
                 .alpha(1)
                 .translationY(0);
     }
@@ -328,7 +328,7 @@ public class MainActivity extends AppCompatActivity
 
         v.animate()
                 .setStartDelay(0)
-                .setDuration(250)
+                .setDuration(300)
                 .alpha(0)
                 .translationY(-v.getHeight());
     }
@@ -375,7 +375,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         int bottomOffset = (int) getResources().getDimension(R.dimen.bottom_offset_dp);
-        int topOffset = (int) getResources().getDimension(R.dimen.top_offset_dp);
+        int topOffset = preferenceChecker.doHideCurrentSessionCard() ? (int) getResources().getDimension(R.dimen.large_top_offset_dp) : (int) getResources().getDimension(R.dimen.top_offset_dp);
         SpaceOffsetDecoration bottomOffsetDecoration = new SpaceOffsetDecoration(bottomOffset, topOffset);
         habitCardContainer.addItemDecoration(bottomOffsetDecoration);
     }
@@ -569,12 +569,12 @@ public class MainActivity extends AppCompatActivity
         if (query.length() != 0) {
             Set<Long> ids = habitDatabase.queryDatabaseByTheUser(query);
 
+            List<Habit> allHabits = habitDatabase.getHabits();
+
             habitList.clear();
 
-            for (long id : ids) {
-                Habit habit = habitDatabase.getHabit(id);
-
-                if (habit != null) {
+            for (Habit habit : allHabits) {
+                if (ids.contains(habit.getDatabaseId())) {
                     if (habitDisplayMode == ONLY_ARCHIVED_HABITS && habit.getIsArchived())
                         habitList.add(habit);
 
@@ -588,6 +588,7 @@ public class MainActivity extends AppCompatActivity
         else {
             showDatabase();
         }
+
     }
 
     public void setInitialFragment() {

@@ -21,6 +21,7 @@ import com.example.brandon.habitlogger.RecyclerViewAdapters.ComplexDecoration;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.EntryViewAdapter;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.SpaceOffsetDecoration;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
+import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
 import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.List;
@@ -38,6 +39,8 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
     FloatingActionMenu fab;
     List<SessionEntry> sessionEntries;
     EntryViewAdapter entryAdapter;
+    private CallbackInterface callbackInterface;
+    private GetScrollEventsFromFragmentsInterface listener;
 
     public EntriesFragment() {
         // Required empty public constructor
@@ -76,7 +79,7 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
         View v = inflater.inflate(R.layout.fragment_entries, container, false);
 
         habitDatabase = new HabitDatabase(getContext());
-        sessionEntries = habitDatabase.getEntries(habitId);
+        sessionEntries = callbackInterface.getSessionEntries().getSessionEntries();
 
         entriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
 
@@ -91,6 +94,7 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
                                 if(entry != null){
                                     habitDatabase.updateEntry(entry.getDatabaseId(), entry);
                                     updateSessionEntryById(entry.getDatabaseId(), entry);
+                                    // Todo notify parent
                                 }
                             }
 
@@ -98,6 +102,7 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
                             public void onDeleteClicked(SessionEntry entry) {
                                 habitDatabase.deleteEntry(entry.getDatabaseId());
                                 removeSessionEntryById(entry.getDatabaseId());
+                                // Todo notify parent
                             }
                         });
 
@@ -131,8 +136,22 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
         entriesContainer.setItemAnimator(new DefaultItemAnimator());
         entriesContainer.setAdapter(entryAdapter);
 
+        entriesContainer.addOnScrollListener(new RecyclerViewScrollObserver() {
+            @Override
+            public void onScrollUp() {
+                if(EntriesFragment.this.listener != null)
+                    EntriesFragment.this.listener.onScrollUp();
+            }
+
+            @Override
+            public void onScrollDown() {
+                if(EntriesFragment.this.listener != null)
+                    EntriesFragment.this.listener.onScrollDown();
+            }
+        });
+
         int bottomOffset = (int) getResources().getDimension(R.dimen.bottom_offset_dp);
-        int topOffset = (int) getResources().getDimension(R.dimen.top_offset_dp);
+        int topOffset = (int) (getResources().getDimension(R.dimen.large_top_offset_dp) * 2);
         SpaceOffsetDecoration spaceOffsetDecoration = new SpaceOffsetDecoration(bottomOffset, topOffset);
         entriesContainer.addItemDecoration(spaceOffsetDecoration);
 
@@ -143,8 +162,12 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        CallbackInterface callbackInterface = (CallbackInterface)context;
+        callbackInterface = (CallbackInterface)context;
         callbackInterface.addCallback(this);
+
+        if(context instanceof GetScrollEventsFromFragmentsInterface){
+            this.listener = (GetScrollEventsFromFragmentsInterface)context;
+        }
     }
 
     private int getSessionEntryIndex(long entryId){

@@ -32,6 +32,7 @@ public class Habit implements Serializable, Parcelable {
 
     private int isArchived = 0;
     private long databaseId = -1;
+    private boolean filter = false;
 
     public Habit(@NonNull String name, @NonNull HabitCategory category) {
         this.name = name;
@@ -393,5 +394,13 @@ public class Habit implements Serializable, Parcelable {
      */
     public boolean getIsArchived() {
         return (this.isArchived == 1);
+    }
+
+    public void setFilterBit(boolean b) {
+        this.filter = b;
+    }
+
+    public boolean getFilterBit() {
+        return this.filter;
     }
 }

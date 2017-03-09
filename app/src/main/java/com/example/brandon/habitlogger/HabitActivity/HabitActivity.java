@@ -7,6 +7,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -39,7 +40,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class HabitActivity extends AppCompatActivity implements CallbackInterface {
+public class HabitActivity extends AppCompatActivity implements CallbackInterface, GetScrollEventsFromFragmentsInterface {
 
     private ViewPager viewPager;
 
@@ -59,6 +60,8 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
     List<UpdateEntriesInterface> callbacks = new ArrayList<>();
     List<UpdateCategorySampleInterface> newCategoryDataSampleCallbacks = new ArrayList<>();
+
+    private GestureDetectorCompat mDetector;
 
     @Override
     public void addCallback(UpdateEntriesInterface callback) {
@@ -128,6 +131,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
                 updateEntries(HabitActivity.this.sessionEntries);
             }
         });
+        dateRangeManager.callOnDateRangeChangedListener();
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -150,30 +154,40 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 //        });
 
         viewPager.setAdapter(sectionsPagerAdapter);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            public void onPageScrollStateChanged(int state) {}
 
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
+        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+
+            @Override
             public void onPageSelected(int position) {
+                super.onPageSelected(position);
+
                 switch (position) {
-                    case 0:
+                    case (0): {
                         fabMenu.showMenu(true);
                         dateRangeManager.showView();
-                        break;
 
-                    case 1:
+                    }
+                    break;
+
+                    case (1): {
                         fabMenu.hideMenu(true);
                         dateRangeManager.hideView();
-                        break;
 
-                    case 2:
+                    }
+                    break;
+
+                    case (2): {
                         fabMenu.hideMenu(true);
                         dateRangeManager.showView();
-                        break;
+
+                    }
+                    break;
                 }
             }
         });
+
+
         tabLayout.setupWithViewPager(viewPager);
 
         fabMenu.setClosedOnTouchOutside(true);
@@ -213,6 +227,13 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         });
 
         updateActivity();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_habit, menu);
+        return true;
     }
 
     @Override
@@ -366,9 +387,25 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         SessionEntriesSample dataSample = new SessionEntriesSample
                 (sessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
 
+        dateRangeManager.updateSessionEntries(sessionEntries);
+
         for (UpdateEntriesInterface callback : callbacks) {
             callback.updateEntries(dataSample);
         }
+    }
+
+    @Override
+    public void onScrollUp() {
+        dateRangeManager.showView();
+        if (tabLayout.getSelectedTabPosition() == 0)
+            fabMenu.showMenu(true);
+    }
+
+    @Override
+    public void onScrollDown() {
+        dateRangeManager.hideView();
+        if (tabLayout.getSelectedTabPosition() == 0)
+            fabMenu.hideMenu(true);
     }
 
     /**
@@ -387,13 +424,13 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
             switch (position) {
                 case 0: {
                     EntriesFragment fragment = EntriesFragment.newInstance(habitId);
-                    fragment.setHasOptionsMenu(true);
+//                    fragment.setHasOptionsMenu(true);
                     return fragment;
                 }
 
                 case 1: {
                     CalendarFragment fragment = CalendarFragment.newInstance();
-                    fragment.setHasOptionsMenu(true);
+//                    fragment.setHasOptionsMenu(true);
                     fragment.setListener(new CalendarFragment.Listener() {
                         @Override
                         public void onDateClicked(int year, int month, int dayOfMonth) {
@@ -406,7 +443,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
                 case 2: {
                     StatisticsFragment fragment = StatisticsFragment.newInstance();
-                    fragment.setHasOptionsMenu(true);
+//                    fragment.setHasOptionsMenu(true);
                     return fragment;
                 }
             }
