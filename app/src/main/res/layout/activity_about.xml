@@ -25,6 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/link_layout"
+        android:textSize="12sp"
         android:layout_alignParentEnd="true"
         android:background="@drawable/underline_background"
         android:text="@string/links"
@@ -51,7 +52,8 @@
         <ImageButton
             android:layout_width="@dimen/link_button_size"
             android:layout_height="@dimen/link_button_size"
-            android:background="@color/transparent"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
             android:contentDescription="@string/github_link_content_description"
             android:onClick="linkButtonClicked"
             android:scaleType="fitXY"
@@ -66,7 +68,8 @@
         <ImageButton
             android:layout_width="@dimen/link_button_size"
             android:layout_height="@dimen/link_button_size"
-            android:background="@color/transparent"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
             android:contentDescription="@string/linkedin_link_content_description"
             android:onClick="linkButtonClicked"
             android:scaleType="fitXY"
@@ -82,7 +85,8 @@
         <ImageButton
             android:layout_width="@dimen/link_button_size"
             android:layout_height="@dimen/link_button_size"
-            android:background="@color/transparent"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
             android:contentDescription="@string/freelancer_link_content_description"
             android:onClick="linkButtonClicked"
             android:scaleType="fitXY"
