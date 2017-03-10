@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
@@ -163,9 +162,9 @@ public class SessionActivity extends AppCompatActivity implements
         getWindow().setStatusBarColor(darkerColor);
         ui.sessionCancel.getBackground().setColorFilter(color, PorterDuff.Mode.SRC);
 
-        Drawable drawable = ui.sessionNote.getBackground(); // get current EditText drawable
-        drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP); // change the drawable color
-        ui.sessionNote.setBackground(drawable);
+//        Drawable drawable = ui.sessionNote.getBackground(); // get current EditText drawable
+//        drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP); // change the drawable color
+//        ui.sessionNote.setBackground(drawable);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

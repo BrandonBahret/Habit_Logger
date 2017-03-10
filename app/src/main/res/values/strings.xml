@@ -21,7 +21,7 @@
     <string name="streak_count_value_content_description">Streak count value.</string>
     <string name="session_control_button_content_description">Session control button</string>
     <string name="card_view_accent_description">A color accent indicating the category type.</string>
-    <string name="session_note_hint">Note</string>
+    <string name="session_note_hint">Use this space for notes.</string>
     <string name="session_pause_play_content_description">Session pause, or play toggle button.</string>
     <string name="export_database">Create Backup</string>
     <string name="restore_database">Restore Data</string>
@@ -87,7 +87,7 @@
     <string name="pref_date_format">preference_date_format</string>
     <string name="uncategorized">Uncategorized</string>
     <string name="create_new_category_button">Create new category button</string>
-    <string name="_0">0</string>
+    <string name="_00">00</string>
     <string name="pref_hide_fab_on_scroll">preference_hide_fab_on_scroll</string>
     <string name="pref_hide_current_sessions_card_on_scroll">preference_hide_current_sessions_card_on_scroll</string>
     <string name="pref_ask_finish">preference_ask_before_session_finish</string>

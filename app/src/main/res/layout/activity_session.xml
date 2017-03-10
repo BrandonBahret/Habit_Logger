@@ -15,12 +15,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
-
             android:layout_marginRight="8dp"
             android:background="@drawable/underline_background"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:paddingBottom="10dp">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/session_pause_play"
@@ -53,7 +51,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-condensed"
 
-                        android:text="@string/_0"
+                        android:text="@string/_00"
                         android:textSize="75sp"/>
 
                     <TextView
@@ -84,7 +82,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-condensed"
 
-                        android:text="@string/_0"
+                        android:text="@string/_00"
                         android:textSize="75sp"/>
 
                     <TextView
@@ -115,7 +113,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-condensed"
 
-                        android:text="@string/_0"
+                        android:text="@string/_00"
                         android:textSize="75sp"/>
 
                     <TextView
@@ -145,12 +143,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/session_cancel"
-
             android:layout_below="@+id/entire_session_time_display_layout"
-            android:layout_margin="10dp"
+
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/note_background"
+            android:elevation="3dp"
             android:fadingEdgeLength="@dimen/activity_vertical_margin"
+            android:cropToPadding="false"
             android:hint="@string/session_note_hint"
-            android:inputType="textMultiLine"/>
+            android:inputType="textMultiLine"
+            android:padding="16dp"/>
 
     </RelativeLayout>
 </layout>

@@ -19,6 +19,7 @@ import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.EntriesTable
 import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.HabitsTableSchema;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.HabitDataSample;
+import com.example.brandon.habitlogger.data.SessionEntriesSample;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +39,51 @@ public class HabitDatabase {
     private SQLiteDatabase writableDatabase;
     private SQLiteDatabase readableDatabase;
     private Context mContext;
+
+    public SessionEntriesSample getEntriesSample(long habitId, long dateFrom, long dateTo) {
+        List<SessionEntry> entries = lookUpEntries(
+                searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo)
+        );
+
+        return new SessionEntriesSample(entries, dateFrom, dateTo);
+    }
+
+    //region // Interface methods for database
+
+    public interface OnEntryChangedListener {
+        /**
+         * This method is only called when individual entries are removed.
+         */
+        void onEntryDeleted(SessionEntry removedEntry);
+
+        /**
+         * This method is only called when individual entries are updated.
+         */
+        void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry);
+    }
+
+    private static List<OnEntryChangedListener> onEntryChangedListeners = new ArrayList<>();
+
+    private void notifyEntryDeleted(SessionEntry removedEntry) {
+        for (OnEntryChangedListener listener : onEntryChangedListeners) {
+            listener.onEntryDeleted(removedEntry);
+        }
+    }
+
+    private void notifyEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
+        for (OnEntryChangedListener listener : onEntryChangedListeners) {
+            listener.onEntryUpdated(oldEntry, newEntry);
+        }
+    }
+
+    public static void addOnEntryChangedListener(OnEntryChangedListener listener) {
+        onEntryChangedListeners.add(listener);
+    }
+
+    public static void removeOnEntryChangedListener(OnEntryChangedListener listener) {
+        onEntryChangedListeners.remove(listener);
+    }
+    //endregion
 
     public HabitDatabase(Context context) {
         databaseHelper = new DatabaseSchema(context);
@@ -271,7 +317,7 @@ public class HabitDatabase {
         List<HabitCategory> categories = new ArrayList<>(size);
 
         cursor.moveToFirst();
-        do categories.add(getHabitCategoryFromCursor(cursor)); while(cursor.moveToNext());
+        do categories.add(getHabitCategoryFromCursor(cursor)); while (cursor.moveToNext());
 
         cursor.close();
 
@@ -637,14 +683,18 @@ public class HabitDatabase {
 
     /**
      * @param entryId The id of the entry to edit.
-     * @param entry   The new session entry to replace the old one.
+     * @param newEntry   The new session entry to replace the old one.
      * @return The number of rows changed, -1 if error.
      */
-    public long updateEntry(long entryId, SessionEntry entry) {
-        if (getEntry(entryId) != null) {
-            updateEntryStartTime(entryId, entry.getStartTime());
-            updateEntryDuration(entryId, entry.getDuration());
-            updateEntryNote(entryId, entry.getNote());
+    public long updateEntry(long entryId, SessionEntry newEntry) {
+        SessionEntry oldEntry = getEntry(entryId);
+
+        if (oldEntry != null) {
+            updateEntryStartTime(entryId, newEntry.getStartTime());
+            updateEntryDuration(entryId, newEntry.getDuration());
+            updateEntryNote(entryId, newEntry.getNote());
+
+            notifyEntryUpdated(oldEntry, newEntry);
             return 1;
         }
 
@@ -656,6 +706,9 @@ public class HabitDatabase {
      * @return The number of rows removed, -1 if error.
      */
     public long deleteEntry(long entryId) {
+        SessionEntry removedEntry = getEntry(entryId);
+        notifyEntryDeleted(removedEntry);
+
         String whereClause = EntriesTableSchema.ENTRY_ID + " =?";
         String whereArgs[] = {String.valueOf(entryId)};
 
@@ -1129,7 +1182,7 @@ public class HabitDatabase {
                 whereClause, whereArgs);
     }
 
-    public CategoryDataSample getCategoryDataSample(HabitCategory category, long dateFrom, long dateTo){
+    public CategoryDataSample getCategoryDataSample(HabitCategory category, long dateFrom, long dateTo) {
         Habit[] habits = getHabits(category.getDatabaseId());
 
         for (Habit habit : habits) {

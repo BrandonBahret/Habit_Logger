@@ -119,8 +119,9 @@ public class SessionEntry implements Serializable, Parcelable {
     }
 
     public String toString() {
-        String format = "{\n\tStarting Time: %d,\n\tDuration: %d\n\tNote: %s\n}\n";
-        return String.format(Locale.US, format, getStartTime(), getDuration(), getNote());
+        String format = "{\n\tStarting Time: %s,\n\tDuration: %s\n\tNote: %s\n}\n";
+        String startTimeString = getDate(getStartTime(), "MMMM/dd/yyyy");
+        return String.format(Locale.US, format, startTimeString, getDurationAsString(), getNote());
     }
 
     /**

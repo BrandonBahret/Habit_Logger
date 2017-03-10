@@ -556,12 +556,29 @@ public class MainActivity extends AppCompatActivity
 //        handler.post(updateCards);
     }
 
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        RecyclerView rv = ui.mainInclude.contentMain.habitRecyclerView;
+
+        int position = ((LinearLayoutManager)rv.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+        getIntent().putExtra("LAST_POSITION", position);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
 
         updateCurrentSessionCard();
         showDatabase();
+
+        if(getIntent().hasExtra("LAST_POSITION")){
+            RecyclerView rv = ui.mainInclude.contentMain.habitRecyclerView;
+            int position = getIntent().getExtras().getInt("LAST_POSITION", 0);
+            rv.scrollToPosition(position);
+        }
 //        handler.post(updateCards);
     }
 

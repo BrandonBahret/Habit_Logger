@@ -6,6 +6,7 @@ import android.preference.PreferenceFragment;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.brandon.habitlogger.HabitSessions.SessionNotificationManager;
@@ -34,13 +35,13 @@ public class SettingsActivity extends AppCompatActivity
         preferenceChecker = new PreferenceChecker(this);
 
         AppCompatDelegate.setDefaultNightMode(
-                preferenceChecker.isNightMode()? AppCompatDelegate.MODE_NIGHT_YES :
+                preferenceChecker.isNightMode() ? AppCompatDelegate.MODE_NIGHT_YES :
                         AppCompatDelegate.MODE_NIGHT_NO
         );
 
         super.onCreate(savedInstanceState);
 
-        if(getSupportActionBar() != null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
@@ -48,6 +49,10 @@ public class SettingsActivity extends AppCompatActivity
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
+
+        String foo = getIntent().getDataString();
+        if (foo != null)
+            Log.d("foobar", foo);
     }
 
     @Override
@@ -75,7 +80,7 @@ public class SettingsActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if(id == android.R.id.home){
+        if (id == android.R.id.home) {
             NavUtils.navigateUpFromSameTask(this);
             return true;
         }
@@ -87,9 +92,9 @@ public class SettingsActivity extends AppCompatActivity
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         setResult(ResultCodes.SETTINGS_CHANGED);
 
-        if (key.equals(getString(R.string.pref_do_show_notifications))){
+        if (key.equals(getString(R.string.pref_do_show_notifications))) {
 
-            if(preferenceChecker.doShowNotifications())
+            if (preferenceChecker.doShowNotifications())
                 sessionNotificationManager.launchNotificationsForAllActiveSessions();
 
             else
@@ -100,7 +105,7 @@ public class SettingsActivity extends AppCompatActivity
             sessionNotificationManager.launchNotificationsForAllActiveSessions();
         }
 
-        else if(key.equals(getString(R.string.pref_is_night_mode))){
+        else if (key.equals(getString(R.string.pref_is_night_mode))) {
             recreate();
         }
     }

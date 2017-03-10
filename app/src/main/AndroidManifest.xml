@@ -56,11 +56,26 @@
             android:name=".ui.AboutActivity"
             android:label="About"
             android:parentActivityName=".ui.MainActivity"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme">
+
+            <intent-filter>
+                <action android:name=".ui.AboutActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </activity>
 
         <activity
             android:name=".Preferences.SettingsActivity"
-            android:parentActivityName=".ui.MainActivity"/>
+            android:parentActivityName=".ui.MainActivity">
+
+            <intent-filter>
+                <action android:name=".Preferences.SettingsActivity" />
+                <data android:mimeType="text/*"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </activity>
 
         <activity
             android:name=".HabitActivity.HabitActivity"
