@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
+import android.widget.SpinnerAdapter;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.R;
@@ -29,13 +30,19 @@ public class CategorySpinner extends AppCompatSpinner implements AdapterView.OnI
 
     @Override
     public boolean performClick() {
+        dialog.show();
+        return false;
+    }
+
+    @Override
+    public void setAdapter(SpinnerAdapter adapter) {
         Context context = getContext();
 
         LayoutInflater layoutInflater = LayoutInflater.from(getContext());
         ui = DataBindingUtil.inflate
                 (layoutInflater, R.layout.dialog_category_selector, null, false);
 
-        ui.categoryList.setAdapter((ListAdapter) getAdapter());
+        ui.categoryList.setAdapter((ListAdapter) adapter);
         ui.categoryList.setOnItemClickListener(this);
         ui.newCategoryButton.setOnClickListener(this);
 
@@ -44,9 +51,11 @@ public class CategorySpinner extends AppCompatSpinner implements AdapterView.OnI
                 .setCancelable(true)
                 .setView(ui.getRoot())
                 .create();
-        dialog.show();
-        return false;
+
+        super.setAdapter(adapter);
     }
+
+
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

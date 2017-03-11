@@ -29,13 +29,15 @@ public class CategorySpinnerAdapter extends BaseAdapter {
         mInflater = LayoutInflater.from(context);
     }
 
-    public class ViewHolder {
+    public static class ViewHolder{
         public TextView title;
         public ImageView color;
+        public View itemView;
 
         public ViewHolder(View view) {
             title = (TextView) view.findViewById(R.id.title);
             color = (ImageView) view.findViewById(R.id.color);
+            itemView = view;
         }
     }
 

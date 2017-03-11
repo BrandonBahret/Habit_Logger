@@ -98,10 +98,10 @@ public class MainActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
         ui = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        currentSession = ui.mainInclude.contentMain.currentSessionsCard.itemRoot;
-        habitCardContainer = ui.mainInclude.contentMain.habitRecyclerView;
+        currentSession = ui.mainInclude.currentSessionsCard.itemRoot;
+        habitCardContainer = ui.mainInclude.habitRecyclerView;
 
-        setSupportActionBar(ui.mainInclude.toolbar);
+        setSupportActionBar(ui.toolbar);
 
         ui.mainInclude.fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, ui.drawerLayout, ui.mainInclude.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, ui.drawerLayout, ui.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         ui.drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -314,7 +314,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showCurrentSessionsCard() {
-        View v = ui.mainInclude.contentMain.currentSessionsCard.getRoot();
+        View v = ui.mainInclude.currentSessionsCard.getRoot();
 
         v.animate()
                 .setStartDelay(0)
@@ -324,7 +324,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void hideCurrentSessionsCard() {
-        View v = ui.mainInclude.contentMain.currentSessionsCard.getRoot();
+        View v = ui.mainInclude.currentSessionsCard.getRoot();
 
         v.animate()
                 .setStartDelay(0)
@@ -561,9 +561,9 @@ public class MainActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
 
-        RecyclerView rv = ui.mainInclude.contentMain.habitRecyclerView;
+        RecyclerView rv = ui.mainInclude.habitRecyclerView;
 
-        int position = ((LinearLayoutManager)rv.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+        int position = ((LinearLayoutManager) rv.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
         getIntent().putExtra("LAST_POSITION", position);
     }
 
@@ -574,8 +574,8 @@ public class MainActivity extends AppCompatActivity
         updateCurrentSessionCard();
         showDatabase();
 
-        if(getIntent().hasExtra("LAST_POSITION")){
-            RecyclerView rv = ui.mainInclude.contentMain.habitRecyclerView;
+        if (getIntent().hasExtra("LAST_POSITION")) {
+            RecyclerView rv = ui.mainInclude.habitRecyclerView;
             int position = getIntent().getExtras().getInt("LAST_POSITION", 0);
             rv.scrollToPosition(position);
         }
@@ -678,8 +678,8 @@ public class MainActivity extends AppCompatActivity
 
     public void updateCurrentSessionCard() {
 
-        TextView countText = ui.mainInclude.contentMain.currentSessionsCard.activeSessionValueText;
-        TextView countLabelText = ui.mainInclude.contentMain.currentSessionsCard.activeSessionDescriptionText;
+        TextView countText = ui.mainInclude.currentSessionsCard.activeSessionValueText;
+        TextView countLabelText = ui.mainInclude.currentSessionsCard.activeSessionDescriptionText;
 
         long count = (int) sessionManager.getSessionCount();
         currentSession.setAlpha(count == 0 ? 0.5f : 1.0f);

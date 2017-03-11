@@ -24,7 +24,7 @@
         android:title="@string/overall_stats_nav_string"
         />
 
-    <item android:title="App Extras">
+    <item android:title="App Tools">
         <menu>
 
             <item

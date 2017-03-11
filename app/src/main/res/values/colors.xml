@@ -19,6 +19,7 @@
     <color name="background">#eaeaea</color>
 
     <color name="headerTextColor">@color/colorPrimaryDark</color>
+    <color name="navigation_drawer_item_color">#89000000</color>
 
     <integer-array name="colors">
         <item>0xffd32f2f</item>

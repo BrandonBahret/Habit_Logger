@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:fab="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         tools:context="com.example.brandon.habitlogger.ui.MainActivity">
 
@@ -10,19 +9,22 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-        <android.support.design.widget.AppBarLayout
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/habit_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay">
+            android:layout_height="match_parent"
+            android:layout_below="@+id/current_sessions_card"
+            android:clipToPadding="false"
+            android:fadingEdgeLength="8dp"
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:popupTheme="@style/AppTheme.PopupOverlay"/>
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:requiresFadingEdge="vertical"
+            android:scrollbars="none"/>
 
-        </android.support.design.widget.AppBarLayout>
+        <include
+            android:id="@+id/current_sessions_card"
+            layout="@layout/current_sessions_card"/>
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fab"
@@ -38,10 +40,6 @@
             app:fab_shadowColor="@color/shadow_black"
             app:fab_showAnimation="@anim/show_fab"/>
 
-        <include
-            android:id="@+id/content_main"
-            layout="@layout/content_main"/>
-
     </android.support.design.widget.CoordinatorLayout>
-</layout>
 
+</layout>
