@@ -26,7 +26,7 @@ import java.util.List;
 
 public class DataOverviewActivity extends AppCompatActivity implements
         CallbackInterface, SearchView.OnQueryTextListener, ViewPager.OnPageChangeListener,
-        FloatingDateRangeWidgetManager.DateRangeChangeListener, GetScrollEventsFromFragmentsInterface {
+        FloatingDateRangeWidgetManager.DateRangeChangeListener, GetScrollEventsFromFragmentsInterface, HabitDatabase.OnEntryChangedListener {
 
     private FloatingDateRangeWidgetManager dateRangeManager;
     private HabitDatabase habitDatabase;
@@ -48,6 +48,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
         //region // Gather dependencies
         exportManager = new LocalDataExportManager(this);
         habitDatabase = new HabitDatabase(this);
+        HabitDatabase.addOnEntryChangedListener(this);
         List<SessionEntry> sessionEntries = habitDatabase.lookUpEntries(habitDatabase.searchAllEntriesWithTimeRange(0, Long.MAX_VALUE));
         dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), sessionEntries);
         //endregion
@@ -159,6 +160,22 @@ public class DataOverviewActivity extends AppCompatActivity implements
     @Override
     public void onDateRangeChanged(long dateFrom, long dateTo) {
         updateEntries();
+    }
+
+    @Override
+    public void onEntryDeleted(SessionEntry removedEntry) {
+        HabitDataSample dataSample = getDataSample();
+
+        List<SessionEntry> sessionEntries = dataSample.getSessionEntriesSample().getSessionEntries();
+        dateRangeManager.updateSessionEntries(sessionEntries);
+    }
+
+    @Override
+    public void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
+        HabitDataSample dataSample = getDataSample();
+
+        List<SessionEntry> sessionEntries = dataSample.getSessionEntriesSample().getSessionEntries();
+        dateRangeManager.updateSessionEntries(sessionEntries);
     }
 
     @Override

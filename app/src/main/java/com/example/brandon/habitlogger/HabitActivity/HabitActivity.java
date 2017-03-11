@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class HabitActivity extends AppCompatActivity implements CallbackInterface, GetScrollEventsFromFragmentsInterface {
+public class HabitActivity extends AppCompatActivity implements CallbackInterface, GetScrollEventsFromFragmentsInterface, HabitDatabase.OnEntryChangedListener {
 
     private ViewPager viewPager;
 
@@ -113,6 +113,9 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
         preferenceChecker = new PreferenceChecker(this);
         habitDatabase = new HabitDatabase(this);
+
+        HabitDatabase.addOnEntryChangedListener(this);
+
         sessionManager = new SessionManager(this);
         exportManager = new LocalDataExportManager(this);
 
@@ -134,24 +137,6 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         dateRangeManager.callOnDateRangeChangedListener();
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-//        appBar.addOnOffsetChangedListener(new AppBarStateChangeListener() {
-//            @Override
-//            public void onStateChanged(AppBarLayout appBarLayout, State state) {
-//                if (state == COLLAPSED) {
-//                    dateRangeManager.hideView();
-//                    if (viewPager.getCurrentItem() == 0)
-//                        fabMenu.hideMenu(true);
-//                }
-//                else if (state == EXPANDED) {
-//                    if (viewPager.getCurrentItem() != 1)
-//                        dateRangeManager.showView();
-//
-//                    if (viewPager.getCurrentItem() == 0)
-//                        fabMenu.showMenu(true);
-//                }
-//            }
-//        });
 
         viewPager.setAdapter(sectionsPagerAdapter);
 
@@ -406,6 +391,20 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         dateRangeManager.hideView();
         if (tabLayout.getSelectedTabPosition() == 0)
             fabMenu.hideMenu(true);
+    }
+
+    @Override
+    public void onEntryDeleted(SessionEntry removedEntry) {
+        Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+        HabitActivity.this.sessionEntries = habitDatabase.lookUpEntries(ids);
+        dateRangeManager.updateSessionEntries(HabitActivity.this.sessionEntries);
+    }
+
+    @Override
+    public void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
+        Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+        HabitActivity.this.sessionEntries = habitDatabase.lookUpEntries(ids);
+        dateRangeManager.updateSessionEntries(HabitActivity.this.sessionEntries);
     }
 
     /**

@@ -94,7 +94,6 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
                                 if(entry != null){
                                     habitDatabase.updateEntry(entry.getDatabaseId(), entry);
                                     updateSessionEntryById(entry.getDatabaseId(), entry);
-                                    // Todo notify parent
                                 }
                             }
 
@@ -102,7 +101,6 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
                             public void onDeleteClicked(SessionEntry entry) {
                                 habitDatabase.deleteEntry(entry.getDatabaseId());
                                 removeSessionEntryById(entry.getDatabaseId());
-                                // Todo notify parent
                             }
                         });
 
@@ -189,14 +187,18 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
 
     public void removeSessionEntryById(long databaseId) {
         int index = getSessionEntryIndex(databaseId);
-        sessionEntries.remove(index);
-        entryAdapter.notifyItemRemoved(index);
+        if(index != sessionEntries.size()) {
+            sessionEntries.remove(index);
+            entryAdapter.notifyItemRemoved(index);
+        }
     }
 
     public void updateSessionEntryById(long databaseId, SessionEntry entry){
         int index = getSessionEntryIndex(databaseId);
-        sessionEntries.set(index, entry);
-        entryAdapter.notifyItemChanged(index);
+        if(index != sessionEntries.size()) {
+            sessionEntries.set(index, entry);
+            entryAdapter.notifyItemChanged(index);
+        }
     }
 
     @Override

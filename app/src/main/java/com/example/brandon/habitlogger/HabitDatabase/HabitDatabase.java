@@ -707,13 +707,16 @@ public class HabitDatabase {
      */
     public long deleteEntry(long entryId) {
         SessionEntry removedEntry = getEntry(entryId);
-        notifyEntryDeleted(removedEntry);
 
         String whereClause = EntriesTableSchema.ENTRY_ID + " =?";
         String whereArgs[] = {String.valueOf(entryId)};
 
-        return writableDatabase.delete(EntriesTableSchema.TABLE_NAME,
+        long res = writableDatabase.delete(EntriesTableSchema.TABLE_NAME,
                 whereClause, whereArgs);
+
+        notifyEntryDeleted(removedEntry);
+
+        return res;
     }
 
     /**
