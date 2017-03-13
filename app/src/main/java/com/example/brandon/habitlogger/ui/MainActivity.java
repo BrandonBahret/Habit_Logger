@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.ui;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -45,6 +46,7 @@ import com.example.brandon.habitlogger.RecyclerViewAdapters.CategoryCardAdapter;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.ComplexDecoration;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.HabitViewAdapter;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.SpaceOffsetDecoration;
+import com.example.brandon.habitlogger.common.AskForConfirmationDialog;
 import com.example.brandon.habitlogger.common.RequestCodes;
 import com.example.brandon.habitlogger.common.ResultCodes;
 import com.example.brandon.habitlogger.databinding.ActivityMainBinding;
@@ -191,17 +193,46 @@ public class MainActivity extends AppCompatActivity
             }
 
             @Override
-            public void onDeleteClick(long habitId) {
-                if (sessionManager.getIsSessionActive(habitId)) {
-                    sessionManager.cancelSession(habitId);
-                    updateCurrentSessionCard();
-                }
+            public void onResetClick(final long habitId) {
+                String habitName = habitDatabase.getHabitName(habitId);
 
-                habitDatabase.deleteHabit(habitId);
+                new AskForConfirmationDialog(MainActivity.this)
+                        .setTitle("Confirm Data Reset")
+                        .setMessage("Do you really want to delete all entries for '" + habitName + "'?")
+                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                habitDatabase.deleteEntriesForHabit(habitId);
+                            }
+                        })
+                        .show();
 
-                int position = getItemPosition(habitId);
-                habitList.remove(position);
-                habitAdapter.notifyItemRemoved(position);
+            }
+
+            @Override
+            public void onDeleteClick(final long habitId) {
+
+                String habitName = habitDatabase.getHabitName(habitId);
+
+                new AskForConfirmationDialog(MainActivity.this)
+                        .setTitle("Confirm Delete")
+                        .setMessage("Do you really want to delete '" + habitName + "'?")
+                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (sessionManager.getIsSessionActive(habitId)) {
+                                    sessionManager.cancelSession(habitId);
+                                    updateCurrentSessionCard();
+                                }
+
+                                habitDatabase.deleteHabit(habitId);
+
+                                int position = getItemPosition(habitId);
+                                habitList.remove(position);
+                                habitAdapter.notifyItemRemoved(position);
+                            }
+                        })
+                        .show();
             }
 
             @Override
@@ -211,13 +242,26 @@ public class MainActivity extends AppCompatActivity
             }
 
             @Override
-            public void onArchiveClick(long habitId) {
-                boolean archivedState = !habitDatabase.getIsHabitArchived(habitId);
-                habitDatabase.updateHabitIsArchived(habitId, archivedState);
+            public void onArchiveClick(final long habitId) {
+                String habitName = habitDatabase.getHabitName(habitId);
+                final boolean archivedState = habitDatabase.getIsHabitArchived(habitId);
+                String actionName = archivedState ? "Unarchive" : "Archive";
+                String actionNameLower = archivedState ? "unarchive" : "archive";
 
-                int position = getItemPosition(habitId);
-                habitList.remove(position);
-                habitAdapter.notifyItemRemoved(position);
+                new AskForConfirmationDialog(MainActivity.this)
+                        .setTitle("Confirm " + actionName)
+                        .setMessage("Do you really want to " + actionNameLower + " '" + habitName + "'? ")
+                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                habitDatabase.updateHabitIsArchived(habitId, !archivedState);
+
+                                int position = getItemPosition(habitId);
+                                habitList.remove(position);
+                                habitAdapter.notifyItemRemoved(position);
+                            }
+                        })
+                        .show();
             }
 
             @Override

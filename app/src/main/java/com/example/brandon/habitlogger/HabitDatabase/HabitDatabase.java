@@ -57,6 +57,11 @@ public class HabitDatabase {
         void onEntryDeleted(SessionEntry removedEntry);
 
         /**
+         * Called after the database clears all entries for some habit.
+         */
+        void onEntriesReset(long habitId);
+
+        /**
          * This method is only called when individual entries are updated.
          */
         void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry);
@@ -73,6 +78,12 @@ public class HabitDatabase {
     private void notifyEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
         for (OnEntryChangedListener listener : onEntryChangedListeners) {
             listener.onEntryUpdated(oldEntry, newEntry);
+        }
+    }
+
+    private void notifyEntriesReset(long habitId){
+        for (OnEntryChangedListener listener : onEntryChangedListeners) {
+            listener.onEntriesReset(habitId);
         }
     }
 
@@ -727,8 +738,12 @@ public class HabitDatabase {
         String whereClause = EntriesTableSchema.ENTRY_HABIT_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId)};
 
-        return writableDatabase.delete(EntriesTableSchema.TABLE_NAME,
+        long res =  writableDatabase.delete(EntriesTableSchema.TABLE_NAME,
                 whereClause, whereArgs);
+
+        notifyEntriesReset(habitId);
+
+        return res;
     }
 
     // ---- habits methods ----

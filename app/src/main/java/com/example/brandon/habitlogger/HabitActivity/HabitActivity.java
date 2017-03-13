@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.HabitActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -28,6 +29,7 @@ import com.example.brandon.habitlogger.ModifyHabitActivity.EditHabitDialog;
 import com.example.brandon.habitlogger.ModifyHabitActivity.NewHabitDialog;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.AskForConfirmationDialog;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager;
@@ -215,6 +217,12 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        callbacks.clear();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_habit, menu);
@@ -299,10 +307,24 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
             break;
 
             case (R.id.menu_toggle_archive): {
-                boolean archivedState = !habitDatabase.getIsHabitArchived(habitId);
-                habitDatabase.updateHabitIsArchived(habitId, archivedState);
-                habit.setIsArchived(archivedState);
-                updateColorTheme();
+
+                String habitName = habitDatabase.getHabitName(habitId);
+                final boolean archivedState = habitDatabase.getIsHabitArchived(habitId);
+                String actionName = archivedState ? "Unarchive" : "Archive";
+                String actionNameLower = archivedState ? "unarchive" : "archive";
+
+                new AskForConfirmationDialog(HabitActivity.this)
+                        .setTitle("Confirm " + actionName)
+                        .setMessage("Do you really want to " + actionNameLower + " '" + habitName + "'? ")
+                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                habitDatabase.updateHabitIsArchived(habitId, !archivedState);
+                                habit.setIsArchived(!archivedState);
+                                updateColorTheme();
+                            }
+                        })
+                        .show();
 
             }
             break;
@@ -313,13 +335,43 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
             }
             break;
 
-            case (R.id.menu_delete_habit): {
-                if (sessionManager.getIsSessionActive(habitId)) {
-                    sessionManager.cancelSession(habitId);
-                }
+            case (R.id.menu_reset_habit): {
 
-                habitDatabase.deleteHabit(habitId);
-                finish();
+                String habitName = habitDatabase.getHabitName(habitId);
+
+                new AskForConfirmationDialog(HabitActivity.this)
+                        .setTitle("Confirm Data Reset")
+                        .setMessage("Do you really want to delete all entries for '" + habitName + "'?")
+                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                habitDatabase.deleteEntriesForHabit(habitId);
+                            }
+                        })
+                        .show();
+
+            }
+            break;
+
+            case (R.id.menu_delete_habit): {
+                String habitName = habitDatabase.getHabitName(habitId);
+
+                new AskForConfirmationDialog(HabitActivity.this)
+                        .setTitle("Confirm Delete")
+                        .setMessage("Do you really want to delete '" + habitName + "'?")
+                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (sessionManager.getIsSessionActive(habitId)) {
+                                    sessionManager.cancelSession(habitId);
+                                }
+
+                                habitDatabase.deleteHabit(habitId);
+                                finish();
+                            }
+                        })
+                        .show();
+
             }
             break;
         }
@@ -406,6 +458,14 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
         HabitActivity.this.sessionEntries = habitDatabase.lookUpEntries(ids);
         dateRangeManager.updateSessionEntries(HabitActivity.this.sessionEntries);
+    }
+
+    @Override
+    public void onEntriesReset(long habitId) {
+        if (habitId == this.habitId) {
+            sessionEntries = new ArrayList<>();
+            updateEntries(sessionEntries);
+        }
     }
 
     /**

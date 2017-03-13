@@ -34,6 +34,8 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
     public interface MenuItemClickListener {
         void onEditClick(long habitId);
 
+        void onResetClick(long habitId);
+
         void onDeleteClick(long habitId);
 
         void onExportClick(long habitId);

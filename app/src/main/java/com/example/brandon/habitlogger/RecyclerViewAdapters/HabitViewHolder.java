@@ -71,6 +71,11 @@ public class HabitViewHolder extends ChildViewHolder {
                     }
                     break;
 
+                    case (R.id.habit_menu_reset): {
+                        menuItemClickListener.onResetClick(habitId);
+                    }
+                    break;
+
                     case (R.id.habit_menu_delete): {
                         menuItemClickListener.onDeleteClick(habitId);
                     }

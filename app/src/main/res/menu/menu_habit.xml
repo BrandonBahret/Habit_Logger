@@ -12,23 +12,25 @@
 
     <item
         android:id="@+id/menu_habit_edit"
-        android:orderInCategory="103"
         android:title="@string/action_edit"/>
     <item
         android:id="@+id/menu_enter_session"
-        android:orderInCategory="104"
-        android:title="Enter Session"/>
-    <item
-        android:id="@+id/menu_toggle_archive"
-        android:orderInCategory="105"
-        android:title="@string/action_archive"/>
+        android:title="@string/action_session"/>
+
     <item
         android:id="@+id/menu_export_habit"
-        android:orderInCategory="106"
         android:title="@string/action_export"/>
+
+    <item
+        android:id="@+id/menu_toggle_archive"
+        android:title="@string/action_archive"/>
+
+    <item
+        android:id="@+id/menu_reset_habit"
+        android:title="@string/action_reset"/>
+
     <item
         android:id="@+id/menu_delete_habit"
-        android:orderInCategory="107"
         android:title="@string/action_delete"/>
 
 </menu>

@@ -171,6 +171,11 @@ public class DataOverviewActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void onEntriesReset(long habitId) {
+        updateEntries();
+    }
+
+    @Override
     public void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
         HabitDataSample dataSample = getDataSample();
 
