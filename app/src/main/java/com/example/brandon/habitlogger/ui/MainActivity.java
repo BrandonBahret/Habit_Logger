@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -20,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -87,6 +89,7 @@ public class MainActivity extends AppCompatActivity
 
     final int NO_ARCHIVED_HABITS = 0, ONLY_ARCHIVED_HABITS = 1;
     int habitDisplayMode = NO_ARCHIVED_HABITS;
+    private SpaceOffsetDecoration spaceOffsetItemDecorator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,6 +160,9 @@ public class MainActivity extends AppCompatActivity
                     Habit habit = habitDatabase.getHabit(habitId);
                     sessionNotificationManager.updateNotification(habit);
                 }
+
+                updateCurrentSessionCard();
+                applySpaceItemDecorator();
             }
         });
 
@@ -374,10 +380,25 @@ public class MainActivity extends AppCompatActivity
             break;
         }
 
+        applySpaceItemDecorator();
+    }
+
+    public void applySpaceItemDecorator() {
+        int sessionCount = (int) sessionManager.getSessionCount();
+        boolean useLargeOffset =
+                (preferenceChecker.doShowCurrentSessions() && sessionCount > 0) ||
+                        (sessionCount >= 0 && preferenceChecker.doAlwaysShowCurrentSessions() && preferenceChecker.doShowCurrentSessions());
+
+        int topOffset = useLargeOffset ? (int) getResources().getDimension(R.dimen.large_top_offset_dp) :
+                (int) getResources().getDimension(R.dimen.top_offset_dp);
+
         int bottomOffset = (int) getResources().getDimension(R.dimen.bottom_offset_dp);
-        int topOffset = preferenceChecker.doHideCurrentSessionCard() ? (int) getResources().getDimension(R.dimen.large_top_offset_dp) : (int) getResources().getDimension(R.dimen.top_offset_dp);
-        SpaceOffsetDecoration bottomOffsetDecoration = new SpaceOffsetDecoration(bottomOffset, topOffset);
-        habitCardContainer.addItemDecoration(bottomOffsetDecoration);
+
+        if (spaceOffsetItemDecorator != null)
+            habitCardContainer.removeItemDecoration(spaceOffsetItemDecorator);
+
+        spaceOffsetItemDecorator = new SpaceOffsetDecoration(bottomOffset, topOffset);
+        habitCardContainer.addItemDecoration(spaceOffsetItemDecorator);
     }
 
     public int getItemPosition(long habitId) {
@@ -676,15 +697,52 @@ public class MainActivity extends AppCompatActivity
         startActivity(startTargetActivity);
     }
 
+    public class CurrentSessionsCardViewHolder {
+        View itemView;
+        ImageView accent;
+        TextView title;
+        TextView captionValue;
+        TextView captionDescription;
+
+        public CurrentSessionsCardViewHolder(View v) {
+            itemView = v;
+            accent = (ImageView) v.findViewById(R.id.card_accent);
+            title = (TextView) v.findViewById(R.id.title);
+            captionValue = (TextView) v.findViewById(R.id.active_session_value_text);
+            captionDescription = (TextView) v.findViewById(R.id.active_session_description_text);
+        }
+
+        public void updateColor(int sessionCount) {
+            if (sessionCount == 0) {
+                int cardColor = ContextCompat.getColor(MainActivity.this, R.color.cardBackgroundDisabledColor);
+                int accentColor = ContextCompat.getColor(MainActivity.this, R.color.colorAccentDisabled);
+                currentSession.setCardBackgroundColor(cardColor);
+                accent.setBackgroundColor(accentColor);
+                title.setAlpha(0.5f);
+                captionValue.setAlpha(0.5f);
+                captionDescription.setAlpha(0.5f);
+            }
+            else {
+                int cardColor = ContextCompat.getColor(MainActivity.this, R.color.cardBackgroundColor);
+                int accentColor = ContextCompat.getColor(MainActivity.this, R.color.colorAccent);
+                currentSession.setCardBackgroundColor(cardColor);
+                accent.setBackgroundColor(accentColor);
+                title.setAlpha(1);
+                captionValue.setAlpha(1);
+                captionDescription.setAlpha(1);
+            }
+        }
+    }
+
     public void updateCurrentSessionCard() {
 
-        TextView countText = ui.mainInclude.currentSessionsCard.activeSessionValueText;
-        TextView countLabelText = ui.mainInclude.currentSessionsCard.activeSessionDescriptionText;
 
-        long count = (int) sessionManager.getSessionCount();
-        currentSession.setAlpha(count == 0 ? 0.5f : 1.0f);
+//        currentSession.setAlpha(count == 0 ? 0.5f : 1.0f);
+        int sessionCount = (int) sessionManager.getSessionCount();
+        CurrentSessionsCardViewHolder cardViewHolder = new CurrentSessionsCardViewHolder(currentSession);
+        cardViewHolder.updateColor(sessionCount);
 
-        if ((count != 0 || preferenceChecker.doAlwaysShowCurrentSessions()) && preferenceChecker.doShowCurrentSessions()
+        if ((sessionCount != 0 || preferenceChecker.doAlwaysShowCurrentSessions()) && preferenceChecker.doShowCurrentSessions()
                 && (currentSession.getVisibility() == View.GONE)) {
             currentSession.setVisibility(View.VISIBLE);
         }
@@ -692,20 +750,20 @@ public class MainActivity extends AppCompatActivity
             currentSession.setVisibility(View.GONE);
         }
 
-        if (count == 0) {
-            countText.setText(R.string.no);
-            countLabelText.setText(R.string.active_sessions);
+        if (sessionCount == 0) {
+            cardViewHolder.captionValue.setText(R.string.no);
+            cardViewHolder.captionDescription.setText(R.string.active_sessions);
 
             if (!preferenceChecker.doAlwaysShowCurrentSessions())
                 currentSession.setVisibility(View.GONE);
         }
-        else if (count == 1) {
-            countText.setText(R.string.one);
-            countLabelText.setText(R.string.active_session);
+        else if (sessionCount == 1) {
+            cardViewHolder.captionValue.setText(R.string.one);
+            cardViewHolder.captionDescription.setText(R.string.active_session);
         }
         else {
-            countText.setText(String.valueOf(count));
-            countLabelText.setText(R.string.active_sessions);
+            cardViewHolder.captionValue.setText(String.valueOf(sessionCount));
+            cardViewHolder.captionDescription.setText(R.string.active_sessions);
         }
     }
 

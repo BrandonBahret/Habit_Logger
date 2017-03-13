@@ -239,6 +239,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
         if (search != null) {
             SearchView searchView = (SearchView) search.getActionView();
+            searchView.setQueryHint(getString(R.string.filter_entries));
             searchView.setOnQueryTextListener(
                     new SearchView.OnQueryTextListener() {
                         @Override
@@ -422,9 +423,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         public Fragment getItem(int position) {
             switch (position) {
                 case 0: {
-                    EntriesFragment fragment = EntriesFragment.newInstance(habitId);
-//                    fragment.setHasOptionsMenu(true);
-                    return fragment;
+                    return EntriesFragment.newInstance(habitId);
                 }
 
                 case 1: {
@@ -441,9 +440,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
                 }
 
                 case 2: {
-                    StatisticsFragment fragment = StatisticsFragment.newInstance();
-//                    fragment.setHasOptionsMenu(true);
-                    return fragment;
+                    return StatisticsFragment.newInstance();
                 }
             }
 

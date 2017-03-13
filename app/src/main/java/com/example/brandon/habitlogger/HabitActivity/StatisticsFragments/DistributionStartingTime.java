@@ -36,6 +36,7 @@ import java.util.List;
 public class DistributionStartingTime extends Fragment implements UpdateEntriesInterface {
     CallbackInterface callbackInterface;
     FragmentDistributionStartingTimeBinding ui;
+    private int color;
 
     int totalEntriesCount;
 
@@ -60,6 +61,7 @@ public class DistributionStartingTime extends Fragment implements UpdateEntriesI
         super.onAttach(context);
         callbackInterface = (CallbackInterface) context;
         callbackInterface.addCallback(this);
+        color = callbackInterface.getDefaultColor();
     }
 
     @Override
@@ -153,7 +155,10 @@ public class DistributionStartingTime extends Fragment implements UpdateEntriesI
         CombinedData data = new CombinedData();
 
         //region // Add data to CombinedData
-        BarData barData = new BarData(new BarDataSet(entries, "label"));
+        BarDataSet dataSet = new BarDataSet(entries, "label");
+        dataSet.setColor(color);
+        dataSet.setHighlightEnabled(false);
+        BarData barData = new BarData(dataSet);
         barData.setValueFormatter(new IValueFormatter() {
             @Override
             public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {

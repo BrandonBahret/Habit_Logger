@@ -25,11 +25,11 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
 
-                android:layout_gravity="center_vertical"
+                android:layout_gravity="center"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/session_pause_play_content_description"
                 android:scaleType="fitXY"
-
+                android:layout_marginBottom="5.5dp"
                 android:src="@drawable/ic_play_black"
                 android:tint="@color/habitCardButtonColor"/>
 
@@ -151,9 +151,9 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:background="@drawable/note_background"
+            android:cropToPadding="false"
             android:elevation="3dp"
             android:fadingEdgeLength="@dimen/activity_vertical_margin"
-            android:cropToPadding="false"
             android:hint="@string/session_note_hint"
             android:inputType="textMultiLine"
             android:padding="16dp"/>

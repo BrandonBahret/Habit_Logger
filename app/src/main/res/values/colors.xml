@@ -4,6 +4,7 @@
     <color name="colorPrimary">#46dfb6</color>
     <color name="colorPrimaryDark">#37b493</color>
     <color name="colorAccent">#4cefc3</color>
+    <color name="colorAccentDisabled">#90E1CB</color>
 
     <color name="completed">#69f0ae</color>
     <color name="skipped">#ff5252</color>
@@ -12,7 +13,7 @@
     <color name="habitCardButtonColor">#4e4d4d</color>
 
     <color name="cardBackgroundColor">#ecfffa</color>
-    <color name="cardBackgroundDisabledColor">#d1e2de</color>
+    <color name="cardBackgroundDisabledColor">#DFE9E6</color>
 
     <color name="black_semi_transparent">#b2000000</color>
     <color name="shadow_black">#42000000</color>

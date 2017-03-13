@@ -83,28 +83,8 @@ public class FloatingDateRangeWidgetManager {
 
         viewHolder.rangeType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-                // Time presets: Year, Month, Week, Day in milliseconds
-                final long MONTH_IN_MILLIS = DateUtils.YEAR_IN_MILLIS / 12;
-                long timePresets[] = new long[]{DateUtils.YEAR_IN_MILLIS, MONTH_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, DateUtils.DAY_IN_MILLIS};
-                if (i != 0 && i < 5) {
-                    setPresetDateRange(timePresets[i - 1]);
-                }
-
-                else {
-                    switch (i) {
-                        case 0: {
-                            setStartRange();
-                        }
-                        break;
-
-                        case 5: {
-                            setCustomRange();
-                        }
-                        break;
-                    }
-                }
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                onItemSelectedMethod(position);
             }
 
             @Override
@@ -116,6 +96,34 @@ public class FloatingDateRangeWidgetManager {
         updateMinMaxTimestamps(sessionEntries);
 
         setStartRange();
+    }
+
+    public void refreshDateRange(){
+        int pos = viewHolder.rangeType.getSelectedItemPosition();
+        onItemSelectedMethod(pos);
+    }
+
+    private void onItemSelectedMethod(int position) {
+        // Time presets: Year, Month, Week, Day in milliseconds
+        final long MONTH_IN_MILLIS = DateUtils.YEAR_IN_MILLIS / 12;
+        long timePresets[] = new long[]{DateUtils.YEAR_IN_MILLIS, MONTH_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, 0};
+        if (position != 0 && position < 5) {
+            setPresetDateRange(timePresets[position - 1]);
+        }
+
+        else {
+            switch (position) {
+                case 0: {
+                    setStartRange();
+                }
+                break;
+
+                case 5: {
+                    setCustomRange();
+                }
+                break;
+            }
+        }
     }
 
     public void showDialog(final boolean setDateFromTime, long currentTime) {

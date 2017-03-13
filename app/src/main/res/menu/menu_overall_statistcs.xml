@@ -1,25 +1,26 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.brandon.habitlogger.OverallStatistics.OverallStatistcsActivity">
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.example.brandon.habitlogger.OverallStatistics.OverallStatistcsActivity">
 
-    <item android:id="@+id/search"
-        android:title="@string/search"
+    <item
+        android:id="@+id/search"
         android:icon="@drawable/ic_search_white_24dp"
-        app:showAsAction="collapseActionView|ifRoom"
-        app:actionViewClass="android.support.v7.widget.SearchView" />
+        android:title="@string/search"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="collapseActionView|ifRoom"/>
 
     <item
-        android:title="Create Backup"
+        android:id="@+id/menu_backup_database"
         android:orderInCategory="101"
-        android:id="@+id/menu_backup_database" />
+        android:title="Create Backup"/>
     <item
-        android:title="Restore Data"
+        android:id="@+id/menu_restore_database"
         android:orderInCategory="102"
-        android:id="@+id/menu_restore_database" />
+        android:title="Restore Data"/>
     <item
         android:id="@+id/menu_export_database_as_csv"
         android:orderInCategory="103"
         android:title="Export Data (CSV)"
-        app:showAsAction="never" />
+        app:showAsAction="never"/>
 </menu>

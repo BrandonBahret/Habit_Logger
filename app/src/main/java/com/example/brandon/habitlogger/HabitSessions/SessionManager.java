@@ -30,6 +30,7 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
     private SQLiteDatabase writableDatabase;
     private SQLiteDatabase readableDatabase;
 
+    //region // Provide interface methods
     private static ArrayList<SessionChangeListeners> sessionChangeListeners = new ArrayList<>();
 
     public interface SessionChangeListeners {
@@ -47,6 +48,7 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
     public void removeSessionChangedCallback(SessionChangeListeners callback) {
         sessionChangeListeners.remove(callback);
     }
+    //endregion
 
     public SessionManager(Context context) {
         databaseHelper = new DatabaseSchema(context);
@@ -105,7 +107,7 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         return deleteSession(habitId);
     }
 
-    private long calculateDuration(long habitId) {
+    public long calculateElapsedTimeForEntry(long habitId) {
         SessionEntry entry = getSession(habitId);
         return calculateElapsedTimeForEntry(entry);
     }
@@ -133,7 +135,7 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
     private void pauseSession(long habitId) {
         setIsPaused(habitId, true);
         setLastPauseTime(habitId, System.currentTimeMillis());
-        setDuration(habitId, calculateDuration(habitId));
+        setDuration(habitId, calculateElapsedTimeForEntry(habitId));
     }
 
     /**
@@ -181,7 +183,7 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         }
 
         SessionEntry entry = getSession(habitId);
-        entry.setDuration(calculateDuration(habitId));
+        entry.setDuration(calculateElapsedTimeForEntry(habitId));
         deleteSession(habitId);
 
         return entry;
@@ -209,22 +211,6 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
 
     public long getSessionCount() {
         return DatabaseUtils.queryNumEntries(readableDatabase, SessionsTableSchema.TABLE_NAME);
-    }
-
-    //region // Getters
-    @Override
-    public <Type> Type getAttribute(long habitId, String columnKey, Class<Type> clazz) {
-        return MyDatabaseUtils.getAttribute(
-                readableDatabase, SessionsTableSchema.TABLE_NAME, SessionsTableSchema.HABIT_ID,
-                habitId, columnKey, clazz
-        );
-    }
-
-    private SessionEntry getSessionEntryFromCursor(Cursor cursor) {
-        ContentValues contentValues = new ContentValues(cursor.getCount());
-        DatabaseUtils.cursorRowToContentValues(cursor, contentValues);
-
-        return SessionsTableSchema.objectFromContentValues(contentValues);
     }
 
     /**
@@ -265,6 +251,22 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         cursor.close();
 
         return sessions;
+    }
+
+    //region // Getters
+    @Override
+    public <Type> Type getAttribute(long habitId, String columnKey, Class<Type> clazz) {
+        return MyDatabaseUtils.getAttribute(
+                readableDatabase, SessionsTableSchema.TABLE_NAME, SessionsTableSchema.HABIT_ID,
+                habitId, columnKey, clazz
+        );
+    }
+
+    private SessionEntry getSessionEntryFromCursor(Cursor cursor) {
+        ContentValues contentValues = new ContentValues(cursor.getCount());
+        DatabaseUtils.cursorRowToContentValues(cursor, contentValues);
+
+        return SessionsTableSchema.objectFromContentValues(contentValues);
     }
 
     public long getDuration(long habitId) {

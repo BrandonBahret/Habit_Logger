@@ -21,7 +21,7 @@
     <item
         android:id="@+id/overall_stats_nav"
         android:icon="@drawable/ic_timeline_black_24px"
-        android:title="@string/overall_stats_nav_string"
+        android:title="@string/statistics_overview_nav_title"
         />
 
     <item android:title="App Tools">

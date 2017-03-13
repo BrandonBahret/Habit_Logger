@@ -6,6 +6,7 @@
              tools:context="com.example.brandon.habitlogger.HabitActivity.StatisticsFragment">
 
     <android.support.v4.widget.NestedScrollView
+        android:overScrollMode="never"
         android:id="@+id/statistics_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -17,7 +18,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="50dp"/>
+                android:layout_height="@dimen/extra_large_top_offset_dp"/>
 
             <fragment
                 android:id="@+id/pie_chart_overview_time_breakdown"

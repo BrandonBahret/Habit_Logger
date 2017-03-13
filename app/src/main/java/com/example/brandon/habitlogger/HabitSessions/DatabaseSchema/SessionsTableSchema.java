@@ -88,7 +88,7 @@ public class SessionsTableSchema {
         entry.setHabit(habit);
 
         // Set duration, this is done here since we may need to calculate the duration.
-        long duration = isPaused ? contentValues.getAsLong(DURATION) : SessionManager.calculateElapsedTimeForEntry(entry);
+        long duration = SessionManager.calculateElapsedTimeForEntry(entry);
         entry.setDuration(duration);
 
         return entry;

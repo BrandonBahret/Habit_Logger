@@ -1,32 +1,34 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.brandon.habitlogger.HabitActivity">
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.example.brandon.habitlogger.HabitActivity">
 
-    <item android:id="@+id/search"
-        android:title="@string/filter_entries"
+    <item
+        android:id="@+id/search"
         android:icon="@drawable/ic_search_white_24dp"
-        app:showAsAction="collapseActionView|ifRoom"
-        app:actionViewClass="android.support.v7.widget.SearchView" />
+        android:title="@string/filter_entries"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="always"/>
 
     <item
         android:id="@+id/menu_habit_edit"
         android:orderInCategory="103"
-        android:title="@string/action_edit" />
+        android:title="@string/action_edit"/>
     <item
-        android:title="Enter Session"
+        android:id="@+id/menu_enter_session"
         android:orderInCategory="104"
-        android:id="@+id/menu_enter_session" />
+        android:title="Enter Session"/>
     <item
-        android:title="@string/action_archive"
+        android:id="@+id/menu_toggle_archive"
         android:orderInCategory="105"
-        android:id="@+id/menu_toggle_archive" />
+        android:title="@string/action_archive"/>
     <item
-        android:title="@string/action_export"
+        android:id="@+id/menu_export_habit"
         android:orderInCategory="106"
-        android:id="@+id/menu_export_habit" />
+        android:title="@string/action_export"/>
     <item
-        android:title="@string/action_delete"
+        android:id="@+id/menu_delete_habit"
         android:orderInCategory="107"
-        android:id="@+id/menu_delete_habit" />
+        android:title="@string/action_delete"/>
+
 </menu>

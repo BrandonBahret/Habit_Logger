@@ -34,6 +34,17 @@ public class SessionActivity extends AppCompatActivity implements
         public static final String SERIALIZED_HABIT = "SERIALIZED_HABIT_KEY";
     }
 
+    AlertDialog confirmationDialog;
+    Bundle dialogSettings = new Bundle();
+
+    private static class DialogSettingKeys {
+        final static String DIALOG_SETTINGS_BUNDLE = "DIALOG_SETTINGS_BUNDLE";
+        final static String SHOW_DIALOG = "SHOW_DIALOG";
+        final static String SHOW_CANCEL_DIALOG = "IS_CANCEL";
+        final static String SHOULD_PAUSE = "SHOULD_PAUSE";
+        public static String INITIAL_PAUSE_STATE = "INITIAL_PAUSE_STATE";
+    }
+
     private SessionManager mSessionManager;
     private Habit mHabit;
 
@@ -69,8 +80,9 @@ public class SessionActivity extends AppCompatActivity implements
             getSupportActionBar().setTitle(mHabit.getName());
         }
 
-        mSessionManager.addSessionChangedCallback(this);
+        updateTimeDisplay(true);
 
+        mSessionManager.addSessionChangedCallback(this);
         ui.sessionCancel.setOnClickListener(this);
         ui.sessionPausePlay.setOnClickListener(this);
     }
@@ -81,7 +93,7 @@ public class SessionActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         updateSessionPlayButton(mSessionManager.getIsPaused(mHabit.getDatabaseId()));
-        updateTimeDisplay();
+        updateTimeDisplay(true);
 
         // Load note from database
         String note = mSessionManager.getNote(mHabit.getDatabaseId());
@@ -111,6 +123,38 @@ public class SessionActivity extends AppCompatActivity implements
     }
     //endregion // Tear-down activity
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (dialogSettings != null) {
+            if (confirmationDialog != null && confirmationDialog.isShowing()) {
+                confirmationDialog.dismiss();
+            }
+
+            outState.putBundle(DialogSettingKeys.DIALOG_SETTINGS_BUNDLE, dialogSettings);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        dialogSettings = savedInstanceState.getBundle(DialogSettingKeys.DIALOG_SETTINGS_BUNDLE);
+        if (dialogSettings == null) throw new RuntimeException();
+
+        else {
+            if (dialogSettings.getBoolean(DialogSettingKeys.SHOW_DIALOG)) {
+                if (dialogSettings.getBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG)) {
+                    onCancelSessionClicked();
+                }
+                else {
+                    onFinishSessionClicked();
+                }
+            }
+        }
+    }
+
     //endregion // Methods responsible for handling the lifecycle of the activity
 
     //region // Methods responsible for updating the UI
@@ -126,8 +170,11 @@ public class SessionActivity extends AppCompatActivity implements
         ui.sessionTimeDisplayLayout.setAlpha(alphaValue);
     }
 
-    public void updateTimeDisplay() {
-        if (mSessionManager.getIsSessionActive(mHabit.getDatabaseId())) {
+    public void updateTimeDisplay(boolean forceUpdate) {
+        boolean shouldUpdate = mSessionManager.getIsSessionActive(mHabit.getDatabaseId()) &&
+                !mSessionManager.getIsPaused(mHabit.getDatabaseId());
+
+        if (forceUpdate || shouldUpdate) {
             SessionEntry entry = mSessionManager.getSession(mHabit.getDatabaseId());
             TimeDisplay display = new TimeDisplay(entry.getDuration());
 
@@ -140,7 +187,7 @@ public class SessionActivity extends AppCompatActivity implements
     private Runnable updateTimeDisplayRunnable = new Runnable() {
         @Override
         public void run() {
-            updateTimeDisplay();
+            updateTimeDisplay(false);
             handler.postDelayed(updateTimeDisplayRunnable, 1000);
         }
     };
@@ -223,16 +270,37 @@ public class SessionActivity extends AppCompatActivity implements
         boolean shouldAsk = new PreferenceChecker(this).doAskBeforeFinish();
 
         if (shouldAsk) {
-            askForConfirmation("Finish session", "Finish this session?",
+            askForConfirmation("Finish session", "Finish this session?", true,
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             finishSession();
                         }
                     });
+
+            dialogSettings.putBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG, false);
         }
         else {
             finishSession();
+        }
+    }
+
+    private void onCancelSessionClicked() {
+        boolean shouldAsk = new PreferenceChecker(this).doAskBeforeCancel();
+
+        if (shouldAsk) {
+            askForConfirmation("Cancel session", "Cancel this session?", false,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mSessionManager.cancelSession(mHabit.getDatabaseId());
+                        }
+                    });
+
+            dialogSettings.putBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG, true);
+        }
+        else {
+            mSessionManager.cancelSession(mHabit.getDatabaseId());
         }
     }
 
@@ -248,37 +316,50 @@ public class SessionActivity extends AppCompatActivity implements
 
         finish();
     }
-
-    private void onCancelSessionClicked() {
-        boolean shouldAsk = new PreferenceChecker(this).doAskBeforeCancel();
-
-        if (shouldAsk) {
-            askForConfirmation("Cancel session", "Cancel this session?",
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            mSessionManager.cancelSession(mHabit.getDatabaseId());
-                        }
-                    });
-        }
-        else {
-            mSessionManager.cancelSession(mHabit.getDatabaseId());
-        }
-    }
     //endregion
 
-    private void askForConfirmation(String title, String message, DialogInterface.OnClickListener method) {
+    private void askForConfirmation(String title, String message, final boolean shouldPause, DialogInterface.OnClickListener onYesMethod) {
         boolean nightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
         int iconRes = nightMode ? R.drawable.ic_warning_white_24px :
                 R.drawable.ic_warning_black_24dp;
 
-        new AlertDialog.Builder(this)
+        long habitId = mHabit.getDatabaseId();
+
+        if (!dialogSettings.getBoolean(DialogSettingKeys.SHOW_DIALOG)) {
+            dialogSettings.putBoolean(DialogSettingKeys.INITIAL_PAUSE_STATE, mSessionManager.getIsPaused(habitId));
+        }
+
+        if (shouldPause) {
+            if (!mSessionManager.getIsPaused(mHabit.getDatabaseId()))
+                mSessionManager.setPauseState(habitId, true);
+        }
+
+        confirmationDialog = new AlertDialog.Builder(this)
                 .setIcon(iconRes)
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("Yes", method)
-                .setNegativeButton("No", null)
+                .setPositiveButton("Yes", onYesMethod)
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, false);
+                        boolean initialPauseState = dialogSettings.getBoolean(DialogSettingKeys.INITIAL_PAUSE_STATE);
+                        if (mSessionManager.getIsPaused(mHabit.getDatabaseId()) != initialPauseState)
+                            mSessionManager.setPauseState(mHabit.getDatabaseId(), initialPauseState);
+                    }
+                })
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        dialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, false);
+                        boolean initialPauseState = dialogSettings.getBoolean(DialogSettingKeys.INITIAL_PAUSE_STATE);
+                        if (mSessionManager.getIsPaused(mHabit.getDatabaseId()) != initialPauseState)
+                            mSessionManager.setPauseState(mHabit.getDatabaseId(), initialPauseState);
+                    }
+                })
                 .show();
+
+        dialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, true);
     }
 
     //endregion // Handle onClick events

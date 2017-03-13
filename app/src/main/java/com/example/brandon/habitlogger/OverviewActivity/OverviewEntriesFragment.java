@@ -130,7 +130,7 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
         entriesContainer.setAdapter(entryAdapter);
 
         int bottomOffset = (int) getResources().getDimension(R.dimen.bottom_offset_dp);
-        int topOffset = (int) getResources().getDimension(R.dimen.top_offset_dp);
+        int topOffset = (int) getResources().getDimension(R.dimen.extra_large_top_offset_dp);
         SpaceOffsetDecoration bottomOffsetDecoration = new SpaceOffsetDecoration(bottomOffset, topOffset);
         entriesContainer.addItemDecoration(bottomOffsetDecoration);
 

@@ -39,11 +39,25 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"/>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:text=":"/>
+
                 <NumberPicker
                     android:id="@+id/minutes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:text=":"/>
 
                 <NumberPicker
                     android:id="@+id/seconds"

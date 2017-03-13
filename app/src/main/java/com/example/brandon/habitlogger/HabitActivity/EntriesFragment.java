@@ -149,7 +149,7 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
         });
 
         int bottomOffset = (int) getResources().getDimension(R.dimen.bottom_offset_dp);
-        int topOffset = (int) (getResources().getDimension(R.dimen.large_top_offset_dp) * 2);
+        int topOffset = (int) (getResources().getDimension(R.dimen.extra_large_top_offset_dp));
         SpaceOffsetDecoration spaceOffsetDecoration = new SpaceOffsetDecoration(bottomOffset, topOffset);
         entriesContainer.addItemDecoration(spaceOffsetDecoration);
 

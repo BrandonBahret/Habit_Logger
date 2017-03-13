@@ -106,6 +106,8 @@ public class PieChartCategoriesDuration extends Fragment implements UpdateHabitD
 
     public void setPieData(List<PieEntry> entries) {
         ui.chart.setCenterText("All Categories");
+        ui.chart.setEntryLabelColor(Color.TRANSPARENT);
+        ui.chart.getDescription().setEnabled(false);
 
         PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setSliceSpace(2f);
@@ -125,7 +127,5 @@ public class PieChartCategoriesDuration extends Fragment implements UpdateHabitD
         ui.chart.setData(data);
         Legend legend = ui.chart.getLegend();
         legend.setWordWrapEnabled(true);
-
-        ui.chart.setEntryLabelColor(Color.TRANSPARENT);
     }
 }

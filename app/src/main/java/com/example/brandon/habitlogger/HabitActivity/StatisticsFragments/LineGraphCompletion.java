@@ -57,6 +57,15 @@ public class LineGraphCompletion extends Fragment implements UpdateEntriesInterf
 
         // Inflate the layout for this fragment
         ui = DataBindingUtil.inflate(inflater, R.layout.fragment_line_graph_completion, container, false);
+
+        ui.chart.getLegend().setEnabled(false);
+        ui.chart.getDescription().setEnabled(false);
+        ui.chart.getAxisRight().setMinWidth(0f);
+        ui.chart.getAxisRight().setEnabled(false);
+        ui.chart.setPinchZoom(true);
+        ui.chart.getViewPortHandler().setMaximumScaleX(8.5f);
+        ui.chart.getViewPortHandler().setMaximumScaleY(8.5f);
+
         return ui.getRoot();
     }
 
@@ -96,22 +105,18 @@ public class LineGraphCompletion extends Fragment implements UpdateEntriesInterf
         data.setHighlightEnabled(false);
 
         ui.chart.setData(data);
-        ui.chart.getLegend().setEnabled(false);
-        ui.chart.getDescription().setEnabled(false);
-        ui.chart.getAxisRight().setMaxWidth(0f);
-        ui.chart.getAxisRight().setEnabled(false);
-        ui.chart.setPinchZoom(true);
-        ui.chart.getViewPortHandler().setMaximumScaleX(10f);
-        ui.chart.getViewPortHandler().setMaximumScaleY(10f);
 
         YAxis yAxis = ui.chart.getAxisLeft();
-        XAxis xAxis = ui.chart.getXAxis();
-        xAxis.setValueFormatter(new DateXAxisValueFormatter());
-        xAxis.setLabelCount(8, true);
         yAxis.setAxisMinimum(0f); // start at zero
         yAxis.setGridColor(ColorUtils.setAlphaComponent(yAxis.getGridColor(), 50));
-        xAxis.setGridColor(ColorUtils.setAlphaComponent(xAxis.getGridColor(), 50));
         yAxis.setValueFormatter(new PercentFormatter());
+
+        XAxis xAxis = ui.chart.getXAxis();
+        xAxis.setValueFormatter(new DateXAxisValueFormatter());
+        xAxis.setGranularity(1f);
+        xAxis.setGranularityEnabled(true);
+        xAxis.setGridColor(ColorUtils.setAlphaComponent(xAxis.getGridColor(), 50));
+//        xAxis.setLabelCount(8, true);
     }
 
     List<Entry> calculateDataSet(SessionEntriesSample dataSample) {

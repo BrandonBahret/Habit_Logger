@@ -1,40 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+      xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/search"
-        android:title="@string/search"
+    <item
+        android:id="@+id/search"
         android:icon="@drawable/ic_search_white_24dp"
-        app:showAsAction="collapseActionView|ifRoom"
-        app:actionViewClass="android.support.v7.widget.SearchView" />
+        android:title="@string/search"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="collapseActionView|ifRoom"/>
+
 
     <item
         android:id="@+id/menu_database_export"
         android:orderInCategory="100"
         android:title="@string/export_database"
-        app:showAsAction="never" />
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/menu_database_restore"
         android:orderInCategory="200"
         android:title="@string/restore_database"
-        app:showAsAction="never" />
+        app:showAsAction="never"/>
 
     <item
-        android:title="Export Data (CSV)"
+        android:id="@+id/menu_export_database_as_csv"
         android:orderInCategory="201"
-        android:id="@+id/menu_export_database_as_csv" />
+        android:title="Export Data (CSV)"/>
     <item
         android:id="@+id/menu_settings"
         android:orderInCategory="300"
         android:title="@string/settings"
-        app:showAsAction="never" />
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/menu_about"
         android:orderInCategory="400"
         android:title="@string/about"
-        app:showAsAction="never" />
+        app:showAsAction="never"/>
 
 </menu>
 

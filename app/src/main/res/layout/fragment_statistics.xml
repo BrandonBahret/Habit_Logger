@@ -19,7 +19,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="50dp"/>
+                android:layout_height="@dimen/extra_large_top_offset_dp"/>
 
             <fragment
                 android:id="@+id/pie_graph_completion"

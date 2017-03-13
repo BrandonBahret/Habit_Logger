@@ -33,6 +33,7 @@
 
                 android:contentDescription="@string/session_pause_play_content_description"
                 android:scaleType="fitXY"
+                android:layout_marginTop="2dp"
                 android:src="@drawable/ic_play_black"
                 android:tint="@color/habitCardButtonColor"/>
 
