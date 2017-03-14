@@ -52,7 +52,7 @@
                 android:layout_above="@+id/entry_note"
                 android:layout_alignStart="@+id/entry_note"
                 android:drawablePadding="3dp"
-                android:drawableStart="@drawable/ic_clock"
+                android:drawableStart="@drawable/ic_clock_black_24dp"
                 android:gravity="center"
                 android:text="12:00 PM" />
 

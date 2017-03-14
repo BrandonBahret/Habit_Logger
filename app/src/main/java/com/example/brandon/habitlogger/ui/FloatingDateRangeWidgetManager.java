@@ -187,6 +187,16 @@ public class FloatingDateRangeWidgetManager {
             hideView();
     }
 
+    public void hideView(boolean animate){
+        if(animate){
+            hideView();
+        }
+        else{
+            viewHolder.view.setTranslationY(viewHolder.view.getHeight());
+            viewHolder.view.setAlpha(0);
+        }
+    }
+
     public void hideView() {
         viewHolder.view.animate()
                 .setStartDelay(0)

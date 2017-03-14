@@ -2,7 +2,6 @@ package com.example.brandon.habitlogger.HabitSessions;
 
 import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -63,7 +62,7 @@ public class SessionActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_session_confirmation, menu);
+        getMenuInflater().inflate(R.menu.menu_session_activity, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -83,7 +82,6 @@ public class SessionActivity extends AppCompatActivity implements
         updateTimeDisplay(true);
 
         mSessionManager.addSessionChangedCallback(this);
-        ui.sessionCancel.setOnClickListener(this);
         ui.sessionPausePlay.setOnClickListener(this);
     }
     //endregion // Set-up activity
@@ -207,7 +205,7 @@ public class SessionActivity extends AppCompatActivity implements
         int darkerColor = HabitCategory.darkenColor(color, 0.7f);
 
         getWindow().setStatusBarColor(darkerColor);
-        ui.sessionCancel.getBackground().setColorFilter(color, PorterDuff.Mode.SRC);
+//        ui.sessionCancel.getBackground().setColorFilter(color, PorterDuff.Mode.SRC);
 
 //        Drawable drawable = ui.sessionNote.getBackground(); // get current EditText drawable
 //        drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP); // change the drawable color
@@ -237,6 +235,11 @@ public class SessionActivity extends AppCompatActivity implements
             }
             break;
 
+            case (R.id.cancel_session_button): {
+                onCancelSessionClicked();
+            }
+            break;
+
             case (android.R.id.home): {
                 finish();
             }
@@ -251,10 +254,6 @@ public class SessionActivity extends AppCompatActivity implements
         final int id = v.getId();
 
         switch (id) {
-            case (R.id.session_cancel): {
-                onCancelSessionClicked();
-            }
-            break;
 
             case (R.id.session_pause_play): {
                 boolean isPaused = !mSessionManager.getIsPaused(mHabit.getDatabaseId());
@@ -270,7 +269,11 @@ public class SessionActivity extends AppCompatActivity implements
         boolean shouldAsk = new PreferenceChecker(this).doAskBeforeFinish();
 
         if (shouldAsk) {
-            askForConfirmation("Finish session", "Finish this session?", true,
+            boolean nightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
+            int iconRes = nightMode ? R.drawable.ic_check_white_24dp :
+                    R.drawable.ic_check_black_24dp;
+
+            askForConfirmation("Finish session", "Finish this session?", true, iconRes,
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -289,7 +292,11 @@ public class SessionActivity extends AppCompatActivity implements
         boolean shouldAsk = new PreferenceChecker(this).doAskBeforeCancel();
 
         if (shouldAsk) {
-            askForConfirmation("Cancel session", "Cancel this session?", false,
+            boolean nightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
+            int iconRes = nightMode ? R.drawable.ic_close_white_24dp :
+                    R.drawable.ic_close_black_24dp;
+
+            askForConfirmation("Cancel session", "Cancel this session?", false, iconRes,
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -318,11 +325,7 @@ public class SessionActivity extends AppCompatActivity implements
     }
     //endregion
 
-    private void askForConfirmation(String title, String message, final boolean shouldPause, DialogInterface.OnClickListener onYesMethod) {
-        boolean nightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
-        int iconRes = nightMode ? R.drawable.ic_warning_white_24px :
-                R.drawable.ic_warning_black_24dp;
-
+    private void askForConfirmation(String title, String message, final boolean shouldPause, int iconRes, DialogInterface.OnClickListener onYesMethod) {
         long habitId = mHabit.getDatabaseId();
 
         if (!dialogSettings.getBoolean(DialogSettingKeys.SHOW_DIALOG)) {

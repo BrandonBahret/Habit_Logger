@@ -1,0 +1,10 @@
+<resources>
+    <declare-styleable name="CalendarView">
+        <attr name="no_data_available_text" format="string"/>
+        <attr name="backgroundColor" format="color"/>
+
+        <attr name="android:textSize"/>
+        <attr name="android:textColor"/>
+        <attr name="android:background"/>
+    </declare-styleable>
+</resources>

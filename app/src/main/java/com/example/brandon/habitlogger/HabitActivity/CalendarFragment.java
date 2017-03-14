@@ -2,14 +2,10 @@ package com.example.brandon.habitlogger.HabitActivity;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CalendarView;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
@@ -22,6 +18,7 @@ public class CalendarFragment extends Fragment implements UpdateEntriesInterface
         // Required empty public constructor
     }
 
+    //region // Create communication with the parent
     public static CalendarFragment newInstance() {
         return new CalendarFragment();
     }
@@ -33,27 +30,7 @@ public class CalendarFragment extends Fragment implements UpdateEntriesInterface
     public void setListener(Listener listener){
         this.listener = listener;
     }
-
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.search).setVisible(false);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(mMenuRes, menu);
-        menu.findItem(R.id.search).setVisible(false);
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    //endregion
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,14 +38,14 @@ public class CalendarFragment extends Fragment implements UpdateEntriesInterface
 
         View v = inflater.inflate(R.layout.fragment_calendar, container, false);
 
-        CalendarView calendar = (CalendarView) v.findViewById(R.id.calendarView);
-        calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(@NonNull CalendarView calendarView, int year, int month, int dayOfMonth) {
-                if(listener != null)
-                    listener.onDateClicked(year, month, dayOfMonth);
-            }
-        });
+//        CalendarView calendar = (CalendarView) v.findViewById(R.id.calendarView);
+//        calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+//            @Override
+//            public void onSelectedDayChange(@NonNull CalendarView calendarView, int year, int month, int dayOfMonth) {
+//                if(listener != null)
+//                    listener.onDateClicked(year, month, dayOfMonth);
+//            }
+//        });
 
         return v;
     }

@@ -214,6 +214,9 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         });
 
         updateActivity();
+        fabMenu.hideMenu(false);
+        dateRangeManager.hideView(false);
+        viewPager.setCurrentItem(1);
     }
 
     @Override

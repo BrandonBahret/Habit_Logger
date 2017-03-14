@@ -128,21 +128,21 @@
             </LinearLayout>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/session_cancel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:background="@drawable/flat_btn_ripple"
-            android:text="@string/cancel"
-            android:textColor="@android:color/white"/>
+        <!--<Button-->
+            <!--android:id="@+id/session_cancel"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentBottom="true"-->
+            <!--android:layout_alignParentStart="true"-->
+            <!--android:background="@drawable/flat_btn_ripple"-->
+            <!--android:text="@string/cancel"-->
+            <!--android:textColor="@android:color/white"/>-->
 
         <EditText
             android:id="@+id/session_note"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/session_cancel"
+            android:layout_alignParentBottom="true"
             android:layout_below="@+id/entire_session_time_display_layout"
 
             android:layout_marginBottom="8dp"
@@ -150,7 +150,7 @@
 
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:background="@drawable/note_background"
+            android:background="@drawable/background_note"
             android:cropToPadding="false"
             android:elevation="3dp"
             android:fadingEdgeLength="@dimen/activity_vertical_margin"
