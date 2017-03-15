@@ -30,14 +30,16 @@
     </string-array>
 
     <string-array name="date_format_options">
-        <item>dd-MM-yyyy</item>
-        <item>MM-dd-yyyy</item>
-        <item>MM-yyyy</item>
+        <item>dd/MM/yyyy</item>
+        <item>MM/dd/yyyy</item>
+        <item>MMMM/dd/yyyy</item>
+        <item>MMMM/yyyy</item>
     </string-array>
     <string-array name="date_format_options_values">
         <item>0</item>
         <item>1</item>
         <item>2</item>
+        <item>3</item>
     </string-array>
 
 </resources>

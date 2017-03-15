@@ -18,15 +18,17 @@
     <!-- Item decorators -->
     <dimen name="indent_pad_top">16dp</dimen>
     <dimen name="indent_pad_bottom_of_group">16dp</dimen>
-    <dimen name="entries_section_text_size">12sp</dimen>
+    <dimen name="entries_section_text_size">14sp</dimen>
     <dimen name="category_section_text_size">15sp</dimen>
     <dimen name="line_width">3dp</dimen>
     <dimen name="line_inset">16dp</dimen>
+    <dimen name="line_vertical_offset">12dp</dimen>
 
     <dimen name="bottom_offset_dp">84dp</dimen>
     <dimen name="top_offset_dp">16dp</dimen>
     <dimen name="fab_elevation">4dp</dimen>
     <dimen name="slide_elevation">8dp</dimen>
     <dimen name="large_top_offset_dp">60dp</dimen>
+    <dimen name="sections_top_offset_dp">14dp</dimen>
     <dimen name="extra_large_top_offset_dp">110dp</dimen>
 </resources>

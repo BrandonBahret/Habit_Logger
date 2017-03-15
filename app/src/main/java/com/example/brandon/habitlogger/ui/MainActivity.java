@@ -433,8 +433,10 @@ public class MainActivity extends AppCompatActivity
                 (preferenceChecker.doShowCurrentSessions() && sessionCount > 0) ||
                         (sessionCount >= 0 && preferenceChecker.doAlwaysShowCurrentSessions() && preferenceChecker.doShowCurrentSessions());
 
-        int topOffset = useLargeOffset ? (int) getResources().getDimension(R.dimen.large_top_offset_dp) :
-                (int) getResources().getDimension(R.dimen.top_offset_dp);
+        int topOffset = useLargeOffset ? (int) getResources().getDimension(R.dimen.large_top_offset_dp) : (int) getResources().getDimension(R.dimen.top_offset_dp);
+
+        if(useLargeOffset && preferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_SECTIONS)
+            topOffset += (int) getResources().getDimension(R.dimen.sections_top_offset_dp);
 
         int bottomOffset = (int) getResources().getDimension(R.dimen.bottom_offset_dp);
 

@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.support.annotation.DimenRes;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextPaint;
 import android.view.View;
@@ -29,17 +30,21 @@ public class ComplexDecoration extends RecyclerView.ItemDecoration {
     private final int textVerticalOffset;
     private Paint.FontMetrics fontMetrics;
 
+    private Context mContext;
+
     public ComplexDecoration(Context context, @DimenRes int textSizeRes, Callback callback) {
         super();
         this.callback = callback;
         final Resources res = context.getResources();
+
+        mContext = context;
 
         int textSize = res.getDimensionPixelSize(textSizeRes);
         lineWidth = res.getDimensionPixelSize(R.dimen.line_width);
         topGap = res.getDimensionPixelSize(R.dimen.indent_pad_top);
         bottomGap = res.getDimensionPixelSize(R.dimen.indent_pad_bottom_of_group);
         lineInset = res.getDimensionPixelSize(R.dimen.line_inset);
-        textVerticalOffset = 20;
+        textVerticalOffset = res.getDimensionPixelSize(R.dimen.line_vertical_offset);
         int color = getColor(context, R.color.headerTextColor);
         int shadowColor = getColor(context, R.color.shadow_black);
 
@@ -56,7 +61,7 @@ public class ComplexDecoration extends RecyclerView.ItemDecoration {
         textPaint.setAntiAlias(true);
         textPaint.getFontMetrics(fontMetrics);
         textPaint.setTextAlign(Paint.Align.CENTER);
-        textPaint.setShadowLayer(8f, 0f, 0f, shadowColor);
+//        textPaint.setShadowLayer(8f, 0f, 0f, shadowColor);
     }
 
     @Override
@@ -120,8 +125,14 @@ public class ComplexDecoration extends RecyclerView.ItemDecoration {
             float lineX1 = width / 2 - textRect.width()/2.0f - lineInset;// width - lineInset;
             float lineX2 = width / 2 + textRect.width()/2.0f + lineInset;// width - lineInset;
 
-            c.drawLine(lineInset, lineY, lineX1, lineY, linePaint);
-            c.drawLine(lineX2, lineY, width - lineInset, lineY, linePaint);
+            int color = ContextCompat.getColor(mContext, R.color.darker_background);
+            Paint paint = new Paint();
+            paint.setColor(color);
+            c.drawRect(0,textY - lineHeight, width, textY + (lineHeight / 3), paint);
+//            c.drawRect(0, lineY, width, lineHeight, paint);
+
+//            c.drawLine(lineInset, lineY, lineX1, lineY, linePaint);
+//            c.drawLine(lineX2, lineY, width - lineInset, lineY, linePaint);
 
             c.drawText(textLine, left, textY, textPaint);
         }

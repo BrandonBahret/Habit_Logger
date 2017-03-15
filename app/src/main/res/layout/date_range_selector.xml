@@ -77,9 +77,12 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:ellipsize="end"
                 android:ems="10"
                 android:enabled="false"
-                android:focusable="false"/>
+                android:focusable="false"
+                android:maxLines="1"
+                android:textSize="14sp"/>
 
             <TextView
                 android:id="@+id/textView9"
@@ -93,9 +96,12 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:ellipsize="end"
                 android:ems="10"
                 android:enabled="false"
-                android:focusable="false"/>
+                android:focusable="false"
+                android:maxLines="1"
+                android:textSize="14sp"/>
         </LinearLayout>
 
         <LinearLayout

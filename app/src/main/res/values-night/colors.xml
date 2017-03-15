@@ -19,7 +19,10 @@
 
     <color name="black_semi_transparent">#b2000000</color>
     <color name="shadow_black">#42000000</color>
+
     <color name="background">#105769</color>
+    <color name="darker_background">#1a6173</color>
+
     <color name="headerTextColor">#f7f7f7</color>
 
     <integer-array name="colors">
