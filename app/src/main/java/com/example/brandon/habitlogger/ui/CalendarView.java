@@ -17,13 +17,9 @@ import com.example.brandon.habitlogger.R;
  */
 
 public class CalendarView extends View {
-    private String mNoDataAvailableString = getResources().getString(R.string.no_data_available);
-    private float mTextSize = getResources().getDimension(R.dimen.labels_text_size);
-    private int mTextColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
-    private int mBackgroundColor = ContextCompat.getColor(getContext(), R.color.background);
-    private Drawable mBackgroundDrawable = ContextCompat.getDrawable(getContext(), R.drawable.background_calendar_view);
 
-    private TextPaint mTextPaint;
+    // This data contains the content of the view (Text elements, etc.)
+    private CalendarViewData mCalendarData;
 
     //region (Measurement Member Variables)
     private int mPaddingLeft;
@@ -33,9 +29,21 @@ public class CalendarView extends View {
 
     private int mContentWidth;
     private int mContentHeight;
+    //endregion
 
-    private float mTextWidth;
-    private float mTextHeight;
+    //region (Colors and Paints)
+    private int mTextColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
+    private int mBackgroundColor = ContextCompat.getColor(getContext(), R.color.background);
+
+    private TextPaint mTextPaint;
+    //endregion
+
+    //region (Drawables)
+    private Drawable mBackgroundDrawable = ContextCompat.getDrawable(getContext(), R.drawable.background_calendar_view);
+    //endregion
+
+    //region (Dimensions)
+    private float mTextSize = getResources().getDimension(R.dimen.labels_text_size);
     //endregion
 
     //region Constructors {}
@@ -56,16 +64,21 @@ public class CalendarView extends View {
     //endregion
 
     private void init(AttributeSet attrs, int defStyle) {
+
+        // Set up a default TextPaint object
+        mTextPaint = new TextPaint();
+        mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        mTextPaint.setTextAlign(Paint.Align.LEFT);
+
+        mCalendarData = new CalendarViewData(getContext())
+                .setTitle("January 2017", mTextPaint);
+
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.CalendarView, defStyle, 0);
 
         //region Gather attributes from attrs
-        if(a.hasValue(R.styleable.CalendarView_no_data_available_text)){
-            mNoDataAvailableString = a.getString(
-                    R.styleable.CalendarView_no_data_available_text);
-        }
-
+        //region Get colors from attributes
         mTextColor = a.getColor(
                 R.styleable.CalendarView_android_textColor,
                 mTextColor);
@@ -73,6 +86,9 @@ public class CalendarView extends View {
         mBackgroundColor = a.getColor(
                 R.styleable.CalendarView_backgroundColor,
                 mBackgroundColor);
+        //endregion
+
+        //region Get dimensions from attributes
 
         // Use getDimensionPixelSize or getDimensionPixelOffset when dealing with
         // values that should fall on pixel boundaries.
@@ -80,6 +96,17 @@ public class CalendarView extends View {
                 R.styleable.CalendarView_android_textSize,
                 mTextSize);
 
+        float titleMarginTop = a.getDimension(
+                R.styleable.CalendarView_title_margin_top, 0);
+        mCalendarData.getTitle().setMarginTop(titleMarginTop);
+
+        float contentMarginTop = a.getDimension(
+                R.styleable.CalendarView_content_margin_top, 0);
+        mCalendarData.setContentMarginTop(contentMarginTop);
+
+        //endregion
+
+        //region Get drawables from attributes
         if (a.hasValue(R.styleable.CalendarView_android_background)) {
             mBackgroundDrawable = a.getDrawable(
                     R.styleable.CalendarView_android_background);
@@ -87,22 +114,26 @@ public class CalendarView extends View {
         }
         //endregion
 
+        //region Get text from attributes
+        if (a.hasValue(R.styleable.CalendarView_no_data_available_text)) {
+            String text = a.getString(R.styleable.CalendarView_no_data_available_text);
+            mCalendarData.setNoDataAvailableText(text, mTextPaint);
+        }
+        else {
+            mCalendarData.setNoDataAvailableText("No Data Available", mTextPaint);
+        }
+        //endregion
+        //endregion
+
         a.recycle();
 
-//        setElevation(getResources().getDimension(R.dimen.cardview_default_elevation));
-
-        // Set up a default TextPaint object
-        mTextPaint = new TextPaint();
-        mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-        mTextPaint.setTextAlign(Paint.Align.LEFT);
-
         // Update TextPaint and text measurements from attributes
+        invalidatePaddingAndContentMeasurements();
         invalidateTextPaintAndMeasurements();
-        updatePaddingAndCalculateContentWidthAndHeight();
     }
 
-    //region // Make measurements
-    private void updatePaddingAndCalculateContentWidthAndHeight(){
+    //region Make measurements {}
+    private void invalidatePaddingAndContentMeasurements() {
         mPaddingLeft = getPaddingLeft();
         mPaddingTop = getPaddingTop();
         mPaddingRight = getPaddingRight();
@@ -115,10 +146,16 @@ public class CalendarView extends View {
     private void invalidateTextPaintAndMeasurements() {
         mTextPaint.setTextSize(mTextSize);
         mTextPaint.setColor(mTextColor);
-        mTextWidth = mTextPaint.measureText(mNoDataAvailableString);
 
-        Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
-        mTextHeight = fontMetrics.bottom;
+        if (mCalendarData.getNoDataAvailableText() != null)
+            mCalendarData.getNoDataAvailableText().setTextPaint(mTextPaint);
+
+        if (mCalendarData.getTitle() != null)
+            mCalendarData.getTitle().setTextPaint(mTextPaint);
+
+        mCalendarData.setDayNameHeaderPaint(mTextPaint);
+
+        mCalendarData.makeMeasurements();
     }
     //endregion // Make measurements
 
@@ -126,8 +163,21 @@ public class CalendarView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        updatePaddingAndCalculateContentWidthAndHeight();
+        invalidatePaddingAndContentMeasurements();
 
+        drawBackground(canvas);
+
+        drawCalendarTitle(canvas);
+
+//        drawNoDataText(canvas);
+
+        drawDateNames(canvas);
+//        drawDateBackgrounds();
+//        drawDateNumbers();
+    }
+
+
+    public void drawBackground(Canvas canvas) {
         // Draw the background color
         canvas.drawColor(getBackgroundColor());
 
@@ -137,15 +187,54 @@ public class CalendarView extends View {
                     mPaddingLeft + mContentWidth, mPaddingTop + mContentHeight);
             mBackgroundDrawable.draw(canvas);
         }
-
-        // Draw the text.
-        canvas.drawText(mNoDataAvailableString,
-                mPaddingLeft + (mContentWidth - mTextWidth) / 2,
-                mPaddingTop + (mContentHeight + mTextHeight) / 2,
-                mTextPaint);
     }
 
-    //region // Getters and Setters
+    public void drawNoDataText(Canvas canvas) {
+        TextElement text = mCalendarData.getNoDataAvailableText();
+
+        // Draw the text
+        text.draw(canvas,
+                mPaddingLeft + (mContentWidth - text.getWidth()) / 2,
+                mPaddingTop + (mContentHeight + text.getHeight()) / 2);
+    }
+
+    private void drawCalendarTitle(Canvas canvas) {
+        TextElement text = mCalendarData.getTitle();
+
+        if (text != null) {
+            // Draw the text
+            text.draw(canvas,
+                    mPaddingLeft + (mContentWidth - text.getWidth()) / 2,
+                    mPaddingTop + text.getHeight());
+        }
+    }
+
+    private void drawDateNames(Canvas canvas) {
+        TextElement dayNames[] = mCalendarData.getDayNameTextElements();
+
+        float textHeight = mCalendarData.getDayNameTextElements()[0].getHeight();
+//        float textWidth = mCalendarData.getDayNameTextElements()[0].getWidth();
+
+        float contentOffset = mContentWidth * 0.05f; // 5% of the total width
+        float calendarWidth = mContentWidth - (contentOffset * 2); // Total width minus offset on either side
+
+        float totalLabelSpace = 0;
+        for (TextElement dayText : mCalendarData.getDayNameTextElements())
+            totalLabelSpace += dayText.getWidth();
+
+        float columnSpacer = (calendarWidth - totalLabelSpace) / ((float) dayNames.length - 1);
+
+        float y = mCalendarData.getTitle().getLastYValue() + textHeight + mCalendarData.getContentMarginTop();
+        float x = contentOffset;
+
+        for (int i = 0; i < dayNames.length; i++) {
+            if (i > 0) {
+                TextElement lastElement = mCalendarData.getDayNameTextElements()[i - 1];
+                x = lastElement.getLastXValue() + lastElement.getWidth() + columnSpacer;
+            }
+            dayNames[i].draw(canvas, x, y);
+        }
+    }
 
     //region // Getters
 
@@ -210,6 +299,4 @@ public class CalendarView extends View {
     }
 
     //endregion // Setters
-
-    //endregion // Getters and Setters
 }

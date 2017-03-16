@@ -1,5 +1,7 @@
 <resources>
     <declare-styleable name="CalendarView">
+        <attr name="title_margin_top" format="dimension"/>
+        <attr name="content_margin_top" format="dimension"/>
         <attr name="no_data_available_text" format="string"/>
         <attr name="backgroundColor" format="color"/>
 
