@@ -10,13 +10,14 @@
     <com.example.brandon.habitlogger.ui.CalendarView
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginTop="4dp"
+        android:layout_margin="8dp"
         android:background="@drawable/background_calendar_view"
-        android:textSize="16sp"
-        calendar_view:content_margin_top="16dp"
-        calendar_view:title_margin_top="4dp"/>
+        android:textSize="20sp"
+        calendar_view:content_margin_top="8dp"
+        calendar_view:date_label_color="@color/calendar_view_date_label"
+        calendar_view:date_label_size="14sp"
+        calendar_view:title_color="@color/calendar_view_title"
+        calendar_view:title_margin_top="6dp"/>
 
     <!--<ScrollView-->
     <!--android:layout_width="match_parent"-->

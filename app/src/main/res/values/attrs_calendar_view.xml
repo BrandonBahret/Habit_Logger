@@ -3,10 +3,17 @@
         <attr name="title_margin_top" format="dimension"/>
         <attr name="content_margin_top" format="dimension"/>
         <attr name="no_data_available_text" format="string"/>
+
         <attr name="backgroundColor" format="color"/>
+
+        <attr name="title_color" format="color"/>
+
+        <attr name="date_label_size" format="dimension"/>
+        <attr name="date_label_color" format="color"/>
 
         <attr name="android:textSize"/>
         <attr name="android:textColor"/>
         <attr name="android:background"/>
+
     </declare-styleable>
 </resources>
