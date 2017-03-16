@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ui;
+package com.example.brandon.habitlogger.ui.CalendarView;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -49,6 +49,7 @@ public class CalendarView extends View {
     //region (Dimensions)
     private float mTextSize = getResources().getDimension(R.dimen.labels_text_size);
     private float mDateTextSize = getResources().getDimension(R.dimen.labels_text_size);
+    private float mDateRadius = 48;
     //endregion
 
     //region Constructors {}
@@ -76,12 +77,12 @@ public class CalendarView extends View {
         mTextPaint.setTextAlign(Paint.Align.LEFT);
 
         mTitlePaint = new TextPaint();
-        mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-        mTextPaint.setTextAlign(Paint.Align.LEFT);
+        mTitlePaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        mTitlePaint.setTextAlign(Paint.Align.LEFT);
 
         mDateTextPaint = new TextPaint();
-        mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-        mTextPaint.setTextAlign(Paint.Align.LEFT);
+        mDateTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        mDateTextPaint.setTextAlign(Paint.Align.LEFT);
         // endregion
 
         mCalendarData = new CalendarViewData(getContext())
@@ -130,6 +131,9 @@ public class CalendarView extends View {
                 R.styleable.CalendarView_content_margin_top, 0);
         mCalendarData.setContentMarginTop(contentMarginTop);
 
+        mDateRadius = a.getDimension(
+                R.styleable.CalendarView_date_circle_radius,
+                mDateRadius);
         //endregion
 
         //region Get drawables from attributes
@@ -180,12 +184,15 @@ public class CalendarView extends View {
         mDateTextPaint.setColor(mDateTextColor);
 
         if (mCalendarData.getNoDataAvailableText() != null)
-            mCalendarData.getNoDataAvailableText().setTextPaint(mTextPaint);
+            mCalendarData.getNoDataAvailableText().setPaint(mTextPaint);
 
         if (mCalendarData.getTitle() != null)
-            mCalendarData.getTitle().setTextPaint(mTitlePaint);
+            mCalendarData.getTitle().setPaint(mTitlePaint);
 
         mCalendarData.setDayNameHeaderPaint(mDateTextPaint);
+        mCalendarData.setDateElementsPaint(mDateTextPaint);
+
+        mCalendarData.setDateElementsRadius(mDateRadius);
 
         mCalendarData.makeMeasurements();
     }
@@ -203,12 +210,12 @@ public class CalendarView extends View {
 
         drawDateNames(canvas);
 
-//        drawNoDataText(canvas);
+        drawDateBackgrounds(canvas);
 
-//        drawDateBackgrounds();
 //        drawDateNumbers();
-    }
 
+//        drawNoDataText(canvas);
+    }
 
     public void drawBackground(Canvas canvas) {
         // Draw the background color
@@ -266,6 +273,38 @@ public class CalendarView extends View {
                 x = lastElement.getLastXValue() + lastElement.getWidth() + columnSpacer;
             }
             dayNames[i].draw(canvas, x, y);
+        }
+    }
+
+    private void drawDateBackgrounds(Canvas canvas) {
+
+        DateElement dateElements[] = mCalendarData.getDateElements();
+
+        TextElement currentDayLabel = mCalendarData.getDayNameTextElements()[0];
+        float yOrigin = currentDayLabel.getLastYValue() + currentDayLabel.getHeight();
+        float calendarHeight = mContentHeight - yOrigin;
+
+        float totalCalendarElementsHeight = dateElements[0].getDiameter() * 6;
+        float elementSpace = (calendarHeight - totalCalendarElementsHeight) / 7f;
+
+        for (int day = 0; day < 7; day++) {
+            currentDayLabel = mCalendarData.getDayNameTextElements()[day];
+
+            float x = currentDayLabel.getLastXValue() + (currentDayLabel.getWidth() / 2);
+
+            for (int row = 0; row < 6; row++) {
+
+                if (row == 0) {
+                    float y = yOrigin + elementSpace;
+                    dateElements[day + (row * 7)].draw(canvas, x, y);
+                }
+                else{
+                    DateElement previousElement = dateElements[day + ((row - 1) * 7)];
+                    float y = previousElement.getLastYValue() + previousElement.getHeight() + elementSpace;
+                    dateElements[day + (row * 7)].draw(canvas, x, y);
+                }
+            }
+
         }
     }
 

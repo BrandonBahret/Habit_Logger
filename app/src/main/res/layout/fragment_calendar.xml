@@ -7,13 +7,14 @@
     android:layout_height="match_parent"
     tools:context="com.example.brandon.habitlogger.HabitActivity.CalendarFragment">
 
-    <com.example.brandon.habitlogger.ui.CalendarView
+    <com.example.brandon.habitlogger.ui.CalendarView.CalendarView
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_margin="8dp"
         android:background="@drawable/background_calendar_view"
         android:textSize="20sp"
         calendar_view:content_margin_top="8dp"
+        calendar_view:date_circle_radius="8dp"
         calendar_view:date_label_color="@color/calendar_view_date_label"
         calendar_view:date_label_size="14sp"
         calendar_view:title_color="@color/calendar_view_title"
@@ -29,40 +30,40 @@
     <!--android:gravity="center_horizontal"-->
     <!--android:orientation="vertical">-->
 
-    <!--<com.example.brandon.habitlogger.ui.CalendarView-->
+    <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
     <!--style="@style/CalendarView"/>-->
 
-    <!--<com.example.brandon.habitlogger.ui.CalendarView-->
+    <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
     <!--style="@style/CalendarView"/>-->
 
-    <!--<com.example.brandon.habitlogger.ui.CalendarView-->
+    <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
     <!--style="@style/CalendarView"/>-->
 
-    <!--<com.example.brandon.habitlogger.ui.CalendarView-->
+    <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
     <!--style="@style/CalendarView"/>-->
 
-    <!--<com.example.brandon.habitlogger.ui.CalendarView-->
+    <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
     <!--style="@style/CalendarView"/>-->
 
-    <!--<com.example.brandon.habitlogger.ui.CalendarView-->
+    <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
     <!--style="@style/CalendarView"/>-->
 
-    <!--<com.example.brandon.habitlogger.ui.CalendarView-->
+    <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
     <!--style="@style/CalendarView"/>-->
 
-    <!--<com.example.brandon.habitlogger.ui.CalendarView-->
+    <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
     <!--style="@style/CalendarView"/>-->
 
-    <!--<com.example.brandon.habitlogger.ui.CalendarView-->
+    <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
     <!--style="@style/CalendarView"/>-->
 
-    <!--<com.example.brandon.habitlogger.ui.CalendarView-->
+    <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
     <!--style="@style/CalendarView"/>-->
 
-    <!--<com.example.brandon.habitlogger.ui.CalendarView-->
+    <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
     <!--style="@style/CalendarView"/>-->
 
-    <!--<com.example.brandon.habitlogger.ui.CalendarView-->
+    <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
     <!--style="@style/CalendarView"/>-->
 
     <!--</LinearLayout>-->
