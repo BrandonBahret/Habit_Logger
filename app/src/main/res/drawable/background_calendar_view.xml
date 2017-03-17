@@ -8,6 +8,6 @@
         android:color="@color/shadow_black"/>
 
     <corners
-        android:radius="8dp"/>
+        android:radius="4dp"/>
 
 </shape>

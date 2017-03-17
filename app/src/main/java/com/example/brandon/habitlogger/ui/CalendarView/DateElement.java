@@ -1,6 +1,7 @@
 package com.example.brandon.habitlogger.ui.CalendarView;
 
 import android.graphics.Canvas;
+import android.support.annotation.Nullable;
 import android.text.TextPaint;
 
 /**
@@ -12,32 +13,58 @@ public class DateElement extends ViewElement {
 
     private float mRadius = 48;
     private float mDiameter = mRadius * 2;
+    private boolean isEnabled = true;
 
-    public DateElement(TextPaint paint) {
+    private TextElement mDateText;
+
+    public DateElement(TextPaint paint, @Nullable TextElement dateText) {
         super(paint);
+        mDateText = dateText;
     }
 
     @Override
     public ViewElement makeMeasurements() {
         mWidth = mDiameter;
         mHeight = mDiameter;
+
+        if(mDateText != null)
+            mDateText.makeMeasurements();
+
         return this;
     }
 
     @Override
     public void draw(Canvas canvas, float x, float y) {
         super.draw(canvas, x, y);
-        canvas.drawCircle(x, y, mRadius, mPaint);
+
+        if(mDateText == null || isEnabled)
+            canvas.drawCircle(x, y, mRadius, mPaint);
+
+        if (mDateText != null) {// Draw the date text
+            mDateText.draw(canvas, mDateText.getWidth() / 2f, y + mDateText.getHeight() / 4f);
+        }
+
     }
 
     //region Setters {}
-    public DateElement setRadius(float radius){
+
+
+    @Override
+    public ViewElement setPaint(TextPaint paint) {
+        if (mDateText != null) {
+            mDateText.setPaintColor(0xffffffff);
+        }
+
+        return super.setPaint(paint);
+    }
+
+    public DateElement setRadius(float radius) {
         mRadius = radius;
         mDiameter = mRadius * 2;
         return this;
     }
 
-    public DateElement setDiameter(float diameter){
+    public DateElement setDiameter(float diameter) {
         mRadius = diameter / 2f;
         mDiameter = diameter;
         return this;
@@ -45,7 +72,7 @@ public class DateElement extends ViewElement {
     //endregion
 
     //region Getters {}
-    public float getRadius(){
+    public float getRadius() {
         return mRadius;
     }
 

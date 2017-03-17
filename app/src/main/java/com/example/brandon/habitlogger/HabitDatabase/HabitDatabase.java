@@ -81,7 +81,7 @@ public class HabitDatabase {
         }
     }
 
-    private void notifyEntriesReset(long habitId){
+    private void notifyEntriesReset(long habitId) {
         for (OnEntryChangedListener listener : onEntryChangedListeners) {
             listener.onEntriesReset(habitId);
         }
@@ -327,8 +327,8 @@ public class HabitDatabase {
         int size = cursor.getCount();
         List<HabitCategory> categories = new ArrayList<>(size);
 
-        cursor.moveToFirst();
-        do categories.add(getHabitCategoryFromCursor(cursor)); while (cursor.moveToNext());
+        if (cursor.moveToFirst())
+            do categories.add(getHabitCategoryFromCursor(cursor)); while (cursor.moveToNext());
 
         cursor.close();
 
@@ -693,8 +693,8 @@ public class HabitDatabase {
     }
 
     /**
-     * @param entryId The id of the entry to edit.
-     * @param newEntry   The new session entry to replace the old one.
+     * @param entryId  The id of the entry to edit.
+     * @param newEntry The new session entry to replace the old one.
      * @return The number of rows changed, -1 if error.
      */
     public long updateEntry(long entryId, SessionEntry newEntry) {
@@ -738,7 +738,7 @@ public class HabitDatabase {
         String whereClause = EntriesTableSchema.ENTRY_HABIT_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId)};
 
-        long res =  writableDatabase.delete(EntriesTableSchema.TABLE_NAME,
+        long res = writableDatabase.delete(EntriesTableSchema.TABLE_NAME,
                 whereClause, whereArgs);
 
         notifyEntriesReset(habitId);

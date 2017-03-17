@@ -40,4 +40,12 @@ public class MyColorUtils {
         hsl[1] = saturation;
         return ColorUtils.HSLToColor(hsl);
     }
+
+    public static int setLightness(int colorBase, float lightness) {
+        int[] rgb = MyColorUtils.getRGBComponents(colorBase);
+        float[] hsl = new float[3];
+        ColorUtils.RGBToHSL(rgb[0], rgb[1], rgb[2], hsl);
+        hsl[2] = lightness;
+        return ColorUtils.HSLToColor(hsl);
+    }
 }

@@ -5,12 +5,13 @@
         <attr name="no_data_available_text" format="string"/>
 
         <attr name="backgroundColor" format="color"/>
-
         <attr name="title_color" format="color"/>
 
         <attr name="date_label_size" format="dimension"/>
         <attr name="date_circle_radius" format="dimension"/>
         <attr name="date_label_color" format="color"/>
+        <!--<attr name="date_label_color" format="color"/>-->
+        <!--<attr name="date_label_color" format="color"/>-->
 
         <attr name="android:textSize"/>
         <attr name="android:textColor"/>

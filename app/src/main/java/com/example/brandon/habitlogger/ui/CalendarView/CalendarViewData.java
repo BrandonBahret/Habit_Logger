@@ -79,7 +79,7 @@ class CalendarViewData {
 
         for (int i = 0; i < mDateElements.length; i++) {
             if (mDateElements[i] == null)
-                mDateElements[i] = new DateElement(paint);
+                mDateElements[i] = new DateElement(paint, null);
             else
                 mDateElements[i].setPaint(paint);
         }

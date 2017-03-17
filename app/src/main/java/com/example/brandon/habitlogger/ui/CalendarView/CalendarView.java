@@ -210,9 +210,7 @@ public class CalendarView extends View {
 
         drawDateNames(canvas);
 
-        drawDateBackgrounds(canvas);
-
-//        drawDateNumbers();
+        drawDateElements(canvas);
 
 //        drawNoDataText(canvas);
     }
@@ -276,7 +274,7 @@ public class CalendarView extends View {
         }
     }
 
-    private void drawDateBackgrounds(Canvas canvas) {
+    private void drawDateElements(Canvas canvas) {
 
         DateElement dateElements[] = mCalendarData.getDateElements();
 
@@ -285,24 +283,22 @@ public class CalendarView extends View {
         float calendarHeight = mContentHeight - yOrigin;
 
         float totalCalendarElementsHeight = dateElements[0].getDiameter() * 6;
-        float elementSpace = (calendarHeight - totalCalendarElementsHeight) / 7f;
+        float elementSpace = (calendarHeight - totalCalendarElementsHeight) / 6f;
 
         for (int day = 0; day < 7; day++) {
             currentDayLabel = mCalendarData.getDayNameTextElements()[day];
 
+            // Draw the first date element
             float x = currentDayLabel.getLastXValue() + (currentDayLabel.getWidth() / 2);
+            float y = yOrigin + elementSpace;
+            DateElement previousElement = dateElements[day];
+            previousElement.draw(canvas, x, y);
 
-            for (int row = 0; row < 6; row++) {
-
-                if (row == 0) {
-                    float y = yOrigin + elementSpace;
-                    dateElements[day + (row * 7)].draw(canvas, x, y);
-                }
-                else{
-                    DateElement previousElement = dateElements[day + ((row - 1) * 7)];
-                    float y = previousElement.getLastYValue() + previousElement.getHeight() + elementSpace;
-                    dateElements[day + (row * 7)].draw(canvas, x, y);
-                }
+            // Draw the rest of the date elements in this column
+            for (int row = 1; row < 6; row++) {
+                y = previousElement.getLastYValue() + previousElement.getHeight() + elementSpace;
+                previousElement = dateElements[day + (row * 7)];
+                previousElement.draw(canvas, x, y);
             }
 
         }
