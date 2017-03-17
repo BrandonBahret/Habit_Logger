@@ -6,7 +6,6 @@ import android.text.TextPaint;
 
 /**
  * Created by Brandon on 3/16/2017.
- *
  */
 
 public class DateElement extends ViewElement {
@@ -27,7 +26,7 @@ public class DateElement extends ViewElement {
         mWidth = mDiameter;
         mHeight = mDiameter;
 
-        if(mDateText != null)
+        if (mDateText != null)
             mDateText.makeMeasurements();
 
         return this;
@@ -37,11 +36,11 @@ public class DateElement extends ViewElement {
     public void draw(Canvas canvas, float x, float y) {
         super.draw(canvas, x, y);
 
-        if(mDateText == null || isEnabled)
-            canvas.drawCircle(x, y, mRadius, mPaint);
+        if (mDateText == null || isEnabled)
+            canvas.drawCircle(x, y, mRadius, mTextPaint);
 
         if (mDateText != null) {// Draw the date text
-            mDateText.draw(canvas, mDateText.getWidth() / 2f, y + mDateText.getHeight() / 4f);
+            mDateText.draw(canvas, x - mDateText.getWidth() / 4f, y + mDateText.getHeight() / 4f);
         }
 
     }
@@ -50,12 +49,12 @@ public class DateElement extends ViewElement {
 
 
     @Override
-    public ViewElement setPaint(TextPaint paint) {
+    public ViewElement setTextPaint(TextPaint paint) {
         if (mDateText != null) {
             mDateText.setPaintColor(0xffffffff);
         }
 
-        return super.setPaint(paint);
+        return super.setTextPaint(paint);
     }
 
     public DateElement setRadius(float radius) {
@@ -68,6 +67,10 @@ public class DateElement extends ViewElement {
         mRadius = diameter / 2f;
         mDiameter = diameter;
         return this;
+    }
+
+    public void setDateText(TextElement text) {
+        mDateText = text;
     }
     //endregion
 

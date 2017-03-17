@@ -24,7 +24,7 @@ public class TextElement extends ViewElement {
     @Override
     public TextElement makeMeasurements() {
         Rect bounds = new Rect();
-        mPaint.getTextBounds(mText, 0, mText.length(), bounds);
+        mTextPaint.getTextBounds(mText, 0, mText.length(), bounds);
 
         mWidth = bounds.width();
         mHeight = bounds.height();
@@ -34,7 +34,7 @@ public class TextElement extends ViewElement {
     @Override
     public void draw(Canvas canvas, float x, float y) {
         super.draw(canvas, x, y);
-        canvas.drawText(mText, lastXValue, lastYValue, mPaint);
+        canvas.drawText(mText, lastXValue, lastYValue, mTextPaint);
     }
 
     //region Setters {}

@@ -18,10 +18,9 @@ import java.util.Set;
 
 /**
  * Created by Brandon on 3/17/2017.
- *
  */
 
-public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapter.ViewHolder>{
+public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapter.ViewHolder> {
 
     Context mContext;
     SessionEntriesSample mEntriesSample;
@@ -36,7 +35,7 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         }
     }
 
-    public CalendarViewAdapter(SessionEntriesSample entriesSample, Context context){
+    public CalendarViewAdapter(SessionEntriesSample entriesSample, Context context) {
         mEntriesSample = entriesSample;
         mContext = context;
 
@@ -60,15 +59,22 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
 
         Set<Integer> dates;
 
-        for(int month = 0; month < diffMonth; month++){
+        for (int month = 0; month < diffMonth; month++) {
             Calendar calendar = Calendar.getInstance();
             dates = new HashSet<>();
 
-            calendar.set(Calendar.MONTH, startCalendar.get(Calendar.MONTH));
+            int targetMonth = startCalendar.get(Calendar.MONTH);
+            int targetYear = startCalendar.get(Calendar.YEAR);
+            calendar.set(Calendar.MONTH, targetMonth);
 
-            while(entryIndex < entries.size()){
-                SessionEntry entry = entries.get(entryIndex++);
-                dates.add(entry.getDateOfEntry());
+            while (entryIndex < entries.size()) {
+                SessionEntry entry = entries.get(entryIndex);
+
+                if (entry.getStartingTimeMonth() == targetMonth && entry.getStartingTimeYear() == targetYear)
+                    dates.add(entry.getDateOfEntry());
+                else break;
+
+                entryIndex++;
             }
 
             monthData.add(new CalendarViewMonthModel(calendar, dates));

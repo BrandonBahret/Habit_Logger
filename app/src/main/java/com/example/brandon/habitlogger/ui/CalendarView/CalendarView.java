@@ -36,14 +36,21 @@ public class CalendarView extends View {
     //endregion
 
     //region (Colors and Paints)
+    private int mStreakColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
     private int mTextColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
     private int mTitleColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
     private int mDateTextColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
     private int mBackgroundColor = ContextCompat.getColor(getContext(), R.color.background);
+    private int mCalendarBackgroundColor = ContextCompat.getColor(getContext(), R.color.habitCard);
+    private int mDateElementColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
 
+    private TextPaint mBackgroundPaint;
+    private TextPaint mCalendarBackgroundPaint;
     private TextPaint mTextPaint;
     private TextPaint mTitlePaint;
     private TextPaint mDateTextPaint;
+    private TextPaint mStreakPaint;
+    private TextPaint mDateElementPaint;
     //endregion
 
     //region (Drawables)
@@ -76,6 +83,16 @@ public class CalendarView extends View {
     private void init(AttributeSet attrs, int defStyle) {
 
         // region Create paint objects
+        mStreakPaint = new TextPaint();
+
+        mBackgroundPaint = new TextPaint();
+
+        mDateElementPaint = new TextPaint();
+        mDateElementPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        mDateElementPaint.setTextAlign(Paint.Align.LEFT);
+
+        mCalendarBackgroundPaint = new TextPaint();
+
         mTextPaint = new TextPaint();
         mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         mTextPaint.setTextAlign(Paint.Align.LEFT);
@@ -98,6 +115,10 @@ public class CalendarView extends View {
 
         //region Gather attributes from attrs
         //region Get colors from attributes
+        mStreakColor = a.getColor(
+                R.styleable.CalendarView_date_circle_streak_color,
+                mStreakColor);
+
         mTextColor = a.getColor(
                 R.styleable.CalendarView_android_textColor,
                 mTextColor);
@@ -113,6 +134,10 @@ public class CalendarView extends View {
         mBackgroundColor = a.getColor(
                 R.styleable.CalendarView_backgroundColor,
                 mBackgroundColor);
+
+        mDateElementColor = a.getColor(
+                R.styleable.CalendarView_date_element_color,
+                mDateElementColor);
         //endregion
 
         //region Get dimensions from attributes
@@ -187,11 +212,20 @@ public class CalendarView extends View {
         mDateTextPaint.setTextSize(mDateTextSize);
         mDateTextPaint.setColor(mDateTextColor);
 
+        mStreakPaint.setColor(mStreakColor);
+
+        mDateElementPaint.setTextSize(mDateTextSize);
+        mDateElementPaint.setColor(mDateElementColor);
+
+        mCalendarBackgroundPaint.setColor(mCalendarBackgroundColor);
+
+        mBackgroundPaint.setColor(mBackgroundColor);
+
         if (mCalendarData.getNoDataAvailableText() != null)
-            mCalendarData.getNoDataAvailableText().setPaint(mTextPaint);
+            mCalendarData.getNoDataAvailableText().setTextPaint(mTextPaint);
 
         if (mCalendarData.getTitle() != null)
-            mCalendarData.getTitle().setPaint(mTitlePaint);
+            mCalendarData.getTitle().setTextPaint(mTitlePaint);
 
         mCalendarData.setDayNameHeaderPaint(mDateTextPaint);
         mCalendarData.setDateElementsPaint(mDateTextPaint);
@@ -205,6 +239,8 @@ public class CalendarView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+        invalidateTextPaintAndMeasurements();
 
         invalidatePaddingAndContentMeasurements();
 
@@ -300,24 +336,53 @@ public class CalendarView extends View {
             // Draw the first date element
             float x = currentDayLabel.getLastXValue() + (currentDayLabel.getWidth() / 2);
             float y = yOrigin + elementSpace;
-            DateElement previousElement = dateElements[day];
+            DateElement currentElement = dateElements[day];
 
-            if (day < firstDay - 1) {
-                previousElement.setPaint(mTextPaint);
+            if (day < firstDay - 1)
+                currentElement.setTextPaint(mDateTextPaint);
+            else {
+                int currentDay = day - (firstDay - 2);
+
+                if (model.getDatesWithEntries().contains(currentDay))
+                    currentElement.setTextPaint(mStreakPaint);
+                else
+                    currentElement.setTextPaint(mCalendarBackgroundPaint);
+
+                TextElement text = new TextElement(String.valueOf(currentDay), mDateElementPaint);
+                text.makeMeasurements();
+                currentElement.setDateText(text);
             }
 
-            previousElement.draw(canvas, x, y);
+
+//            else if (model.getDatesWithEntries().contains(day))
+//                currentElement.setTextPaint(mStreakPaint);
+
+            currentElement.draw(canvas, x, y);
 
             // Draw the rest of the date elements in this column
             for (int row = 1; row < 6; row++) {
-                y = previousElement.getLastYValue() + previousElement.getHeight() + elementSpace;
+                y = currentElement.getLastYValue() + currentElement.getHeight() + elementSpace;
                 int dayIndex = day + (row * 7);
-                previousElement = dateElements[dayIndex];
+                currentElement = dateElements[dayIndex];
 
-                if(dayIndex >= maxCell - 1)
-                    previousElement.setPaint(mTextPaint);
+                if (dayIndex >= maxCell - 1)
+                    currentElement.setTextPaint(mDateTextPaint);
+                else {
+                    int currentDay = dayIndex - (firstDay - 2);
+                    if (model.getDatesWithEntries().contains(currentDay))
+                        currentElement.setTextPaint(mStreakPaint);
+                    else
+                        currentElement.setTextPaint(mCalendarBackgroundPaint);
 
-                previousElement.draw(canvas, x, y);
+                    TextElement text = new TextElement(String.valueOf(currentDay), mDateElementPaint);
+                    text.makeMeasurements();
+                    currentElement.setDateText(text);
+                }
+
+//                else if (model.getDatesWithEntries().contains(day))
+//                    currentElement.setTextPaint(mStreakPaint);
+
+                currentElement.draw(canvas, x, y);
             }
 
         }

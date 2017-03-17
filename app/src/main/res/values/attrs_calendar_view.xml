@@ -9,6 +9,10 @@
 
         <attr name="date_label_size" format="dimension"/>
         <attr name="date_circle_radius" format="dimension"/>
+
+
+        <attr name="date_element_color" format="color"/>
+        <attr name="date_circle_streak_color" format="color"/>
         <attr name="date_label_color" format="color"/>
         <!--<attr name="date_label_color" format="color"/>-->
         <!--<attr name="date_label_color" format="color"/>-->

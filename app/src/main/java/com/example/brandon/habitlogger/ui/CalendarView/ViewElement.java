@@ -10,7 +10,7 @@ import android.text.TextPaint;
  */
 
 abstract public class ViewElement {
-    protected TextPaint mPaint;
+    protected TextPaint mTextPaint;
     protected float mWidth;
     protected float mHeight;
     protected float lastYValue = 0, lastXValue = 0;
@@ -18,7 +18,7 @@ abstract public class ViewElement {
     @Dimension protected float mMarginTop;
 
     public ViewElement(TextPaint paint) {
-        mPaint = paint;
+        mTextPaint = paint;
     }
 
     abstract public ViewElement makeMeasurements();
@@ -29,13 +29,13 @@ abstract public class ViewElement {
     }
 
     //region Setters {}
-    public ViewElement setPaint(TextPaint paint) {
-        mPaint = paint;
+    public ViewElement setTextPaint(TextPaint paint) {
+        mTextPaint = paint;
         return this;
     }
 
     public ViewElement setPaintColor(int color) {
-        mPaint.setColor(color);
+        mTextPaint.setColor(color);
         return this;
     }
 
@@ -48,7 +48,7 @@ abstract public class ViewElement {
 
     //region Getters {}
     public TextPaint getPaint() {
-        return mPaint;
+        return mTextPaint;
     }
 
     public float getWidth() {
