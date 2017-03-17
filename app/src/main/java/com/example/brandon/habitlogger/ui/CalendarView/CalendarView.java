@@ -12,6 +12,8 @@ import android.view.View;
 
 import com.example.brandon.habitlogger.R;
 
+import java.util.Calendar;
+
 /**
  * A view to represent entry data of a habit in a month-long calendar space.
  */
@@ -20,6 +22,8 @@ public class CalendarView extends View {
 
     // This data contains the content of the view (Text elements, etc.)
     private CalendarViewData mCalendarData;
+    CalendarViewMonthModel model;
+    public static final int NUMBER_OF_CELLS = 42;
 
     //region (Measurement Member Variables)
     private int mPaddingLeft;
@@ -285,6 +289,11 @@ public class CalendarView extends View {
         float totalCalendarElementsHeight = dateElements[0].getDiameter() * 6;
         float elementSpace = (calendarHeight - totalCalendarElementsHeight) / 6f;
 
+        int firstDay = model.getFirstWeekDay();
+        int totalDays = model.getCalendarMonth().getActualMaximum(Calendar.DAY_OF_MONTH);
+        int maxCell = totalDays + firstDay;
+
+
         for (int day = 0; day < 7; day++) {
             currentDayLabel = mCalendarData.getDayNameTextElements()[day];
 
@@ -292,12 +301,22 @@ public class CalendarView extends View {
             float x = currentDayLabel.getLastXValue() + (currentDayLabel.getWidth() / 2);
             float y = yOrigin + elementSpace;
             DateElement previousElement = dateElements[day];
+
+            if (day < firstDay - 1) {
+                previousElement.setPaint(mTextPaint);
+            }
+
             previousElement.draw(canvas, x, y);
 
             // Draw the rest of the date elements in this column
             for (int row = 1; row < 6; row++) {
                 y = previousElement.getLastYValue() + previousElement.getHeight() + elementSpace;
-                previousElement = dateElements[day + (row * 7)];
+                int dayIndex = day + (row * 7);
+                previousElement = dateElements[dayIndex];
+
+                if(dayIndex >= maxCell - 1)
+                    previousElement.setPaint(mTextPaint);
+
                 previousElement.draw(canvas, x, y);
             }
 
@@ -364,6 +383,14 @@ public class CalendarView extends View {
     public void setBackgroundColor(int color) {
         mBackgroundColor = color;
         invalidateTextPaintAndMeasurements();
+    }
+
+    public void bindModel(CalendarViewMonthModel model) {
+        this.model = model;
+        mCalendarData.getTitle().setText(model.getMonthTitle());
+        invalidateTextPaintAndMeasurements();
+        invalidatePaddingAndContentMeasurements();
+        invalidate();
     }
 
     //endregion // Setters

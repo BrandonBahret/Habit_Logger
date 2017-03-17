@@ -20,53 +20,58 @@
         <!--calendar_view:title_color="@color/calendar_view_title"-->
         <!--calendar_view:title_margin_top="6dp"/>-->
 
-    <ScrollView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/calendar_view_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
+    <!--<ScrollView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
 
-            <com.example.brandon.habitlogger.ui.CalendarView.CalendarView
-                style="@style/CalendarView"/>
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:gravity="center_horizontal"-->
+            <!--android:orientation="vertical">-->
 
-            <com.example.brandon.habitlogger.ui.CalendarView.CalendarView
-                style="@style/CalendarView"/>
+            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
+                <!--style="@style/CalendarView"/>-->
 
-            <com.example.brandon.habitlogger.ui.CalendarView.CalendarView
-                style="@style/CalendarView"/>
+            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
+                <!--style="@style/CalendarView"/>-->
 
-            <com.example.brandon.habitlogger.ui.CalendarView.CalendarView
-                style="@style/CalendarView"/>
+            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
+                <!--style="@style/CalendarView"/>-->
 
-            <com.example.brandon.habitlogger.ui.CalendarView.CalendarView
-                style="@style/CalendarView"/>
+            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
+                <!--style="@style/CalendarView"/>-->
 
-            <com.example.brandon.habitlogger.ui.CalendarView.CalendarView
-                style="@style/CalendarView"/>
+            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
+                <!--style="@style/CalendarView"/>-->
 
-            <com.example.brandon.habitlogger.ui.CalendarView.CalendarView
-                style="@style/CalendarView"/>
+            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
+                <!--style="@style/CalendarView"/>-->
 
-            <com.example.brandon.habitlogger.ui.CalendarView.CalendarView
-                style="@style/CalendarView"/>
+            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
+                <!--style="@style/CalendarView"/>-->
 
-            <com.example.brandon.habitlogger.ui.CalendarView.CalendarView
-                style="@style/CalendarView"/>
+            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
+                <!--style="@style/CalendarView"/>-->
 
-            <com.example.brandon.habitlogger.ui.CalendarView.CalendarView
-                style="@style/CalendarView"/>
+            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
+                <!--style="@style/CalendarView"/>-->
 
-            <com.example.brandon.habitlogger.ui.CalendarView.CalendarView
-                style="@style/CalendarView"/>
+            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
+                <!--style="@style/CalendarView"/>-->
 
-            <com.example.brandon.habitlogger.ui.CalendarView.CalendarView
-                style="@style/CalendarView"/>
+            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
+                <!--style="@style/CalendarView"/>-->
 
-        </LinearLayout>
-    </ScrollView>
+            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
+                <!--style="@style/CalendarView"/>-->
+
+        <!--</LinearLayout>-->
+    <!--</ScrollView>-->
 
 </FrameLayout>

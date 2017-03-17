@@ -45,7 +45,7 @@
 
     <string name="active_session">active session</string>
     <string name="preference_checkbox_preference">checkbox_preference</string>
-    <string name="cannot_open_active_sessions_activity">No active fsessions</string>
+    <string name="cannot_open_active_sessions_activity">No active sessions</string>
     <string name="habit_name">Habit Name</string>
     <string name="habit_description">Habit Description</string>
     <string name="habit_category">Habit Category</string>
