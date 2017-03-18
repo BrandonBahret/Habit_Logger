@@ -18,11 +18,19 @@ public class MyColorUtils {
         return new int[]{red, green, blue};
     }
 
-    public static float getHue(int color){
+    public static float[] getHSLComponents(int color){
         float hsl[] = new float[3];
         int rgb[] = getRGBComponents(color);
         ColorUtils.RGBToHSL(rgb[0], rgb[1], rgb[2], hsl);
-        return hsl[0];
+        return hsl;
+    }
+
+    public static float getHue(int color){
+        return getHSLComponents(color)[0];
+    }
+
+    public static float getLightness(int color) {
+        return getHSLComponents(color)[2];
     }
 
     public static int setHue(int colorBase, float hue){

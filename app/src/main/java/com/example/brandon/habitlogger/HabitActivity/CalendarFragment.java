@@ -55,7 +55,9 @@ public class CalendarFragment extends Fragment implements UpdateEntriesInterface
         calendarViewContainer = (RecyclerView) v.findViewById(R.id.calendar_view_container);
 
         mSessionEntries = callbackInterface.getSessionEntries().getSessionEntries();
-        mAdapter = new CalendarViewAdapter(callbackInterface.getSessionEntries(), getContext());
+        defaultColor = callbackInterface.getDefaultColor();
+
+        mAdapter = new CalendarViewAdapter(callbackInterface.getSessionEntries(), defaultColor, getContext());
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         calendarViewContainer.setLayoutManager(layoutManager);
@@ -70,7 +72,6 @@ public class CalendarFragment extends Fragment implements UpdateEntriesInterface
         super.onAttach(context);
 
         callbackInterface = (CallbackInterface)context;
-        defaultColor = callbackInterface.getDefaultColor();
         callbackInterface.addCallback(this);
     }
 
@@ -84,8 +85,7 @@ public class CalendarFragment extends Fragment implements UpdateEntriesInterface
     public void updateEntries(SessionEntriesSample dataSample) {
         if (calendarViewContainer != null) {
             mSessionEntries = dataSample.getSessionEntries();
-            mAdapter = new CalendarViewAdapter(callbackInterface.getSessionEntries(), getContext())
-                    .setStreakColor(defaultColor);
+            mAdapter = new CalendarViewAdapter(callbackInterface.getSessionEntries(), defaultColor, getContext());
             calendarViewContainer.setAdapter(mAdapter);
         }
     }

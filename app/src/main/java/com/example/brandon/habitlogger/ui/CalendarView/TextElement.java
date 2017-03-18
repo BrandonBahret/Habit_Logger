@@ -38,6 +38,11 @@ public class TextElement extends ViewElement {
         canvas.drawText(mText, lastXValue, lastYValue, mTextPaint);
     }
 
+    public void draw(Canvas canvas, TextPaint paint,  float x, float y) {
+        super.draw(canvas, x, y);
+        canvas.drawText(mText, lastXValue, lastYValue, paint);
+    }
+
     //region Setters {}
     public TextElement setText(String text) {
         mText = text;

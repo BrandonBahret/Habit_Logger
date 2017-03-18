@@ -18,7 +18,6 @@ import java.util.Set;
 
 /**
  * Created by Brandon on 3/17/2017.
- *
  */
 
 public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapter.ViewHolder> {
@@ -26,7 +25,7 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
     Context mContext;
     SessionEntriesSample mEntriesSample;
     List<CalendarViewMonthModel> monthData;
-//    private int mStreakColor = -1;
+    private int mStreakColor = -1;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         CalendarView calendarView;
@@ -34,13 +33,15 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         public ViewHolder(View view) {
             super(view);
             calendarView = (CalendarView) view.findViewById(R.id.calendar_view);
-//            calendarView.setStreakColor(mStreakColor);
+            if (mStreakColor != -1)
+                calendarView.setStreakColor(mStreakColor);
         }
     }
 
-    public CalendarViewAdapter(SessionEntriesSample entriesSample, Context context) {
+    public CalendarViewAdapter(SessionEntriesSample entriesSample, int streakColor, Context context) {
         mEntriesSample = entriesSample;
         mContext = context;
+        setStreakColor(streakColor);
 
         generateMonthDataFromEntries(mEntriesSample);
     }
@@ -92,8 +93,8 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.calendar_view, parent, false);
 
-//        if (mStreakColor != -1)
-//            ((CalendarView) itemView).setStreakColor(mStreakColor);
+        if (mStreakColor != -1)
+            ((CalendarView) itemView).setStreakColor(mStreakColor);
 
         return new ViewHolder(itemView);
     }
@@ -104,9 +105,8 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         holder.calendarView.bindModel(model);
     }
 
-    public CalendarViewAdapter setStreakColor(int color) {
-//        mStreakColor = color;
-        return this;
+    public void setStreakColor(int color) {
+        mStreakColor = color;
     }
 
     @Override
