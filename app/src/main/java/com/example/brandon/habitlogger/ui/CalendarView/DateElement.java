@@ -1,8 +1,11 @@
 package com.example.brandon.habitlogger.ui.CalendarView;
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.text.TextPaint;
+
+import com.example.brandon.habitlogger.common.MyColorUtils;
 
 /**
  * Created by Brandon on 3/16/2017.
@@ -15,10 +18,21 @@ public class DateElement extends ViewElement {
     private boolean isEnabled = true;
 
     private TextElement mDateText;
+    private boolean isCurrentDay = false;
+    private Paint mCurrentDatePaint;
+    private Paint mStreakLinePaint;
+    private boolean isAStreak = false;
 
     public DateElement(TextPaint paint, @Nullable TextElement dateText) {
         super(paint);
         mDateText = dateText;
+        mCurrentDatePaint = new Paint(paint);
+        mCurrentDatePaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+
+        mStreakLinePaint = new Paint(paint);
+        mStreakLinePaint.setStrokeWidth(16);
+        int currentDateColor = MyColorUtils.setLightness(mCurrentDatePaint.getColor(), 0.35f);
+        mCurrentDatePaint.setColor(currentDateColor);
     }
 
     @Override
@@ -36,25 +50,39 @@ public class DateElement extends ViewElement {
     public void draw(Canvas canvas, float x, float y) {
         super.draw(canvas, x, y);
 
+        if(isCurrentDay){
+            canvas.drawCircle(x, y, mRadius * 1.2f, mCurrentDatePaint);
+        }
+
         if (mDateText == null || isEnabled)
             canvas.drawCircle(x, y, mRadius, mTextPaint);
 
         if (mDateText != null) {// Draw the date text
-            mDateText.draw(canvas, x - mDateText.getWidth() / 4f, y + mDateText.getHeight() / 4f);
+            mDateText.draw(canvas, x - mDateText.getWidth() / 2f, y + mDateText.getHeight() / 2f);
         }
 
     }
 
+    public void drawStreakLine(Canvas canvas, float y, float x1, float x2) {
+        canvas.drawLine(x1, y, x2, y, mStreakLinePaint);
+    }
+
     //region Setters {}
-
-
     @Override
     public ViewElement setTextPaint(TextPaint paint) {
         if (mDateText != null) {
             mDateText.setPaintColor(0xffffffff);
         }
 
+        mStreakLinePaint.setColor(paint.getColor());
+
         return super.setTextPaint(paint);
+    }
+
+    @Override
+    public ViewElement setPaintColor(int color) {
+        mStreakLinePaint.setColor(color);
+        return super.setPaintColor(color);
     }
 
     public DateElement setRadius(float radius) {
@@ -72,6 +100,14 @@ public class DateElement extends ViewElement {
     public void setDateText(TextElement text) {
         mDateText = text;
     }
+
+    public void setIsCurrentDay(boolean isCurrentDay) {
+        this.isCurrentDay = isCurrentDay;
+    }
+
+    public void setIsAStreak(boolean isAStreak) {
+        this.isAStreak = isAStreak;
+    }
     //endregion
 
     //region Getters {}
@@ -81,6 +117,10 @@ public class DateElement extends ViewElement {
 
     public float getDiameter() {
         return mDiameter;
+    }
+
+    public boolean getIsAStreak() {
+        return isAStreak;
     }
     //endregion
 

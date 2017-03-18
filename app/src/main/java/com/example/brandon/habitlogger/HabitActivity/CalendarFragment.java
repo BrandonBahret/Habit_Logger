@@ -26,6 +26,7 @@ public class CalendarFragment extends Fragment implements UpdateEntriesInterface
 
     private List<SessionEntry> mSessionEntries;
     private CalendarViewAdapter mAdapter;
+    private int defaultColor = -1;
 
     public CalendarFragment() {
         // Required empty public constructor
@@ -69,6 +70,7 @@ public class CalendarFragment extends Fragment implements UpdateEntriesInterface
         super.onAttach(context);
 
         callbackInterface = (CallbackInterface)context;
+        defaultColor = callbackInterface.getDefaultColor();
         callbackInterface.addCallback(this);
     }
 
@@ -82,7 +84,8 @@ public class CalendarFragment extends Fragment implements UpdateEntriesInterface
     public void updateEntries(SessionEntriesSample dataSample) {
         if (calendarViewContainer != null) {
             mSessionEntries = dataSample.getSessionEntries();
-            mAdapter = new CalendarViewAdapter(callbackInterface.getSessionEntries(), getContext());
+            mAdapter = new CalendarViewAdapter(callbackInterface.getSessionEntries(), getContext())
+                    .setStreakColor(defaultColor);
             calendarViewContainer.setAdapter(mAdapter);
         }
     }

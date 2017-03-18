@@ -106,7 +106,8 @@ public class CalendarView extends View {
         mDateTextPaint.setTextAlign(Paint.Align.LEFT);
         // endregion
 
-        mCalendarData = new CalendarViewData(getContext())
+
+        mCalendarData = new CalendarViewData()
                 .setTitle("January 2017", mTitlePaint);
 
         // Load attributes
@@ -125,11 +126,11 @@ public class CalendarView extends View {
 
         mTitleColor = a.getColor(
                 R.styleable.CalendarView_title_color,
-                mTextColor);
+                mTitleColor);
 
         mDateTextColor = a.getColor(
                 R.styleable.CalendarView_date_label_color,
-                mTextColor);
+                mDateTextColor);
 
         mBackgroundColor = a.getColor(
                 R.styleable.CalendarView_backgroundColor,
@@ -252,7 +253,6 @@ public class CalendarView extends View {
 
         drawDateElements(canvas);
 
-//        drawNoDataText(canvas);
     }
 
     public void drawBackground(Canvas canvas) {
@@ -265,15 +265,6 @@ public class CalendarView extends View {
                     mPaddingLeft + mContentWidth, mPaddingTop + mContentHeight);
             mBackgroundDrawable.draw(canvas);
         }
-    }
-
-    public void drawNoDataText(Canvas canvas) {
-        TextElement text = mCalendarData.getNoDataAvailableText();
-
-        // Draw the text
-        text.draw(canvas,
-                mPaddingLeft + (mContentWidth - text.getWidth()) / 2,
-                mPaddingTop + (mContentHeight + text.getHeight()) / 2);
     }
 
     private void drawCalendarTitle(Canvas canvas) {
@@ -314,6 +305,7 @@ public class CalendarView extends View {
         }
     }
 
+
     private void drawDateElements(Canvas canvas) {
 
         DateElement dateElements[] = mCalendarData.getDateElements();
@@ -329,6 +321,18 @@ public class CalendarView extends View {
         int totalDays = model.getCalendarMonth().getActualMaximum(Calendar.DAY_OF_MONTH);
         int maxCell = totalDays + firstDay;
 
+        int modelMonth = model.getCalendarMonth().get(Calendar.MONTH);
+        int modelYear = model.getCalendarMonth().get(Calendar.YEAR);
+
+        Calendar c = Calendar.getInstance();
+        int currentDate = c.get(Calendar.DAY_OF_MONTH);
+        int currentMonth = c.get(Calendar.MONTH);
+        int currentYear = c.get(Calendar.YEAR);
+
+        boolean isCurrentMonth = (modelMonth == currentMonth) && (modelYear == currentYear);
+
+        boolean pastCurrentDate = false;
+
 
         for (int day = 0; day < 7; day++) {
             currentDayLabel = mCalendarData.getDayNameTextElements()[day];
@@ -341,21 +345,52 @@ public class CalendarView extends View {
             if (day < firstDay - 1)
                 currentElement.setTextPaint(mDateTextPaint);
             else {
-                int currentDay = day - (firstDay - 2);
+                int thisDay = day - (firstDay - 2);
 
-                if (model.getDatesWithEntries().contains(currentDay))
+                if (model.getDatesWithEntries().contains(thisDay)) {
                     currentElement.setTextPaint(mStreakPaint);
+
+                    boolean isAStreak = (day == 0 && model.getDatesWithEntries().contains(thisDay - 1)) ||
+                            model.getDatesWithEntries().contains(thisDay + 1);
+
+                    currentElement.setIsAStreak(isAStreak);
+                }
                 else
                     currentElement.setTextPaint(mCalendarBackgroundPaint);
 
-                TextElement text = new TextElement(String.valueOf(currentDay), mDateElementPaint);
+                if (!pastCurrentDate && isCurrentMonth && thisDay == currentDate) {
+                    pastCurrentDate = true;
+                    currentElement.setIsCurrentDay(true);
+//                    mDateElementPaint.setAlpha(127);
+                }
+
+                mDateElementPaint.setAlpha(thisDay > currentDate && isCurrentMonth ? 77 : 255);
+                TextElement text = new TextElement(String.valueOf(thisDay), mDateElementPaint);
                 text.makeMeasurements();
                 currentElement.setDateText(text);
-            }
 
+
+            }
 
 //            else if (model.getDatesWithEntries().contains(day))
 //                currentElement.setTextPaint(mStreakPaint);
+
+            if (currentElement.getIsAStreak()) {
+                float x1 = x;
+                float x2 = mContentWidth;
+
+                if (day + 1 < mCalendarData.getDayNameTextElements().length) {
+                    TextElement element = mCalendarData.getDayNameTextElements()[day + 1];
+                    x2 = element.getLastXValue();
+                }
+                int thisDay = day - (firstDay - 2);
+                if (day == 0 && model.getDatesWithEntries().contains(thisDay - 1)) {
+                    x1 = 0;
+                    x2 = model.getDatesWithEntries().contains(thisDay + 1) ? x2 : x;
+                }
+
+                currentElement.drawStreakLine(canvas, y, x1, x2);
+            }
 
             currentElement.draw(canvas, x, y);
 
@@ -368,20 +403,49 @@ public class CalendarView extends View {
                 if (dayIndex >= maxCell - 1)
                     currentElement.setTextPaint(mDateTextPaint);
                 else {
-                    int currentDay = dayIndex - (firstDay - 2);
-                    if (model.getDatesWithEntries().contains(currentDay))
+                    int thisDay = dayIndex - (firstDay - 2);
+                    if (model.getDatesWithEntries().contains(thisDay)) {
                         currentElement.setTextPaint(mStreakPaint);
+
+                        boolean isAStreak = (day == 0 && model.getDatesWithEntries().contains(thisDay - 1)) ||
+                                model.getDatesWithEntries().contains(thisDay + 1);
+
+                        currentElement.setIsAStreak(isAStreak);
+                    }
                     else
                         currentElement.setTextPaint(mCalendarBackgroundPaint);
 
-                    TextElement text = new TextElement(String.valueOf(currentDay), mDateElementPaint);
+                    mDateElementPaint.setAlpha(thisDay > currentDate && isCurrentMonth ? 77 : 255);
+                    TextElement text = new TextElement(String.valueOf(thisDay), mDateElementPaint);
                     text.makeMeasurements();
                     currentElement.setDateText(text);
+
+                    if (!pastCurrentDate && isCurrentMonth && thisDay == currentDate) {
+                        pastCurrentDate = true;
+                        currentElement.setIsCurrentDay(true);
+//                        mDateElementPaint.setAlpha(127);
+                    }
                 }
 
 //                else if (model.getDatesWithEntries().contains(day))
 //                    currentElement.setTextPaint(mStreakPaint);
 
+                if (currentElement.getIsAStreak()) {
+                    float x1 = x;
+                    float x2 = mContentWidth;
+
+                    if (day + 1 < mCalendarData.getDayNameTextElements().length) {
+                        TextElement element = mCalendarData.getDayNameTextElements()[day + 1];
+                        x2 = element.getLastXValue();
+                    }
+                    int thisDay = dayIndex - (firstDay - 2);
+                    if (day == 0 && model.getDatesWithEntries().contains(thisDay - 1)) {
+                        x1 = 0;
+                        x2 = model.getDatesWithEntries().contains(thisDay + 1) ? x2 : x;
+                    }
+
+                    currentElement.drawStreakLine(canvas, y, x1, x2);
+                }
                 currentElement.draw(canvas, x, y);
             }
 
@@ -450,13 +514,20 @@ public class CalendarView extends View {
         invalidateTextPaintAndMeasurements();
     }
 
-    public void bindModel(CalendarViewMonthModel model) {
-        this.model = model;
-        mCalendarData.getTitle().setText(model.getMonthTitle());
-        invalidateTextPaintAndMeasurements();
-        invalidatePaddingAndContentMeasurements();
-        invalidate();
+    public void setStreakColor(int streakColor) {
+        mStreakColor = streakColor;
+        if (mStreakPaint != null)
+            mStreakPaint.setColor(streakColor);
     }
 
+    public void bindModel(CalendarViewMonthModel model) {
+        this.model = model;
+        if (mCalendarData != null) {
+            mCalendarData.getTitle().setText(model.getMonthTitle());
+            invalidateTextPaintAndMeasurements();
+            invalidatePaddingAndContentMeasurements();
+            invalidate();
+        }
+    }
     //endregion // Setters
 }

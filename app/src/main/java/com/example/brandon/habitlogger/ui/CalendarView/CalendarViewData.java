@@ -1,27 +1,22 @@
 package com.example.brandon.habitlogger.ui.CalendarView;
 
-import android.content.Context;
 import android.text.TextPaint;
 
 /**
  * Created by Brandon on 3/15/2017.
+ *
  */
 
 class CalendarViewData {
-    private Context mContext;
 
     private TextElement mNoDataAvailableText;
     private TextElement mTitle;
 
-    private String days[] = new String[]{"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"};
+    private String days[] = new String[]{"S", "M", "T", "W", "T", "F", "S"};
     private TextElement[] mDayNameTextElements;
     private float mContentMarginTop;
 
     private DateElement mDateElements[];
-
-    public CalendarViewData(Context context) {
-        mContext = context;
-    }
 
     public void makeMeasurements() {
         if (getTitle() != null)
@@ -111,16 +106,3 @@ class CalendarViewData {
     }
     //endregion
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
