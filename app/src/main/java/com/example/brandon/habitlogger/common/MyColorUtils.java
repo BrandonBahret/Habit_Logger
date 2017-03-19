@@ -3,6 +3,8 @@ package com.example.brandon.habitlogger.common;
 import android.graphics.Color;
 import android.support.v4.graphics.ColorUtils;
 
+import java.util.Random;
+
 /**
  * Created by Brandon on 3/11/2017.
  *
@@ -55,5 +57,13 @@ public class MyColorUtils {
         ColorUtils.RGBToHSL(rgb[0], rgb[1], rgb[2], hsl);
         hsl[2] = lightness;
         return ColorUtils.HSLToColor(hsl);
+    }
+
+    public static int getRandomColor() {
+        Random r = new Random();
+        int red  = r.nextInt(255);
+        int green  = r.nextInt(255);
+        int blue  = r.nextInt(255);
+        return Color.argb(255, red, green, blue);
     }
 }

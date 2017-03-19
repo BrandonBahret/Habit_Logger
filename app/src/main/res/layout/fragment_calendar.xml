@@ -1,77 +1,14 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:calendar_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/calendar_fragment_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.brandon.habitlogger.HabitActivity.CalendarFragment">
 
-    <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="304dp"-->
-        <!--android:layout_margin="8dp"-->
-        <!--android:background="@drawable/background_calendar_view"-->
-        <!--android:textSize="20sp"-->
-        <!--calendar_view:content_margin_top="8dp"-->
-        <!--calendar_view:date_circle_radius="14dp"-->
-        <!--calendar_view:date_label_color="@color/calendar_view_date_label"-->
-        <!--calendar_view:date_label_size="14sp"-->
-        <!--calendar_view:title_color="@color/calendar_view_title"-->
-        <!--calendar_view:title_margin_top="6dp"/>-->
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/calendar_view_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
-    <!--<ScrollView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content">-->
-
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:gravity="center_horizontal"-->
-            <!--android:orientation="vertical">-->
-
-            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
-                <!--style="@style/CalendarView"/>-->
-
-            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
-                <!--style="@style/CalendarView"/>-->
-
-            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
-                <!--style="@style/CalendarView"/>-->
-
-            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
-                <!--style="@style/CalendarView"/>-->
-
-            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
-                <!--style="@style/CalendarView"/>-->
-
-            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
-                <!--style="@style/CalendarView"/>-->
-
-            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
-                <!--style="@style/CalendarView"/>-->
-
-            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
-                <!--style="@style/CalendarView"/>-->
-
-            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
-                <!--style="@style/CalendarView"/>-->
-
-            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
-                <!--style="@style/CalendarView"/>-->
-
-            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
-                <!--style="@style/CalendarView"/>-->
-
-            <!--<com.example.brandon.habitlogger.ui.CalendarView.CalendarView-->
-                <!--style="@style/CalendarView"/>-->
-
-        <!--</LinearLayout>-->
-    <!--</ScrollView>-->
 
 </FrameLayout>

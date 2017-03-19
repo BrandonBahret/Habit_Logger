@@ -22,19 +22,13 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case (0):
-                OverviewEntriesFragment entriesFragment = OverviewEntriesFragment.newInstance();
-                entriesFragment.setHasOptionsMenu(true);
-                return entriesFragment;
+                return OverviewEntriesFragment.newInstance();
 
             case (1):
-                OverviewCalendarFragment calendarFragment = OverviewCalendarFragment.newInstance();
-                calendarFragment.setHasOptionsMenu(true);
-                return calendarFragment;
+                return OverviewCalendarFragment.newInstance();
 
             case (2):
-                OverviewStatisticsFragment statisticsFragment = OverviewStatisticsFragment.newInstance();
-                statisticsFragment.setHasOptionsMenu(true);
-                return statisticsFragment;
+                return OverviewStatisticsFragment.newInstance();
         }
 
         return null;

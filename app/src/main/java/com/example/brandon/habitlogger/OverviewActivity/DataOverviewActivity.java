@@ -2,7 +2,6 @@ package com.example.brandon.habitlogger.OverviewActivity;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +11,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
-import com.example.brandon.habitlogger.HabitActivity.AppBarStateChangeListener;
 import com.example.brandon.habitlogger.HabitActivity.GetScrollEventsFromFragmentsInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
@@ -39,19 +37,21 @@ public class DataOverviewActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         ActivityDataOverviewBinding ui = DataBindingUtil.setContentView(this, R.layout.activity_data_overview);
 
-        // Set stylization
-        int statusColor = ContextCompat.getColor(DataOverviewActivity.this, R.color.colorPrimaryDark);
-        getWindow().setStatusBarColor(statusColor);
-
         //region // Gather dependencies
-        exportManager = new LocalDataExportManager(this);
         habitDatabase = new HabitDatabase(this);
         HabitDatabase.addOnEntryChangedListener(this);
         List<SessionEntry> sessionEntries = habitDatabase.lookUpEntries(habitDatabase.searchAllEntriesWithTimeRange(0, Long.MAX_VALUE));
         dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), sessionEntries);
+        dateRangeManager.hideView(false);
+        exportManager = new LocalDataExportManager(this);
         //endregion
+
+        // Set stylization
+        int statusColor = ContextCompat.getColor(DataOverviewActivity.this, R.color.colorPrimaryDark);
+        getWindow().setStatusBarColor(statusColor);
 
         //region // Set-up views
         ui.tabs.setupWithViewPager(ui.container);
@@ -65,27 +65,24 @@ public class DataOverviewActivity extends AppCompatActivity implements
         //region // Include listeners
         dateRangeManager.setDateRangeChangeListener(this);
         ui.container.addOnPageChangeListener(this);
-        ui.appbar.addOnOffsetChangedListener(new AppBarStateChangeListener() {
-            @Override
-            public void onStateChanged(AppBarLayout appBarLayout, State state) {
-                dateRangeManager.setViewShown(state == State.EXPANDED);
-            }
-        });
         //endregion
 
         updateEntries();
+        ui.container.setCurrentItem(1);
     }
 
     //endregion // Entire lifecycle (onCreate - onDestroy)
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_overall_statistcs, menu);
+
         MenuItem search = menu.findItem(R.id.search);
 
         if (search != null)
             ((SearchView) search.getActionView()).setOnQueryTextListener(this);
 
-        return super.onPrepareOptionsMenu(menu);
+        return true;
     }
 
     //endregion // Methods responsible for handling the activity lifecycle
