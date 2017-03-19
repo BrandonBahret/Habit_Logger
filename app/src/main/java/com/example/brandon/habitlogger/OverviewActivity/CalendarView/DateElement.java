@@ -27,7 +27,7 @@ public class DateElement extends ViewElement {
     private int mDateTextColorDark = -1;
     private int mDateTextColorLight = -1;
 
-    private Paint mCurrentDatePaint;
+    private TextPaint mCurrentDatePaint;
     private Paint mStreakLinePaint;
     private boolean isAStreak = false;
 
@@ -36,12 +36,12 @@ public class DateElement extends ViewElement {
     public DateElement(TextPaint paint, @Nullable TextElement dateText, @Nullable CalendarPieDataSet pieData) {
         super(paint);
         mDateText = dateText;
-        mCurrentDatePaint = new Paint(paint);
+        mCurrentDatePaint = new TextPaint(paint);
         mCurrentDatePaint.setFlags(Paint.ANTI_ALIAS_FLAG);
 
         mStreakLinePaint = new Paint(paint);
         mStreakLinePaint.setStrokeWidth(16);
-        int currentDateColor = MyColorUtils.setLightness(mCurrentDatePaint.getColor(), 0.35f);
+        int currentDateColor = MyColorUtils.setLightness(paint.getColor(), 0.35f);
         mCurrentDatePaint.setColor(currentDateColor);
 
         mPieData = pieData;
@@ -88,7 +88,7 @@ public class DateElement extends ViewElement {
     }
 
     private float calculateSmallRadius() {
-        return mRadius * 0.9f;
+        return mRadius * 0.85f;
     }
 
     //region Setters {}

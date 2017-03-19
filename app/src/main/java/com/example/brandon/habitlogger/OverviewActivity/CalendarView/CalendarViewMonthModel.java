@@ -1,7 +1,10 @@
 package com.example.brandon.habitlogger.OverviewActivity.CalendarView;
 
+import android.support.annotation.Nullable;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -14,15 +17,26 @@ public class CalendarViewMonthModel {
 
     private Calendar mCalendarMonth;
     private Set<Integer> mDatesWithEntries;
+    private List<CalendarPieDataSet> mPieData;
     private SimpleDateFormat titleFormat = new SimpleDateFormat("MMMM, yyyy", Locale.US);
 
     /**
      * @param calendar A calendar object representing the month to render
      * @param datesWithEntries A list of date's with entries available.
      */
-    public CalendarViewMonthModel(Calendar calendar, Set<Integer> datesWithEntries){
+    public CalendarViewMonthModel(Calendar calendar, Set<Integer> datesWithEntries, @Nullable List<CalendarPieDataSet> pieData){
         mCalendarMonth = calendar;
         mDatesWithEntries = datesWithEntries;
+        mPieData = pieData;
+    }
+
+    public CalendarPieDataSet getPieDataSetForDate(int thisDay) {
+        for(CalendarPieDataSet dataSet : mPieData){
+            if(dataSet.getDate() == thisDay)
+                return dataSet;
+        }
+
+        return null;
     }
 
     //region Getters ()

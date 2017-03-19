@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.ColorUtils;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
@@ -14,9 +13,7 @@ import android.view.View;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyColorUtils;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 /**
  * A view to represent entry data of a habit in a month-long calendar space.
@@ -222,7 +219,7 @@ public class CalendarView extends View {
         mDateTextPaint.setTextSize(mDateTextSize);
         mDateTextPaint.setColor(mDateTextColor);
 
-        mEmptyDateElementPaint.setColor(ColorUtils.setAlphaComponent(mDateTextColor, 50));
+        mEmptyDateElementPaint.setColor(MyColorUtils.setLightness(mDateTextColor, 0.9f));
 
         mStreakPaint.setColor(mStreakColor);
 
@@ -343,20 +340,6 @@ public class CalendarView extends View {
 
         boolean pastCurrentDate = false;
 
-        List<CalendarPieDataSet.CalendarPieEntry> entries = new ArrayList<>();
-        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
-        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
-        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
-        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
-        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
-        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
-        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
-        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
-        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
-        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
-        CalendarPieDataSet testData = new CalendarPieDataSet(entries);
-
-
         for (int day = 0; day < 7; day++) {
             currentDayLabel = mCalendarData.getDayNameTextElements()[day];
 
@@ -381,7 +364,7 @@ public class CalendarView extends View {
                 TextElement text = new TextElement(String.valueOf(thisDay), mDateElementPaint);
                 text.makeMeasurements();
                 currentElement.setDateText(text);
-                currentElement.setPieData(testData);
+                currentElement.setPieData(model.getPieDataSetForDate(thisDay));
             }
 
             currentElement.draw(canvas, x, y);
@@ -403,7 +386,7 @@ public class CalendarView extends View {
                     TextElement text = new TextElement(String.valueOf(thisDay), mDateElementPaint);
                     text.makeMeasurements();
                     currentElement.setDateText(text);
-                    currentElement.setPieData(testData);
+                    currentElement.setPieData(model.getPieDataSetForDate(thisDay));
 
                     if (!pastCurrentDate && isCurrentMonth && thisDay == currentDate) {
                         pastCurrentDate = true;

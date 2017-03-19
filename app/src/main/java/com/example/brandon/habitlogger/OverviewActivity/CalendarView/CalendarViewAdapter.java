@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.MyColorUtils;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 
 import java.util.ArrayList;
@@ -62,10 +63,13 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         List<SessionEntry> entries = entriesSample.getSessionEntries();
 
         Set<Integer> dates;
+        List<SessionEntry> monthEntries;
 
         for (int month = 0; month < diffMonth; month++) {
             Calendar calendar = Calendar.getInstance();
             dates = new HashSet<>();
+            monthEntries = new ArrayList<>();
+
 
             int targetMonth = startCalendar.get(Calendar.MONTH);
             int targetYear = startCalendar.get(Calendar.YEAR);
@@ -75,17 +79,45 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
             while (entryIndex < entries.size()) {
                 SessionEntry entry = entries.get(entryIndex);
 
-                if (entry.getStartingTimeMonth() == targetMonth && entry.getStartingTimeYear() == targetYear)
+                if (entry.getStartingTimeMonth() == targetMonth && entry.getStartingTimeYear() == targetYear) {
                     dates.add(entry.getDateOfEntry());
+                    monthEntries.add(entry);
+                }
                 else break;
 
                 entryIndex++;
             }
 
-            monthData.add(new CalendarViewMonthModel(calendar, dates));
+            List<CalendarPieDataSet> pieDataSet = getPieDataSets(monthEntries, dates);
+
+            monthData.add(new CalendarViewMonthModel(calendar, dates, pieDataSet));
 
             startCalendar.add(Calendar.MONTH, 1);
         }
+    }
+
+    private List<CalendarPieDataSet> getPieDataSets(List<SessionEntry> monthEntries, Set<Integer> dates) {
+        List<CalendarPieDataSet> dataSets = new ArrayList<>(dates.size());
+
+        for(int date : dates){
+            dataSets.add(getPieDataSet(monthEntries, date));
+        }
+
+        return dataSets;
+    }
+
+    private CalendarPieDataSet getPieDataSet(List<SessionEntry> monthEntries, int date) {
+        List<CalendarPieDataSet.CalendarPieEntry> entries = new ArrayList<>();
+
+        float numberOfWedges = 3f;
+
+        float value = 1 / numberOfWedges;
+
+        for(float totalValue = 0; totalValue < 1f; totalValue+=value) {
+            entries.add(new CalendarPieDataSet.CalendarPieEntry(value, MyColorUtils.getRandomColor()));
+        }
+
+        return new CalendarPieDataSet(entries, date);
     }
 
     @Override
