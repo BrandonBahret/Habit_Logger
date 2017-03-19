@@ -20,6 +20,7 @@ public class CalendarPieDataSet {
     public CalendarPieDataSet(List<Float> values, List<Integer> colors){
         calendarPieEntries = CalendarPieEntry.getDataSet(values, colors);
         mCurrentPaint = new Paint();
+        mCurrentPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
     }
 
     public CalendarPieDataSet(List<CalendarPieEntry> entries) {

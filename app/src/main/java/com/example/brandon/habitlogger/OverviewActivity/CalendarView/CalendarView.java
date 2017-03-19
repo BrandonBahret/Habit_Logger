@@ -12,6 +12,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.MyColorUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -343,11 +344,16 @@ public class CalendarView extends View {
         boolean pastCurrentDate = false;
 
         List<CalendarPieDataSet.CalendarPieEntry> entries = new ArrayList<>();
-        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.20f, getBackgroundColor()));
-        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.20f, getTextColor()));
-        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.20f, ContextCompat.getColor(getContext(), R.color.colorPrimaryDark)));
-        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.20f, ContextCompat.getColor(getContext(), R.color.colorPrimaryLight)));
-        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.20f, ContextCompat.getColor(getContext(), R.color.colorAccentDisabled)));
+        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
+        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
+        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
+        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
+        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
+        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
+        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
+        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
+        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
+        entries.add(new CalendarPieDataSet.CalendarPieEntry(0.10f, MyColorUtils.getRandomColor()));
         CalendarPieDataSet testData = new CalendarPieDataSet(entries);
 
 
@@ -364,21 +370,11 @@ public class CalendarView extends View {
             else {
                 int thisDay = day - (firstDay - 2);
 
-                if (model.getDatesWithEntries().contains(thisDay)) {
-                    currentElement.setTextPaint(mStreakPaint);
-
-                    boolean isAStreak = (day == 0 && model.getDatesWithEntries().contains(thisDay - 1)) ||
-                            model.getDatesWithEntries().contains(thisDay + 1);
-
-                    currentElement.setIsAStreak(isAStreak);
-                }
-                else
-                    currentElement.setTextPaint(mEmptyDateElementPaint);
+                currentElement.setTextPaint(mEmptyDateElementPaint);
 
                 if (!pastCurrentDate && isCurrentMonth && thisDay == currentDate) {
                     pastCurrentDate = true;
                     currentElement.setIsCurrentDay(true);
-//                    mDateElementPaint.setAlpha(127);
                 }
 
                 mDateElementPaint.setAlpha(thisDay > currentDate && isCurrentMonth ? 77 : 255);
@@ -387,9 +383,6 @@ public class CalendarView extends View {
                 currentElement.setDateText(text);
                 currentElement.setPieData(testData);
             }
-
-//            else if (model.getDatesWithEntries().contains(day))
-//                currentElement.setTextPaint(mStreakPaint);
 
             currentElement.draw(canvas, x, y);
 
@@ -403,16 +396,8 @@ public class CalendarView extends View {
                     currentElement.setTextPaint(mDateTextPaint);
                 else {
                     int thisDay = dayIndex - (firstDay - 2);
-                    if (model.getDatesWithEntries().contains(thisDay)) {
-                        currentElement.setTextPaint(mStreakPaint);
 
-                        boolean isAStreak = (day == 0 && model.getDatesWithEntries().contains(thisDay - 1)) ||
-                                model.getDatesWithEntries().contains(thisDay + 1);
-
-                        currentElement.setIsAStreak(isAStreak);
-                    }
-                    else
-                        currentElement.setTextPaint(mEmptyDateElementPaint);
+                    currentElement.setTextPaint(mEmptyDateElementPaint);
 
                     mDateElementPaint.setAlpha(thisDay > currentDate && isCurrentMonth ? 77 : 255);
                     TextElement text = new TextElement(String.valueOf(thisDay), mDateElementPaint);
@@ -423,12 +408,8 @@ public class CalendarView extends View {
                     if (!pastCurrentDate && isCurrentMonth && thisDay == currentDate) {
                         pastCurrentDate = true;
                         currentElement.setIsCurrentDay(true);
-//                        mDateElementPaint.setAlpha(127);
                     }
                 }
-
-//                else if (model.getDatesWithEntries().contains(day))
-//                    currentElement.setTextPaint(mStreakPaint);
 
                 currentElement.draw(canvas, x, y);
             }
