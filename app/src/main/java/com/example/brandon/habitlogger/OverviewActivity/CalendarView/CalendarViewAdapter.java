@@ -12,6 +12,7 @@ import com.example.brandon.habitlogger.common.MyColorUtils;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
@@ -25,7 +26,7 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
 
     Context mContext;
     SessionEntriesSample mEntriesSample;
-    List<CalendarViewMonthModel> monthData;
+    List<CalendarViewMonthModel> calendarData;
     private int mStreakColor = -1;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -57,7 +58,7 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         int diffYear = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
         int diffMonth = diffYear * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH) + 1;
 
-        monthData = new ArrayList<>(diffMonth);
+        calendarData = new ArrayList<>(diffMonth);
 
         int entryIndex = 0;
         List<SessionEntry> entries = entriesSample.getSessionEntries();
@@ -73,6 +74,7 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
 
             int targetMonth = startCalendar.get(Calendar.MONTH);
             int targetYear = startCalendar.get(Calendar.YEAR);
+
             calendar.set(Calendar.MONTH, targetMonth);
             calendar.set(Calendar.YEAR, targetYear);
 
@@ -88,9 +90,10 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
                 entryIndex++;
             }
 
-            List<CalendarPieDataSet> pieDataSet = getPieDataSets(monthEntries, dates);
-
-            monthData.add(new CalendarViewMonthModel(calendar, dates, pieDataSet));
+            if (!monthEntries.isEmpty()) {
+                List<CalendarPieDataSet> pieDataSet = getPieDataSets(monthEntries, dates);
+                calendarData.add(new CalendarViewMonthModel(calendar, dates, pieDataSet));
+            }
 
             startCalendar.add(Calendar.MONTH, 1);
         }
@@ -99,23 +102,62 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
     private List<CalendarPieDataSet> getPieDataSets(List<SessionEntry> monthEntries, Set<Integer> dates) {
         List<CalendarPieDataSet> dataSets = new ArrayList<>(dates.size());
 
-        for(int date : dates){
-            dataSets.add(getPieDataSet(monthEntries, date));
+//        Collections.sort(monthEntries, SessionEntry.StartingTimeComparator);
+
+        int entryIndex = 0;
+
+        Integer datesArray[] = new Integer[dates.size()];
+        dates.toArray(datesArray);
+        Arrays.sort(datesArray);
+
+        for (int date : datesArray) {
+
+            List<SessionEntry> dateEntries = new ArrayList<>();
+
+            while (entryIndex < monthEntries.size()) {
+                SessionEntry entry = monthEntries.get(entryIndex);
+                if (entry.getStartingTimeDayOfMonth() == date) {
+                    dateEntries.add(entry);
+                    entryIndex++;
+                }
+                else break;
+            }
+
+            if (!dateEntries.isEmpty())
+                dataSets.add(getPieDataSet(dateEntries, date));
         }
 
         return dataSets;
     }
 
-    private CalendarPieDataSet getPieDataSet(List<SessionEntry> monthEntries, int date) {
+    private CalendarPieDataSet getPieDataSet(List<SessionEntry> dateEntries, int date) {
+
+        /* todo implement this method
+        iterate the monthEntries and calculate a duration pie chart of all the categories
+        */
+
         List<CalendarPieDataSet.CalendarPieEntry> entries = new ArrayList<>();
 
-        float numberOfWedges = 3f;
+//        HabitDataSample dataSample = new HabitDataSample(dateEntries);
 
-        float value = 1 / numberOfWedges;
+        SessionEntriesSample sample = new SessionEntriesSample(dateEntries);
 
-        for(float totalValue = 0; totalValue < 1f; totalValue+=value) {
-            entries.add(new CalendarPieDataSet.CalendarPieEntry(value, MyColorUtils.getRandomColor()));
+        long totalDuration = sample.calculateDuration();
+
+
+
+        for (SessionEntry entry : dateEntries) {
+
+            entries.add(new CalendarPieDataSet.CalendarPieEntry(entry.getDuration() / (float) totalDuration, MyColorUtils.getRandomColor()));
         }
+
+//        float numberOfWedges = 3f;
+//
+//        float value = 1 / numberOfWedges;
+//
+//        for(float totalValue = 0; totalValue < 1f; totalValue+=value) {
+//            entries.add(new CalendarPieDataSet.CalendarPieEntry(value, MyColorUtils.getRandomColor()));
+//        }
 
         return new CalendarPieDataSet(entries, date);
     }
@@ -133,7 +175,7 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        CalendarViewMonthModel model = monthData.get(position);
+        CalendarViewMonthModel model = calendarData.get(position);
         holder.calendarView.bindModel(model);
     }
 
@@ -143,6 +185,6 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
 
     @Override
     public int getItemCount() {
-        return monthData.size();
+        return calendarData.size();
     }
 }

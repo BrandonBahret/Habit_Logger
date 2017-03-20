@@ -21,6 +21,12 @@ public class SessionEntriesSample{
         this.dateToTime = dateToTime;
     }
 
+    public SessionEntriesSample(List<SessionEntry> sessionEntries) {
+        this.sessionEntries = sessionEntries;
+        this.dateFromTime = sessionEntries.get(0).getStartingTimeDate();
+        this.dateToTime = sessionEntries.get(sessionEntries.size() - 1).getStartingTimeDate();
+    }
+
     public List<SessionEntry> getSessionEntries(){
         return sessionEntries;
     }

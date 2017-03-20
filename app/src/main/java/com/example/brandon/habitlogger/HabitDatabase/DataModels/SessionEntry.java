@@ -152,6 +152,14 @@ public class SessionEntry implements Serializable, Parcelable {
         return c.getTimeInMillis();
     }
 
+    public int getStartingTimeDayOfMonth(){
+        Calendar c = Calendar.getInstance();
+
+        c.setTimeInMillis(getStartTime());
+
+        return c.get(Calendar.DAY_OF_MONTH);
+    }
+
     public int getStartingTimeMonth() {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(getStartTime());

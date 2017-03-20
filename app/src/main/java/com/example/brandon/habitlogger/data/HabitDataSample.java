@@ -22,6 +22,20 @@ public class HabitDataSample {
         mDateTo = dateTo;
     }
 
+    public HabitDataSample(List<SessionEntry> dateEntries) {
+        mData = generateCategoryDataSampleList(dateEntries);
+        mDateFrom = dateEntries.get(0).getStartingTimeDate();
+        mDateTo = dateEntries.get(dateEntries.size() - 1).getStartingTimeDate();
+    }
+
+    private List<CategoryDataSample> generateCategoryDataSampleList(List<SessionEntry> dateEntries) {
+        List<CategoryDataSample> data = new ArrayList<>();
+
+//        new CategoryDataSample();
+
+        return data;
+    }
+
     public List<CategoryDataSample> getData() {
         return mData;
     }
