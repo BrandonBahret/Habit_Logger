@@ -22,18 +22,14 @@ public class HabitDataSample {
         mDateTo = dateTo;
     }
 
-    public HabitDataSample(List<SessionEntry> dateEntries) {
-        mData = generateCategoryDataSampleList(dateEntries);
-        mDateFrom = dateEntries.get(0).getStartingTimeDate();
-        mDateTo = dateEntries.get(dateEntries.size() - 1).getStartingTimeDate();
-    }
+    public HabitDataSample getDataSampleForDate(long dateInMillis){
+        List<CategoryDataSample> categoryDataSamples = new ArrayList<>();
 
-    private List<CategoryDataSample> generateCategoryDataSampleList(List<SessionEntry> dateEntries) {
-        List<CategoryDataSample> data = new ArrayList<>();
+        for(CategoryDataSample dataSample : mData){
+            categoryDataSamples.add(dataSample.getDataSampleForDate(dateInMillis));
+        }
 
-//        new CategoryDataSample();
-
-        return data;
+        return new HabitDataSample(categoryDataSamples, dateInMillis, dateInMillis);
     }
 
     public List<CategoryDataSample> getData() {
@@ -46,7 +42,6 @@ public class HabitDataSample {
         for (CategoryDataSample categoryDataSample : mData) {
             entries.addAll(categoryDataSample.getSessionEntries());
         }
-
 
         Collections.sort(entries, SessionEntry.StartingTimeComparator);
 
@@ -72,5 +67,13 @@ public class HabitDataSample {
         }
 
         return colors;
+    }
+
+    public long getDateFrom(){
+        return mDateFrom;
+    }
+
+    public long getDateTo(){
+        return mDateTo;
     }
 }

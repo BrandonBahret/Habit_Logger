@@ -44,6 +44,20 @@ public class CategoryDataSample {
         return mDuration;
     }
 
+    public CategoryDataSample getDataSampleForDate(long dateInMillis){
+
+        Habit habits[]  = new Habit[mHabits.length];
+
+        for(int i = 0; i < mHabits.length; i++){
+            Habit habit = mHabits[i];
+
+            habits[i] = new Habit(habit.getName(), habit.getCategory());
+            habits[i].setEntries(habit.getEntriesForDate(dateInMillis));
+        }
+
+        return new CategoryDataSample(mCategory, habits, dateInMillis, dateInMillis);
+    }
+
     //region // Getters
     public HabitCategory getCategory() {
         return mCategory;

@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyColorUtils;
+import com.example.brandon.habitlogger.common.MyTimeUtils;
+import com.example.brandon.habitlogger.data.CategoryDataSample;
+import com.example.brandon.habitlogger.data.HabitDataSample;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 
 import java.util.ArrayList;
@@ -25,7 +28,7 @@ import java.util.Set;
 public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapter.ViewHolder> {
 
     Context mContext;
-    SessionEntriesSample mEntriesSample;
+    HabitDataSample mDataSample;
     List<CalendarViewMonthModel> calendarData;
     private int mStreakColor = -1;
 
@@ -40,20 +43,20 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         }
     }
 
-    public CalendarViewAdapter(SessionEntriesSample entriesSample, int streakColor, Context context) {
-        mEntriesSample = entriesSample;
+    public CalendarViewAdapter(HabitDataSample habitDataSample, int streakColor, Context context) {
+        mDataSample = habitDataSample;
         mContext = context;
         setStreakColor(streakColor);
 
-        generateMonthDataFromEntries(mEntriesSample);
+        generateMonthDataFromEntries(mDataSample);
     }
 
-    private void generateMonthDataFromEntries(SessionEntriesSample entriesSample) {
+    private void generateMonthDataFromEntries(HabitDataSample dataSample) {
         Calendar startCalendar = Calendar.getInstance();
-        startCalendar.setTimeInMillis(entriesSample.dateFromTime);
+        startCalendar.setTimeInMillis(dataSample.getDateFrom());
 
         Calendar endCalendar = Calendar.getInstance();
-        endCalendar.setTimeInMillis(entriesSample.dateToTime);
+        endCalendar.setTimeInMillis(dataSample.getDateTo());
 
         int diffYear = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
         int diffMonth = diffYear * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH) + 1;
@@ -61,7 +64,7 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         calendarData = new ArrayList<>(diffMonth);
 
         int entryIndex = 0;
-        List<SessionEntry> entries = entriesSample.getSessionEntries();
+        List<SessionEntry> entries = dataSample.getSessionEntriesSample().getSessionEntries();
 
         Set<Integer> dates;
         List<SessionEntry> monthEntries;
@@ -70,7 +73,6 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
             Calendar calendar = Calendar.getInstance();
             dates = new HashSet<>();
             monthEntries = new ArrayList<>();
-
 
             int targetMonth = startCalendar.get(Calendar.MONTH);
             int targetYear = startCalendar.get(Calendar.YEAR);
@@ -91,7 +93,7 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
             }
 
             if (!monthEntries.isEmpty()) {
-                List<CalendarPieDataSet> pieDataSet = getPieDataSets(monthEntries, dates);
+                List<CalendarPieDataSet> pieDataSet = getPieDataSets(targetMonth, targetYear, dates); //getPieDataSets(monthEntries, dates);
                 calendarData.add(new CalendarViewMonthModel(calendar, dates, pieDataSet));
             }
 
@@ -158,6 +160,41 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
 //        for(float totalValue = 0; totalValue < 1f; totalValue+=value) {
 //            entries.add(new CalendarPieDataSet.CalendarPieEntry(value, MyColorUtils.getRandomColor()));
 //        }
+
+        return new CalendarPieDataSet(entries, date);
+    }
+
+    private List<CalendarPieDataSet> getPieDataSets(int month, int year, Set<Integer> dates){
+        List<CalendarPieDataSet> dataSets = new ArrayList<>(dates.size());
+
+        Integer datesArray[] = new Integer[dates.size()];
+        dates.toArray(datesArray);
+        Arrays.sort(datesArray);
+
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.MONTH, month);
+        MyTimeUtils.setTimePortion(c, true, 0, 0, 0, 0);
+
+        for (int date : datesArray) {
+            c.set(Calendar.DAY_OF_MONTH, date);
+            dataSets.add(getPieDataSet(mDataSample.getDataSampleForDate(c.getTimeInMillis()), date));
+        }
+
+        return dataSets;
+    }
+
+    public CalendarPieDataSet getPieDataSet(HabitDataSample dataSample, int date){
+        final long totalDuration = dataSample.calculateTotalDuration();
+        List<CalendarPieDataSet.CalendarPieEntry> entries = new ArrayList<>();
+
+        for (CategoryDataSample categoryDataSample : dataSample.getData()) {
+            float ratio = categoryDataSample.calculateTotalDuration() / (float) totalDuration;
+            if (ratio > 0) {
+                entries.add(new CalendarPieDataSet.CalendarPieEntry(ratio, categoryDataSample.getCategory().getColorAsInt()));
+            }
+        }
+
 
         return new CalendarPieDataSet(entries, date);
     }

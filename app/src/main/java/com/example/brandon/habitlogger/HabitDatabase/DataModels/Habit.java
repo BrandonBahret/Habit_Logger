@@ -11,6 +11,7 @@ import com.opencsv.CSVReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -45,7 +46,7 @@ public class Habit implements Serializable, Parcelable {
         this.description = description;
         this.category = category;
         this.iconResId = iconResId;
-        if(entries != null) {
+        if (entries != null) {
             this.entries = entries;
             this.entriesDuration = calculateEntriesDurationSum();
         }
@@ -61,7 +62,7 @@ public class Habit implements Serializable, Parcelable {
         this.iconResId = iconResId;
         this.isArchived = isArchived;
         this.databaseId = databaseId;
-        if(entries != null) {
+        if (entries != null) {
             this.entries = entries;
             this.entriesDuration = calculateEntriesDurationSum();
         }
@@ -76,7 +77,7 @@ public class Habit implements Serializable, Parcelable {
         this.iconResId = habit.iconResId;
         this.databaseId = habit.databaseId;
         this.isArchived = habit.isArchived;
-        if(entries != null) {
+        if (entries != null) {
             this.entries = entries;
             this.entriesDuration = calculateEntriesDurationSum();
         }
@@ -258,21 +259,21 @@ public class Habit implements Serializable, Parcelable {
         }
     }
 
-    public long getEntriesDuration(){
+    public long getEntriesDuration() {
         return this.entriesDuration;
     }
 
-    private long calculateEntriesDurationSum(){
+    private long calculateEntriesDurationSum() {
         long duration = 0;
 
-        if(entries != null) {
+        if (entries != null) {
             for (SessionEntry entry : entries) {
                 duration += entry.getDuration();
             }
 
             return duration;
         }
-        else{
+        else {
             throw new RuntimeException("SessionEntries was null in " + this.getClass().getName());
         }
     }
@@ -340,6 +341,19 @@ public class Habit implements Serializable, Parcelable {
      */
     public void setCategory(@NonNull HabitCategory category) {
         this.category = category;
+    }
+
+    public List<SessionEntry> getEntriesForDate(long dateInMillis) {
+        List<SessionEntry> entries = new ArrayList<>();
+
+        if (this.entries != null && !(this.entries.length == 0)) {
+            for (SessionEntry entry : this.entries) {
+                if (entry.getStartingTimeDate() == dateInMillis)
+                    entries.add(entry);
+            }
+        }
+
+        return entries;
     }
 
     /**

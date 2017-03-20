@@ -15,7 +15,6 @@ import com.example.brandon.habitlogger.HabitActivity.CalendarFragment;
 import com.example.brandon.habitlogger.OverviewActivity.CalendarView.CalendarViewAdapter;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.HabitDataSample;
-import com.example.brandon.habitlogger.data.SessionEntriesSample;
 
 
 public class OverviewCalendarFragment extends Fragment implements UpdateHabitDataSampleInterface {
@@ -49,7 +48,7 @@ public class OverviewCalendarFragment extends Fragment implements UpdateHabitDat
 
         RecyclerView calendarViewContainer = (RecyclerView) v.findViewById(R.id.calendar_view_container);
 
-        SessionEntriesSample sample = callbackInterface.getDataSample().getSessionEntriesSample();
+        HabitDataSample sample = callbackInterface.getDataSample();
         int defaultColor = ContextCompat.getColor(getContext(), R.color.colorAccent);
 
         CalendarViewAdapter mAdapter = new CalendarViewAdapter(sample, defaultColor, getContext());
