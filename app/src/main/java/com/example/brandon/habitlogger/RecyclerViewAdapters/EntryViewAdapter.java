@@ -113,10 +113,12 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
 
         holder.accent.setBackgroundColor(habitDatabase.getHabitColor(holder.habitId));
 
-        String note = item.getNote();
-        if (!note.equals("")) {
+        if (!item.getNote().equals("")) {
             holder.noteText.setText(item.getNote());
             holder.noteText.setTypeface(Typeface.DEFAULT);
+        }else{
+            holder.noteText.setText(context.getResources().getString(R.string.no_note_available_entry));
+            holder.noteText.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
         }
 
         final int maxLines = context.getResources().getInteger(R.integer.entry_card_note_max_lines);

@@ -822,6 +822,7 @@ public class MainActivity extends AppCompatActivity
 
             if (habitDisplayMode == ONLY_ARCHIVED_HABITS)
                 MyCollectionUtils.filter(habitList, Habit.FilterOutNonArchivedHabits);
+
             else if (habitDisplayMode == NO_ARCHIVED_HABITS)
                 MyCollectionUtils.filter(habitList, Habit.FilterOutArchivedHabits);
 

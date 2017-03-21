@@ -78,7 +78,7 @@
                 android:elevation="1dp"
                 android:ellipsize="end"
                 android:maxLines="@integer/entry_card_note_max_lines"
-                android:text="Tap to add note."
+                android:text="@string/no_note_available_entry"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textStyle="normal|italic"/>
 

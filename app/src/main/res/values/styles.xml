@@ -7,11 +7,10 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@color/background</item>
-
     </style>
 
-    <style name="AppTheme.PopupOverlay" parent="@android:style/Widget.PopupMenu">
-        <item name="android:popupBackground">@android:color/white</item>
+    <style name="AppTheme.AppBarOverlay" parent="@android:style/Widget.PopupMenu">
+        <item name="colorControlNormal">@color/android:white</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -19,19 +18,13 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-
-    <style name="AppTheme.Card">
-        <item name="android:layout_margin">4dp</item>
-        <item name="contentPadding">8dp</item>
-        <item name="cardBackgroundColor">@color/habitCard</item>
-    </style>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat" />
 
     <style name="card_title">
-        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Medium</item>
-        <item name="android:textStyle">normal|bold</item>
-        <item name="android:textAlignment">center</item>
         <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/habitCardButtonColor</item>
+
     </style>
 
     <style name="menu_labels_style">
@@ -42,48 +35,15 @@
     <style name="MenuButtonsStyle">
         <item name="fab_size">mini</item>
         <item name="fab_shadowColor">@color/shadow_black</item>
-        <item name="elevation">@dimen/fab_elevation</item>
+        <item name="elevation">4dp</item>
         <item name="fab_colorNormal">?attr/colorAccent</item>
         <item name="fab_colorPressed">?attr/colorPrimaryDark</item>
     </style>
 
-    <style name="circle_button">
-        <item name="android:background">@drawable/circle_background</item>
-        <item name="android:elevation">4dp</item>
-        <item name="android:layout_marginLeft">4dp</item>
-        <item name="android:layout_marginRight">4dp</item>
-    </style>
-
-    <style name="Flat_Button">
-        <item name="android:background">?android:attr/selectableItemBackground</item>
-    </style>
-
-    <style name="Flat_Button.NavigationDrawerItem">
-        <item name="android:drawablePadding">28dp</item>
-        <item name="android:paddingLeft">16dp</item>
-        <item name="android:textAlignment">viewStart</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">#000000</item>
-        <item name="android:typeface">normal</item>
-    </style>
-
-    <style name="CalendarView">
-        <item name="android:background">@drawable/background_calendar_view</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">304dp</item>
-
-        <item name="android:layout_marginTop">4dp</item>
-        <item name="android:layout_marginBottom">0dp</item>
-        <item name="android:layout_marginLeft">4dp</item>
-        <item name="android:layout_marginRight">4dp</item>
-        <item name="android:textSize">20sp</item>
-
-        <item name="content_margin_top">16dp</item>
-        <item name="date_circle_radius">14dp</item>
-        <item name="date_label_color">@color/calendar_view_date_label</item>
-        <item name="date_label_size">14sp</item>
-        <item name="title_color">@color/calendar_view_title</item>
-        <item name="title_margin_top">8dp</item>
+    <style name="AppTheme.Card">
+        <item name="android:layout_margin">4dp</item>
+        <item name="contentPadding">8dp</item>
+        <item name="cardBackgroundColor">@color/habitCard</item>
     </style>
 
 </resources>

@@ -96,5 +96,6 @@
     <string name="action_reset">Reset Entries</string>
     <string name="finish">Finish</string>
     <string name="no_data_available">No Data Available</string>
+    <string name="no_note_available_entry">Tap to add note.</string>
 
 </resources>
