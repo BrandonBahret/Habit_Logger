@@ -47,6 +47,7 @@ import com.example.brandon.habitlogger.RecyclerViewAdapters.ComplexDecoration;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.HabitViewAdapter;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.SpaceOffsetDecoration;
 import com.example.brandon.habitlogger.common.AskForConfirmationDialog;
+import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.RequestCodes;
 import com.example.brandon.habitlogger.common.ResultCodes;
 import com.example.brandon.habitlogger.databinding.ActivityMainBinding;
@@ -435,7 +436,7 @@ public class MainActivity extends AppCompatActivity
 
         int topOffset = useLargeOffset ? (int) getResources().getDimension(R.dimen.large_top_offset_dp) : (int) getResources().getDimension(R.dimen.top_offset_dp);
 
-        if(useLargeOffset && preferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_SECTIONS)
+        if (useLargeOffset && preferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_SECTIONS)
             topOffset += (int) getResources().getDimension(R.dimen.sections_top_offset_dp);
 
         int bottomOffset = (int) getResources().getDimension(R.dimen.bottom_offset_dp);
@@ -817,9 +818,15 @@ public class MainActivity extends AppCompatActivity
         if (preferenceChecker.howToDisplayCategories() != PreferenceChecker.AS_CARDS) {
             habitList = habitDatabase.getHabits();
 
+            habitAdapter = new HabitViewAdapter(habitList, menuItemClickListener, buttonClickListener);
+
+            if (habitDisplayMode == ONLY_ARCHIVED_HABITS)
+                MyCollectionUtils.filter(habitList, Habit.FilterOutNonArchivedHabits);
+            else if (habitDisplayMode == NO_ARCHIVED_HABITS)
+                MyCollectionUtils.filter(habitList, Habit.FilterOutArchivedHabits);
+
             Collections.sort(habitList, Habit.CategoryNameComparator);
 
-            habitAdapter = new HabitViewAdapter(habitList, menuItemClickListener, buttonClickListener);
             habitCardContainer.setAdapter(habitAdapter);
         }
     }
