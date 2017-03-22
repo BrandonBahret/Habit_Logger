@@ -71,8 +71,9 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
                             @Override
                             public void onFinishedWithResult(SessionEntry entry) {
                                 if(entry != null){
+                                    SessionEntry oldEntry = habitDatabase.getEntry(entry.getDatabaseId());
                                     habitDatabase.updateEntry(entry.getDatabaseId(), entry);
-                                    updateSessionEntryById(entry.getDatabaseId(), entry);
+                                    updateSessionEntryById(entry.getDatabaseId(), oldEntry, entry);
                                 }
                             }
 
@@ -163,10 +164,40 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
         entryAdapter.notifyItemRemoved(index);
     }
 
-    public void updateSessionEntryById(long databaseId, SessionEntry entry){
+    public void updateSessionEntryById(long databaseId, SessionEntry oldEntry, SessionEntry newEntry){
         int index = getSessionEntryIndex(databaseId);
-        sessionEntries.set(index, entry);
-        entryAdapter.notifyItemChanged(index);
+        if (index != sessionEntries.size()) {
+            if (oldEntry.isSameStartingTimeAs(newEntry)) {
+                sessionEntries.set(index, newEntry);
+                entryAdapter.notifyItemChanged(index);
+            }
+            else {
+                sessionEntries.remove(index);
+                int newIndex = getPositionForEntry(newEntry);
+                sessionEntries.add(newIndex, newEntry);
+                entryAdapter.notifyItemMoved(index, newIndex);
+                entryAdapter.notifyItemChanged(newIndex);
+            }
+        }
+    }
+
+    private int getPositionForEntry(SessionEntry newEntry) {
+
+        if (sessionEntries.size() <= 1)
+            return 0;
+
+        if (newEntry.getStartTime() < sessionEntries.get(0).getStartTime())
+            return 0;
+
+        for (int i = sessionEntries.size()-1; i >= 0; i--) {
+            SessionEntry entry = sessionEntries.get(i);
+
+            if (newEntry.getStartTime() > entry.getStartTime()) {
+                return i + 1;
+            }
+        }
+
+        return sessionEntries.size() - 1;
     }
     //endregion
 

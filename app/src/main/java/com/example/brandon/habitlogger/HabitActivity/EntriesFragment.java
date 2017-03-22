@@ -69,7 +69,7 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
         }
 
         preferenceChecker = new PreferenceChecker(getContext());
-        fab = (FloatingActionMenu)getActivity().findViewById(R.id.menu_fab);
+        fab = (FloatingActionMenu) getActivity().findViewById(R.id.menu_fab);
     }
 
     @Override
@@ -91,9 +91,10 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
                         dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
                             @Override
                             public void onFinishedWithResult(SessionEntry entry) {
-                                if(entry != null){
+                                if (entry != null) {
+                                    SessionEntry oldEntry = habitDatabase.getEntry(entry.getDatabaseId());
                                     habitDatabase.updateEntry(entry.getDatabaseId(), entry);
-                                    updateSessionEntryById(entry.getDatabaseId(), entry);
+                                    updateSessionEntryById(entry.getDatabaseId(), oldEntry, entry);
                                 }
                             }
 
@@ -111,19 +112,22 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
         entriesContainer.addItemDecoration(new ComplexDecoration(getContext(), R.dimen.entries_section_text_size, new ComplexDecoration.Callback() {
             @Override
             public long getGroupId(int position) {
-                if(position >= 0 && position < sessionEntries.size()) {
+                if (position >= 0 && position < sessionEntries.size()) {
                     return sessionEntries.get(position).getStartingTimeDate();
-                } else{
+                }
+                else {
                     return -1;
                 }
             }
 
-            @Override @NonNull
+            @Override
+            @NonNull
             public String getGroupFirstLine(int position) {
-                if(position >= 0 && position < sessionEntries.size()) {
+                if (position >= 0 && position < sessionEntries.size()) {
                     String dateFormat = preferenceChecker.stringGetDateFormat();
                     return sessionEntries.get(position).getStartTimeAsString(dateFormat);
-                } else{
+                }
+                else {
                     return "";
                 }
             }
@@ -137,13 +141,13 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
         entriesContainer.addOnScrollListener(new RecyclerViewScrollObserver() {
             @Override
             public void onScrollUp() {
-                if(EntriesFragment.this.listener != null)
+                if (EntriesFragment.this.listener != null)
                     EntriesFragment.this.listener.onScrollUp();
             }
 
             @Override
             public void onScrollDown() {
-                if(EntriesFragment.this.listener != null)
+                if (EntriesFragment.this.listener != null)
                     EntriesFragment.this.listener.onScrollDown();
             }
         });
@@ -160,18 +164,18 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        callbackInterface = (CallbackInterface)context;
+        callbackInterface = (CallbackInterface) context;
         callbackInterface.addCallback(this);
 
-        if(context instanceof GetScrollEventsFromFragmentsInterface){
-            this.listener = (GetScrollEventsFromFragmentsInterface)context;
+        if (context instanceof GetScrollEventsFromFragmentsInterface) {
+            this.listener = (GetScrollEventsFromFragmentsInterface) context;
         }
     }
 
-    private int getSessionEntryIndex(long entryId){
+    private int getSessionEntryIndex(long entryId) {
         int index = 0;
-        for(SessionEntry entry : sessionEntries){
-            if(entry.getDatabaseId() == entryId){
+        for (SessionEntry entry : sessionEntries) {
+            if (entry.getDatabaseId() == entryId) {
                 break;
             }
             index++;
@@ -187,23 +191,51 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
 
     public void removeSessionEntryById(long databaseId) {
         int index = getSessionEntryIndex(databaseId);
-        if(index != sessionEntries.size()) {
+        if (index != sessionEntries.size()) {
             sessionEntries.remove(index);
             entryAdapter.notifyItemRemoved(index);
         }
     }
 
-    public void updateSessionEntryById(long databaseId, SessionEntry entry){
+    public void updateSessionEntryById(long databaseId, SessionEntry oldEntry, SessionEntry newEntry) {
         int index = getSessionEntryIndex(databaseId);
-        if(index != sessionEntries.size()) {
-            sessionEntries.set(index, entry);
-            entryAdapter.notifyItemChanged(index);
+        if (index != sessionEntries.size()) {
+            if (oldEntry.isSameStartingTimeAs(newEntry)) {
+                sessionEntries.set(index, newEntry);
+                entryAdapter.notifyItemChanged(index);
+            }
+            else {
+                sessionEntries.remove(index);
+                int newIndex = getPositionForEntry(newEntry);
+                sessionEntries.add(newIndex, newEntry);
+                entryAdapter.notifyItemMoved(index, newIndex);
+                entryAdapter.notifyItemChanged(newIndex);
+            }
         }
+    }
+
+    private int getPositionForEntry(SessionEntry newEntry) {
+
+        if (sessionEntries.size() <= 1)
+            return 0;
+
+        if (newEntry.getStartTime() < sessionEntries.get(0).getStartTime())
+            return 0;
+
+        for (int i = sessionEntries.size()-1; i >= 0; i--) {
+            SessionEntry entry = sessionEntries.get(i);
+
+            if (newEntry.getStartTime() > entry.getStartTime()) {
+                return i + 1;
+            }
+        }
+
+        return sessionEntries.size() - 1;
     }
 
     @Override
     public void updateEntries(SessionEntriesSample dataSample) {
-        if(entryAdapter != null) {
+        if (entryAdapter != null) {
             this.sessionEntries = dataSample.getSessionEntries();
 
             entryAdapter = new EntryViewAdapter(this.sessionEntries, getContext(), entryAdapter.getListener());

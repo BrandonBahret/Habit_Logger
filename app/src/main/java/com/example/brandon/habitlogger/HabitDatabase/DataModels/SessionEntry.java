@@ -124,6 +124,14 @@ public class SessionEntry implements Serializable, Parcelable {
         return String.format(Locale.US, format, startTimeString, getDurationAsString(), getNote());
     }
 
+    public boolean isSameDayAs(SessionEntry entry) {
+        return entry.getStartingTimeDate() == getStartingTimeDate();
+    }
+
+    public boolean isSameStartingTimeAs(SessionEntry entry) {
+        return entry.getStartTime() == getStartTime();
+    }
+
     /**
      * @param startTime a time in milliseconds for the time the session was started.
      */
