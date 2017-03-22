@@ -8,10 +8,9 @@ import android.view.ViewGroup;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.ui.MainActivity;
 
 import java.util.List;
-
-import static android.R.attr.id;
 
 /**
  * Created by Brandon on 12/26/2016.
@@ -21,15 +20,12 @@ import static android.R.attr.id;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
 
+//    private final SessionManager sessionManager;
     List<Habit> habitsList;
-
-    public void removeAt(int position) {
-        habitsList.remove(position);
-        notifyItemRemoved(position);
-    }
 
     private MenuItemClickListener menuItemClickListener;
     private ButtonClickListener buttonClickListener;
+    private static List<SessionEntry> currentEntries;
 
     public interface MenuItemClickListener {
         void onEditClick(long habitId);
@@ -53,10 +49,11 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
         void onCardClicked(long habitId);
     }
 
-    public HabitViewAdapter(List<Habit> habitsList, MenuItemClickListener menuItemClickListener,
+    public HabitViewAdapter(List<Habit> habitsList, MainActivity context, MenuItemClickListener menuItemClickListener,
                             ButtonClickListener buttonClickListener) {
 
         this.habitsList = habitsList;
+//        this.sessionManager = new SessionManager(context);
         this.menuItemClickListener = menuItemClickListener;
         this.buttonClickListener = buttonClickListener;
     }
@@ -82,27 +79,52 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
     @Override
     public void onBindViewHolder(final HabitViewHolder holder, int position) {
         Habit item = habitsList.get(position);
-        holder.itemView.setVisibility(View.VISIBLE);
         holder.bindItem(item, menuItemClickListener, buttonClickListener);
+        holder.setEntry(getSessionForHabitId(item.getDatabaseId()));
+    }
+
+    @Override
+    public void onBindViewHolder(HabitViewHolder holder, int position, List<Object> payloads) {
+        super.onBindViewHolder(holder, position, payloads);
+        if (payloads != null && !payloads.isEmpty()) {
+            holder.setEntry((SessionEntry) payloads.get(0));
+        }
+        else holder.setEntry(null);
+    }
+
+    public void removeAt(int position) {
+        habitsList.remove(position);
+        notifyItemRemoved(position);
     }
 
     public void updateHabitViews(List<SessionEntry> entries) {
+        currentEntries = entries;
+
         for (SessionEntry entry : entries) {
-            // Todo get viewholder from position then .setEntry(entry);
             long habitId = entry.getHabitId();
             int adapterPosition = this.getAdapterItemPosition(habitId);
-
-            HabitViewHolder vh = onCreateViewHolder(null, 0);
-            vh.setEntry(entry);
-
-            onBindViewHolder(vh, adapterPosition);
+            notifyItemChanged(adapterPosition, entry);
         }
     }
 
+    private SessionEntry getSessionForHabitId(long databaseId) {
+        if(currentEntries != null) {
+            for (SessionEntry entry : currentEntries) {
+                if (entry.getHabitId() == databaseId) {
+                    return entry;
+                }
+            }
+        }
+
+        return null;
+    }
+
     private int getAdapterItemPosition(long habitId) {
-        for (int position = 0; position < getItemCount(); position++)
-            if (this.habitsList.get(position).getDatabaseId() == id)
+        for (int position = 0; position < getItemCount(); position++) {
+            if (this.habitsList.get(position).getDatabaseId() == habitId)
                 return position;
+        }
+
         return 0;
     }
 

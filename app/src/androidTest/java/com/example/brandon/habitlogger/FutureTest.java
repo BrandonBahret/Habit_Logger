@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 public class FutureTest {
     @Test
     public void useAppContext() throws Exception {
-        // Context of the app under test.
+        // MainActivity of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         assertEquals("com.example.brandon.habitlogger", appContext.getPackageName());

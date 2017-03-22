@@ -31,6 +31,7 @@ import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.HabitActivity.HabitActivity;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.CategoryHabitsContainer;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitSessions.ActiveSessionsActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
@@ -79,7 +80,6 @@ public class MainActivity extends AppCompatActivity
     List<Habit> habitList = new ArrayList<>();
 
     List<CategoryHabitsContainer> categoryContainers = new ArrayList<>();
-    Runnable updateCards;
     Handler handler = new Handler();
     private ComplexDecoration itemDecoration;
 
@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity
                 else {
                     boolean isPaused = sessionManager.getIsPaused(habitId);
                     sessionManager.setPauseState(habitId, !isPaused);
-//                    handler.post(updateCards);
+                    updateCards.run();
                 }
             }
 
@@ -294,17 +294,6 @@ public class MainActivity extends AppCompatActivity
                 startHabitActivity(habitId);
             }
         };
-
-        updateCards = new Runnable() {
-            @Override
-            public void run() {
-//                List<SessionEntry> entries = sessionManager.getActiveSessionList();
-//                habitAdapter.updateHabitViews(entries);
-
-                handler.postDelayed(updateCards, 1000);
-            }
-        };
-//        handler.post(updateCards);
 
         applyItemDecorationToRecyclerView();
 
@@ -349,7 +338,7 @@ public class MainActivity extends AppCompatActivity
             habitCardContainer.setAdapter(categoryAdapter);
         }
         else {
-            habitAdapter = new HabitViewAdapter(habitList, menuItemClickListener, buttonClickListener);
+            habitAdapter = new HabitViewAdapter(habitList, this, menuItemClickListener, buttonClickListener);
             habitCardContainer.setAdapter(habitAdapter);
             showDatabase();
         }
@@ -362,6 +351,24 @@ public class MainActivity extends AppCompatActivity
         });
 
         updateCurrentSessionCard();
+    }
+
+    private Runnable updateCards = new Runnable() {
+        @Override
+        public void run() {
+            List<SessionEntry> entries = sessionManager.getActiveSessionList();
+            habitAdapter.updateHabitViews(entries);
+
+            handler.postDelayed(updateCards, 1000);
+        }
+    };
+
+    void startRepeatingTask() {
+        updateCards.run();
+    }
+
+    void stopRepeatingTask() {
+        handler.removeCallbacks(updateCards);
     }
 
     private void showCurrentSessionsCard() {
@@ -621,7 +628,6 @@ public class MainActivity extends AppCompatActivity
             sessionNotificationManager.launchNotificationsForAllActiveSessions();
         }
 
-//        handler.post(updateCards);
     }
 
 
@@ -629,6 +635,7 @@ public class MainActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
 
+        stopRepeatingTask();
         RecyclerView rv = ui.mainInclude.habitRecyclerView;
 
         int position = ((LinearLayoutManager) rv.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
@@ -641,13 +648,16 @@ public class MainActivity extends AppCompatActivity
 
         updateCurrentSessionCard();
         showDatabase();
+        startRepeatingTask();
+
+        List<SessionEntry> entries = sessionManager.getActiveSessionList();
+        habitAdapter.updateHabitViews(entries);
 
         if (getIntent().hasExtra("LAST_POSITION")) {
             RecyclerView rv = ui.mainInclude.habitRecyclerView;
             int position = getIntent().getExtras().getInt("LAST_POSITION", 0);
             rv.scrollToPosition(position);
         }
-//        handler.post(updateCards);
     }
 
     public void processUserQuery(String query) {
@@ -818,7 +828,8 @@ public class MainActivity extends AppCompatActivity
         if (preferenceChecker.howToDisplayCategories() != PreferenceChecker.AS_CARDS) {
             habitList = habitDatabase.getHabits();
 
-            habitAdapter = new HabitViewAdapter(habitList, menuItemClickListener, buttonClickListener);
+
+            habitAdapter = new HabitViewAdapter(habitList, this, menuItemClickListener, buttonClickListener);
 
             if (habitDisplayMode == ONLY_ARCHIVED_HABITS)
                 MyCollectionUtils.filter(habitList, Habit.FilterOutNonArchivedHabits);

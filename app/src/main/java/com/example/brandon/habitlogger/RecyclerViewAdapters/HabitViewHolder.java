@@ -25,6 +25,7 @@ public class HabitViewHolder extends ChildViewHolder {
     public Toolbar toolbar;
     public ImageButton playButton;
     public TextView time;
+    private String placeholderTime = "00:00:00";
 
     public HabitViewHolder(View view) {
         super(view);
@@ -130,9 +131,17 @@ public class HabitViewHolder extends ChildViewHolder {
     }
 
     public void setEntry(SessionEntry entry) {
-        time.setText(TimeDisplay.getDisplay(entry.getDuration()));
-        playButton.setImageResource(
-                getResourceIdForPauseButton(entry.getIsPaused())
-        );
+        if (entry!=null){
+            time.setText(TimeDisplay.getDisplay(entry.getDuration()));
+            playButton.setImageResource(
+                    getResourceIdForPauseButton(entry.getIsPaused())
+            );
+        }
+        else {
+            time.setText(placeholderTime);
+            playButton.setImageResource(
+                    getResourceIdForPauseButton(true)
+            );
+        }
     }
 }
