@@ -50,7 +50,6 @@ import com.example.brandon.habitlogger.RecyclerViewAdapters.SpaceOffsetDecoratio
 import com.example.brandon.habitlogger.common.AskForConfirmationDialog;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.RequestCodes;
-import com.example.brandon.habitlogger.common.ResultCodes;
 import com.example.brandon.habitlogger.databinding.ActivityMainBinding;
 import com.github.clans.fab.FloatingActionButton;
 
@@ -594,16 +593,16 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK) {
+        if (requestCode == RequestCodes.SETTINGS_ACTIVITY) {
+            recreate();
+        }
+        else if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case GoogleDriveDataExportManager.REQUEST_CODE_RESOLUTION: {
                     googleDrive.connect();
                 }
                 break;
             }
-        }
-        else if (requestCode == RequestCodes.SETTINGS_ACTIVITY && resultCode == ResultCodes.SETTINGS_CHANGED) {
-            recreate();
         }
     }
 
