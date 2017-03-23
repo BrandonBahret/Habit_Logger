@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -38,7 +39,9 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
         SessionManager.SessionChangeListeners, ActiveSessionViewAdapter.OnClickListeners,
         SearchView.OnQueryTextListener {
 
-    List<SessionEntry> sessionEntriesUndoStack = new ArrayList<>();
+    List<Pair<SessionEntry, Integer>> sessionEntriesUndoStack = new ArrayList<>();
+
+
     List<SessionEntry> sessionEntries;
     SessionManager sessionManager;
 
@@ -62,6 +65,10 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
         sessionManager = new SessionManager(this);
 
         sessionEntries = sessionManager.getActiveSessionList();
+
+        Collections.sort(sessionEntries, SessionEntry.Alphabetical);
+        Collections.sort(sessionEntries, SessionEntry.CategoryComparator);
+
         sessionViewAdapter = new ActiveSessionViewAdapter(sessionEntries, this, this);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
@@ -106,6 +113,10 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (sessionManager.getSessionCount() == 0)
+            finish();
+
         startRepeatingTask();
     }
 
@@ -177,12 +188,14 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     private ItemTouchHelper.Callback createItemTouchCallback() {
         return new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                                  RecyclerView.ViewHolder target) {
                 return false;
             }
 
             @Override
-            public void onChildDrawOver(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            public void onChildDrawOver(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder
+                    viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
                 super.onChildDrawOver(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
 
                 final CardView rootView = ((CardView) (viewHolder.itemView));
@@ -200,7 +213,8 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
                     });
                     anim.setDuration(150);
                     anim.start();
-                }else{
+                }
+                else {
                     rootView.setCardElevation(targetElevation);
                 }
 
@@ -210,7 +224,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
                 long habitId = sessionEntries.get(position).getHabitId();
-                sessionEntriesUndoStack.add(sessionManager.getSession(habitId));
+                sessionEntriesUndoStack.add(0, new Pair<>(sessionManager.getSession(habitId), position));
 
                 sessionManager.cancelSession(habitId);
                 sessionEntries.remove(position);
@@ -224,23 +238,28 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
 
                                 if (sessionManager.getSessionCount() == 0)
                                     finish();
+
+                                if (event != DISMISS_EVENT_CONSECUTIVE)
+                                    sessionEntriesUndoStack.clear();
+
                             }
                         })
                         .setAction("UNDO", new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
 
-                                for (SessionEntry entry : sessionEntriesUndoStack) {
-                                    sessionManager.insertSession(entry);
-                                    sessionEntries.add(entry);
-                                }
+                                for (Pair entryPair : sessionEntriesUndoStack) {
+                                    sessionManager.insertSession((SessionEntry) entryPair.first);
 
-                                Collections.sort(sessionEntries, SessionEntry.Alphabetical);
-                                Collections.sort(sessionEntries, SessionEntry.CategoryComparator);
+                                    sessionEntries.add((Integer) entryPair.second, (SessionEntry) entryPair.first);
+                                    sessionViewAdapter.notifyItemInserted((Integer) entryPair.second);
+                                }
 
                                 sessionEntriesUndoStack.clear();
 
-                                sessionViewAdapter.notifyDataSetChanged();
+//                                Collections.sort(sessionEntries, SessionEntry.Alphabetical);
+//                                Collections.sort(sessionEntries, SessionEntry.CategoryComparator);
+//                                sessionViewAdapter.notifyDataSetChanged();
                             }
                         })
                         .setActionTextColor(ContextCompat.getColor(ActiveSessionsActivity.this, R.color.colorAccent))
@@ -302,7 +321,10 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onSessionEnded(long habitId, boolean wasCanceled) {}
+    public void beforeSessionEnded(long habitId, boolean wasCanceled) {}
+
+    @Override
+    public void afterSessionEnded(long habitId, boolean wasCanceled) {}
 
     @Override
     public void onSessionStarted(long habitId) {}

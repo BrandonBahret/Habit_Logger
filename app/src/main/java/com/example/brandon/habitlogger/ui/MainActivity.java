@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity
             public void onSessionPauseStateChanged(long habitId, boolean isPaused) {}
 
             @Override
-            public void onSessionEnded(long habitId, boolean wasCanceled) {
+            public void beforeSessionEnded(long habitId, boolean wasCanceled) {
                 sessionNotificationManager.cancel((int) habitId);
 
                 for (int i = 0; i < habitList.size(); i++) {
@@ -155,6 +155,11 @@ public class MainActivity extends AppCompatActivity
                         break;
                     }
                 }
+            }
+
+            @Override
+            public void afterSessionEnded(long habitId, boolean wasCanceled) {
+
             }
 
             @Override

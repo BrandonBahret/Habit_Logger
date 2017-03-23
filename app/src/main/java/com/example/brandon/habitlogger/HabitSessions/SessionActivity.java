@@ -375,9 +375,14 @@ public class SessionActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onSessionEnded(long habitId, boolean wasCanceled) {
+    public void beforeSessionEnded(long habitId, boolean wasCanceled) {
         if (habitId == this.mHabit.getDatabaseId() && wasCanceled)
             finish();
+    }
+
+    @Override
+    public void afterSessionEnded(long habitId, boolean wasCanceled) {
+
     }
 
     @Override

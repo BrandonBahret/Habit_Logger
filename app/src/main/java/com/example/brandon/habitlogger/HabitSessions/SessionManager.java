@@ -36,7 +36,9 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
     public interface SessionChangeListeners {
         void onSessionPauseStateChanged(long habitId, boolean isPaused);
 
-        void onSessionEnded(long habitId, boolean wasCanceled);
+        void beforeSessionEnded(long habitId, boolean wasCanceled);
+
+        void afterSessionEnded(long habitId, boolean wasCanceled);
 
         void onSessionStarted(long habitId);
     }
@@ -75,6 +77,7 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
     }
 
     private long deleteSession(long habitId) {
+
         return writableDatabase.delete(
                 SessionsTableSchema.TABLE_NAME,
                 SessionsTableSchema.HABIT_ID + " =?",
@@ -100,11 +103,19 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
     public long cancelSession(long habitId) {
         if (sessionChangeListeners != null) {
             for (SessionChangeListeners listener : sessionChangeListeners) {
-                listener.onSessionEnded(habitId, true);
+                listener.beforeSessionEnded(habitId, true);
             }
         }
 
-        return deleteSession(habitId);
+        long res = deleteSession(habitId);
+
+        if (sessionChangeListeners != null) {
+            for (SessionChangeListeners listener : sessionChangeListeners) {
+                listener.afterSessionEnded(habitId, true);
+            }
+        }
+
+        return res;
     }
 
     public long calculateElapsedTimeForEntry(long habitId) {
@@ -178,7 +189,7 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
 
         if (sessionChangeListeners != null) {
             for (SessionChangeListeners listener : sessionChangeListeners) {
-                listener.onSessionEnded(habitId, false);
+                listener.beforeSessionEnded(habitId, false);
             }
         }
 
