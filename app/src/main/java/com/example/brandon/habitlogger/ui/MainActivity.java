@@ -355,6 +355,10 @@ public class MainActivity extends AppCompatActivity
         });
 
         updateCurrentSessionCard();
+        if (savedInstanceState != null) {
+            RecyclerView rv = ui.mainInclude.habitRecyclerView;
+            rv.getLayoutManager().onRestoreInstanceState(savedInstanceState.getParcelable("LAST_POSITION"));
+        }
     }
 
     private Runnable updateCards = new Runnable() {
@@ -613,6 +617,9 @@ public class MainActivity extends AppCompatActivity
         if (categoryAdapter != null) {
             categoryAdapter.onSaveInstanceState(outState);
         }
+
+        RecyclerView rv = ui.mainInclude.habitRecyclerView;
+        outState.putParcelable("LAST_POSITION", rv.getLayoutManager().onSaveInstanceState());
     }
 
     @Override
@@ -642,13 +649,19 @@ public class MainActivity extends AppCompatActivity
         stopRepeatingTask();
         RecyclerView rv = ui.mainInclude.habitRecyclerView;
 
-        int position = ((LinearLayoutManager) rv.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-        getIntent().putExtra("LAST_POSITION", position);
+        getIntent().putExtra("LAST_POSITION", rv.getLayoutManager().onSaveInstanceState());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (getIntent().hasExtra("LAST_POSITION")) {
+            RecyclerView rv = ui.mainInclude.habitRecyclerView;
+            rv.getLayoutManager().onRestoreInstanceState(getIntent().getExtras().getParcelable("LAST_POSITION"));
+//            int position = getIntent().getExtras().getInt("LAST_POSITION", 0);
+//            rv.scrollToPosition(position);
+        }
 
         updateCurrentSessionCard();
         showDatabase();
@@ -656,12 +669,6 @@ public class MainActivity extends AppCompatActivity
 
         List<SessionEntry> entries = sessionManager.getActiveSessionList();
         habitAdapter.updateHabitViews(entries);
-
-        if (getIntent().hasExtra("LAST_POSITION")) {
-            RecyclerView rv = ui.mainInclude.habitRecyclerView;
-            int position = getIntent().getExtras().getInt("LAST_POSITION", 0);
-            rv.scrollToPosition(position);
-        }
     }
 
     public void processUserQuery(String query) {
@@ -793,6 +800,7 @@ public class MainActivity extends AppCompatActivity
                 captionDescription.setAlpha(1);
             }
         }
+
     }
 
     public void updateCurrentSessionCard() {
