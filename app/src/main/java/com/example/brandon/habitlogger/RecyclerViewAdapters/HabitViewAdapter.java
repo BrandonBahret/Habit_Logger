@@ -20,7 +20,7 @@ import java.util.List;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
 
-//    private final SessionManager sessionManager;
+    //    private final SessionManager sessionManager;
     List<Habit> habitsList;
 
     private MenuItemClickListener menuItemClickListener;
@@ -89,7 +89,6 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
         if (payloads != null && !payloads.isEmpty()) {
             holder.setEntry((SessionEntry) payloads.get(0));
         }
-        else holder.setEntry(null);
     }
 
     public void removeAt(int position) {
@@ -108,7 +107,7 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
     }
 
     private SessionEntry getSessionForHabitId(long databaseId) {
-        if(currentEntries != null) {
+        if (currentEntries != null) {
             for (SessionEntry entry : currentEntries) {
                 if (entry.getHabitId() == databaseId) {
                     return entry;
