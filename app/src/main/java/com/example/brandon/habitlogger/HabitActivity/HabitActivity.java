@@ -458,6 +458,8 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
     @Override
     public void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
+        dateRangeManager.entryChanged(oldEntry, newEntry);
+
         Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
         HabitActivity.this.sessionEntries = habitDatabase.lookUpEntries(ids);
         dateRangeManager.updateSessionEntries(HabitActivity.this.sessionEntries);
@@ -495,7 +497,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
                     fragment.setListener(new CalendarFragment.Listener() {
                         @Override
                         public void onDateClicked(int year, int month, int dayOfMonth) {
-                            dateRangeManager.setDateRangeForDate(year, month, dayOfMonth);
+                            dateRangeManager.setDateRangeForDate(year, month, dayOfMonth, true);
                             viewPager.setCurrentItem(0, true);
                         }
                     });

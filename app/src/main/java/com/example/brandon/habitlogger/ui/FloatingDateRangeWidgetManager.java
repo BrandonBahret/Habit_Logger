@@ -19,6 +19,7 @@ import com.example.brandon.habitlogger.common.TimeDisplay;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -84,7 +85,7 @@ public class FloatingDateRangeWidgetManager {
         viewHolder.rangeType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                onItemSelectedMethod(position);
+                onItemSelectedMethod(position, true);
             }
 
             @Override
@@ -95,31 +96,31 @@ public class FloatingDateRangeWidgetManager {
         updateSessionEntries(sessionEntries);
         updateMinMaxTimestamps(sessionEntries);
 
-        setStartRange();
+        setStartRange(true);
     }
 
-    public void refreshDateRange(){
+    public void refreshDateRange(boolean shouldNotify) {
         int pos = viewHolder.rangeType.getSelectedItemPosition();
-        onItemSelectedMethod(pos);
+        onItemSelectedMethod(pos, shouldNotify);
     }
 
-    private void onItemSelectedMethod(int position) {
+    private void onItemSelectedMethod(int position, boolean shouldNotify) {
         // Time presets: Year, Month, Week, Day in milliseconds
         final long MONTH_IN_MILLIS = DateUtils.YEAR_IN_MILLIS / 12;
         long timePresets[] = new long[]{DateUtils.YEAR_IN_MILLIS, MONTH_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, 0};
         if (position != 0 && position < 5) {
-            setPresetDateRange(timePresets[position - 1]);
+            setPresetDateRange(timePresets[position - 1], shouldNotify);
         }
 
         else {
             switch (position) {
                 case 0: {
-                    setStartRange();
+                    setStartRange(shouldNotify);
                 }
                 break;
 
                 case 5: {
-                    setCustomRange();
+                    setCustomRange(shouldNotify);
                 }
                 break;
             }
@@ -150,7 +151,7 @@ public class FloatingDateRangeWidgetManager {
                     if (time > dateFromTime)
                         dateToTime = time;
                 }
-                updateDateRangeLabels();
+                updateDateRangeLabels(true);
             }
         });
         dialog.show(activity.getSupportFragmentManager(), "text");
@@ -187,11 +188,11 @@ public class FloatingDateRangeWidgetManager {
             hideView();
     }
 
-    public void hideView(boolean animate){
-        if(animate){
+    public void hideView(boolean animate) {
+        if (animate) {
             hideView();
         }
-        else{
+        else {
             viewHolder.view.setTranslationY(viewHolder.view.getHeight());
             viewHolder.view.setAlpha(0);
         }
@@ -223,23 +224,31 @@ public class FloatingDateRangeWidgetManager {
         viewHolder.dateTo.setEnabled(state);
     }
 
-    private void updateDateRangeLabels() {
+    private void updateDateRangeLabels(boolean shouldNotify) {
         viewHolder.dateTo.setText(getDate(dateToTime, preferenceChecker.stringGetDateFormat()));
         viewHolder.dateFrom.setText(getDate(dateFromTime, preferenceChecker.stringGetDateFormat()));
 
-        notifyDateRangeChanged(dateFromTime, dateToTime);
+        if (shouldNotify)
+            notifyDateRangeChanged(dateFromTime, dateToTime);
     }
 
-    public void updateMinMaxTimestamps(List<SessionEntry> sessionEntries){
-        int numberOfEntries = sessionEntries.size();
-
-        this.minimumTime = sessionEntries.isEmpty() ? 0 :
-                sessionEntries.get(0).getStartTime();
+    public void updateMinMaxTimestamps(List<SessionEntry> sessionEntries) {
+        this.minimumTime = Collections.min(sessionEntries, SessionEntry.StartingTimeComparator).getStartTime();
         this.minimumTime = MyTimeUtils.setTimePortion(this.minimumTime, true, 0, 0, 0, 0);
 
-        this.maximumTime = sessionEntries.isEmpty() ? 0 :
-                sessionEntries.get(numberOfEntries - 1).getStartTime();
+        this.maximumTime = Collections.max(sessionEntries, SessionEntry.StartingTimeComparator).getStartTime();
         this.maximumTime = MyTimeUtils.setTimePortion(this.minimumTime, false, 11, 59, 59, 999);
+    }
+
+    public void entryChanged(SessionEntry oldEntry, SessionEntry newEntry) {
+        if(newEntry.getStartTime() > maximumTime){
+            this.maximumTime = MyTimeUtils.setTimePortion(newEntry.getStartTime(), false, 11, 59, 59, 999);
+            refreshDateRange(false);
+        }
+        else if(newEntry.getStartTime() < minimumTime){
+            this.minimumTime = MyTimeUtils.setTimePortion(newEntry.getStartTime(), true, 0, 0, 0, 0);
+            refreshDateRange(false);
+        }
     }
 
     public void updateSessionEntries(List<SessionEntry> sessionEntries) {
@@ -253,30 +262,33 @@ public class FloatingDateRangeWidgetManager {
         viewHolder.entriesCountText.setText(String.valueOf(numberOfEntries));
         String totalTimeString = TimeDisplay.getDisplay(totalDuration);
         viewHolder.totalTimeText.setText(totalTimeString);
+
+        updateMinMaxTimestamps(sessionEntries);
+        refreshDateRange(false);
     }
 
-    public void setPresetDateRange(long time) {
+    public void setPresetDateRange(long time, boolean shouldNotify) {
         setDateRangeEnabled(false);
 
         dateToTime = MyTimeUtils.setTimePortion(getCurrentTime(), false, 11, 59, 59, 999);
         dateFromTime = MyTimeUtils.setTimePortion(dateToTime - time, true, 0, 0, 0, 0);
-        updateDateRangeLabels();
+        updateDateRangeLabels(shouldNotify);
     }
 
-    public void setStartRange() {
+    public void setStartRange(boolean shouldNotify) {
         setDateRangeEnabled(false);
 
         dateToTime = MyTimeUtils.setTimePortion(getCurrentTime(), false, 11, 59, 59, 999);
         dateFromTime = minimumTime;
-        updateDateRangeLabels();
+        updateDateRangeLabels(shouldNotify);
     }
 
-    public void setCustomRange() {
+    public void setCustomRange(boolean shouldNotify) {
         setDateRangeEnabled(true);
-        updateDateRangeLabels();
+        updateDateRangeLabels(shouldNotify);
     }
 
-    public void setDateRangeForDate(int year, int month, int dayOfMonth) {
+    public void setDateRangeForDate(int year, int month, int dayOfMonth, boolean shouldNotify) {
         viewHolder.rangeType.setSelection(5);
 
         Calendar c = Calendar.getInstance();
@@ -285,7 +297,7 @@ public class FloatingDateRangeWidgetManager {
         dateToTime = MyTimeUtils.setTimePortion(c, false, 11, 59, 59, 999);
         dateFromTime = MyTimeUtils.setTimePortion(dateToTime - DateUtils.DAY_IN_MILLIS, true, 0, 0, 0, 0);
 
-        updateDateRangeLabels();
+        updateDateRangeLabels(shouldNotify);
     }
 
     public long getDateFrom() {
