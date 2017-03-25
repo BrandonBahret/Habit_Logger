@@ -97,5 +97,8 @@
     <string name="finish">Finish</string>
     <string name="no_data_available">No Data Available</string>
     <string name="no_note_available_entry">Tap to add note.</string>
+    <string name="habit_session_activity_label">Habit Session</string>
+    <string name="active_habits_activity_label">Active Habits</string>
+    <string name="about_activity_label">About</string>
 
 </resources>

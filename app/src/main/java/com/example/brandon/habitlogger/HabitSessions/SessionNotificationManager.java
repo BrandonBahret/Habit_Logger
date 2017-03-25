@@ -14,7 +14,6 @@ import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.HabitViewHolder;
-import com.example.brandon.habitlogger.common.TimeDisplay;
 
 import java.io.Serializable;
 
@@ -58,7 +57,7 @@ public class SessionNotificationManager {
 
         if (sessionManager.getIsSessionActive(habitId)) {
             SessionEntry entry = sessionManager.getSession(habitId);
-            remoteViews.setTextViewText(R.id.active_habit_time, TimeDisplay.getDisplay(entry.getDuration()));
+            remoteViews.setTextViewText(R.id.active_habit_time, entry.stringifyDuration());
             remoteViews.setTextViewText(R.id.time_started, entry.getStartTimeAsString("h:mm a"));
             remoteViews.setOnClickPendingIntent(R.id.session_pause_play, getPendingIntentForSessionToggle(habit));
             remoteViews.setInt(

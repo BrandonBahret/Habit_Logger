@@ -20,7 +20,7 @@ import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.HabitViewHolder;
-import com.example.brandon.habitlogger.common.TimeDisplay;
+import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.databinding.ActivitySessionBinding;
 
 import java.util.Locale;
@@ -174,11 +174,12 @@ public class SessionActivity extends AppCompatActivity implements
 
         if (forceUpdate || shouldUpdate) {
             SessionEntry entry = mSessionManager.getSession(mHabit.getDatabaseId());
-            TimeDisplay display = new TimeDisplay(entry.getDuration());
 
-            ui.sessionHoursView.setText(String.format(Locale.US, "%02d", display.hours));
-            ui.sessionMinutesView.setText(String.format(Locale.US, "%02d", display.minutes));
-            ui.sessionSecondsView.setText(String.format(Locale.US, "%02d", display.seconds));
+            int time[] = MyTimeUtils.getTimePortion(entry.getDuration());
+
+            ui.sessionHoursView.setText(String.format(Locale.US, "%02d",   time[0]));
+            ui.sessionMinutesView.setText(String.format(Locale.US, "%02d", time[1]));
+            ui.sessionSecondsView.setText(String.format(Locale.US, "%02d", time[2]));
         }
     }
 

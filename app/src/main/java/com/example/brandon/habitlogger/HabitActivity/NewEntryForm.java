@@ -14,7 +14,7 @@ import android.view.View;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.common.TimeDisplay;
+import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.databinding.DialogNewEntryBinding;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -110,7 +110,7 @@ public class NewEntryForm extends DialogFragment {
         ui.startingTime.setText(entry.getStartTimeAsString("h:mm a"));
         ui.sessionDate.setText(entry.getStartTimeAsString(new PreferenceChecker(getContext()).stringGetDateFormat()));
 
-        TimeDisplay time = new TimeDisplay(entry.getDuration());
+        int time[] = MyTimeUtils.getTimePortion(entry.getDuration());
 
         ui.hours.setMinValue(0);
         ui.hours.setMaxValue(8760);
@@ -121,9 +121,9 @@ public class NewEntryForm extends DialogFragment {
         ui.seconds.setMinValue(0);
         ui.seconds.setMaxValue(59);
 
-        ui.hours.setValue((int) time.hours);
-        ui.minutes.setValue((int) time.minutes);
-        ui.seconds.setValue((int) time.seconds);
+        ui.hours.setValue(time[0]);
+        ui.minutes.setValue(time[1]);
+        ui.seconds.setValue(time[2]);
 
         ui.sessionDate.setOnClickListener(new View.OnClickListener() {
             @Override

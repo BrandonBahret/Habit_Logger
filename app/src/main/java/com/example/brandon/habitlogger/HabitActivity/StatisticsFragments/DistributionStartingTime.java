@@ -13,7 +13,7 @@ import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
 import com.example.brandon.habitlogger.HabitActivity.UpdateEntriesInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.common.TimeDisplay;
+import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.databinding.FragmentDistributionStartingTimeBinding;
 import com.github.mikephil.charting.charts.CombinedChart;
@@ -135,7 +135,7 @@ public class DistributionStartingTime extends Fragment implements UpdateEntriesI
             @Override
             public String getFormattedValue(float counterIndex, AxisBase axis) {
                 long time = (long) counterIndex * interval * DateUtils.MINUTE_IN_MILLIS;
-                return TimeDisplay.getTimeAsString(time, "h a");
+                return MyTimeUtils.stringifyTimePortion(time, "h a");
             }
         });
 

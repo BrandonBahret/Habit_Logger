@@ -5,7 +5,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 
-import com.example.brandon.habitlogger.common.TimeDisplay;
+import com.example.brandon.habitlogger.common.MyTimeUtils;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -122,6 +122,24 @@ public class SessionEntry implements Serializable, Parcelable {
         String format = "{\n\tStarting Time: %s,\n\tDuration: %s\n\tNote: %s\n}\n";
         String startTimeString = getDate(getStartTime(), "MMMM/dd/yyyy");
         return String.format(Locale.US, format, startTimeString, getDurationAsString(), getNote());
+    }
+
+    public static String stringifyDuration(long duration) {
+        int[] timeComponents = MyTimeUtils.getTimePortion(duration);
+        int hours = timeComponents[0];
+        int minutes = timeComponents[1];
+        int seconds = timeComponents[2];
+
+        return String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    public String stringifyDuration() {
+        int[] timeComponents = MyTimeUtils.getTimePortion(this.mDuration);
+        int hours = timeComponents[0];
+        int minutes = timeComponents[1];
+        int seconds = timeComponents[2];
+
+        return String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds);
     }
 
     public boolean isSameDayAs(SessionEntry entry) {
@@ -314,7 +332,7 @@ public class SessionEntry implements Serializable, Parcelable {
     }
 
     public String getDurationAsString() {
-        return TimeDisplay.getDisplay(getDuration());
+        return stringifyDuration(getDuration());
     }
 
     public String getStartTimeAsString(String dateFormat) {

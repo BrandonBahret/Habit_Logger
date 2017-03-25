@@ -29,7 +29,7 @@ import com.example.brandon.habitlogger.ModifyHabitActivity.EditHabitDialog;
 import com.example.brandon.habitlogger.ModifyHabitActivity.NewHabitDialog;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.common.AskForConfirmationDialog;
+import com.example.brandon.habitlogger.common.ConfirmationDialog;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager;
@@ -316,7 +316,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
                 String actionName = archivedState ? "Unarchive" : "Archive";
                 String actionNameLower = archivedState ? "unarchive" : "archive";
 
-                new AskForConfirmationDialog(HabitActivity.this)
+                new ConfirmationDialog(HabitActivity.this)
                         .setTitle("Confirm " + actionName)
                         .setMessage("Do you really want to " + actionNameLower + " '" + habitName + "'? ")
                         .setOnYesClickListener(new DialogInterface.OnClickListener() {
@@ -342,7 +342,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
                 String habitName = habitDatabase.getHabitName(habitId);
 
-                new AskForConfirmationDialog(HabitActivity.this)
+                new ConfirmationDialog(HabitActivity.this)
                         .setTitle("Confirm Data Reset")
                         .setMessage("Do you really want to delete all entries for '" + habitName + "'?")
                         .setOnYesClickListener(new DialogInterface.OnClickListener() {
@@ -359,7 +359,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
             case (R.id.menu_delete_habit): {
                 String habitName = habitDatabase.getHabitName(habitId);
 
-                new AskForConfirmationDialog(HabitActivity.this)
+                new ConfirmationDialog(HabitActivity.this)
                         .setTitle("Confirm Delete")
                         .setMessage("Do you really want to delete '" + habitName + "'?")
                         .setOnYesClickListener(new DialogInterface.OnClickListener() {

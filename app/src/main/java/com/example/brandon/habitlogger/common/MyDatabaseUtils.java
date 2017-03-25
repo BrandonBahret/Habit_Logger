@@ -17,6 +17,7 @@ public class MyDatabaseUtils {
         int setAttribute(long recordId, String columnKey, Object object);
     }
 
+    //region Get attributes from a database {}
     /**
      * @param readableDatabase Sqlite database object to query.
      * @param tableName        The name of the table to query.
@@ -46,6 +47,29 @@ public class MyDatabaseUtils {
         return clazz.cast(result);
     }
 
+    public static Object getObjectFromCursor(Cursor cursor, int columnIndex) {
+        final int type = cursor.getType(columnIndex);
+
+        switch (type) {
+            case (Cursor.FIELD_TYPE_STRING):
+                return cursor.getString(columnIndex);
+
+            case (Cursor.FIELD_TYPE_INTEGER):
+                return cursor.getLong(columnIndex);
+
+            case (Cursor.FIELD_TYPE_FLOAT):
+                return cursor.getDouble(columnIndex);
+
+            case (Cursor.FIELD_TYPE_BLOB):
+                return cursor.getBlob(columnIndex);
+
+            default:
+                return null;
+        }
+    }
+    //endregion
+
+    //region Set attributes in a database {}
     /**
      * @param writableDatabase Sqlite database object to update.
      * @param tableName        The name of the table to update.
@@ -74,36 +98,5 @@ public class MyDatabaseUtils {
         return writableDatabase.update(tableName, value,
                 recordKey + " =?", new String[]{String.valueOf(recordId)});
     }
-
-    public static Object getObjectFromCursor(Cursor cursor, int columnIndex) {
-        final int type = cursor.getType(columnIndex);
-        Object result;
-
-        switch (type) {
-            case (Cursor.FIELD_TYPE_STRING): {
-                result = cursor.getString(columnIndex);
-            }
-            break;
-
-            case (Cursor.FIELD_TYPE_INTEGER): {
-                result = cursor.getLong(columnIndex);
-            }
-            break;
-
-            case (Cursor.FIELD_TYPE_FLOAT): {
-                result = cursor.getDouble(columnIndex);
-            }
-            break;
-
-            case (Cursor.FIELD_TYPE_BLOB): {
-                result = cursor.getBlob(columnIndex);
-            }
-            break;
-
-            default:
-                result = null;
-        }
-
-        return result;
-    }
+    //endregion
 }

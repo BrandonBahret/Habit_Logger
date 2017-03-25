@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.common.TimeDisplay;
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder;
 
 /**
@@ -132,7 +131,7 @@ public class HabitViewHolder extends ChildViewHolder {
 
     public void setEntry(SessionEntry entry) {
         if (entry!=null){
-            time.setText(TimeDisplay.getDisplay(entry.getDuration()));
+            time.setText(entry.stringifyDuration());
             playButton.setImageResource(
                     getResourceIdForPauseButton(entry.getIsPaused())
             );

@@ -13,7 +13,6 @@ import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitSessions.DatabaseSchema.DatabaseSchema;
 import com.example.brandon.habitlogger.HabitSessions.DatabaseSchema.SessionsTableSchema;
 import com.example.brandon.habitlogger.common.MyDatabaseUtils;
-import com.example.brandon.habitlogger.common.TimeDisplay;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -285,7 +284,7 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
     }
 
     public String getDurationAsString(long habitId) {
-        return TimeDisplay.getDisplay(getDuration(habitId) / DateUtils.SECOND_IN_MILLIS);
+        return SessionEntry.stringifyDuration(getDuration(habitId) / DateUtils.SECOND_IN_MILLIS);
     }
 
     public String getNote(long habitId) {

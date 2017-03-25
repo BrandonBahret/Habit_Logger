@@ -47,7 +47,7 @@ import com.example.brandon.habitlogger.RecyclerViewAdapters.CategoryCardAdapter;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.ComplexDecoration;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.HabitViewAdapter;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.SpaceOffsetDecoration;
-import com.example.brandon.habitlogger.common.AskForConfirmationDialog;
+import com.example.brandon.habitlogger.common.ConfirmationDialog;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.RequestCodes;
 import com.example.brandon.habitlogger.databinding.ActivityMainBinding;
@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity
             public void onResetClick(final long habitId) {
                 String habitName = habitDatabase.getHabitName(habitId);
 
-                new AskForConfirmationDialog(MainActivity.this)
+                new ConfirmationDialog(MainActivity.this)
                         .setTitle("Confirm Data Reset")
                         .setMessage("Do you really want to delete all entries for '" + habitName + "'?")
                         .setOnYesClickListener(new DialogInterface.OnClickListener() {
@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity
 
                 String habitName = habitDatabase.getHabitName(habitId);
 
-                new AskForConfirmationDialog(MainActivity.this)
+                new ConfirmationDialog(MainActivity.this)
                         .setTitle("Confirm Delete")
                         .setMessage("Do you really want to delete '" + habitName + "'?")
                         .setOnYesClickListener(new DialogInterface.OnClickListener() {
@@ -253,7 +253,7 @@ public class MainActivity extends AppCompatActivity
                 String actionName = archivedState ? "Unarchive" : "Archive";
                 String actionNameLower = archivedState ? "unarchive" : "archive";
 
-                new AskForConfirmationDialog(MainActivity.this)
+                new ConfirmationDialog(MainActivity.this)
                         .setTitle("Confirm " + actionName)
                         .setMessage("Do you really want to " + actionNameLower + " '" + habitName + "'? ")
                         .setOnYesClickListener(new DialogInterface.OnClickListener() {

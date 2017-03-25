@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.example.brandon.habitlogger.common.MyCollectionUtils;
+import com.android.internal.util.Predicate;
 import com.opencsv.CSVReader;
 
 import java.io.IOException;
@@ -195,16 +195,16 @@ public class Habit implements Serializable, Parcelable {
         }
     };
 
-    public static MyCollectionUtils.Filter<Habit> FilterOutArchivedHabits = new MyCollectionUtils.Filter<Habit>() {
+    public static Predicate<Habit> FilterOutArchivedHabits = new Predicate<Habit>() {
         @Override
-        public boolean retain(Habit item) {
+        public boolean apply(Habit item) {
             return !item.getIsArchived();
         }
     };
 
-    public static MyCollectionUtils.Filter<Habit> FilterOutNonArchivedHabits = new MyCollectionUtils.Filter<Habit>() {
+    public static Predicate<Habit> FilterOutNonArchivedHabits = new Predicate<Habit>() {
         @Override
-        public boolean retain(Habit item) {
+        public boolean apply(Habit item) {
             return item.getIsArchived();
         }
     };

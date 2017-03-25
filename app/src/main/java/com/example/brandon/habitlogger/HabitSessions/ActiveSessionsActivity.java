@@ -26,7 +26,6 @@ import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.ActiveSessionViewAdapter;
-import com.example.brandon.habitlogger.common.TimeDisplay;
 import com.example.brandon.habitlogger.databinding.ActivityActiveSessionsBinding;
 
 import java.io.Serializable;
@@ -156,7 +155,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
 
                     if (item != null) {
                         TextView timeTextView = (TextView) item.findViewById(R.id.active_habit_time);
-                        timeTextView.setText(TimeDisplay.getDisplay(entry.getDuration()));
+                        timeTextView.setText(entry.stringifyDuration());
                     }
                 }
                 else {

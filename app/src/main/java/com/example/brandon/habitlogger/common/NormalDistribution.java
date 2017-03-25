@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * Created by Brandon on 3/4/2017.
+ * Class for calculating normal distribution curves from histogram data. (Currently not working properly)
  */
 
 public class NormalDistribution {
@@ -40,12 +41,17 @@ public class NormalDistribution {
         return entries;
     }
 
-    private double curveFormula(double value) {
-        final double SD_TIMES_SQRT_TWO_PI = this.standardDeviation * Math.sqrt(2 * Math.PI);
-        final double VALUE_MINUS_MEAN_SQUARED = Math.pow((value - this.mean), 2);
-        final double TWO_TIMES_SD_SQUARED = 2 * Math.pow(this.standardDeviation, 2);
+    //region // Methods responsible for calculating curve points
+    private Double calculateSum(List<Double> values) {
+        double sum = 0;
+        for (Double value : values)
+            sum += value;
 
-        return (1 / SD_TIMES_SQRT_TWO_PI) * Math.pow(Math.E, -(VALUE_MINUS_MEAN_SQUARED / TWO_TIMES_SD_SQUARED));
+        return sum;
+    }
+
+    private Double calculateMean(List<Double> values) {
+        return calculateSum(values) / (double) values.size();
     }
 
     /**
@@ -66,15 +72,12 @@ public class NormalDistribution {
         return Math.sqrt(meanOfDeviations);
     }
 
-    private Double calculateMean(List<Double> values) {
-        return calculateSum(values) / (double) values.size();
-    }
+    private double curveFormula(double value) {
+        final double SD_TIMES_SQRT_TWO_PI = this.standardDeviation * Math.sqrt(2 * Math.PI);
+        final double VALUE_MINUS_MEAN_SQUARED = Math.pow((value - this.mean), 2);
+        final double TWO_TIMES_SD_SQUARED = 2 * Math.pow(this.standardDeviation, 2);
 
-    private Double calculateSum(List<Double> values) {
-        double sum = 0;
-        for (Double value : values)
-            sum += value;
-
-        return sum;
+        return (1 / SD_TIMES_SQRT_TWO_PI) * Math.pow(Math.E, -(VALUE_MINUS_MEAN_SQUARED / TWO_TIMES_SD_SQUARED));
     }
+    //endregion
 }

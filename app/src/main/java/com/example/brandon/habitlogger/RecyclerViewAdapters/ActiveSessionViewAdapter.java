@@ -14,7 +14,6 @@ import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.common.TimeDisplay;
 
 import java.util.List;
 
@@ -92,7 +91,7 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
         if (sessionManager.getIsSessionActive(habitId)) {
             holder.habitId = habitId;
             holder.name.setText(item.getHabit().getName());
-            holder.time.setText(TimeDisplay.getDisplay(item.getDuration()));
+            holder.time.setText(item.stringifyDuration());
             holder.timeStarted.setText(item.getStartTimeAsString("h:mm a"));
 
             int color = habitDatabase.getHabitColor(habitId);
