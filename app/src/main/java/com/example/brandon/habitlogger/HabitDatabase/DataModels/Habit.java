@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.android.internal.util.Predicate;
+import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.opencsv.CSVReader;
 
 import java.io.IOException;
@@ -93,6 +94,22 @@ public class Habit implements Serializable, Parcelable {
         this.isArchived = 0;
     }
 
+    public static Habit duplicate(Habit habit) {
+        Habit result = new Habit(habit.name, habit.category);
+
+        result.description = habit.description;
+        result.iconResId = habit.iconResId;
+        result.databaseId = habit.databaseId;
+        result.isArchived = habit.isArchived;
+
+        if (habit.entries != null) {
+            result.entries = habit.entries;
+            result.entriesDuration = habit.entriesDuration;
+        }
+
+        return result;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -112,6 +129,13 @@ public class Habit implements Serializable, Parcelable {
         @Override
         public Habit[] newArray(int size) {
             return new Habit[size];
+        }
+    };
+
+    public static MyCollectionUtils.IGetKey IGetEntriesDuration = new MyCollectionUtils.IGetKey() {
+        @Override
+        public Object get(Object object) {
+            return ((Habit) object).getEntriesDuration();
         }
     };
 
@@ -198,14 +222,14 @@ public class Habit implements Serializable, Parcelable {
     public static Predicate<Habit> FilterOutArchivedHabits = new Predicate<Habit>() {
         @Override
         public boolean apply(Habit item) {
-            return !item.getIsArchived();
+            return item.getIsArchived();
         }
     };
 
     public static Predicate<Habit> FilterOutNonArchivedHabits = new Predicate<Habit>() {
         @Override
         public boolean apply(Habit item) {
-            return item.getIsArchived();
+            return !item.getIsArchived();
         }
     };
 
@@ -380,6 +404,14 @@ public class Habit implements Serializable, Parcelable {
         return entries;
     }
 
+    @Nullable
+    public List<SessionEntry> getEntriesAsList(){
+        if(entries != null)
+            return Arrays.asList(entries);
+
+        return null;
+    }
+
     /**
      * @param newEntries The new entry array to replace the old entries.
      */
@@ -432,5 +464,9 @@ public class Habit implements Serializable, Parcelable {
 
     public boolean getFilterBit() {
         return this.filter;
+    }
+
+    public boolean hasEntries() {
+        return entries != null;
     }
 }

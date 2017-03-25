@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.data;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.common.MyCollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,17 +11,19 @@ import java.util.List;
 
 /**
  * Created by Brandon on 2/28/2017.
- *
+ * This is a class to structure a sample of session entries on the categorical level.
  */
 
-public class CategoryDataSample {
+public final class CategoryDataSample {
 
+    //region (Member Attributes)
     private final HabitCategory mCategory;
     private final Habit[] mHabits;
-    private final int mNumberOfHabits;
     private final long mDateFromTime;
     private final long mDateToTime;
-    private long mDuration = -1;
+    private List<SessionEntry> mSessionEntries;
+    private Long mDuration;
+    //endregion
 
     public CategoryDataSample(HabitCategory category, Habit[] habits,
                               long dateFromTime, long dateToTime) {
@@ -28,43 +31,61 @@ public class CategoryDataSample {
         mCategory = category;
         mHabits = habits;
         Arrays.sort(mHabits, Habit.DurationComparator);
-        mNumberOfHabits = habits.length;
         mDateFromTime = dateFromTime;
         mDateToTime = dateToTime;
     }
 
-    public long calculateTotalDuration() {
-        if (mDuration == -1) {
-            mDuration = 0;
-            for(Habit habit : mHabits){
-                mDuration += habit.getEntriesDuration();
-            }
+    /**
+     * @param timestamp Epoch timestamp for a certain date to filter for.
+     */
+    public CategoryDataSample getDataSampleForDate(long timestamp) {
+
+        Habit habits[] = new Habit[mHabits.length];
+
+        for (int i = 0; i < mHabits.length; i++) {
+            habits[i] = Habit.duplicate(mHabits[i]);
+            List<SessionEntry> entriesForDate = habits[i].getEntriesForDate(timestamp);
+            habits[i].setEntries(entriesForDate);
         }
+
+        return new CategoryDataSample(mCategory, habits, timestamp, timestamp);
+    }
+
+    //region Methods With One Time Calculations {}
+    public long calculateTotalDuration() {
+        if (mDuration == null)
+            mDuration = MyCollectionUtils.sum(mHabits, Habit.IGetEntriesDuration);
 
         return mDuration;
     }
 
-    public CategoryDataSample getDataSampleForDate(long dateInMillis){
+    public List<SessionEntry> buildSessionEntriesList() {
 
-        Habit habits[]  = new Habit[mHabits.length];
+        if (mSessionEntries == null) {
+            mSessionEntries = new ArrayList<>();
 
-        for(int i = 0; i < mHabits.length; i++){
-            Habit habit = mHabits[i];
-
-            habits[i] = new Habit(habit.getName(), habit.getCategory());
-            habits[i].setEntries(habit.getEntriesForDate(dateInMillis));
+            for (Habit habit : mHabits) {
+                List<SessionEntry> entries = habit.getEntriesAsList();
+                if (entries != null)
+                    mSessionEntries.addAll(entries);
+            }
         }
 
-        return new CategoryDataSample(mCategory, habits, dateInMillis, dateInMillis);
+        return mSessionEntries;
+    }
+    //endregion
+
+    //region Getters {}
+    public String getCategoryName() {
+        return mCategory.getName();
     }
 
-    //region // Getters
     public HabitCategory getCategory() {
         return mCategory;
     }
 
     public final int getNumberOfHabits() {
-        return mNumberOfHabits;
+        return mHabits.length;
     }
 
     public long getDateFromTime() {
@@ -75,29 +96,13 @@ public class CategoryDataSample {
         return mDateToTime;
     }
 
-    public long getHabitDuration(int i){
+    public long getHabitDuration(int i) {
         return mHabits[i].getEntriesDuration();
     }
 
     public Habit getHabit(int i) {
         return mHabits[i];
     }
-
-    public List<SessionEntry> getSessionEntries() {
-        List<SessionEntry> sessionEntries = new ArrayList<>();
-
-        for (Habit habit : mHabits) {
-            SessionEntry[] entries = habit.getEntries();
-            if(entries != null){
-                sessionEntries.addAll(Arrays.asList(entries));
-            }
-        }
-
-        return sessionEntries;
-    }
-
-    public String getName() {
-        return mCategory.getName();
-    }
     //endregion
+
 }

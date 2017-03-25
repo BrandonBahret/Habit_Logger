@@ -2,7 +2,7 @@ package com.example.brandon.habitlogger.common;
 
 import com.android.internal.util.Predicate;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -12,16 +12,27 @@ import java.util.List;
 
 public class MyCollectionUtils {
 
-    public static <T> void filter(List<T> list, Predicate<? super T> filter) {
-        List<T> itemsToRetain = new ArrayList<>(list.size());
+    public interface IGetKey {
+        Object get(Object object);
+    }
 
-        for (T item : list) {
-            if (filter.apply(item))
-                itemsToRetain.add(item);
+    public static <T> void filter(List<T> list, Predicate<? super T> shouldRemove) {
+
+        Iterator<T> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            if (shouldRemove.apply(iterator.next()))
+                iterator.remove();
         }
 
-        list.clear();
-        list.addAll(itemsToRetain);
+    }
+
+    public static <In> Long sum(In[] objects, IGetKey keyGetter) {
+        Long sum = 0L;
+
+        for (In object : objects)
+            sum += (Long)keyGetter.get(object);
+
+        return sum;
     }
 
 }

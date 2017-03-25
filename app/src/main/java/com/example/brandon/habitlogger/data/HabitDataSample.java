@@ -40,7 +40,7 @@ public class HabitDataSample {
         List<SessionEntry> entries = new ArrayList<>();
 
         for (CategoryDataSample categoryDataSample : mData) {
-            entries.addAll(categoryDataSample.getSessionEntries());
+            entries.addAll(categoryDataSample.buildSessionEntriesList());
         }
 
         Collections.sort(entries, SessionEntry.StartingTimeComparator);

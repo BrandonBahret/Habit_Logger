@@ -82,7 +82,7 @@ public class PieChartCategoriesDuration extends Fragment implements UpdateHabitD
         for (CategoryDataSample categoryDataSample : data.getData()) {
             float ratio = 100 * categoryDataSample.calculateTotalDuration() / (float) totalDuration;
             if (ratio > 0) {
-                entries.add(new PieEntry(ratio, categoryDataSample.getName(), categoryDataSample.getCategory().getColorAsInt()));
+                entries.add(new PieEntry(ratio, categoryDataSample.getCategoryName(), categoryDataSample.getCategory().getColorAsInt()));
             }
         }
 
