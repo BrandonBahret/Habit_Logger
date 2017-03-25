@@ -17,7 +17,6 @@ import com.example.brandon.habitlogger.databinding.DialogCategorySelectorBinding
 
 /**
  * Created by Brandon on 2/25/2017.
- *
  */
 
 public class CategorySpinner extends AppCompatSpinner implements AdapterView.OnItemClickListener, View.OnClickListener, NewCategoryDialogFactory.OnFinishedListener {
@@ -56,7 +55,6 @@ public class CategorySpinner extends AppCompatSpinner implements AdapterView.OnI
     }
 
 
-
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         setSelection(position);
@@ -67,7 +65,7 @@ public class CategorySpinner extends AppCompatSpinner implements AdapterView.OnI
     public void onClick(View v) {
         int id = v.getId();
 
-        if(id == ui.newCategoryButton.getId()){
+        if (id == ui.newCategoryButton.getId()) {
             NewCategoryDialogFactory dialog = new NewCategoryDialogFactory(getContext(), this);
             dialog.createBuilder().show();
         }
@@ -75,7 +73,7 @@ public class CategorySpinner extends AppCompatSpinner implements AdapterView.OnI
 
     @Override
     public void onFinishedWithResult(HabitCategory category) {
-        ((CategorySpinnerAdapter)getAdapter()).addCategory(category);
+        ((CategorySpinnerAdapter) getAdapter()).addCategory(category);
     }
 
 }

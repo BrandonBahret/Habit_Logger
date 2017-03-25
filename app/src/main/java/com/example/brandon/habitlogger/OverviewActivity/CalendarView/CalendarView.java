@@ -37,7 +37,6 @@ public class CalendarView extends View {
     //endregion
 
     //region (Colors and Paints)
-    private int mStreakColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
     private int mTextColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
     private int mTitleColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
     private int mDateTextColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
@@ -50,7 +49,6 @@ public class CalendarView extends View {
     private TextPaint mTextPaint;
     private TextPaint mTitlePaint;
     private TextPaint mDateTextPaint;
-    private TextPaint mStreakPaint;
     private TextPaint mEmptyDateElementPaint;
     private TextPaint mDateElementPaint;
     //endregion
@@ -86,8 +84,6 @@ public class CalendarView extends View {
     private void init(AttributeSet attrs, int defStyle) {
 
         // region Create paint objects
-        mStreakPaint = new TextPaint();
-
         mBackgroundPaint = new TextPaint();
 
         mDateElementPaint = new TextPaint();
@@ -120,10 +116,6 @@ public class CalendarView extends View {
 
         //region Gather attributes from attrs
         //region Get colors from attributes
-        mStreakColor = a.getColor(
-                R.styleable.CalendarView_date_circle_streak_color,
-                mStreakColor);
-
         mTextColor = a.getColor(
                 R.styleable.CalendarView_android_textColor,
                 mTextColor);
@@ -215,13 +207,10 @@ public class CalendarView extends View {
         mTitlePaint.setTextSize(mTextSize);
         mTitlePaint.setColor(mTitleColor);
 
-
         mDateTextPaint.setTextSize(mDateTextSize);
         mDateTextPaint.setColor(mDateTextColor);
 
         mEmptyDateElementPaint.setColor(MyColorUtils.setLightness(mDateTextColor, 0.9f));
-
-        mStreakPaint.setColor(mStreakColor);
 
         mDateElementPaint.setTextSize(mDateTextSize);
         mDateElementPaint.setColor(mDateElementColor);
@@ -460,12 +449,6 @@ public class CalendarView extends View {
     public void setBackgroundColor(int color) {
         mBackgroundColor = color;
         invalidateTextPaintAndMeasurements();
-    }
-
-    public void setStreakColor(int streakColor) {
-        mStreakColor = streakColor;
-        if (mStreakPaint != null)
-            mStreakPaint.setColor(streakColor);
     }
 
     public void bindModel(CalendarViewMonthModel model) {

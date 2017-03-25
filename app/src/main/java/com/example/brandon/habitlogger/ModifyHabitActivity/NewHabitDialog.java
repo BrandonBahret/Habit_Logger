@@ -94,7 +94,6 @@ public class NewHabitDialog extends DialogFragment implements DialogInterface.On
         onFinishedListener.onFinishedWithResult(habit);
     }
 
-
     public Habit getHabitFromDialog() {
         String name = ui.habitName.getText().toString();
         String description = ui.habitDescription.getText().toString();

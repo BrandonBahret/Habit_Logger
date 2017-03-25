@@ -30,7 +30,6 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
     Context mContext;
     HabitDataSample mDataSample;
     List<CalendarViewMonthModel> calendarData;
-    private int mStreakColor = -1;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         CalendarView calendarView;
@@ -38,15 +37,12 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         public ViewHolder(View view) {
             super(view);
             calendarView = (CalendarView) view.findViewById(R.id.calendar_view);
-            if (mStreakColor != -1)
-                calendarView.setStreakColor(mStreakColor);
         }
     }
 
-    public CalendarViewAdapter(HabitDataSample habitDataSample, int streakColor, Context context) {
+    public CalendarViewAdapter(HabitDataSample habitDataSample, Context context) {
         mDataSample = habitDataSample;
         mContext = context;
-        setStreakColor(streakColor);
 
         generateMonthDataFromEntries(mDataSample);
     }
@@ -204,9 +200,6 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.data_overview_calendar_view, parent, false);
 
-        if (mStreakColor != -1)
-            ((CalendarView) itemView).setStreakColor(mStreakColor);
-
         return new ViewHolder(itemView);
     }
 
@@ -214,10 +207,6 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
     public void onBindViewHolder(ViewHolder holder, int position) {
         CalendarViewMonthModel model = calendarData.get(position);
         holder.calendarView.bindModel(model);
-    }
-
-    public void setStreakColor(int color) {
-        mStreakColor = color;
     }
 
     @Override

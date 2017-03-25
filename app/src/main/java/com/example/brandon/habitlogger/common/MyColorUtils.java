@@ -81,7 +81,7 @@ public class MyColorUtils {
 
     public static int setLightness(int color, float lightness) {
         float[] hsl = getHSLComponents(color);
-        hsl[1] = lightness;
+        hsl[2] = lightness;
         return ColorUtils.HSLToColor(hsl);
     }
     //endregion

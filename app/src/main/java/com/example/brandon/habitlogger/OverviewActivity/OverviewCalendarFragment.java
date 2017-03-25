@@ -3,7 +3,6 @@ package com.example.brandon.habitlogger.OverviewActivity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.HabitActivity.CalendarFragment;
 import com.example.brandon.habitlogger.OverviewActivity.CalendarView.CalendarViewAdapter;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.HabitDataSample;
@@ -19,9 +17,7 @@ import com.example.brandon.habitlogger.data.HabitDataSample;
 
 public class OverviewCalendarFragment extends Fragment implements UpdateHabitDataSampleInterface {
 
-    private CalendarFragment.Listener listener;
     CallbackInterface callbackInterface;
-
 
     public OverviewCalendarFragment() {
         // Required empty public constructor
@@ -49,9 +45,8 @@ public class OverviewCalendarFragment extends Fragment implements UpdateHabitDat
         RecyclerView calendarViewContainer = (RecyclerView) v.findViewById(R.id.calendar_view_container);
 
         HabitDataSample sample = callbackInterface.getDataSample();
-        int defaultColor = ContextCompat.getColor(getContext(), R.color.colorAccent);
 
-        CalendarViewAdapter mAdapter = new CalendarViewAdapter(sample, defaultColor, getContext());
+        CalendarViewAdapter mAdapter = new CalendarViewAdapter(sample, getContext());
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         calendarViewContainer.setLayoutManager(layoutManager);

@@ -12,14 +12,6 @@ import java.util.List;
 
 public class MyCollectionUtils {
 
-    public interface IComprehension<T> {
-
-        /**
-         * Method to be applied to each element.
-         */
-        T foreach(T item);
-    }
-
     public static <T> void filter(List<T> list, Predicate<? super T> filter) {
         List<T> itemsToRetain = new ArrayList<>(list.size());
 
@@ -30,14 +22,6 @@ public class MyCollectionUtils {
 
         list.clear();
         list.addAll(itemsToRetain);
-    }
-
-    public static <T> void comprehension(List<T> list, IComprehension<T> comprehension) {
-
-        for(T eachItem : list){
-            int index = list.indexOf(eachItem);
-            list.set(index, comprehension.foreach(eachItem));
-        }
     }
 
 }
