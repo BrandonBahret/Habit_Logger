@@ -156,7 +156,7 @@ public class TimeAverages extends Fragment implements UpdateEntriesInterface {
                 totalDuration += entry.getDuration();
             }
 
-            long totalTime = dataSample.dateToTime - dataSample.dateFromTime;
+            long totalTime = dataSample.getDateToTime() - dataSample.getDateFromTime();
 
             double months = totalTime / 2592000000L;
             double weeks = totalTime / 604800000L;

@@ -204,7 +204,7 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
     @Override
     public void updateDataSample(HabitDataSample data) {
         if(entryAdapter != null) {
-            this.sessionEntries = data.getSessionEntriesSample().getSessionEntries();
+            this.sessionEntries = data.buildSessionEntriesList().getSessionEntries();
             entryAdapter = new EntryViewAdapter(this.sessionEntries, getContext(), entryAdapter.getListener());
             entriesContainer.setAdapter(entryAdapter);
         }

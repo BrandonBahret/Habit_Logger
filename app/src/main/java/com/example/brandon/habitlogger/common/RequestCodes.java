@@ -12,4 +12,8 @@ public final class RequestCodes {
     // Modified Habit request codes
     public static final int NEW_HABIT_REQUEST_CODE = 200;
     public static final int EDIT_HABIT_REQUEST_CODE = 210;
+
+    // Export Managers
+    public static final int GOOGLE_DRIVE_REQUEST_CODE = 300;
+
 }

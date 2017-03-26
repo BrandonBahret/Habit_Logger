@@ -35,4 +35,13 @@ public class MyCollectionUtils {
         return sum;
     }
 
+    public static <In> Long sum(Iterable<In> objects, IGetKey keyGetter) {
+        Long sum = 0L;
+
+        for (In object : objects)
+            sum += (Long)keyGetter.get(object);
+
+        return sum;
+    }
+
 }

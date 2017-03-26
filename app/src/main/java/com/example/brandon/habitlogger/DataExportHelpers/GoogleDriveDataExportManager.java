@@ -4,10 +4,10 @@ import android.app.Activity;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.DatabaseSchema;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
+import com.example.brandon.habitlogger.common.RequestCodes;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -38,12 +38,16 @@ import java.util.ArrayList;
 public class GoogleDriveDataExportManager implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    public static final int REQUEST_CODE_RESOLUTION = 10;
-    public static final String TAG = "GOOGLE_DRIVE_EXPORT";
-
+    //region (Member Attributes)
     private GoogleApiClient mGoogleApiClient;
     private HabitDatabase mHabitDatabase;
     private Activity mActivity;
+    //endregion
+
+    //region Code responsible for providing an interface to this object.
+    public interface OnConnected {
+        void onConnected();
+    }
 
     private ArrayList<OnConnected> OnConnectedListeners = new ArrayList<>();
 
@@ -54,14 +58,11 @@ public class GoogleDriveDataExportManager implements GoogleApiClient.ConnectionC
             listener.onConnected();
         }
     }
-
-    public interface OnConnected {
-        void onConnected();
-    }
+    //endregion
 
     public GoogleDriveDataExportManager(Activity activity) {
         mActivity = activity;
-        mHabitDatabase = new HabitDatabase(activity);
+        mHabitDatabase = new HabitDatabase(mActivity);
         mGoogleApiClient = new GoogleApiClient.Builder(mActivity)
                 .addApi(Drive.API)
                 .addScope(Drive.SCOPE_APPFOLDER)
@@ -71,31 +72,7 @@ public class GoogleDriveDataExportManager implements GoogleApiClient.ConnectionC
                 .build();
     }
 
-    public boolean connect() {
-        if (!mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.connect();
-        }
-
-        return mGoogleApiClient.isConnected();
-    }
-
-    public boolean isConnected() {
-        return mGoogleApiClient.isConnected();
-    }
-
-    public void doesDatabaseExist(ResultCallback<DriveApi.MetadataBufferResult> callback) {
-        Query query = new Query.Builder()
-                .addFilter(Filters.eq(SearchableField.TITLE, DatabaseSchema.DATABASE_NAME))
-                .build();
-
-        Drive.DriveApi.getAppFolder(mGoogleApiClient).queryChildren(mGoogleApiClient, query)
-                .setResultCallback(callback);
-    }
-
-    public void deleteDriveResource(DriveId id) {
-        id.asDriveResource().delete(mGoogleApiClient);
-    }
-
+    //region Methods responsible for manipulating the HabitDatabase (App data.)
     public void backupDatabase() {
         doesDatabaseExist(new ResultCallback<DriveApi.MetadataBufferResult>() {
             @Override
@@ -154,9 +131,8 @@ public class GoogleDriveDataExportManager implements GoogleApiClient.ConnectionC
                                             InputStream inputStream = contents.getInputStream();
 
                                             int read = 0;
-                                            while (read != fileSize) {
+                                            while (read != fileSize)
                                                 read += inputStream.read(bytes.array());
-                                            }
 
                                             mHabitDatabase.databaseHelper.setBytes(bytes);
                                         } catch (Exception e) {
@@ -170,20 +146,20 @@ public class GoogleDriveDataExportManager implements GoogleApiClient.ConnectionC
             }
         });
     }
+    //endregion
 
-    public void getAppFolderContents() {
-        Drive.DriveApi.getAppFolder(mGoogleApiClient).listChildren(mGoogleApiClient)
-                .setResultCallback(new ResultCallback<DriveApi.MetadataBufferResult>() {
-                    @Override
-                    public void onResult(@NonNull DriveApi.MetadataBufferResult metadataBufferResult) {
-                        MetadataBuffer metadata = metadataBufferResult.getMetadataBuffer();
-                        for (Metadata data : metadata) {
-                            Log.i(TAG, data.getTitle());
-                        }
-                        metadataBufferResult.release();
-                        metadata.release();
-                    }
-                });
+    //region Methods responsible for manipulating the Google Drive app folder (Cloud data.)
+    public void doesDatabaseExist(ResultCallback<DriveApi.MetadataBufferResult> callback) {
+        Query query = new Query.Builder()
+                .addFilter(Filters.eq(SearchableField.TITLE, DatabaseSchema.DATABASE_NAME))
+                .build();
+
+        Drive.DriveApi.getAppFolder(mGoogleApiClient).queryChildren(mGoogleApiClient, query)
+                .setResultCallback(callback);
+    }
+
+    public void deleteDriveResource(DriveId id) {
+        id.asDriveResource().delete(mGoogleApiClient);
     }
 
     public void resetAppFolder() {
@@ -193,45 +169,58 @@ public class GoogleDriveDataExportManager implements GoogleApiClient.ConnectionC
                     @Override
                     public void onResult(@NonNull DriveApi.MetadataBufferResult metadataBufferResult) {
                         MetadataBuffer data = metadataBufferResult.getMetadataBuffer();
-                        for (Metadata metadata : data) {
+                        for (Metadata metadata : data)
                             metadata.getDriveId().asDriveResource().delete(mGoogleApiClient);
-                        }
                         data.release();
                     }
                 });
     }
+    //endregion
 
+    //region Methods responsible for getting connected
+    public boolean connect() {
+        if (!mGoogleApiClient.isConnected())
+            mGoogleApiClient.connect();
 
+        return isConnected();
+    }
+
+    public boolean isConnected() {
+        return mGoogleApiClient.isConnected();
+    }
+    //endregion
+
+    //region Methods responsible for handling connection state
     @Override
     public void onConnected(Bundle connectionHint) {
-        Log.i(TAG, "API client connected.");
-
-        for (OnConnected listener : OnConnectedListeners) {
+        for (OnConnected listener : OnConnectedListeners)
             listener.onConnected();
-        }
 
         OnConnectedListeners.clear();
     }
 
     @Override
     public void onConnectionSuspended(int cause) {
-        Log.i(TAG, "GoogleApiClient connection suspended");
+        // "GoogleApiClient connection suspended"
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         if (connectionResult.hasResolution()) {
             try {
-                connectionResult.startResolutionForResult(mActivity, REQUEST_CODE_RESOLUTION);
+                connectionResult.startResolutionForResult(mActivity, RequestCodes.GOOGLE_DRIVE_REQUEST_CODE);
             } catch (IntentSender.SendIntentException e) {
                 // Unable to resolve, message user appropriately
             }
-        } else {
+        }
+        else {
             int errorCode = connectionResult.getErrorCode();
 
             GoogleApiAvailability.getInstance()
-                    .getErrorDialog(mActivity, errorCode, REQUEST_CODE_RESOLUTION)
+                    .getErrorDialog(mActivity, errorCode, RequestCodes.GOOGLE_DRIVE_REQUEST_CODE)
                     .show();
         }
     }
+    //endregion
+
 }

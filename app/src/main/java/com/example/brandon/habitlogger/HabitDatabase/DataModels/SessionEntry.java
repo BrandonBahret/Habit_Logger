@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 
+import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
 
 import java.io.Serializable;
@@ -21,6 +22,7 @@ import java.util.Locale;
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class SessionEntry implements Serializable, Parcelable {
+
     private long mStartTime, mDuration;
     private boolean mIsPaused = false;
     private long lastTimePaused;
@@ -275,6 +277,13 @@ public class SessionEntry implements Serializable, Parcelable {
     public long getHabitId() {
         return habitId;
     }
+
+    public static MyCollectionUtils.IGetKey IGetSessionDuration = new MyCollectionUtils.IGetKey() {
+        @Override
+        public Object get(Object object) {
+            return ((SessionEntry)object).getDuration();
+        }
+    };
 
     /**
      * @param duration a time in milliseconds for the getDatabaseLength of the session.

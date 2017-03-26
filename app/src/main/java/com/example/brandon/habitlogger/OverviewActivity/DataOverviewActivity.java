@@ -163,7 +163,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
     public void onEntryDeleted(SessionEntry removedEntry) {
         HabitDataSample dataSample = getDataSample();
 
-        List<SessionEntry> sessionEntries = dataSample.getSessionEntriesSample().getSessionEntries();
+        List<SessionEntry> sessionEntries = dataSample.buildSessionEntriesList().getSessionEntries();
         dateRangeManager.updateSessionEntries(sessionEntries);
     }
 
@@ -177,7 +177,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
         dateRangeManager.entryChanged(oldEntry, newEntry);
 
         HabitDataSample dataSample = getDataSample();
-        List<SessionEntry> sessionEntries = dataSample.getSessionEntriesSample().getSessionEntries();
+        List<SessionEntry> sessionEntries = dataSample.buildSessionEntriesList().getSessionEntries();
         dateRangeManager.updateSessionEntries(sessionEntries);
     }
 
@@ -200,7 +200,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
     public void updateEntries() {
         HabitDataSample dataSample = getDataSample();
 
-        List<SessionEntry> sessionEntries = dataSample.getSessionEntriesSample().getSessionEntries();
+        List<SessionEntry> sessionEntries = dataSample.buildSessionEntriesList().getSessionEntries();
         dateRangeManager.updateSessionEntries(sessionEntries);
 
         for (UpdateHabitDataSampleInterface callback : callbacks) {

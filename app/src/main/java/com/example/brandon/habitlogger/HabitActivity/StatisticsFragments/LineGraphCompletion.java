@@ -120,8 +120,8 @@ public class LineGraphCompletion extends Fragment implements UpdateEntriesInterf
     }
 
     List<Entry> calculateDataSet(SessionEntriesSample dataSample) {
-        long dateTo = dataSample.dateToTime;
-        long dateFrom = dataSample.dateFromTime;
+        long dateTo = dataSample.getDateToTime();
+        long dateFrom = dataSample.getDateFromTime();
 
         int totalDays = (int) ((dateTo - dateFrom) / DateUtils.DAY_IN_MILLIS);
         List<Entry> values = new ArrayList<>(totalDays);

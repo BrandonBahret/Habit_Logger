@@ -19,8 +19,7 @@ public final class CategoryDataSample {
     //region (Member Attributes)
     private final HabitCategory mCategory;
     private final Habit[] mHabits;
-    private final long mDateFromTime;
-    private final long mDateToTime;
+    private final long mDateFromTime, mDateToTime;
     private List<SessionEntry> mSessionEntries;
     private Long mDuration;
     //endregion
@@ -36,7 +35,7 @@ public final class CategoryDataSample {
     }
 
     /**
-     * @param timestamp Epoch timestamp for a certain date to filter for.
+     * @param timestamp Epoch timestamp for a certain date to search for.
      */
     public CategoryDataSample getDataSampleForDate(long timestamp) {
 
@@ -53,6 +52,7 @@ public final class CategoryDataSample {
 
     //region Methods With One Time Calculations {}
     public long calculateTotalDuration() {
+
         if (mDuration == null)
             mDuration = MyCollectionUtils.sum(mHabits, Habit.IGetEntriesDuration);
 
@@ -76,6 +76,13 @@ public final class CategoryDataSample {
     //endregion
 
     //region Getters {}
+    public static MyCollectionUtils.IGetKey IGetEntriesDuration = new MyCollectionUtils.IGetKey() {
+        @Override
+        public Object get(Object object) {
+            return ((CategoryDataSample)object).calculateTotalDuration();
+        }
+    };
+
     public String getCategoryName() {
         return mCategory.getName();
     }

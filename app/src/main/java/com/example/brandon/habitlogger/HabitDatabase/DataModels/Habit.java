@@ -219,6 +219,13 @@ public class Habit implements Serializable, Parcelable {
         }
     };
 
+    public static Comparator<Habit> DurationComparator = new Comparator<Habit>() {
+        @Override
+        public int compare(Habit itemOne, Habit itemTwo) {
+            return Long.compare(itemTwo.getEntriesDuration(), itemOne.getEntriesDuration());
+        }
+    };
+
     public static Predicate<Habit> FilterOutArchivedHabits = new Predicate<Habit>() {
         @Override
         public boolean apply(Habit item) {
@@ -233,14 +240,7 @@ public class Habit implements Serializable, Parcelable {
         }
     };
 
-
-    public static Comparator<Habit> DurationComparator = new Comparator<Habit>() {
-        @Override
-        public int compare(Habit itemOne, Habit itemTwo) {
-            return Long.compare(itemTwo.getEntriesDuration(), itemOne.getEntriesDuration());
-        }
-    };
-
+    @Override
     public String toString() {
         int entriesLength = 0;
         if (getEntries() != null) {

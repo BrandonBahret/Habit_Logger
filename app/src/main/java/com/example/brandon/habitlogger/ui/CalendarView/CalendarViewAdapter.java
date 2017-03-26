@@ -48,10 +48,10 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
 
     private void generateMonthDataFromEntries(SessionEntriesSample entriesSample) {
         Calendar startCalendar = Calendar.getInstance();
-        startCalendar.setTimeInMillis(entriesSample.dateFromTime);
+        startCalendar.setTimeInMillis(entriesSample.getDateFromTime());
 
         Calendar endCalendar = Calendar.getInstance();
-        endCalendar.setTimeInMillis(entriesSample.dateToTime);
+        endCalendar.setTimeInMillis(entriesSample.getDateToTime());
 
         int diffYear = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
         int diffMonth = diffYear * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH) + 1;

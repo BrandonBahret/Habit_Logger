@@ -60,7 +60,7 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         calendarData = new ArrayList<>(diffMonth);
 
         int entryIndex = 0;
-        List<SessionEntry> entries = dataSample.getSessionEntriesSample().getSessionEntries();
+        List<SessionEntry> entries = dataSample.buildSessionEntriesList().getSessionEntries();
 
         Set<Integer> dates;
         List<SessionEntry> monthEntries;

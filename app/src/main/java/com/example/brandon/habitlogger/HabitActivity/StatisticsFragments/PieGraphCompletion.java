@@ -75,11 +75,11 @@ public class PieGraphCompletion extends Fragment implements UpdateEntriesInterfa
             Collections.sort(entries, SessionEntry.StartingTimeComparator);
             final long DAY_IN_MILLI = 86400000L;
 
-            long totalTime = dataSample.dateToTime - dataSample.dateFromTime;
+            long totalTime = dataSample.getDateToTime() - dataSample.getDateFromTime();
             totalDays = (int) (totalTime / DAY_IN_MILLI);
 
             if (totalDays > 0) {
-                long targetDate = dataSample.dateFromTime;
+                long targetDate = dataSample.getDateFromTime();
 
                 for (SessionEntry entry : entries) {
                     long currentDate = entry.getStartingTimeDate();

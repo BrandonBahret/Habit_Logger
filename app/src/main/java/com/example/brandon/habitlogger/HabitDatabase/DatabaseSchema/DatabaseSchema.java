@@ -22,7 +22,6 @@ public class DatabaseSchema extends SQLiteOpenHelper {
         public static final String PRI_INT_KEY = " INTEGER PRIMARY KEY ";
         public static final String INTEGER = " INTEGER ";
         public static final String TEXT = " TEXT ";
-
     }
 
     public DatabaseSchema(Context context) {

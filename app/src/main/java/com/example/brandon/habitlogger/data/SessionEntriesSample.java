@@ -1,48 +1,60 @@
 package com.example.brandon.habitlogger.data;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.common.MyCollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by Brandon on 3/2/2017.
- *
+ * A class to structure SessionEntry objects.
  */
 
-public class SessionEntriesSample{
-    private final List<SessionEntry> sessionEntries;
-    public final long dateFromTime;
-    public final long dateToTime;
-    private long mDuration = -1;
+public class SessionEntriesSample {
 
-    public SessionEntriesSample(List<SessionEntry> sessionEntries, long dateFromTime, long dateToTime){
-        this.sessionEntries = sessionEntries;
-        this.dateFromTime = dateFromTime;
-        this.dateToTime = dateToTime;
+    //region (Member Attributes)
+    private final List<SessionEntry> mSessionEntries;
+    private final long mDateFromTime, mDateToTime;
+    private Long mDuration;
+    //endregion
+
+    public SessionEntriesSample(List<SessionEntry> sessionEntries, long dateFromTime, long dateToTime) {
+        mSessionEntries = sessionEntries;
+        mDateFromTime = dateFromTime;
+        mDateToTime = dateToTime;
     }
 
     public SessionEntriesSample(List<SessionEntry> sessionEntries) {
-        this.sessionEntries = sessionEntries;
-        this.dateFromTime = sessionEntries.get(0).getStartingTimeDate();
-        this.dateToTime = sessionEntries.get(sessionEntries.size() - 1).getStartingTimeDate();
+        mSessionEntries = sessionEntries;
+        mDateFromTime = Collections.min(sessionEntries, SessionEntry.StartingTimeComparator).getStartTime();
+        mDateToTime = Collections.max(sessionEntries, SessionEntry.StartingTimeComparator).getStartTime();
     }
 
-    public List<SessionEntry> getSessionEntries(){
-        return sessionEntries;
-    }
-
-    public long calculateDuration(){
-        if(mDuration == -1){
-            mDuration = 0;
-            for(SessionEntry entry : sessionEntries){
-                mDuration += entry.getDuration();
-            }
-        }
+    //region Methods With One Time Calculations {}
+    public long calculateDuration() {
+        if (mDuration == null)
+            mDuration = MyCollectionUtils.sum(mSessionEntries, SessionEntry.IGetSessionDuration);
 
         return mDuration;
     }
+    //endregion
+
+    //region Getters {}
+    public List<SessionEntry> getSessionEntries() {
+        return mSessionEntries;
+    }
 
     public boolean isEmpty() {
-        return sessionEntries.isEmpty();
+        return mSessionEntries.isEmpty();
     }
+
+    public long getDateFromTime() {
+        return mDateFromTime;
+    }
+
+    public long getDateToTime() {
+        return mDateToTime;
+    }
+    //endregion
 }
