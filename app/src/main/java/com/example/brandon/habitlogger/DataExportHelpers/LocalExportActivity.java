@@ -19,11 +19,9 @@ public class LocalExportActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         finish();
 
-        manager = new LocalDataExportManager(this);
-        String receivedText;
-
         if (getIntent() != null && getIntent().getAction().equals(Intent.ACTION_SEND)) {
-            receivedText = getIntent().getStringExtra(Intent.EXTRA_TEXT);
+            String receivedText = getIntent().getStringExtra(Intent.EXTRA_TEXT);
+            manager = new LocalDataExportManager(this);
             manager.exportHabit(Habit.fromCSV(receivedText), true);
         }
     }

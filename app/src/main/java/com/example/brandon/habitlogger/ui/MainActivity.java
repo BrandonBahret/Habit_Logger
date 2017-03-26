@@ -602,7 +602,7 @@ public class MainActivity extends AppCompatActivity
         }
         else if (resultCode == RESULT_OK) {
             switch (requestCode) {
-                case GoogleDriveDataExportManager.REQUEST_CODE_RESOLUTION: {
+                case RequestCodes.GOOGLE_DRIVE_REQUEST_CODE: {
                     googleDrive.connect();
                 }
                 break;
