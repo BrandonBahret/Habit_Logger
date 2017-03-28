@@ -54,7 +54,7 @@ public final class CategoryDataSample {
     public long calculateTotalDuration() {
 
         if (mDuration == null)
-            mDuration = MyCollectionUtils.sum(mHabits, Habit.IGetEntriesDuration);
+            mDuration = (long) MyCollectionUtils.sum(mHabits, Habit.IGetEntriesDuration);
 
         return mDuration;
     }
@@ -76,10 +76,10 @@ public final class CategoryDataSample {
     //endregion
 
     //region Getters {}
-    public static MyCollectionUtils.IGetKey IGetEntriesDuration = new MyCollectionUtils.IGetKey() {
+    public static MyCollectionUtils.IGetKey<CategoryDataSample, Long> IGetEntriesDuration = new MyCollectionUtils.IGetKey<CategoryDataSample, Long>() {
         @Override
-        public Object get(Object object) {
-            return ((CategoryDataSample)object).calculateTotalDuration();
+        public Long get(CategoryDataSample dataSample) {
+            return dataSample.calculateTotalDuration();
         }
     };
 

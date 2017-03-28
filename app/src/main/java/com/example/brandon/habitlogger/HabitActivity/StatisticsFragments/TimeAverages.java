@@ -13,11 +13,8 @@ import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
 import com.example.brandon.habitlogger.HabitActivity.UpdateEntriesInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class TimeAverages extends Fragment implements UpdateEntriesInterface {
 
@@ -38,6 +35,7 @@ public class TimeAverages extends Fragment implements UpdateEntriesInterface {
         return new TimeAverages();
     }
 
+    //region Methods to handle the fragment lifecycle
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -66,111 +64,30 @@ public class TimeAverages extends Fragment implements UpdateEntriesInterface {
         super.onStart();
         updateEntries(callbackInterface.getSessionEntries());
     }
-
-    public static List<StreaksFragment.Streak> getWeekStreaks(List<SessionEntry> sessionEntries) {
-        List<StreaksFragment.Streak> streaks = new ArrayList<>();
-
-        if (!sessionEntries.isEmpty()) {
-            Collections.sort(sessionEntries, SessionEntry.StartingTimeComparator);
-
-            int size = sessionEntries.size();
-            long targetDate = sessionEntries.get(0).getStartingTimeDate();
-
-            long interval = DateUtils.WEEK_IN_MILLIS;
-            long endOfWeek = targetDate + interval - DateUtils.DAY_IN_MILLIS;
-
-            StreaksFragment.Streak currentStreak = new StreaksFragment.Streak(targetDate, endOfWeek, 0);
-
-            for (SessionEntry entry : sessionEntries) {
-                long currentDate = entry.getStartingTimeDate();
-                boolean endOfList = sessionEntries.indexOf(entry) == (size - 1);
-
-                if (currentDate == targetDate) {
-                    currentStreak.streakLength++;
-
-                    if (currentDate >= endOfWeek) {
-                        streaks.add(currentStreak);
-                        endOfWeek = currentDate + interval;
-                        currentStreak = new StreaksFragment.Streak(currentDate + DateUtils.DAY_IN_MILLIS, endOfWeek, 0);
-                        targetDate = currentDate + DateUtils.DAY_IN_MILLIS;
-                    }
-                    else if (endOfList) {
-                        streaks.add(currentStreak);
-                        break;
-                    }
-                    else {
-                        targetDate += DateUtils.DAY_IN_MILLIS;
-                    }
-
-                }
-                else if (currentDate > targetDate) {
-
-                    currentStreak.streakLength++;
-
-                    if (currentDate >= endOfWeek) {
-                        streaks.add(currentStreak);
-                        endOfWeek = currentDate + interval;
-                        currentStreak = new StreaksFragment.Streak(currentDate + DateUtils.DAY_IN_MILLIS, endOfWeek, 0);
-                        targetDate = currentDate + DateUtils.DAY_IN_MILLIS;
-                    }
-
-                    else if (endOfList) {
-                        streaks.add(currentStreak);
-                        break;
-                    }
-                    else {
-                        targetDate = currentDate + DateUtils.DAY_IN_MILLIS;
-                    }
-                }
-
-                else if (endOfList) {
-                    streaks.add(currentStreak);
-                    break;
-                }
-            }
-        }
-
-        return streaks;
-    }
+    //endregion
 
     @Override
     public void updateEntries(SessionEntriesSample dataSample) {
 
         if (!dataSample.isEmpty()) {
-            List<StreaksFragment.Streak> streaks = getWeekStreaks(dataSample.getSessionEntries());
 
-            int amount = 0;
-            for (StreaksFragment.Streak streak : streaks) {
-                amount += streak.streakLength;
-            }
+            double totalHours = dataSample.calculateDuration() / DateUtils.HOUR_IN_MILLIS;
 
-            if (streaks.size() != 0) {// Don't divide by zero
-                amount /= streaks.size();
-            }
-
-            this.habitFrequency.setText(String.valueOf(amount));
-
-
-            long totalDuration = 0;
-            for (SessionEntry entry : dataSample.getSessionEntries()) {
-                totalDuration += entry.getDuration();
-            }
-
-            long totalTime = dataSample.getDateToTime() - dataSample.getDateFromTime();
-
-            double months = totalTime / 2592000000L;
-            double weeks = totalTime / 604800000L;
-            double days = totalTime / 86400000L;
-
-            double totalHours = totalDuration / 3600000L;
-
-            double hoursPerMonthTime = months == 0 ? totalHours : totalHours / months;
-            double hoursPerWeekTime = weeks == 0 ? totalHours : totalHours / weeks;
-            double hoursPerDayTime = days == 0 ? totalHours : totalHours / days;
-
+            double months = dataSample.calculateTotalDaysLength() / (365.0 / 12.0);
+            double hoursPerMonthTime = months == 0 ? 0 : totalHours / months;
             hoursPerMonth.setText(String.valueOf(hoursPerMonthTime));
+
+            double weeks = dataSample.calculateTotalDaysLength() / 7.0;
+            double hoursPerWeekTime = weeks == 0 ? 0 : totalHours / weeks;
             hoursPerWeek.setText(String.valueOf(hoursPerWeekTime));
+
+            double days = dataSample.calculateTotalDaysLength();
+            double hoursPerDayTime = days == 0 ? 0 : totalHours / days;
             hoursPerDay.setText(String.valueOf(hoursPerDayTime));
+
+            double daysPerWeekOnAverage = MyCollectionUtils.listToSet(dataSample.getSessionEntries(), SessionEntry.IGetSessionStartDate).size() / weeks;
+            this.habitFrequency.setText(String.valueOf(daysPerWeekOnAverage));
         }
     }
+
 }

@@ -37,15 +37,15 @@ public class SessionEntriesSample {
     //region Methods With One Time Calculations {}
     public long calculateDuration() {
         if (mDuration == null)
-            mDuration = MyCollectionUtils.sum(mSessionEntries, SessionEntry.IGetSessionDuration);
+            mDuration = (long) MyCollectionUtils.sum(mSessionEntries, SessionEntry.IGetSessionDuration);
 
         return mDuration;
     }
 
-    public int calculateTotalDaysLength(){
-        if(mTotalDaysLength == null) {
+    public int calculateTotalDaysLength() {
+        if (mTotalDaysLength == null) {
             long totalTime = getDateToTime() - getDateFromTime();
-            mTotalDaysLength = (int) (totalTime / DateUtils.DAY_IN_MILLIS);
+            mTotalDaysLength = (int) Math.ceil(totalTime / DateUtils.DAY_IN_MILLIS);
         }
 
         return mTotalDaysLength;

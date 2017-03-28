@@ -16,17 +16,17 @@ import java.util.Set;
 
 public class MyCollectionUtils {
 
-    public interface IGetKey <Out> {
-        Out get(Object object);
+    public interface IGetKey<In, Out> {
+        Out get(In object);
     }
 
     public interface KeyComparator {
         int compare(Object element, Object key);
     }
 
-    public static <SetType, ListType> Set<SetType> listToSet(List<ListType> list, IGetKey<SetType> collectObj){
+    public static <SetType, ListType> Set<SetType> listToSet(List<ListType> list, IGetKey<ListType, SetType> collectObj) {
         Set<SetType> set = new HashSet<>();
-        for(ListType element : list)
+        for (ListType element : list)
             set.add(collectObj.get(element));
 
         return set;
@@ -40,7 +40,7 @@ public class MyCollectionUtils {
         }
     }
 
-    public static int binarySearch(List<?> list, final Object key, final KeyComparator comparator){
+    public static int binarySearch(List<?> list, final Object key, final KeyComparator comparator) {
         return Collections.binarySearch(list, null, new Comparator<Object>() {
             @Override
             public int compare(Object obj, Object nullObj) {
@@ -49,20 +49,18 @@ public class MyCollectionUtils {
         });
     }
 
-    public static <In> Long sum(In[] objects, IGetKey keyGetter) {
-        Long sum = 0L;
-
+    public static <In> double sum(In[] objects, IGetKey<In, ? extends Number> keyGetter) {
+        double sum = 0.0;
         for (In object : objects)
-            sum += (Long)keyGetter.get(object);
+            sum += keyGetter.get(object).doubleValue();
 
         return sum;
     }
 
-    public static <In> Long sum(Iterable<In> objects, IGetKey keyGetter) {
-        Long sum = 0L;
-
+    public static <In> double sum(Iterable<In> objects, IGetKey<In, ? extends Number> keyGetter) {
+        double sum = 0.0;
         for (In object : objects)
-            sum += (Long)keyGetter.get(object);
+            sum += keyGetter.get(object).doubleValue();
 
         return sum;
     }

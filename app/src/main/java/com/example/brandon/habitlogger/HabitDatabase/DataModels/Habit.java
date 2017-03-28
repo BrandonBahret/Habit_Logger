@@ -132,10 +132,10 @@ public class Habit implements Serializable, Parcelable {
         }
     };
 
-    public static MyCollectionUtils.IGetKey IGetEntriesDuration = new MyCollectionUtils.IGetKey() {
+    public static MyCollectionUtils.IGetKey<Habit, Long> IGetEntriesDuration = new MyCollectionUtils.IGetKey<Habit, Long>() {
         @Override
-        public Object get(Object object) {
-            return ((Habit) object).getEntriesDuration();
+        public Long get(Habit habit) {
+            return habit.getEntriesDuration();
         }
     };
 

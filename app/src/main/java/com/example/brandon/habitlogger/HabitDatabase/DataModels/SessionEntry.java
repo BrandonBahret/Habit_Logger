@@ -180,10 +180,10 @@ public class SessionEntry implements Serializable, Parcelable {
         return c.getTimeInMillis();
     }
 
-    public static MyCollectionUtils.IGetKey<Long> IGetSessionStartDate = new MyCollectionUtils.IGetKey<Long>() {
+    public static MyCollectionUtils.IGetKey<SessionEntry, Long> IGetSessionStartDate = new MyCollectionUtils.IGetKey<SessionEntry, Long>() {
         @Override
-        public Long get(Object object) {
-            return ((SessionEntry)object).getStartingTimeDate();
+        public Long get(SessionEntry sessionEntry) {
+            return sessionEntry.getStartingTimeDate();
         }
     };
 
@@ -285,10 +285,10 @@ public class SessionEntry implements Serializable, Parcelable {
         return habitId;
     }
 
-    public static MyCollectionUtils.IGetKey IGetSessionDuration = new MyCollectionUtils.IGetKey() {
+    public static MyCollectionUtils.IGetKey<SessionEntry, Long> IGetSessionDuration = new MyCollectionUtils.IGetKey<SessionEntry, Long>() {
         @Override
-        public Object get(Object object) {
-            return ((SessionEntry)object).getDuration();
+        public Long get(SessionEntry sessionEntry) {
+            return sessionEntry.getDuration();
         }
     };
 

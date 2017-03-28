@@ -53,7 +53,7 @@ public class HabitDataSample {
     //region Methods With One Time Calculations {}
     public long calculateTotalDuration() {
         if (mDuration == null)
-            mDuration = MyCollectionUtils.sum(mData, CategoryDataSample.IGetEntriesDuration);
+            mDuration = (long) MyCollectionUtils.sum(mData, CategoryDataSample.IGetEntriesDuration);
 
         return mDuration;
     }

@@ -91,7 +91,7 @@ public class PieGraphCompletion extends Fragment implements UpdateEntriesInterfa
             );
 
             int totalDaysWithEntries = uniqueEntryStartDates.size();
-            int totalDays = dataSample.calculateTotalDaysLength();
+            int totalDays = dataSample.calculateTotalDaysLength() + 1;
             float ratio = totalDaysWithEntries / (float) totalDays * 100;
 
             setPieData(totalDaysWithEntries, totalDays, ratio);
