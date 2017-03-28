@@ -17,103 +17,76 @@ import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.RecyclerViewAdapters.ComplexDecoration;
+import com.example.brandon.habitlogger.RecyclerViewAdapters.GroupDecoration;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.EntryViewAdapter;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.SpaceOffsetDecoration;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
-import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.List;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class EntriesFragment extends Fragment implements UpdateEntriesInterface {
+public class EntriesFragment extends Fragment implements CallbackInterface.IUpdateEntries, EntryViewAdapter.OnClickListeners {
 
-    private static final String HABIT_ID = "HABIT_ID";
-    private long habitId;
+    //region (Member attributes)
+    private CallbackInterface mCallbackInterface;
+    private RecyclerViewScrollObserver.IScrollEvents mListener;
 
-    PreferenceChecker preferenceChecker;
+    private String mDateFormat;
+    private HabitDatabase mHabitDatabase;
+    private List<SessionEntry> mSessionEntries;
 
-    HabitDatabase habitDatabase;
-    RecyclerView entriesContainer;
-    FloatingActionMenu fab;
-    List<SessionEntry> sessionEntries;
-    EntryViewAdapter entryAdapter;
-    private CallbackInterface callbackInterface;
-    private GetScrollEventsFromFragmentsInterface listener;
+    private EntryViewAdapter mEntryAdapter;
+    private RecyclerView mEntriesContainer;
+    //endregion
 
     public EntriesFragment() {
         // Required empty public constructor
     }
 
-    public static EntriesFragment newInstance(long habitId) {
-        EntriesFragment fragment = new EntriesFragment();
-        Bundle args = new Bundle();
-        args.putLong(HABIT_ID, habitId);
-        fragment.setArguments(args);
+    public static EntriesFragment newInstance() {
+        return new EntriesFragment();
+    }
 
-        return fragment;
+    //region Methods responsible for handling fragment lifecycle
+
+    //region (onAttach - onDetach)
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        mCallbackInterface = (CallbackInterface) context;
+        mCallbackInterface.addUpdateEntriesCallback(this);
+
+        mSessionEntries = mCallbackInterface.getSessionEntries().getSessionEntries();
+        mDateFormat = new PreferenceChecker(context).stringGetDateFormat();
+        mHabitDatabase = new HabitDatabase(context);
+
+        if (context instanceof RecyclerViewScrollObserver.IScrollEvents)
+            this.mListener = (RecyclerViewScrollObserver.IScrollEvents) context;
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_habit, menu);
+    public void onDetach() {
+        super.onDetach();
+        mCallbackInterface.removeUpdateEntriesCallback(this);
     }
+    //endregion
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            this.habitId = getArguments().getLong(HABIT_ID);
-        }
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        preferenceChecker = new PreferenceChecker(getContext());
-        fab = (FloatingActionMenu) getActivity().findViewById(R.id.menu_fab);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_entries, container, false);
 
-        habitDatabase = new HabitDatabase(getContext());
-        sessionEntries = callbackInterface.getSessionEntries().getSessionEntries();
+        mEntriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
 
-        entriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
+        mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), this);
 
-        entryAdapter = new EntryViewAdapter(sessionEntries, getContext(),
-                new EntryViewAdapter.OnClickListeners() {
-                    @Override
-                    public void onRootClick(long habitId, final long entryId) {
-                        NewEntryForm dialog = NewEntryForm.newInstance(habitDatabase.getEntry(entryId));
-                        dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
-                            @Override
-                            public void onFinishedWithResult(SessionEntry entry) {
-                                if (entry != null) {
-                                    SessionEntry oldEntry = habitDatabase.getEntry(entry.getDatabaseId());
-                                    habitDatabase.updateEntry(entry.getDatabaseId(), entry);
-                                    updateSessionEntryById(entry.getDatabaseId(), oldEntry, entry);
-                                }
-                            }
-
-                            @Override
-                            public void onDeleteClicked(SessionEntry entry) {
-                                habitDatabase.deleteEntry(entry.getDatabaseId());
-                                removeSessionEntryById(entry.getDatabaseId());
-                            }
-                        });
-
-                        dialog.show(getFragmentManager(), "edit-entry");
-                    }
-                });
-
-        entriesContainer.addItemDecoration(new ComplexDecoration(getContext(), R.dimen.entries_section_text_size, new ComplexDecoration.Callback() {
+        mEntriesContainer.addItemDecoration(new GroupDecoration(getContext(), R.dimen.entries_section_text_size, new GroupDecoration.Callback() {
             @Override
             public long getGroupId(int position) {
-                if (position >= 0 && position < sessionEntries.size()) {
-                    return sessionEntries.get(position).getStartingTimeDate();
+                if (position >= 0 && position < mSessionEntries.size()) {
+                    return mSessionEntries.get(position).getStartingTimeDate();
                 }
                 else {
                     return -1;
@@ -123,9 +96,8 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
             @Override
             @NonNull
             public String getGroupFirstLine(int position) {
-                if (position >= 0 && position < sessionEntries.size()) {
-                    String dateFormat = preferenceChecker.stringGetDateFormat();
-                    return sessionEntries.get(position).getStartTimeAsString(dateFormat);
+                if (position >= 0 && position < mSessionEntries.size()) {
+                    return mSessionEntries.get(position).getStartTimeAsString(mDateFormat);
                 }
                 else {
                     return "";
@@ -134,47 +106,74 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
         }));
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        entriesContainer.setLayoutManager(layoutManager);
-        entriesContainer.setItemAnimator(new DefaultItemAnimator());
-        entriesContainer.setAdapter(entryAdapter);
+        mEntriesContainer.setLayoutManager(layoutManager);
+        mEntriesContainer.setItemAnimator(new DefaultItemAnimator());
+        mEntriesContainer.setAdapter(mEntryAdapter);
 
-        entriesContainer.addOnScrollListener(new RecyclerViewScrollObserver() {
+        mEntriesContainer.addOnScrollListener(new RecyclerViewScrollObserver() {
             @Override
             public void onScrollUp() {
-                if (EntriesFragment.this.listener != null)
-                    EntriesFragment.this.listener.onScrollUp();
+                if (EntriesFragment.this.mListener != null)
+                    EntriesFragment.this.mListener.onScrollUp();
             }
 
             @Override
             public void onScrollDown() {
-                if (EntriesFragment.this.listener != null)
-                    EntriesFragment.this.listener.onScrollDown();
+                if (EntriesFragment.this.mListener != null)
+                    EntriesFragment.this.mListener.onScrollDown();
             }
         });
 
         int bottomOffset = (int) getResources().getDimension(R.dimen.bottom_offset_dp);
         int topOffset = (int) (getResources().getDimension(R.dimen.extra_large_top_offset_dp)) + (int) (getResources().getDimension(R.dimen.sections_top_offset_dp));
         SpaceOffsetDecoration spaceOffsetDecoration = new SpaceOffsetDecoration(bottomOffset, topOffset);
-        entriesContainer.addItemDecoration(spaceOffsetDecoration);
+        mEntriesContainer.addItemDecoration(spaceOffsetDecoration);
 
         return v;
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_habit, menu);
+    }
 
-        callbackInterface = (CallbackInterface) context;
-        callbackInterface.addCallback(this);
+    //endregion
 
-        if (context instanceof GetScrollEventsFromFragmentsInterface) {
-            this.listener = (GetScrollEventsFromFragmentsInterface) context;
+    //region Methods responsible for manipulating entries in the fragment
+    public void addSessionEntry(SessionEntry entry) {
+        mSessionEntries.add(entry);
+        mEntryAdapter.notifyItemInserted(mSessionEntries.size() - 1);
+    }
+
+    public void removeSessionEntryById(long databaseId) {
+        int index = getSessionEntryIndex(databaseId);
+        if (index != mSessionEntries.size()) {
+            mSessionEntries.remove(index);
+            mEntryAdapter.notifyItemRemoved(index);
+        }
+    }
+
+    public void updateSessionEntryById(long databaseId, SessionEntry oldEntry, SessionEntry newEntry) {
+        int index = getSessionEntryIndex(databaseId);
+        if (index != mSessionEntries.size()) {
+            if (oldEntry.isSameStartingTimeAs(newEntry)) {
+                mSessionEntries.set(index, newEntry);
+                mEntryAdapter.notifyItemChanged(index);
+            }
+            else {
+                mSessionEntries.remove(index);
+                int newIndex = getPositionForEntry(newEntry);
+                mSessionEntries.add(newIndex, newEntry);
+                mEntryAdapter.notifyItemMoved(index, newIndex);
+                mEntryAdapter.notifyItemChanged(newIndex);
+            }
         }
     }
 
     private int getSessionEntryIndex(long entryId) {
         int index = 0;
-        for (SessionEntry entry : sessionEntries) {
+        for (SessionEntry entry : mSessionEntries) {
             if (entry.getDatabaseId() == entryId) {
                 break;
             }
@@ -184,62 +183,54 @@ public class EntriesFragment extends Fragment implements UpdateEntriesInterface 
         return index;
     }
 
-    public void addSessionEntry(SessionEntry entry) {
-        sessionEntries.add(entry);
-        entryAdapter.notifyItemInserted(sessionEntries.size() - 1);
-    }
-
-    public void removeSessionEntryById(long databaseId) {
-        int index = getSessionEntryIndex(databaseId);
-        if (index != sessionEntries.size()) {
-            sessionEntries.remove(index);
-            entryAdapter.notifyItemRemoved(index);
-        }
-    }
-
-    public void updateSessionEntryById(long databaseId, SessionEntry oldEntry, SessionEntry newEntry) {
-        int index = getSessionEntryIndex(databaseId);
-        if (index != sessionEntries.size()) {
-            if (oldEntry.isSameStartingTimeAs(newEntry)) {
-                sessionEntries.set(index, newEntry);
-                entryAdapter.notifyItemChanged(index);
-            }
-            else {
-                sessionEntries.remove(index);
-                int newIndex = getPositionForEntry(newEntry);
-                sessionEntries.add(newIndex, newEntry);
-                entryAdapter.notifyItemMoved(index, newIndex);
-                entryAdapter.notifyItemChanged(newIndex);
-            }
-        }
-    }
-
     private int getPositionForEntry(SessionEntry newEntry) {
-
-        if (sessionEntries.size() <= 1)
+        if (mSessionEntries.size() <= 1)
             return 0;
 
-        if (newEntry.getStartTime() < sessionEntries.get(0).getStartTime())
+        if (newEntry.getStartTime() < mSessionEntries.get(0).getStartTime())
             return 0;
 
-        for (int i = sessionEntries.size()-1; i >= 0; i--) {
-            SessionEntry entry = sessionEntries.get(i);
+        for (int i = mSessionEntries.size() - 1; i >= 0; i--) {
+            SessionEntry entry = mSessionEntries.get(i);
 
             if (newEntry.getStartTime() > entry.getStartTime()) {
                 return i + 1;
             }
         }
 
-        return sessionEntries.size() - 1;
+        return mSessionEntries.size() - 1;
     }
+    //endregion
 
     @Override
     public void updateEntries(SessionEntriesSample dataSample) {
-        if (entryAdapter != null) {
-            this.sessionEntries = dataSample.getSessionEntries();
-
-            entryAdapter = new EntryViewAdapter(this.sessionEntries, getContext(), entryAdapter.getListener());
-            entriesContainer.setAdapter(entryAdapter);
+        if (mEntryAdapter != null) {
+            this.mSessionEntries = dataSample.getSessionEntries();
+            mEntryAdapter = new EntryViewAdapter(this.mSessionEntries, getContext(), this);
+            mEntriesContainer.setAdapter(mEntryAdapter);
         }
+    }
+
+    @Override
+    public void onEntryViewClick(long habitId, long entryId) {
+        NewEntryForm dialog = NewEntryForm.newInstance(mHabitDatabase.getEntry(entryId));
+        dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
+            @Override
+            public void onFinishedWithResult(SessionEntry entry) {
+                if (entry != null) {
+                    SessionEntry oldEntry = mHabitDatabase.getEntry(entry.getDatabaseId());
+                    mHabitDatabase.updateEntry(entry.getDatabaseId(), entry);
+                    updateSessionEntryById(entry.getDatabaseId(), oldEntry, entry);
+                }
+            }
+
+            @Override
+            public void onDeleteClicked(SessionEntry entry) {
+                mHabitDatabase.deleteEntry(entry.getDatabaseId());
+                removeSessionEntryById(entry.getDatabaseId());
+            }
+        });
+
+        dialog.show(getFragmentManager(), "edit-entry");
     }
 }

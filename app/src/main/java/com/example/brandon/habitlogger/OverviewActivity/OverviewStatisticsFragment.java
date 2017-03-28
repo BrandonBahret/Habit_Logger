@@ -9,13 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.HabitActivity.GetScrollEventsFromFragmentsInterface;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
 
 public class OverviewStatisticsFragment extends Fragment {
 
     private static View view;
-    private GetScrollEventsFromFragmentsInterface listener;
+    private RecyclerViewScrollObserver.IScrollEvents listener;
 
     public OverviewStatisticsFragment() {
         // Required empty public constructor
@@ -68,8 +68,8 @@ public class OverviewStatisticsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(context instanceof GetScrollEventsFromFragmentsInterface){
-            this.listener = (GetScrollEventsFromFragmentsInterface)context;
+        if(context instanceof RecyclerViewScrollObserver.IScrollEvents){
+            this.listener = (RecyclerViewScrollObserver.IScrollEvents)context;
         }
     }
 }

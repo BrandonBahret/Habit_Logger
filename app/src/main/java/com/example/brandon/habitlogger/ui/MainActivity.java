@@ -44,7 +44,7 @@ import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.Preferences.SettingsActivity;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.CategoryCardAdapter;
-import com.example.brandon.habitlogger.RecyclerViewAdapters.ComplexDecoration;
+import com.example.brandon.habitlogger.RecyclerViewAdapters.GroupDecoration;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.HabitViewAdapter;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.SpaceOffsetDecoration;
 import com.example.brandon.habitlogger.common.ConfirmationDialog;
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity
 
     List<CategoryHabitsContainer> categoryContainers = new ArrayList<>();
     Handler handler = new Handler();
-    private ComplexDecoration itemDecoration;
+    private GroupDecoration itemDecoration;
 
     HabitViewAdapter habitAdapter;
     CategoryCardAdapter categoryAdapter;
@@ -407,7 +407,7 @@ public class MainActivity extends AppCompatActivity
             break;
 
             case PreferenceChecker.AS_SECTIONS: {
-                itemDecoration = new ComplexDecoration(this, R.dimen.category_section_text_size, new ComplexDecoration.Callback() {
+                itemDecoration = new GroupDecoration(this, R.dimen.category_section_text_size, new GroupDecoration.Callback() {
                     @Override
                     public long getGroupId(int position) {
                         if (position >= 0 && position < habitList.size()) {

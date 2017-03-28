@@ -33,6 +33,7 @@ import com.example.brandon.habitlogger.common.ConfirmationDialog;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager;
+import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
@@ -42,7 +43,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class HabitActivity extends AppCompatActivity implements CallbackInterface, GetScrollEventsFromFragmentsInterface, HabitDatabase.OnEntryChangedListener {
+public class HabitActivity extends AppCompatActivity implements CallbackInterface, RecyclerViewScrollObserver.IScrollEvents, HabitDatabase.OnEntryChangedListener {
 
     private ViewPager viewPager;
 
@@ -60,31 +61,36 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     FloatingActionButton enterSession, createEntry;
     FloatingDateRangeWidgetManager dateRangeManager;
 
-    List<UpdateEntriesInterface> callbacks = new ArrayList<>();
-    List<UpdateCategorySampleInterface> newCategoryDataSampleCallbacks = new ArrayList<>();
+    List<IUpdateEntries> callbacks = new ArrayList<>();
+    List<IUpdateCategorySample> newCategoryDataSampleCallbacks = new ArrayList<>();
 
     private GestureDetectorCompat mDetector;
 
     @Override
-    public void addCallback(UpdateEntriesInterface callback) {
+    public void addUpdateEntriesCallback(IUpdateEntries callback) {
         callbacks.add(callback);
     }
 
     @Override
-    public void removeCallback(UpdateEntriesInterface callback) {
+    public void removeUpdateEntriesCallback(IUpdateEntries callback) {
         callbacks.remove(callback);
+    }
+
+
+    @Override
+    public void addUpdateCategoryDataSampleCallback(IUpdateCategorySample callback) {
+        newCategoryDataSampleCallbacks.add(callback);
+    };
+
+    @Override
+    public void removeUpdateCategoryDataSampleCallback(IUpdateCategorySample callback) {
+        newCategoryDataSampleCallbacks.remove(callback);
     }
 
     @Override
     public SessionEntriesSample getSessionEntries() {
         return new SessionEntriesSample(sessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
     }
-
-    @Override
-    public void addOnNewCategoryDataSampleCallback(UpdateCategorySampleInterface callback) {
-        newCategoryDataSampleCallbacks.add(callback);
-    }
-
     @Override
     public CategoryDataSample getCategoryDataSample() {
         long dateFrom = dateRangeManager.getDateFrom();
@@ -430,7 +436,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
         dateRangeManager.updateSessionEntries(sessionEntries);
 
-        for (UpdateEntriesInterface callback : callbacks) {
+        for (IUpdateEntries callback : callbacks) {
             callback.updateEntries(dataSample);
         }
     }
@@ -492,16 +498,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
                 }
 
                 case 1: {
-                    CalendarFragment fragment = CalendarFragment.newInstance();
-//                    fragment.setHasOptionsMenu(true);
-                    fragment.setListener(new CalendarFragment.Listener() {
-                        @Override
-                        public void onDateClicked(int year, int month, int dayOfMonth) {
-                            dateRangeManager.setDateRangeForDate(year, month, dayOfMonth, true);
-                            viewPager.setCurrentItem(0, true);
-                        }
-                    });
-                    return fragment;
+                    return CalendarFragment.newInstance();
                 }
 
                 case 2: {

@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
-import com.example.brandon.habitlogger.HabitActivity.UpdateEntriesInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
@@ -22,7 +21,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-public class StreaksFragment extends Fragment implements UpdateEntriesInterface {
+public class StreaksFragment extends Fragment implements CallbackInterface.IUpdateEntries {
 
     private TextView value;
     CallbackInterface callbackInterface;
@@ -51,7 +50,7 @@ public class StreaksFragment extends Fragment implements UpdateEntriesInterface 
         super.onAttach(context);
 
         callbackInterface = (CallbackInterface) context;
-        callbackInterface.addCallback(this);
+        callbackInterface.addUpdateEntriesCallback(this);
     }
 
     @Override

@@ -11,13 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.HabitActivity.GetScrollEventsFromFragmentsInterface;
 import com.example.brandon.habitlogger.HabitActivity.NewEntryForm;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.RecyclerViewAdapters.ComplexDecoration;
+import com.example.brandon.habitlogger.RecyclerViewAdapters.GroupDecoration;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.EntryViewAdapter;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.SpaceOffsetDecoration;
 import com.example.brandon.habitlogger.data.HabitDataSample;
@@ -34,7 +33,7 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
 
     PreferenceChecker preferenceChecker;
     private CallbackInterface callbackInterface;
-    private GetScrollEventsFromFragmentsInterface listener;
+    private RecyclerViewScrollObserver.IScrollEvents listener;
 
     public OverviewEntriesFragment() {
         // Required empty public constructor
@@ -65,7 +64,7 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
         entryAdapter = new EntryViewAdapter(sessionEntries, getContext(),
                 new EntryViewAdapter.OnClickListeners() {
                     @Override
-                    public void onRootClick(long habitId, long entryId) {
+                    public void onEntryViewClick(long habitId, long entryId) {
                         NewEntryForm dialog = NewEntryForm.newInstance(habitDatabase.getEntry(entryId));
                         dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
                             @Override
@@ -88,7 +87,7 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
                     }
                 });
 
-        entriesContainer.addItemDecoration(new ComplexDecoration(getContext(), R.dimen.entries_section_text_size, new ComplexDecoration.Callback() {
+        entriesContainer.addItemDecoration(new GroupDecoration(getContext(), R.dimen.entries_section_text_size, new GroupDecoration.Callback() {
             @Override
             public long getGroupId(int position) {
                 if(position >= 0 && position < sessionEntries.size()) {
@@ -145,8 +144,8 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
         callbackInterface = (CallbackInterface)context;
         callbackInterface.addCallback(this);
 
-        if(context instanceof GetScrollEventsFromFragmentsInterface){
-            this.listener = (GetScrollEventsFromFragmentsInterface)context;
+        if(context instanceof RecyclerViewScrollObserver.IScrollEvents){
+            this.listener = (RecyclerViewScrollObserver.IScrollEvents)context;
         }
     }
 

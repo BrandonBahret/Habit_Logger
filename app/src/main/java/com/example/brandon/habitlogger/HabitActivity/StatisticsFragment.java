@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -20,7 +21,7 @@ import com.example.brandon.habitlogger.R;
 public class StatisticsFragment extends Fragment{
 
     private static View view;
-    private GetScrollEventsFromFragmentsInterface listener;
+    private RecyclerViewScrollObserver.IScrollEvents listener;
     int menuRes = R.menu.menu_habit;
 
     public StatisticsFragment() {
@@ -82,8 +83,8 @@ public class StatisticsFragment extends Fragment{
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(context instanceof GetScrollEventsFromFragmentsInterface){
-            this.listener = (GetScrollEventsFromFragmentsInterface)context;
+        if(context instanceof RecyclerViewScrollObserver.IScrollEvents){
+            this.listener = (RecyclerViewScrollObserver.IScrollEvents)context;
         }
     }
 

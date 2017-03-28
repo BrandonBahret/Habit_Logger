@@ -5,18 +5,28 @@ import com.example.brandon.habitlogger.data.SessionEntriesSample;
 
 /**
  * Created by Brandon on 2/9/2017.
- * Interface to communicate with fragments in the habit activity
+ * Interface to communicate with fragments within HabitActivity
  */
 
 public interface CallbackInterface {
 
-    void addCallback(UpdateEntriesInterface callback);
-    void removeCallback(UpdateEntriesInterface callback);
+    interface IUpdateEntries {
+        void updateEntries(SessionEntriesSample dataSample);
+    }
 
-    void addOnNewCategoryDataSampleCallback(UpdateCategorySampleInterface callback);
+    interface IUpdateCategorySample {
+        void updateCategoryDataSample(CategoryDataSample dataSample, long dateFrom, long dateTo);
 
-    SessionEntriesSample getSessionEntries();
-    CategoryDataSample getCategoryDataSample();
+    }
 
     int getDefaultColor();
+
+    SessionEntriesSample getSessionEntries();
+    void addUpdateEntriesCallback(IUpdateEntries callback);
+    void removeUpdateEntriesCallback(IUpdateEntries callback);
+
+    CategoryDataSample getCategoryDataSample();
+    void addUpdateCategoryDataSampleCallback(IUpdateCategorySample callback);
+    void removeUpdateCategoryDataSampleCallback(IUpdateCategorySample callback);
+
 }

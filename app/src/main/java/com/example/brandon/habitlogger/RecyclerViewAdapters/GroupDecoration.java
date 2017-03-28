@@ -18,7 +18,7 @@ import com.example.brandon.habitlogger.R;
 import static android.support.v4.content.ContextCompat.getColor;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class ComplexDecoration extends RecyclerView.ItemDecoration {
+public class GroupDecoration extends RecyclerView.ItemDecoration {
 
     private final Callback callback;
     private final TextPaint textPaint;
@@ -32,7 +32,7 @@ public class ComplexDecoration extends RecyclerView.ItemDecoration {
 
     private Context mContext;
 
-    public ComplexDecoration(Context context, @DimenRes int textSizeRes, Callback callback) {
+    public GroupDecoration(Context context, @DimenRes int textSizeRes, Callback callback) {
         super();
         this.callback = callback;
         final Resources res = context.getResources();

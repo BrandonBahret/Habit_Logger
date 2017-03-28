@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
-import com.example.brandon.habitlogger.HabitActivity.UpdateEntriesInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
@@ -33,7 +32,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DistributionStartingTime extends Fragment implements UpdateEntriesInterface {
+public class DistributionStartingTime extends Fragment implements CallbackInterface.IUpdateEntries {
     CallbackInterface callbackInterface;
     FragmentDistributionStartingTimeBinding ui;
     private int mColor;
@@ -58,14 +57,14 @@ public class DistributionStartingTime extends Fragment implements UpdateEntriesI
     public void onAttach(Context context) {
         super.onAttach(context);
         callbackInterface = (CallbackInterface) context;
-        callbackInterface.addCallback(this);
+        callbackInterface.addUpdateEntriesCallback(this);
         mColor = callbackInterface.getDefaultColor();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        callbackInterface.removeCallback(this);
+        callbackInterface.removeUpdateEntriesCallback(this);
     }
 
     //endregion // Methods (onAttach - onDetach)

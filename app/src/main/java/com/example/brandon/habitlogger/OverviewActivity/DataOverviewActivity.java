@@ -11,20 +11,20 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
-import com.example.brandon.habitlogger.HabitActivity.GetScrollEventsFromFragmentsInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.HabitDataSample;
 import com.example.brandon.habitlogger.databinding.ActivityDataOverviewBinding;
 import com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager;
+import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DataOverviewActivity extends AppCompatActivity implements
         CallbackInterface, SearchView.OnQueryTextListener, ViewPager.OnPageChangeListener,
-        FloatingDateRangeWidgetManager.DateRangeChangeListener, GetScrollEventsFromFragmentsInterface, HabitDatabase.OnEntryChangedListener {
+        FloatingDateRangeWidgetManager.DateRangeChangeListener, RecyclerViewScrollObserver.IScrollEvents, HabitDatabase.OnEntryChangedListener {
 
     private FloatingDateRangeWidgetManager dateRangeManager;
     private HabitDatabase habitDatabase;

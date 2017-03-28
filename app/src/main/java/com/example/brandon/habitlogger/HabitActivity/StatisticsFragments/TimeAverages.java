@@ -10,13 +10,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
-import com.example.brandon.habitlogger.HabitActivity.UpdateEntriesInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 
-public class TimeAverages extends Fragment implements UpdateEntriesInterface {
+public class TimeAverages extends Fragment implements CallbackInterface.IUpdateEntries {
 
     private TextView hoursPerMonth, hoursPerWeek, hoursPerDay, habitFrequency;
     CallbackInterface callbackInterface;
@@ -56,7 +55,7 @@ public class TimeAverages extends Fragment implements UpdateEntriesInterface {
         super.onAttach(context);
 
         callbackInterface = (CallbackInterface) context;
-        callbackInterface.addCallback(this);
+        callbackInterface.addUpdateEntriesCallback(this);
     }
 
     @Override

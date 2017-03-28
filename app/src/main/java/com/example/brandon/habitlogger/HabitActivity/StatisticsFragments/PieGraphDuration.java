@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
-import com.example.brandon.habitlogger.HabitActivity.UpdateCategorySampleInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
@@ -26,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class PieGraphDuration extends Fragment implements UpdateCategorySampleInterface {
+public class PieGraphDuration extends Fragment implements CallbackInterface.IUpdateCategorySample {
 
     private FragmentPieGraphDurationBinding ui;
     CallbackInterface callbackInterface;
@@ -60,13 +59,21 @@ public class PieGraphDuration extends Fragment implements UpdateCategorySampleIn
         return ui.getRoot();
     }
 
+    //region (onAttach - onDetach)
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
         callbackInterface = (CallbackInterface) context;
-        callbackInterface.addOnNewCategoryDataSampleCallback(this);
+        callbackInterface.addUpdateCategoryDataSampleCallback(this);
     }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callbackInterface.removeUpdateCategoryDataSampleCallback(this);
+    }
+    //endregion
 
     @Override
     public void onStart() {

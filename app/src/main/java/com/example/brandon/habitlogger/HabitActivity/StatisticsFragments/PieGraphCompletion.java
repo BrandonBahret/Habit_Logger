@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
-import com.example.brandon.habitlogger.HabitActivity.UpdateEntriesInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
@@ -27,7 +26,7 @@ import java.util.Locale;
 import java.util.Set;
 
 
-public class PieGraphCompletion extends Fragment implements UpdateEntriesInterface {
+public class PieGraphCompletion extends Fragment implements CallbackInterface.IUpdateEntries {
 
     private FragmentPieGraphCompletionBinding ui;
     CallbackInterface callbackInterface;
@@ -69,7 +68,7 @@ public class PieGraphCompletion extends Fragment implements UpdateEntriesInterfa
         super.onAttach(context);
 
         callbackInterface = (CallbackInterface) context;
-        callbackInterface.addCallback(this);
+        callbackInterface.addUpdateEntriesCallback(this);
 
         mCompletedColor = callbackInterface.getDefaultColor();
         mSkippedColor = ColorUtils.setAlphaComponent(mCompletedColor, 85);
