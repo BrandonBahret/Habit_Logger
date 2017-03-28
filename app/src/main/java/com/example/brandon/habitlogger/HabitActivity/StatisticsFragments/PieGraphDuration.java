@@ -6,7 +6,6 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.graphics.ColorUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +14,8 @@ import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
 import com.example.brandon.habitlogger.HabitActivity.UpdateCategorySampleInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.common.MyColorUtils;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.databinding.FragmentPieGraphDurationBinding;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
@@ -42,6 +39,7 @@ public class PieGraphDuration extends Fragment implements UpdateCategorySampleIn
         return new PieGraphDuration();
     }
 
+    //region Methods responsible for handling the fragment lifecycle
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -56,10 +54,8 @@ public class PieGraphDuration extends Fragment implements UpdateCategorySampleIn
         ui.chart.setHoleRadius(65f);
         ui.chart.setHoleColor(Color.TRANSPARENT);
         ui.chart.setHighlightPerTapEnabled(true);
-        Legend legend = ui.chart.getLegend();
-        legend.setWordWrapEnabled(true);
+        ui.chart.getLegend().setWordWrapEnabled(true);
         ui.chart.setDrawEntryLabels(false);
-//        ui.chart.setEntryLabelColor(Color.BLACK);
 
         return ui.getRoot();
     }
@@ -78,14 +74,14 @@ public class PieGraphDuration extends Fragment implements UpdateCategorySampleIn
         CategoryDataSample sample = callbackInterface.getCategoryDataSample();
         updateCategoryDataSample(sample, sample.getDateFromTime(), sample.getDateToTime());
     }
+    //endregion
 
     @Override
     public void updateCategoryDataSample(CategoryDataSample dataSample, long dateFrom, long dateTo) {
         float[] durationRatios = new float[dataSample.getNumberOfHabits()];
 
-        for (int i = 0; i < durationRatios.length; i++) {
+        for (int i = 0; i < durationRatios.length; i++)
             durationRatios[i] = dataSample.getHabitDuration(i) / (float) dataSample.calculateTotalDuration() * 100;
-        }
 
         setPieData(durationRatios, dataSample);
     }
@@ -104,18 +100,11 @@ public class PieGraphDuration extends Fragment implements UpdateCategorySampleIn
         }
 
         PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setSliceSpace(1f);
+        dataSet.setSliceSpace(0f);
         dataSet.setSelectionShift(0f);
-
         dataSet.setValueTextColor(Color.BLACK);
         dataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
-
         dataSet.setValueLineVariableLength(true);
-
-//        int colors[] = genColors(category.getColorAsInt(), durationRatios.length);
-
-//        dataSet.setColors(genColors(callbackInterface.getDefaultColor(), entries));
-//        dataSet.setColors(genColors2(callbackInterface.getDefaultColor(), durationRatios.length));
         dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
 
         PieData data = new PieData(dataSet);
@@ -125,41 +114,4 @@ public class PieGraphDuration extends Fragment implements UpdateCategorySampleIn
         ui.chart.setData(data);
     }
 
-    private int[] genColors2(int color, int length) {
-        int colors[] = new int[length];
-
-        float hue = MyColorUtils.getHue(color);
-        for (int i = 0; i < length; i++) {
-            int thisColor = ColorUtils.blendARGB(ColorTemplate.MATERIAL_COLORS[i], ColorTemplate.PASTEL_COLORS[i], 0.75f);
-            colors[i] = MyColorUtils.setHue(thisColor, hue);
-        }
-
-        return colors;
-    }
-
-    private int[] genColors(int color, List<PieEntry> entries) {
-        int length = entries.size();
-        int[] colors = new int[length];
-
-        for (int i = 0; i < length; i++) {
-            float y = entries.get(i).getValue();
-            colors[i] = genColor(color, i, length, y);
-        }
-
-        return colors;
-    }
-
-    private int genColor(int color, int i, int max, float y) {
-
-        int red = Color.red(color);//(int) (Color.red(color)   - (i / (float) max * BASE_VALUE));
-        int green = Color.green(color);//(int) (Color.green(color) - (i / (float) max * BASE_VALUE));
-        int blue = Color.blue(color);//(int) (Color.blue(color)  - (i / (float) max * BASE_VALUE));
-
-        float hsl[] = new float[3];
-        ColorUtils.RGBToHSL(red, green, blue, hsl);
-        float ratio = (max - i) / (float) max * hsl[1];
-        hsl[1] = ratio;
-        hsl[2] = Math.max(0.5f, y / 100f * 0.75f);
-        return ColorUtils.HSLToColor(hsl);
-    }
 }

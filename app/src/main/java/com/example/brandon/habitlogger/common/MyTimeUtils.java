@@ -74,4 +74,16 @@ public class MyTimeUtils {
     }
     //endregion
 
+    /**
+     * Return date in specified format.
+     *
+     * @param timestamp Date in milliseconds
+     * @param dateFormat   Date format
+     * @return String representing date in specified format
+     */
+    public static String stringifyTimestamp(long timestamp, String dateFormat) {
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.getDefault());
+        return formatter.format(new Date(timestamp));
+    }
+
 }

@@ -3,7 +3,6 @@ package com.example.brandon.habitlogger.HabitActivity.StatisticsFragments;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.graphics.ColorUtils;
@@ -15,6 +14,7 @@ import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
 import com.example.brandon.habitlogger.HabitActivity.UpdateEntriesInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.databinding.FragmentPieGraphCompletionBinding;
 import com.github.mikephil.charting.data.PieData;
@@ -22,15 +22,19 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 
 public class PieGraphCompletion extends Fragment implements UpdateEntriesInterface {
 
     private FragmentPieGraphCompletionBinding ui;
     CallbackInterface callbackInterface;
+
+    private int mChartHoleColor;
+    private int mCompletedColor;
+    private int mSkippedColor;
 
     public PieGraphCompletion() {
         // Required empty public constructor
@@ -40,12 +44,23 @@ public class PieGraphCompletion extends Fragment implements UpdateEntriesInterfa
         return new PieGraphCompletion();
     }
 
+    //region Methods responsible for handling fragment lifecycle
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
         ui = DataBindingUtil.inflate(inflater, R.layout.fragment_pie_graph_completion, container, false);
+
+        ui.chart.setUsePercentValues(true);
+        ui.chart.getDescription().setEnabled(false);
+        ui.chart.setRotationEnabled(false);
+        ui.chart.setExtraOffsets(4, 3, 0, 3);
+        ui.chart.setCenterTextSize(25);
+        ui.chart.setRotationAngle(-195f);
+        ui.chart.setHoleRadius(75f);
+        ui.chart.getLegend().setEnabled(false);
+
         return ui.getRoot();
     }
 
@@ -55,6 +70,10 @@ public class PieGraphCompletion extends Fragment implements UpdateEntriesInterfa
 
         callbackInterface = (CallbackInterface) context;
         callbackInterface.addCallback(this);
+
+        mCompletedColor = callbackInterface.getDefaultColor();
+        mSkippedColor = ColorUtils.setAlphaComponent(mCompletedColor, 85);
+        mChartHoleColor = ColorUtils.setAlphaComponent(mCompletedColor, 10);
     }
 
     @Override
@@ -62,84 +81,42 @@ public class PieGraphCompletion extends Fragment implements UpdateEntriesInterfa
         super.onStart();
         updateEntries(callbackInterface.getSessionEntries());
     }
+    //endregion
 
     @Override
     public void updateEntries(SessionEntriesSample dataSample) {
-
         if (!dataSample.isEmpty()) {
-            float ratio = 1.0f;
-            int dayCount = 0;
-            int totalDays = 0;
+            Set<Long> uniqueEntryStartDates = MyCollectionUtils.listToSet(
+                    dataSample.getSessionEntries(), SessionEntry.IGetSessionStartDate
+            );
 
-            List<SessionEntry> entries = dataSample.getSessionEntries();
-            Collections.sort(entries, SessionEntry.StartingTimeComparator);
-            final long DAY_IN_MILLI = 86400000L;
+            int totalDaysWithEntries = uniqueEntryStartDates.size();
+            int totalDays = dataSample.calculateTotalDaysLength();
+            float ratio = totalDaysWithEntries / (float) totalDays * 100;
 
-            long totalTime = dataSample.getDateToTime() - dataSample.getDateFromTime();
-            totalDays = (int) (totalTime / DAY_IN_MILLI);
-
-            if (totalDays > 0) {
-                long targetDate = dataSample.getDateFromTime();
-
-                for (SessionEntry entry : entries) {
-                    long currentDate = entry.getStartingTimeDate();
-
-                    if (currentDate == targetDate) {
-                        dayCount++;
-                        targetDate += DAY_IN_MILLI;
-                    }
-                    else if (currentDate > targetDate) {
-                        dayCount++;
-                        targetDate = currentDate + DAY_IN_MILLI;
-                    }
-                }
-
-                ratio = dayCount / (float) totalDays;
-
-            }
-            else {
-                ratio = 1;
-            }
-
-            setPieData(ratio);
-            setTextLabels(dayCount, totalDays);
+            setPieData(totalDaysWithEntries, totalDays, ratio);
         }
     }
 
-    private void setTextLabels(int dayCount, int totalDays) {
-        ui.completedDaysText.setText(String.valueOf(dayCount));
+    public void setPieData(int totalDaysWithEntries, int totalDays, float ratio) {
+        ui.completedDaysText.setText(String.valueOf(totalDaysWithEntries));
         ui.totalDaysText.setText(String.valueOf(totalDays));
-    }
-
-    public void setPieData(float ratio){
-        ui.chart.setUsePercentValues(true);
-        ui.chart.getDescription().setEnabled(false);
-        ui.chart.setRotationEnabled(false);
-        ui.chart.setExtraOffsets(4, 3, 0, 3);
-        ui.chart.setCenterText(String.format(Locale.US, "%.2f%%", ratio * 100));
-        ui.chart.setCenterTextSize(25);
-        ui.chart.setRotationAngle(-195f);
-        ui.chart.setHoleRadius(75f);
+        ui.chart.setCenterText(String.format(Locale.US, "%.2f%%", ratio));
 
         List<PieEntry> entries = new ArrayList<>();
-        entries.add(new PieEntry(ratio * 100));
-        entries.add(new PieEntry((1-ratio) * 100));
+        entries.add(new PieEntry(ratio));
+        entries.add(new PieEntry(100 - ratio));
 
         PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setSliceSpace(0f);
         dataSet.setSelectionShift(0f);
 
-        int completedColor = callbackInterface.getDefaultColor();
-        int skippedColor = ColorUtils.setAlphaComponent(callbackInterface.getDefaultColor(), (int)(255 * 0.3));
-        int holeColor = ColorUtils.setAlphaComponent(callbackInterface.getDefaultColor(), (int)(255 * 0.03));
-
-        dataSet.setColors(completedColor, skippedColor);
-        ui.chart.setHoleColor(holeColor);
+        ui.chart.setHoleColor(mChartHoleColor);
+        dataSet.setColors(mCompletedColor, mSkippedColor);
 
         PieData data = new PieData(dataSet);
-        data.setValueTextColor(Color.TRANSPARENT);
+        data.setDrawValues(false);
 
         ui.chart.setData(data);
-        ui.chart.getLegend().setEnabled(false);
     }
 }

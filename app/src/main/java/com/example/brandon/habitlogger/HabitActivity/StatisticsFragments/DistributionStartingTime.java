@@ -36,9 +36,7 @@ import java.util.List;
 public class DistributionStartingTime extends Fragment implements UpdateEntriesInterface {
     CallbackInterface callbackInterface;
     FragmentDistributionStartingTimeBinding ui;
-    private int color;
-
-    int totalEntriesCount;
+    private int mColor;
 
     //region // Methods responsible for handling the fragment lifecycle
 
@@ -61,7 +59,7 @@ public class DistributionStartingTime extends Fragment implements UpdateEntriesI
         super.onAttach(context);
         callbackInterface = (CallbackInterface) context;
         callbackInterface.addCallback(this);
-        color = callbackInterface.getDefaultColor();
+        mColor = callbackInterface.getDefaultColor();
     }
 
     @Override
@@ -95,8 +93,7 @@ public class DistributionStartingTime extends Fragment implements UpdateEntriesI
                 entryCounter.incrementCounter(entry.getStartingTimePortion());
 
 
-            totalEntriesCount = dataSample.getSessionEntries().size();
-
+            int totalEntriesCount = dataSample.getSessionEntries().size();
             List<BarEntry> entries = new ArrayList<>();
             for (int counterIndex = 0; counterIndex < entryCounter.COUNTERS_LENGTH; counterIndex++) {
                 float ratio = entryCounter.getCounter(counterIndex) / (float) totalEntriesCount * 100;
@@ -156,7 +153,7 @@ public class DistributionStartingTime extends Fragment implements UpdateEntriesI
 
         //region // Add data to CombinedData
         BarDataSet dataSet = new BarDataSet(entries, "label");
-        dataSet.setColor(color);
+        dataSet.setColor(mColor);
         dataSet.setHighlightEnabled(false);
         BarData barData = new BarData(dataSet);
         barData.setValueFormatter(new IValueFormatter() {
@@ -177,25 +174,6 @@ public class DistributionStartingTime extends Fragment implements UpdateEntriesI
         ui.chart.setData(data);
         ui.chart.invalidate();
     }
-
-//    private LineData generateBellCurveData(List<BarEntry> data, int interval) {
-//        List<Entry> entries = NormalDistribution.getLineEntries(data, interval);
-//
-//        LineDataSet dataSet = new LineDataSet(entries, "");
-//        dataSet.setDrawFilled(true);
-//        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-//        dataSet.setDrawCircles(false);
-//        dataSet.setLineWidth(2f);
-//        int color = callbackInterface.getDefaultColor();
-//        dataSet.setFillColor(color);
-//        dataSet.setColor(color);
-//
-//        LineData lineData = new LineData(dataSet);
-//        lineData.setDrawValues(false);
-//        lineData.setHighlightEnabled(false);
-//
-//        return new LineData(dataSet);
-//    }
 
     class TimeIntervalEntryCounter {
         private final int DAY_IN_MINUTES = 1439;

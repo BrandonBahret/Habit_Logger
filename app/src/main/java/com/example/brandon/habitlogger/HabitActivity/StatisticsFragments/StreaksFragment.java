@@ -13,6 +13,7 @@ import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
 import com.example.brandon.habitlogger.HabitActivity.UpdateEntriesInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class StreaksFragment extends Fragment implements UpdateEntriesInterface 
         return new StreaksFragment();
     }
 
+    //region Methods responsible for handling the fragment lifecycle
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -56,6 +58,7 @@ public class StreaksFragment extends Fragment implements UpdateEntriesInterface 
         super.onStart();
         updateEntries(callbackInterface.getSessionEntries());
     }
+    //endregion
 
     @Override
     public void updateEntries(SessionEntriesSample dataSample) {
@@ -134,8 +137,8 @@ public class StreaksFragment extends Fragment implements UpdateEntriesInterface 
         @Override
         public String toString() {
             String format = "%s [%d] %s";
-            String startDate = SessionEntry.getDate(streakStart, "MMMM-d-yyyy");
-            String endDate = SessionEntry.getDate(streakEnd, "MMMM-d-yyyy");
+            String startDate = MyTimeUtils.stringifyTimestamp(streakStart, "MMMM-d-yyyy");
+            String endDate = MyTimeUtils.stringifyTimestamp(streakEnd, "MMMM-d-yyyy");
 
             return String.format(Locale.US, format, startDate, streakLength, endDate);
         }

@@ -9,11 +9,11 @@ import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Locale;
+
+import static com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager.getDate;
 
 /**
  * Created by Brandon on 10/26/2016.
@@ -180,6 +180,13 @@ public class SessionEntry implements Serializable, Parcelable {
         return c.getTimeInMillis();
     }
 
+    public static MyCollectionUtils.IGetKey<Long> IGetSessionStartDate = new MyCollectionUtils.IGetKey<Long>() {
+        @Override
+        public Long get(Object object) {
+            return ((SessionEntry)object).getStartingTimeDate();
+        }
+    };
+
     public int getStartingTimeDayOfMonth(){
         Calendar c = Calendar.getInstance();
 
@@ -345,21 +352,8 @@ public class SessionEntry implements Serializable, Parcelable {
     }
 
     public String getStartTimeAsString(String dateFormat) {
-        return getDate(getStartTime(), dateFormat);
+        return MyTimeUtils.stringifyTimestamp(getStartTime(), dateFormat);
     }
-
-    /**
-     * Return date in specified format.
-     *
-     * @param milliSeconds Date in milliseconds
-     * @param dateFormat   Date format
-     * @return String representing date in specified format
-     */
-    public static String getDate(long milliSeconds, String dateFormat) {
-        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.getDefault());
-        return formatter.format(new Date(milliSeconds));
-    }
-
 
     public Habit getHabit() {
         return habit;

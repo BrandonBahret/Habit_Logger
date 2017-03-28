@@ -1,5 +1,7 @@
 package com.example.brandon.habitlogger.data;
 
+import android.text.format.DateUtils;
+
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 
@@ -17,6 +19,7 @@ public class SessionEntriesSample {
     private final List<SessionEntry> mSessionEntries;
     private final long mDateFromTime, mDateToTime;
     private Long mDuration;
+    private Integer mTotalDaysLength;
     //endregion
 
     public SessionEntriesSample(List<SessionEntry> sessionEntries, long dateFromTime, long dateToTime) {
@@ -37,6 +40,15 @@ public class SessionEntriesSample {
             mDuration = MyCollectionUtils.sum(mSessionEntries, SessionEntry.IGetSessionDuration);
 
         return mDuration;
+    }
+
+    public int calculateTotalDaysLength(){
+        if(mTotalDaysLength == null) {
+            long totalTime = getDateToTime() - getDateFromTime();
+            mTotalDaysLength = (int) (totalTime / DateUtils.DAY_IN_MILLIS);
+        }
+
+        return mTotalDaysLength;
     }
     //endregion
 

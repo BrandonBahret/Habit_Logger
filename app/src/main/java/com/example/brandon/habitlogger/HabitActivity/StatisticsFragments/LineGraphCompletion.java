@@ -23,6 +23,8 @@ import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
 import com.example.brandon.habitlogger.HabitActivity.UpdateEntriesInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.MyCollectionUtils;
+import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.databinding.FragmentLineGraphCompletionBinding;
 import com.github.mikephil.charting.components.AxisBase;
@@ -42,6 +44,7 @@ public class LineGraphCompletion extends Fragment implements UpdateEntriesInterf
 
     private FragmentLineGraphCompletionBinding ui;
     CallbackInterface callbackInterface;
+    private int mColor;
 
     public LineGraphCompletion() {
         // Required empty public constructor
@@ -51,6 +54,7 @@ public class LineGraphCompletion extends Fragment implements UpdateEntriesInterf
         return new LineGraphCompletion();
     }
 
+    //region Methods responsible for handling the fragment lifecycle
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -60,11 +64,32 @@ public class LineGraphCompletion extends Fragment implements UpdateEntriesInterf
 
         ui.chart.getLegend().setEnabled(false);
         ui.chart.getDescription().setEnabled(false);
-        ui.chart.getAxisRight().setMinWidth(0f);
-        ui.chart.getAxisRight().setEnabled(false);
         ui.chart.setPinchZoom(true);
         ui.chart.getViewPortHandler().setMaximumScaleX(8.5f);
         ui.chart.getViewPortHandler().setMaximumScaleY(8.5f);
+
+        //region Stylize the axi
+        YAxis yAxis = ui.chart.getAxisLeft();
+        yAxis.setAxisMinimum(0f);
+        yAxis.setGridColor(ColorUtils.setAlphaComponent(yAxis.getGridColor(), 50));
+        yAxis.setValueFormatter(new PercentFormatter());
+
+        yAxis = ui.chart.getAxisRight();
+        yAxis.setMinWidth(0f);
+        yAxis.setEnabled(false);
+
+        XAxis xAxis = ui.chart.getXAxis();
+        xAxis.setGranularity(1f);
+        xAxis.setGranularityEnabled(true);
+        xAxis.setGridColor(ColorUtils.setAlphaComponent(xAxis.getGridColor(), 50));
+        xAxis.setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                long timestamp = (long) (value * DateUtils.HOUR_IN_MILLIS);
+                return MyTimeUtils.stringifyTimestamp(timestamp, "d/MMM");
+            }
+        });
+        //endregion
 
         return ui.getRoot();
     }
@@ -75,6 +100,8 @@ public class LineGraphCompletion extends Fragment implements UpdateEntriesInterf
 
         callbackInterface = (CallbackInterface) context;
         callbackInterface.addCallback(this);
+
+        mColor = callbackInterface.getDefaultColor();
     }
 
     @Override
@@ -82,102 +109,63 @@ public class LineGraphCompletion extends Fragment implements UpdateEntriesInterf
         super.onStart();
         updateEntries(callbackInterface.getSessionEntries());
     }
+    //endregion
 
-    @Override
-    public void updateEntries(SessionEntriesSample dataSample) {
-        if (!dataSample.isEmpty()) {
-            setLineChartData(calculateDataSet(dataSample));
-        }
-    }
-
-    private void setLineChartData(List<Entry> values) {
-        LineDataSet dataSet = new LineDataSet(values, "label");
-        dataSet.setDrawFilled(true);
-        dataSet.setMode(LineDataSet.Mode.LINEAR);
-        dataSet.setDrawCircles(false);
-        dataSet.setLineWidth(2f);
-        int color = callbackInterface.getDefaultColor();
-        dataSet.setFillColor(color);
-        dataSet.setColor(color);
-
-        LineData data = new LineData(dataSet);
-        data.setDrawValues(false);
-        data.setHighlightEnabled(false);
-
-        ui.chart.setData(data);
-
-        YAxis yAxis = ui.chart.getAxisLeft();
-        yAxis.setAxisMinimum(0f); // start at zero
-        yAxis.setGridColor(ColorUtils.setAlphaComponent(yAxis.getGridColor(), 50));
-        yAxis.setValueFormatter(new PercentFormatter());
-
-        XAxis xAxis = ui.chart.getXAxis();
-        xAxis.setValueFormatter(new DateXAxisValueFormatter());
-        xAxis.setGranularity(1f);
-        xAxis.setGranularityEnabled(true);
-        xAxis.setGridColor(ColorUtils.setAlphaComponent(xAxis.getGridColor(), 50));
-//        xAxis.setLabelCount(8, true);
-    }
-
+    //region Methods responsible for generating the line chart data.
     List<Entry> calculateDataSet(SessionEntriesSample dataSample) {
-        long dateTo = dataSample.getDateToTime();
-        long dateFrom = dataSample.getDateFromTime();
 
-        int totalDays = (int) ((dateTo - dateFrom) / DateUtils.DAY_IN_MILLIS);
+        int totalDays = dataSample.calculateTotalDaysLength();
         List<Entry> values = new ArrayList<>(totalDays);
-        int dayCount = 0; // The number of days performed.
-        int entryIndex = 0;
-        long targetDate = dateFrom;
+
+        long targetDate = dataSample.getDateFromTime();
+        int dayCounter = 0; // The number of days performed.
 
         for (int dateIndex = 0; dateIndex < totalDays; dateIndex++) {
-            int index = findIndexForDate(dataSample.getSessionEntries(), targetDate, entryIndex);
-            if (index != -1) {
-                entryIndex = index;
-                dayCount++;
-            }
 
-            values.add(new HabitValue(targetDate, dayCount, totalDays));
+            if (hasIndexForDate(dataSample.getSessionEntries(), targetDate))
+                dayCounter++;
+
+            float ratio = dayCounter / (float) totalDays * 100;
+            values.add(new Entry(targetDate / DateUtils.HOUR_IN_MILLIS, ratio));
+
             targetDate += DateUtils.DAY_IN_MILLIS;
         }
 
         return values;
     }
 
-    public int findIndexForDate(List<SessionEntry> sessionEntries, long date, int entryIndexStart) {
-        for (int index = entryIndexStart; index < sessionEntries.size(); index++) {
-            long entryTime = sessionEntries.get(index).getStartingTimeDate();
+    public boolean hasIndexForDate(List<SessionEntry> sessionEntries, final long searchDate) {
+        return MyCollectionUtils.binarySearch(sessionEntries, searchDate, new MyCollectionUtils.KeyComparator() {
+            @Override
+            public int compare(Object element, Object key) {
+                return Long.compare(((SessionEntry) element).getStartingTimeDate(), (long) key);
+            }
+        }) >= 0;
+    }
+    //endregion
 
-            if (entryTime == date)
-                return index;
-
-            else if (entryTime > date)
-                return -1;
-        }
-
-        return -1;
+    @Override
+    public void updateEntries(SessionEntriesSample dataSample) {
+        if (!dataSample.isEmpty())
+            setLineChartData(calculateDataSet(dataSample));
     }
 
-    class HabitValue extends Entry {
-        public long date;
-        public int dateCount;
-        public float ratio;
+    private void setLineChartData(List<Entry> values) {
+        LineDataSet dataSet = new LineDataSet(values, "");
+        //region Stylize the data set
+        dataSet.setDrawFilled(true);
+        dataSet.setMode(LineDataSet.Mode.LINEAR);
+        dataSet.setDrawCircles(false);
+        dataSet.setLineWidth(2f);
+        dataSet.setFillColor(mColor);
+        dataSet.setColor(mColor);
+        //endregion
 
-        public HabitValue(long date, int dateCount, int totalDays) {
-            this.date = date;
-            this.dateCount = dateCount;
-            this.ratio = 100 * dateCount / (float) totalDays;
+        LineData data = new LineData(dataSet);
+        data.setDrawValues(false);
+        data.setHighlightEnabled(false);
 
-            setX(date / 3600000L);
-            setY(ratio);
-        }
+        ui.chart.setData(data);
     }
 
-    public class DateXAxisValueFormatter implements IAxisValueFormatter {
-
-        @Override
-        public String getFormattedValue(float value, AxisBase axis) {
-            long millis = (long) (value * 3600000L);
-            return SessionEntry.getDate(millis, "d/MMM");
-        }
-    }
 }
