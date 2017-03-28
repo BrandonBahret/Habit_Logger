@@ -13,13 +13,16 @@ import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
 import com.example.brandon.habitlogger.HabitActivity.UpdateEntriesInterface;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Set;
 
 public class StreaksFragment extends Fragment implements UpdateEntriesInterface {
 
@@ -49,7 +52,7 @@ public class StreaksFragment extends Fragment implements UpdateEntriesInterface 
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        callbackInterface = (CallbackInterface)context;
+        callbackInterface = (CallbackInterface) context;
         callbackInterface.addCallback(this);
     }
 
@@ -62,67 +65,43 @@ public class StreaksFragment extends Fragment implements UpdateEntriesInterface 
 
     @Override
     public void updateEntries(SessionEntriesSample dataSample) {
-        value.setText(Streak.listToString(getStreaks(dataSample.getSessionEntries())));
+        value.setText(Streak.listToString(getStreaks(dataSample)));
     }
 
-    public static List<Streak> getStreaks(List<SessionEntry> sessionEntries) {
+    public static List<Streak> getStreaks(SessionEntriesSample dataSample) {
         List<Streak> streaks = new ArrayList<>();
 
-        if(!sessionEntries.isEmpty()) {
-            Collections.sort(sessionEntries, SessionEntry.StartingTimeComparator);
+        Set<Long> sessionDatesSet = MyCollectionUtils.listToSet(dataSample.getSessionEntries(), SessionEntry.IGetSessionStartDate);
+        List<Long> sessionDates = new ArrayList<>(sessionDatesSet);
+        Collections.sort(sessionDates);
 
-            int size = sessionEntries.size();
-            long targetDate = sessionEntries.get(0).getStartingTimeDate();
-            long previousDate = -1;
+        Streak currentStreak = new Streak(sessionDates.get(0));
+        long lastDate = currentStreak.streakStart;
+        ListIterator iterator = sessionDates.listIterator(1);
 
-            Streak currentStreak = new Streak(targetDate);
+        while (iterator.hasNext()) {
+            long currentDate = (long) iterator.next();
+            if (currentDate - lastDate <= DateUtils.DAY_IN_MILLIS)
+                currentStreak.streakLength++;
+            else {
+                currentStreak.streakEnd = lastDate;
+                streaks.add(currentStreak);
 
-            for (SessionEntry entry : sessionEntries) {
-                long currentDate = entry.getStartingTimeDate();
-                boolean endOfList = sessionEntries.indexOf(entry) == (size - 1);
-
-                if (currentDate == targetDate) {
-                    currentStreak.streakLength++;
-
-                    if (endOfList) {
-                        currentStreak.streakEnd = currentDate;
-                        streaks.add(currentStreak);
-                        break;
-                    }
-
-                    previousDate = currentDate;
-                    targetDate += DateUtils.DAY_IN_MILLIS;
-
-                } else if (currentDate > targetDate) {
-                    currentStreak.streakEnd = previousDate;
-                    streaks.add(currentStreak);
-
-                    currentStreak = new Streak(currentDate, currentDate, 1);
-
-                    if (endOfList) {
-                        currentStreak.streakEnd = currentDate;
-                        streaks.add(currentStreak);
-                        break;
-                    }
-
-                    previousDate = currentDate;
-                    targetDate = currentDate + DateUtils.DAY_IN_MILLIS;
-                }
-
-                if (endOfList) {
-                    currentStreak.streakEnd = currentDate;
-                    streaks.add(currentStreak);
-                    break;
-                }
+                if (!iterator.hasNext())
+                    streaks.add(new Streak(currentDate, currentDate, 1));
+                else
+                    currentStreak = new Streak(currentDate);
             }
+
+            lastDate = currentDate;
         }
 
         return streaks;
     }
 
-    public static class Streak{
+    public static class Streak {
         public long streakStart = -1, streakEnd = -1;
-        public int streakLength = 0;
+        public int streakLength = 1;
 
         public Streak(long streakStart, long streakEnd, int streakLength) {
             this.streakStart = streakStart;
@@ -130,7 +109,7 @@ public class StreaksFragment extends Fragment implements UpdateEntriesInterface 
             this.streakLength = streakLength;
         }
 
-        public Streak(long streakStart){
+        public Streak(long streakStart) {
             this.streakStart = streakStart;
         }
 
@@ -143,7 +122,7 @@ public class StreaksFragment extends Fragment implements UpdateEntriesInterface 
             return String.format(Locale.US, format, startDate, streakLength, endDate);
         }
 
-        public static String listToString(List<Streak> streaks){
+        public static String listToString(List<Streak> streaks) {
             String result = "";
             for (Streak streak : streaks) {
                 result += streak.toString() + '\n';
