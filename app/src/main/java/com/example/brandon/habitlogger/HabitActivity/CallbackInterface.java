@@ -15,8 +15,7 @@ public interface CallbackInterface {
     }
 
     interface IUpdateCategorySample {
-        void updateCategoryDataSample(CategoryDataSample dataSample, long dateFrom, long dateTo);
-
+        void updateCategoryDataSample(CategoryDataSample dataSample);
     }
 
     int getDefaultColor();

@@ -40,8 +40,6 @@ public class CalendarFragment extends Fragment implements CallbackInterface.IUpd
 
         callbackInterface = (CallbackInterface)context;
         callbackInterface.addUpdateEntriesCallback(this);
-
-        mDefaultColor = callbackInterface.getDefaultColor();
     }
 
     @Override
@@ -56,6 +54,8 @@ public class CalendarFragment extends Fragment implements CallbackInterface.IUpd
                              Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_calendar, container, false);
+
+        mDefaultColor = callbackInterface.getDefaultColor();
         mCalendarViewContainer = (RecyclerView) v.findViewById(R.id.calendar_view_container);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());

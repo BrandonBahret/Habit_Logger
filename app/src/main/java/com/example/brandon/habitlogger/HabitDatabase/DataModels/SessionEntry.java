@@ -166,6 +166,14 @@ public class SessionEntry implements Serializable, Parcelable {
         return this.mStartTime;
     }
 
+    public static MyCollectionUtils.KeyComparator ICompareStartTime = new MyCollectionUtils.KeyComparator() {
+        @Override
+        public int compare(Object element, Object key) {
+            long elementStartTime = ((SessionEntry)element).getStartTime();
+            return Long.compare(elementStartTime, (long)key);
+        }
+    };
+
     public long getStartingTimeDate() {
         Calendar c = Calendar.getInstance();
 
@@ -187,7 +195,7 @@ public class SessionEntry implements Serializable, Parcelable {
         }
     };
 
-    public int getStartingTimeDayOfMonth(){
+    public int getStartingTimeDayOfMonth() {
         Calendar c = Calendar.getInstance();
 
         c.setTimeInMillis(getStartTime());

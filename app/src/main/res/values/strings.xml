@@ -101,4 +101,10 @@
     <string name="active_habits_activity_label">Active Habits</string>
     <string name="about_activity_label">About</string>
 
+    <array name="tab_titles">
+        <item>Entries</item>
+        <item>Calendar</item>
+        <item>Statistics</item>
+    </array>
+
 </resources>

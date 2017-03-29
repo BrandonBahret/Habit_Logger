@@ -756,7 +756,7 @@ public class MainActivity extends AppCompatActivity
 
     public void startHabitActivity(long habitId) {
         Intent startTargetActivity = new Intent(MainActivity.this, HabitActivity.class);
-        startTargetActivity.putExtra("habitId", habitId);
+        startTargetActivity.putExtra(HabitActivity.HABIT_ID, habitId);
         startActivity(startTargetActivity);
     }
 

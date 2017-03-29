@@ -32,7 +32,7 @@ public class NewEntryForm extends DialogFragment {
     }
 
     public interface OnFinishedListener {
-        void onFinishedWithResult(SessionEntry entry);
+        void onUpdateClicked(SessionEntry entry);
 
         void onDeleteClicked(SessionEntry entry);
     }
@@ -75,7 +75,7 @@ public class NewEntryForm extends DialogFragment {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     SessionEntry entry = getEntry();
-                    onFinishedListener.onFinishedWithResult(entry);
+                    onFinishedListener.onUpdateClicked(entry);
                     dismiss();
                 }
             });
@@ -89,7 +89,7 @@ public class NewEntryForm extends DialogFragment {
                     SessionEntry entry = getEntry();
 
                     if (onFinishedListener != null) {
-                        onFinishedListener.onFinishedWithResult(entry);
+                        onFinishedListener.onUpdateClicked(entry);
                     }
 
                     dismiss();

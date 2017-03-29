@@ -78,13 +78,12 @@ public class PieGraphDuration extends Fragment implements CallbackInterface.IUpd
     @Override
     public void onStart() {
         super.onStart();
-        CategoryDataSample sample = callbackInterface.getCategoryDataSample();
-        updateCategoryDataSample(sample, sample.getDateFromTime(), sample.getDateToTime());
+        updateCategoryDataSample(callbackInterface.getCategoryDataSample());
     }
     //endregion
 
     @Override
-    public void updateCategoryDataSample(CategoryDataSample dataSample, long dateFrom, long dateTo) {
+    public void updateCategoryDataSample(CategoryDataSample dataSample) {
         float[] durationRatios = new float[dataSample.getNumberOfHabits()];
 
         for (int i = 0; i < durationRatios.length; i++)

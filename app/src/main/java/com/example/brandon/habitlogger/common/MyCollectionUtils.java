@@ -40,6 +40,9 @@ public class MyCollectionUtils {
         }
     }
 
+    /**
+     * @return The non-negative index of the element, or a negative index which is the -index - 1 where the element would be inserted
+     */
     public static int binarySearch(List<?> list, final Object key, final KeyComparator comparator) {
         return Collections.binarySearch(list, null, new Comparator<Object>() {
             @Override

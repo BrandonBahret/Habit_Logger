@@ -1,93 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_content"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context="com.example.brandon.habitlogger.HabitActivity.HabitActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:elevation="4dp"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            android:theme="@style/AppTheme.AppBarOverlay"
-            app:titleTextColor="@color/android:white"/>
-
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="32dp"
-            android:theme="@style/AppTheme.AppBarOverlay"
-            app:tabTextColor="@color/tab_color"
-            app:tabSelectedTextColor="@color/selected_tab_color"
-            app:tabIndicatorColor="@android:color/white"/>
-
-    </android.support.design.widget.AppBarLayout>
-
-    <FrameLayout
-        android:id="@+id/content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <include
-            android:id="@+id/date_range"
-            layout="@layout/date_range_selector"/>
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-    </FrameLayout>
-
-
-    <com.github.clans.fab.FloatingActionMenu
-        android:id="@+id/menu_fab"
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="8dp"
-        android:elevation="3dp"
-        app:menu_colorNormal="?attr/colorAccent"
-        app:menu_colorPressed="?attr/colorPrimaryDark"
-        app:menu_fab_hide_animation="@anim/hide_fab"
-        app:menu_fab_show_animation="@anim/show_fab"
-        app:menu_shadowColor="@color/shadow_black"
-        app:theme="@style/MenuButtonsStyle"
-        fab:menu_fab_size="normal"
-        fab:menu_labels_ellipsize="end"
-        fab:menu_labels_singleLine="true"
-        fab:menu_openDirection="up">
+        android:fitsSystemWindows="true"
+        tools:context="com.example.brandon.habitlogger.HabitActivity.HabitActivity">
 
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/enter_session_fab"
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="4dp"
+            android:theme="@style/AppTheme.AppBarOverlay">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorPrimary"
+                android:theme="@style/AppTheme.AppBarOverlay"
+                app:titleTextColor="@color/android:white"/>
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:theme="@style/AppTheme.AppBarOverlay"
+                app:tabIndicatorColor="@android:color/white"
+                app:tabSelectedTextColor="@color/selected_tab_color"
+                app:tabTextColor="@color/tab_color"/>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <FrameLayout
+            android:id="@+id/content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_timer_white_24px"
-            fab:fab_label="Enter Session"
-            fab:fab_size="mini"/>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/create_entry_fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_manually_create_entry"
-            fab:fab_label="Manually Create Entry"
-            fab:fab_size="mini"/>
+            <include
+                android:id="@+id/date_range"
+                layout="@layout/date_range_selector"/>
 
-    </com.github.clans.fab.FloatingActionMenu>
+            <android.support.v4.view.ViewPager
+                android:id="@+id/container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
 
-</android.support.design.widget.CoordinatorLayout>
+        </FrameLayout>
+
+        <com.github.clans.fab.FloatingActionMenu
+            android:id="@+id/menu_fab"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="8dp"
+            android:elevation="3dp"
+            app:menu_colorNormal="?attr/colorAccent"
+            app:menu_colorPressed="?attr/colorPrimaryDark"
+            app:menu_fab_hide_animation="@anim/hide_fab"
+            app:menu_fab_show_animation="@anim/show_fab"
+            app:menu_shadowColor="@color/shadow_black"
+            app:theme="@style/MenuButtonsStyle"
+            fab:menu_fab_size="normal"
+            fab:menu_labels_ellipsize="end"
+            fab:menu_labels_singleLine="true"
+            fab:menu_openDirection="up">
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/enter_session_fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_timer_white_24px"
+                fab:fab_label="Enter Session"
+                fab:fab_size="mini"/>
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/create_entry_fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_manually_create_entry"
+                fab:fab_label="Manually Create Entry"
+                fab:fab_size="mini"/>
+
+        </com.github.clans.fab.FloatingActionMenu>
+
+    </android.support.design.widget.CoordinatorLayout>
+</layout>

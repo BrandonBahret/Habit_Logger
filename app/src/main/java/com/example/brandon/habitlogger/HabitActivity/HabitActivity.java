@@ -2,13 +2,11 @@ package com.example.brandon.habitlogger.HabitActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -27,15 +25,13 @@ import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.ModifyHabitActivity.EditHabitDialog;
 import com.example.brandon.habitlogger.ModifyHabitActivity.NewHabitDialog;
-import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.ConfirmationDialog;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
+import com.example.brandon.habitlogger.databinding.ActivityHabitBinding;
 import com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager;
 import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
-import com.github.clans.fab.FloatingActionButton;
-import com.github.clans.fab.FloatingActionMenu;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -43,192 +39,112 @@ import java.util.List;
 import java.util.Set;
 
 
-public class HabitActivity extends AppCompatActivity implements CallbackInterface, RecyclerViewScrollObserver.IScrollEvents, HabitDatabase.OnEntryChangedListener {
+public class HabitActivity extends AppCompatActivity implements CallbackInterface, RecyclerViewScrollObserver.IScrollEvents {
 
-    private ViewPager viewPager;
+    //region (Member attributes)
+    public static String HABIT_ID = "HABIT_ID";
 
-    HabitDatabase habitDatabase;
-    PreferenceChecker preferenceChecker;
-    List<SessionEntry> sessionEntries = new ArrayList<>();
-    LocalDataExportManager exportManager;
-    SessionManager sessionManager;
-    public Habit habit;
-    long habitId;
+    private HabitDatabase mHabitDatabase;
+    private List<SessionEntry> mSessionEntries = new ArrayList<>();
+    private LocalDataExportManager mExportManager;
+    private SessionManager mSessionManager;
+    private Habit mHabit;
+    private long mHabitId;
 
-    TabLayout tabLayout;
-    Toolbar toolbar;
-    FloatingActionMenu fabMenu;
-    FloatingActionButton enterSession, createEntry;
     FloatingDateRangeWidgetManager dateRangeManager;
+    ActivityHabitBinding ui;
 
-    List<IUpdateEntries> callbacks = new ArrayList<>();
-    List<IUpdateCategorySample> newCategoryDataSampleCallbacks = new ArrayList<>();
+    private List<IUpdateEntries> mSessionEntriesCallbacks = new ArrayList<>();
+    private List<IUpdateCategorySample> mCategoryDataSampleCallbacks = new ArrayList<>();
+    //endregion
 
-    private GestureDetectorCompat mDetector;
+    //region Methods responsible for communication between this activity and fragments
 
+    //region Methods to add and remove callback methods
     @Override
     public void addUpdateEntriesCallback(IUpdateEntries callback) {
-        callbacks.add(callback);
+        mSessionEntriesCallbacks.add(callback);
     }
 
     @Override
     public void removeUpdateEntriesCallback(IUpdateEntries callback) {
-        callbacks.remove(callback);
+        mSessionEntriesCallbacks.remove(callback);
     }
-
 
     @Override
     public void addUpdateCategoryDataSampleCallback(IUpdateCategorySample callback) {
-        newCategoryDataSampleCallbacks.add(callback);
-    };
+        mCategoryDataSampleCallbacks.add(callback);
+    }
+
+    ;
 
     @Override
     public void removeUpdateCategoryDataSampleCallback(IUpdateCategorySample callback) {
-        newCategoryDataSampleCallbacks.remove(callback);
+        mCategoryDataSampleCallbacks.remove(callback);
     }
+    //endregion
 
     @Override
     public SessionEntriesSample getSessionEntries() {
-        return new SessionEntriesSample(sessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+        return new SessionEntriesSample
+                (mSessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
     }
+
     @Override
     public CategoryDataSample getCategoryDataSample() {
-        long dateFrom = dateRangeManager.getDateFrom();
-        long dateTo = dateRangeManager.getDateTo();
-
-        return habitDatabase.getCategoryDataSample(habit.getCategory(), dateFrom, dateTo);
+        return mHabitDatabase.getCategoryDataSample
+                (mHabit.getCategory(), dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
     }
 
     @Override
     public int getDefaultColor() {
-        return habit.getColor();
+        return mHabit.getColor();
     }
+    //endregion
 
+    //region Methods responsible for handling the activity lifecycle
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_habit);
+        ui = DataBindingUtil.setContentView(HabitActivity.this, R.layout.activity_habit);
+        setSupportActionBar(ui.toolbar);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        AppBarLayout appBar = (AppBarLayout) findViewById(R.id.appbar);
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
-        fabMenu = (FloatingActionMenu) findViewById(R.id.menu_fab);
-        enterSession = (FloatingActionButton) findViewById(R.id.enter_session_fab);
-        createEntry = (FloatingActionButton) findViewById(R.id.create_entry_fab);
-        viewPager = (ViewPager) findViewById(R.id.container);
-
-        preferenceChecker = new PreferenceChecker(this);
-        habitDatabase = new HabitDatabase(this);
-
-        HabitDatabase.addOnEntryChangedListener(this);
-
-        sessionManager = new SessionManager(this);
-        exportManager = new LocalDataExportManager(this);
+        //region Gather dependencies
+        mSessionManager = new SessionManager(this);
+        mExportManager = new LocalDataExportManager(this);
+        mHabitDatabase = new HabitDatabase(this);
+        HabitDatabase.addOnEntryChangedListener(getOnEntryChangeInDatabaseListener());
 
         Intent data = getIntent();
-        habitId = data.getLongExtra("habitId", -1);
-        habit = habitDatabase.getHabit(habitId);
-        sessionEntries = habitDatabase.getEntries(habitId);
+        mHabitId = data.getLongExtra(HABIT_ID, -1);
+        mHabit = mHabitDatabase.getHabit(mHabitId);
+        mSessionEntries = mHabitDatabase.getEntries(mHabitId);
+        //endregion
 
-        dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), sessionEntries);
-        dateRangeManager.setDateRangeChangeListener(new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
-            @Override
-            public void onDateRangeChanged(long dateFrom, long dateTo) {
-                Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo);
-                HabitActivity.this.sessionEntries = habitDatabase.lookUpEntries(ids);
-                dateRangeManager.updateSessionEntries(HabitActivity.this.sessionEntries);
-                updateEntries(HabitActivity.this.sessionEntries);
-            }
-        });
-        dateRangeManager.callOnDateRangeChangedListener();
+        HabitActivityPagerAdapter pagerAdapter = new HabitActivityPagerAdapter(getSupportFragmentManager());
+        ui.container.setAdapter(pagerAdapter);
+        ui.container.addOnPageChangeListener(getOnPageChangedListener());
 
-        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        ui.tabs.setupWithViewPager(ui.container);
 
-        viewPager.setAdapter(sectionsPagerAdapter);
+        ui.menuFab.hideMenu(false);
+        ui.menuFab.setClosedOnTouchOutside(true);
+        ui.enterSessionFab.setOnClickListener(getOnEnterSessionFabClickedListener());
+        ui.createEntryFab.setOnClickListener(getOnCreateEntryFabClickedListener());
 
-
-        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-
-                switch (position) {
-                    case (0): {
-                        fabMenu.showMenu(true);
-                        dateRangeManager.showView();
-
-                    }
-                    break;
-
-                    case (1): {
-                        fabMenu.hideMenu(true);
-                        dateRangeManager.hideView();
-
-                    }
-                    break;
-
-                    case (2): {
-                        fabMenu.hideMenu(true);
-                        dateRangeManager.showView();
-
-                    }
-                    break;
-                }
-            }
-        });
-
-
-        tabLayout.setupWithViewPager(viewPager);
-
-        fabMenu.setClosedOnTouchOutside(true);
-
-        enterSession.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                fabMenu.close(true);
-                startSession();
-            }
-        });
-
-        createEntry.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                NewEntryForm dialog = new NewEntryForm();
-                dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
-                    @Override
-                    public void onFinishedWithResult(SessionEntry entry) {
-                        if (entry != null) {
-                            habitDatabase.addEntry(habitId, entry);
-                            sessionEntries.add(entry);
-                            updateEntries(sessionEntries);
-                        }
-                    }
-
-                    @Override
-                    public void onDeleteClicked(SessionEntry entry) {
-
-                    }
-                });
-
-                fabMenu.close(true);
-                dialog.show(getSupportFragmentManager(), "new-entry");
-            }
-        });
+        dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), mSessionEntries);
+        dateRangeManager.setDateRangeChangeListener(getDateRangeChangeListener());
+        dateRangeManager.hideView(false);
 
         updateActivity();
-        fabMenu.hideMenu(false);
-        dateRangeManager.hideView(false);
-        viewPager.setCurrentItem(1);
+        ui.container.setCurrentItem(1);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        callbacks.clear();
+        mSessionEntriesCallbacks.clear();
+        mCategoryDataSampleCallbacks.clear();
     }
 
     @Override
@@ -241,9 +157,8 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem archive = menu.findItem(R.id.menu_toggle_archive);
-
         if (archive != null) {
-            if (habit.getIsArchived()) {
+            if (mHabit.getIsArchived()) {
                 archive.setTitle("Unarchive");
             }
             else {
@@ -251,158 +166,28 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
             }
         }
 
-
         MenuItem search = menu.findItem(R.id.search);
-
         if (search != null) {
             SearchView searchView = (SearchView) search.getActionView();
             searchView.setQueryHint(getString(R.string.filter_entries));
-            searchView.setOnQueryTextListener(
-                    new SearchView.OnQueryTextListener() {
-                        @Override
-                        public boolean onQueryTextSubmit(String query) {
-                            processQuery(query);
-                            return false;
-                        }
-
-                        @Override
-                        public boolean onQueryTextChange(String query) {
-                            processQuery(query);
-                            return false;
-                        }
-                    }
-            );
+            searchView.setOnQueryTextListener(getOnSearchQueryListener());
         }
 
         return super.onPrepareOptionsMenu(menu);
     }
+    //endregion
 
-    public void processQuery(String query) {
-        List<SessionEntry> entries = habitDatabase.lookUpEntries(
-                habitDatabase.searchEntryIdsByComment(habitId, query)
-        );
-
-        dateRangeManager.updateSessionEntries(entries);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch (id) {
-            case (android.R.id.home): {
-                finish();
-            }
-            break;
-
-            case (R.id.menu_habit_edit): {
-
-                EditHabitDialog dialog = EditHabitDialog.newInstance(new NewHabitDialog.OnFinishedListener() {
-                    @Override
-                    public void onFinishedWithResult(Habit habit) {
-                        HabitActivity.this.habit = habit;
-                        habitDatabase.updateHabit(habit.getDatabaseId(), habit);
-                        updateActivity();
-                    }
-                }, habit);
-
-                dialog.show(getSupportFragmentManager(), "edit-habit");
-            }
-            break;
-
-            case (R.id.menu_enter_session): {
-                startSession();
-            }
-            break;
-
-            case (R.id.menu_toggle_archive): {
-
-                String habitName = habitDatabase.getHabitName(habitId);
-                final boolean archivedState = habitDatabase.getIsHabitArchived(habitId);
-                String actionName = archivedState ? "Unarchive" : "Archive";
-                String actionNameLower = archivedState ? "unarchive" : "archive";
-
-                new ConfirmationDialog(HabitActivity.this)
-                        .setTitle("Confirm " + actionName)
-                        .setMessage("Do you really want to " + actionNameLower + " '" + habitName + "'? ")
-                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                habitDatabase.updateHabitIsArchived(habitId, !archivedState);
-                                habit.setIsArchived(!archivedState);
-                                updateColorTheme();
-                            }
-                        })
-                        .show();
-
-            }
-            break;
-
-            case (R.id.menu_export_habit): {
-                Habit habit = habitDatabase.getHabit(habitId);
-                exportManager.shareExportHabit(habit);
-            }
-            break;
-
-            case (R.id.menu_reset_habit): {
-
-                String habitName = habitDatabase.getHabitName(habitId);
-
-                new ConfirmationDialog(HabitActivity.this)
-                        .setTitle("Confirm Data Reset")
-                        .setMessage("Do you really want to delete all entries for '" + habitName + "'?")
-                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                habitDatabase.deleteEntriesForHabit(habitId);
-                            }
-                        })
-                        .show();
-
-            }
-            break;
-
-            case (R.id.menu_delete_habit): {
-                String habitName = habitDatabase.getHabitName(habitId);
-
-                new ConfirmationDialog(HabitActivity.this)
-                        .setTitle("Confirm Delete")
-                        .setMessage("Do you really want to delete '" + habitName + "'?")
-                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (sessionManager.getIsSessionActive(habitId)) {
-                                    sessionManager.cancelSession(habitId);
-                                }
-
-                                habitDatabase.deleteHabit(habitId);
-                                finish();
-                            }
-                        })
-                        .show();
-
-            }
-            break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void startSession() {
-        Intent startSession = new Intent(this, SessionActivity.class);
-        startSession.putExtra(SessionActivity.BundleKeys.SERIALIZED_HABIT, (Serializable) habit);
-        startActivity(startSession);
-    }
-
+    //region Methods responsible for changing the appearance of the activity
     private void updateActivity() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(habit.getName());
+        toolbar.setTitle(mHabit.getName());
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
         updateColorTheme();
     }
 
@@ -410,100 +195,332 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         int color = 0xFFCCCCCC;
         int darkerColor = 0xFFBBBBBB;
 
-        if (!habit.getIsArchived()) {
-            color = habit.getCategory().getColorAsInt();
+        if (!mHabit.getIsArchived()) {
+            color = mHabit.getCategory().getColorAsInt();
             darkerColor = HabitCategory.darkenColor(color, 0.7f);
         }
 
         getWindow().setStatusBarColor(darkerColor);
-        tabLayout.setBackgroundColor(color);
+        ui.tabs.setBackgroundColor(color);
 
-        toolbar.setBackgroundColor(color);
+        ui.toolbar.setBackgroundColor(color);
 
-        fabMenu.setMenuButtonColorNormal(color);
-        fabMenu.setMenuButtonColorPressed(darkerColor);
+        ui.menuFab.setMenuButtonColorNormal(color);
+        ui.menuFab.setMenuButtonColorPressed(darkerColor);
 
-        enterSession.setColorNormal(color);
-        enterSession.setColorPressed(darkerColor);
+        ui.enterSessionFab.setColorNormal(color);
+        ui.enterSessionFab.setColorPressed(darkerColor);
 
-        createEntry.setColorNormal(color);
-        createEntry.setColorPressed(darkerColor);
+        ui.createEntryFab.setColorNormal(color);
+        ui.createEntryFab.setColorPressed(darkerColor);
+    }
+    //endregion
+
+    //region Methods responsible for handling events
+
+    //region Methods to handle new entry fab events
+    private View.OnClickListener getOnCreateEntryFabClickedListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NewEntryForm dialog = new NewEntryForm();
+                dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
+                    @Override
+                    public void onUpdateClicked(SessionEntry entry) {
+                        if (entry != null) {
+                            mHabitDatabase.addEntry(mHabitId, entry);
+                            mSessionEntries.add(entry);
+                            updateEntries(mSessionEntries);
+                        }
+                    }
+
+                    @Override
+                    public void onDeleteClicked(SessionEntry entry) {
+
+                    }
+                });
+
+                ui.menuFab.close(true);
+                dialog.show(getSupportFragmentManager(), "new-entry");
+            }
+        };
     }
 
-    public void updateEntries(List<SessionEntry> sessionEntries) {
-        SessionEntriesSample dataSample = new SessionEntriesSample
-                (sessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+    private View.OnClickListener getOnEnterSessionFabClickedListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ui.menuFab.close(true);
+                startSession();
+            }
+        };
+    }
+    //endregion
 
-        dateRangeManager.updateSessionEntries(sessionEntries);
+    //region Methods to handle HabitActivityPagerAdapter events
+    private ViewPager.SimpleOnPageChangeListener getOnPageChangedListener() {
+        return new ViewPager.SimpleOnPageChangeListener() {
 
-        for (IUpdateEntries callback : callbacks) {
-            callback.updateEntries(dataSample);
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+
+                switch (position) {
+                    case (0): {
+                        ui.menuFab.showMenu(true);
+                        dateRangeManager.showView();
+                    }
+                    break;
+
+                    case (1): {
+                        ui.menuFab.hideMenu(true);
+                        dateRangeManager.hideView();
+                    }
+                    break;
+
+                    case (2): {
+                        ui.menuFab.hideMenu(true);
+                        dateRangeManager.showView();
+                    }
+                    break;
+                }
+            }
+        };
+    }
+    //endregion
+
+    //region Methods to handle menu item events
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case (android.R.id.home):
+                finish();
+                break;
+
+            case (R.id.menu_habit_edit):
+                onHabitEditClicked();
+                break;
+
+            case (R.id.menu_enter_session):
+                startSession();
+                break;
+
+            case (R.id.menu_toggle_archive):
+                onMenuToggleArchiveClicked();
+                break;
+
+            case (R.id.menu_export_habit):
+                mExportManager.shareExportHabit(mHabitDatabase.getHabit(mHabitId));
+                break;
+
+            case (R.id.menu_reset_habit):
+                onMenuResetHabitClicked();
+                break;
+
+            case (R.id.menu_delete_habit):
+                onMenuDeleteHabitClicked();
+                break;
         }
+
+        return super.onOptionsItemSelected(item);
     }
 
+    private void onMenuDeleteHabitClicked() {
+        String habitName = mHabitDatabase.getHabitName(mHabitId);
+
+        new ConfirmationDialog(HabitActivity.this)
+                .setTitle("Confirm Delete")
+                .setMessage("Do you really want to delete '" + habitName + "'?")
+                .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (mSessionManager.getIsSessionActive(mHabitId)) {
+                            mSessionManager.cancelSession(mHabitId);
+                        }
+
+                        mHabitDatabase.deleteHabit(mHabitId);
+                        finish();
+                    }
+                })
+                .show();
+    }
+
+    private void onMenuResetHabitClicked() {
+        String habitName = mHabitDatabase.getHabitName(mHabitId);
+
+        new ConfirmationDialog(HabitActivity.this)
+                .setTitle("Confirm Data Reset")
+                .setMessage("Do you really want to delete all entries for '" + habitName + "'?")
+                .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mHabitDatabase.deleteEntriesForHabit(mHabitId);
+                    }
+                })
+                .show();
+    }
+
+    private void onMenuToggleArchiveClicked() {
+        String habitName = mHabitDatabase.getHabitName(mHabitId);
+        final boolean archivedState = mHabitDatabase.getIsHabitArchived(mHabitId);
+        String actionName = archivedState ? "Unarchive" : "Archive";
+        String actionNameLower = archivedState ? "unarchive" : "archive";
+
+        new ConfirmationDialog(HabitActivity.this)
+                .setTitle("Confirm " + actionName)
+                .setMessage("Do you really want to " + actionNameLower + " '" + habitName + "'? ")
+                .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mHabitDatabase.updateHabitIsArchived(mHabitId, !archivedState);
+                        mHabit.setIsArchived(!archivedState);
+                        updateColorTheme();
+                    }
+                })
+                .show();
+    }
+
+    private void onHabitEditClicked() {
+        EditHabitDialog dialog = EditHabitDialog.newInstance(new NewHabitDialog.OnFinishedListener() {
+            @Override
+            public void onFinishedWithResult(Habit habit) {
+                HabitActivity.this.mHabit = habit;
+                mHabitDatabase.updateHabit(habit.getDatabaseId(), habit);
+                updateActivity();
+            }
+        }, mHabit);
+
+        dialog.show(getSupportFragmentManager(), "edit-mHabit");
+    }
+    //endregion
+
+    //region Methods to handle search events
+    public void processQuery(String query) {
+        List<SessionEntry> entries = mHabitDatabase.lookUpEntries(
+                mHabitDatabase.searchEntryIdsByComment(mHabitId, query)
+        );
+
+        dateRangeManager.updateSessionEntries(entries);
+    }
+
+    private SearchView.OnQueryTextListener getOnSearchQueryListener() {
+        return new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                processQuery(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                processQuery(newText);
+                return true;
+            }
+        };
+    }
+    //endregion
+
+    //region Methods to handle scroll events
     @Override
     public void onScrollUp() {
         dateRangeManager.showView();
-        if (tabLayout.getSelectedTabPosition() == 0)
-            fabMenu.showMenu(true);
+        if (ui.tabs.getSelectedTabPosition() == 0)
+            ui.menuFab.showMenu(true);
     }
 
     @Override
     public void onScrollDown() {
         dateRangeManager.hideView();
-        if (tabLayout.getSelectedTabPosition() == 0)
-            fabMenu.hideMenu(true);
+        if (ui.tabs.getSelectedTabPosition() == 0)
+            ui.menuFab.hideMenu(true);
+    }
+    //endregion
+
+    //region Methods to handle DateRangeManager events
+    private FloatingDateRangeWidgetManager.DateRangeChangeListener getDateRangeChangeListener() {
+        return new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
+            @Override
+            public void onDateRangeChanged(long dateFrom, long dateTo) {
+                Set<Long> ids = mHabitDatabase.searchEntriesWithTimeRangeForAHabit(mHabitId, dateFrom, dateTo);
+                HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
+                dateRangeManager.updateSessionEntries(HabitActivity.this.mSessionEntries);
+                updateEntries(HabitActivity.this.mSessionEntries);
+            }
+        };
+    }
+    //endregion
+
+    //region Methods to handle session entry change events
+    private HabitDatabase.OnEntryChangedListener getOnEntryChangeInDatabaseListener() {
+        return new HabitDatabase.OnEntryChangedListener() {
+            @Override
+            public void onEntryDeleted(SessionEntry removedEntry) {
+                Set<Long> ids = mHabitDatabase.searchEntriesWithTimeRangeForAHabit(mHabitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+                HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
+                dateRangeManager.updateSessionEntries(HabitActivity.this.mSessionEntries);
+            }
+
+            @Override
+            public void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
+                dateRangeManager.entryChanged(oldEntry, newEntry);
+
+                Set<Long> ids = mHabitDatabase.searchEntriesWithTimeRangeForAHabit(mHabitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+                HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
+                dateRangeManager.updateSessionEntries(HabitActivity.this.mSessionEntries);
+            }
+
+            @Override
+            public void onEntriesReset(long habitId) {
+                if (habitId == HabitActivity.this.mHabitId) {
+                    mSessionEntries = new ArrayList<>();
+                    updateEntries(mSessionEntries);
+                }
+            }
+        };
+    }
+    //endregion
+
+    //endregion
+
+    public void startSession() {
+        Intent startSession = new Intent(this, SessionActivity.class);
+        startSession.putExtra(SessionActivity.BundleKeys.SERIALIZED_HABIT, (Serializable) mHabit);
+        startActivity(startSession);
     }
 
-    @Override
-    public void onEntryDeleted(SessionEntry removedEntry) {
-        Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
-        HabitActivity.this.sessionEntries = habitDatabase.lookUpEntries(ids);
-        dateRangeManager.updateSessionEntries(HabitActivity.this.sessionEntries);
+    public void updateEntries(List<SessionEntry> sessionEntries) {
+
+        dateRangeManager.updateSessionEntries(sessionEntries);
+        SessionEntriesSample entriesDataSample = getSessionEntries();
+        CategoryDataSample categoryDataSample = getCategoryDataSample();
+
+        for (IUpdateEntries callback : mSessionEntriesCallbacks)
+            callback.updateEntries(entriesDataSample);
+
+        for (IUpdateCategorySample callback : mCategoryDataSampleCallbacks)
+            callback.updateCategoryDataSample(categoryDataSample);
     }
 
-    @Override
-    public void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
-        dateRangeManager.entryChanged(oldEntry, newEntry);
-
-        Set<Long> ids = habitDatabase.searchEntriesWithTimeRangeForAHabit(habitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
-        HabitActivity.this.sessionEntries = habitDatabase.lookUpEntries(ids);
-        dateRangeManager.updateSessionEntries(HabitActivity.this.sessionEntries);
-    }
-
-    @Override
-    public void onEntriesReset(long habitId) {
-        if (habitId == this.habitId) {
-            sessionEntries = new ArrayList<>();
-            updateEntries(sessionEntries);
-        }
-    }
-
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-        public SectionsPagerAdapter(FragmentManager fm) {
+    public class HabitActivityPagerAdapter extends FragmentPagerAdapter {
+        public HabitActivityPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
-        public final String[] titles = {"Entries", "Calendar", "Statistics"};
+        public final String[] titles = getResources().getStringArray(R.array.tab_titles);
 
         @Override
         public Fragment getItem(int position) {
             switch (position) {
-                case 0: {
-                    return EntriesFragment.newInstance(habitId);
-                }
+                case 0:
+                    return EntriesFragment.newInstance();
 
-                case 1: {
+                case 1:
                     return CalendarFragment.newInstance();
-                }
 
-                case 2: {
+                case 2:
                     return StatisticsFragment.newInstance();
-                }
             }
 
             return null;
@@ -511,7 +528,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
+            // Show 3 pages in total
             return 3;
         }
 
