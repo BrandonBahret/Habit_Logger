@@ -64,13 +64,10 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         Set<Integer> dates;
 
         for (int month = 0; month < diffMonth; month++) {
-            Calendar calendar = Calendar.getInstance();
             dates = new HashSet<>();
 
             int targetMonth = startCalendar.get(Calendar.MONTH);
             int targetYear = startCalendar.get(Calendar.YEAR);
-            calendar.set(Calendar.MONTH, targetMonth);
-            calendar.set(Calendar.YEAR, targetYear);
 
             while (entryIndex < entries.size()) {
                 SessionEntry entry = entries.get(entryIndex);
@@ -81,6 +78,11 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
 
                 entryIndex++;
             }
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.YEAR, targetYear);
+            calendar.set(Calendar.MONTH, targetMonth);
 
             monthData.add(new CalendarViewMonthModel(calendar, dates));
 

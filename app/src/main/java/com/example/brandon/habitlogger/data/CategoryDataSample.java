@@ -1,9 +1,12 @@
 package com.example.brandon.habitlogger.data;
 
+import android.os.Parcel;
+
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
+import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +17,7 @@ import java.util.List;
  * This is a class to structure a sample of session entries on the categorical level.
  */
 
-public final class CategoryDataSample {
+public final class CategoryDataSample extends ExpandableGroup<Habit> {
 
     //region (Member Attributes)
     private final HabitCategory mCategory;
@@ -27,7 +30,7 @@ public final class CategoryDataSample {
     public CategoryDataSample(HabitCategory category, Habit[] habits,
                               long dateFromTime, long dateToTime) {
 
-//        super(category.getName(), Arrays.asList(habits));
+        super(category.getName(), Arrays.asList(habits));
         mCategory = category;
         mHabits = habits;
         Arrays.sort(mHabits, Habit.DurationComparator);
@@ -36,39 +39,39 @@ public final class CategoryDataSample {
     }
 
     //region Implement Parcelable
-//    protected CategoryDataSample(Parcel in) {
-//        super(in);
-//        CategoryDataSample sample = in.readParcelable(CategoryDataSample.class.getClassLoader());
-//
-//        this.mCategory = sample.getCategory();
-//        this.mHabits = sample.getHabits();
-//        this.mDateFromTime = sample.getDateFromTime();
-//        this.mDateToTime = sample.getDateToTime();
-//        this.mDuration = sample.calculateTotalDuration();
-//        this.mSessionEntries = sample.buildSessionEntriesList();
-//    }
-//
-//    @Override
-//    public int describeContents() {
-//        return 0;
-//    }
-//
-//    @Override
-//    public void writeToParcel(Parcel dest, int flags) {
-//        dest.writeParcelable(this, flags);
-//    }
-//
-//    public static final Creator<CategoryDataSample> CREATOR = new Creator<CategoryDataSample>() {
-//        @Override
-//        public CategoryDataSample createFromParcel(Parcel in) {
-//            return new CategoryDataSample(in);
-//        }
-//
-//        @Override
-//        public CategoryDataSample[] newArray(int size) {
-//            return new CategoryDataSample[size];
-//        }
-//    };
+    protected CategoryDataSample(Parcel in) {
+        super(in);
+        CategoryDataSample sample = in.readParcelable(CategoryDataSample.class.getClassLoader());
+
+        this.mCategory = sample.getCategory();
+        this.mHabits = sample.getHabits();
+        this.mDateFromTime = sample.getDateFromTime();
+        this.mDateToTime = sample.getDateToTime();
+        this.mDuration = sample.calculateTotalDuration();
+        this.mSessionEntries = sample.buildSessionEntriesList();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(this, flags);
+    }
+
+    public static final Creator<CategoryDataSample> CREATOR = new Creator<CategoryDataSample>() {
+        @Override
+        public CategoryDataSample createFromParcel(Parcel in) {
+            return new CategoryDataSample(in);
+        }
+
+        @Override
+        public CategoryDataSample[] newArray(int size) {
+            return new CategoryDataSample[size];
+        }
+    };
     //endregion
 
     /**

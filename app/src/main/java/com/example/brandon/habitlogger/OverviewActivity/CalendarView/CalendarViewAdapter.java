@@ -63,32 +63,29 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         Set<Integer> dates;
 
         for (int month = 0; month < diffMonth; month++) {
-            Calendar calendar = Calendar.getInstance();
             dates = new HashSet<>();
-            boolean hasEntriesThisMonth = false;
 
-            int targetMonth = startCalendar.get(Calendar.MONTH);
             int targetYear = startCalendar.get(Calendar.YEAR);
-
-            calendar.set(Calendar.MONTH, targetMonth);
-            calendar.set(Calendar.YEAR, targetYear);
+            int targetMonth = startCalendar.get(Calendar.MONTH);
 
             while (entryIndex < entries.size()) {
                 SessionEntry entry = entries.get(entryIndex);
 
-                if (entry.getStartingTimeMonth() == targetMonth && entry.getStartingTimeYear() == targetYear) {
+                if (entry.getStartingTimeMonth() == targetMonth && entry.getStartingTimeYear() == targetYear)
                     dates.add(entry.getDateOfEntry());
-                    hasEntriesThisMonth = true;
-                }
+
                 else break;
 
                 entryIndex++;
             }
 
-            if (hasEntriesThisMonth) {
-                List<CalendarPieDataSet> pieDataSet = getPieDataSets(targetMonth, targetYear, dates);
-                calendarData.add(new CalendarViewMonthModel(calendar, dates, pieDataSet));
-            }
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.YEAR, targetYear);
+            calendar.set(Calendar.MONTH, targetMonth);
+
+            List<CalendarPieDataSet> pieDataSet = getPieDataSets(targetMonth, targetYear, dates);
+            calendarData.add(new CalendarViewMonthModel(calendar, dates, pieDataSet));
 
             startCalendar.add(Calendar.MONTH, 1);
         }
