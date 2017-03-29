@@ -9,7 +9,7 @@ import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -21,19 +21,19 @@ public final class CategoryDataSample extends ExpandableGroup<Habit> {
 
     //region (Member Attributes)
     private final HabitCategory mCategory;
-    private final Habit[] mHabits;
+    private final List<Habit> mHabits;
     private final long mDateFromTime, mDateToTime;
     private List<SessionEntry> mSessionEntries;
     private Long mDuration;
     //endregion
 
-    public CategoryDataSample(HabitCategory category, Habit[] habits,
+    public CategoryDataSample(HabitCategory category, List<Habit> habits,
                               long dateFromTime, long dateToTime) {
 
-        super(category.getName(), Arrays.asList(habits));
+        super(category.getName(), habits);
         mCategory = category;
         mHabits = habits;
-        Arrays.sort(mHabits, Habit.DurationComparator);
+        Collections.sort(mHabits, Habit.DurationComparator);
         mDateFromTime = dateFromTime;
         mDateToTime = dateToTime;
     }
@@ -79,12 +79,12 @@ public final class CategoryDataSample extends ExpandableGroup<Habit> {
      */
     public CategoryDataSample getDataSampleForDate(long timestamp) {
 
-        Habit habits[] = new Habit[mHabits.length];
+        List<Habit> habits = new ArrayList<>(mHabits.size());
 
-        for (int i = 0; i < mHabits.length; i++) {
-            habits[i] = Habit.duplicate(mHabits[i]);
-            List<SessionEntry> entriesForDate = habits[i].getEntriesForDate(timestamp);
-            habits[i].setEntries(entriesForDate);
+        for (int i = 0; i < mHabits.size(); i++) {
+            habits.add(i, Habit.duplicate(mHabits.get(i)));
+            List<SessionEntry> entriesForDate = habits.get(i).getEntriesForDate(timestamp);
+            habits.get(i).setEntries(entriesForDate);
         }
 
         return new CategoryDataSample(mCategory, habits, timestamp, timestamp);
@@ -132,7 +132,7 @@ public final class CategoryDataSample extends ExpandableGroup<Habit> {
     }
 
     public final int getNumberOfHabits() {
-        return mHabits.length;
+        return mHabits.size();
     }
 
     public long getDateFromTime() {
@@ -143,15 +143,15 @@ public final class CategoryDataSample extends ExpandableGroup<Habit> {
         return mDateToTime;
     }
 
-    public long getHabitDuration(int i) {
-        return mHabits[i].getEntriesDuration();
+    public long getHabitDuration(int index) {
+        return mHabits.get(index).getEntriesDuration();
     }
 
-    public Habit getHabit(int i) {
-        return mHabits[i];
+    public Habit getHabit(int index) {
+        return mHabits.get(index);
     }
 
-    public Habit[] getHabits() {
+    public List<Habit> getHabits() {
         return mHabits;
     }
     //endregion

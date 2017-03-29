@@ -29,7 +29,6 @@ import android.widget.Toast;
 import com.example.brandon.habitlogger.DataExportHelpers.GoogleDriveDataExportManager;
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.HabitActivity.HabitActivity;
-import com.example.brandon.habitlogger.HabitDatabase.DataModels.CategoryHabitsContainer;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
@@ -50,6 +49,7 @@ import com.example.brandon.habitlogger.RecyclerViewAdapters.SpaceOffsetDecoratio
 import com.example.brandon.habitlogger.common.ConfirmationDialog;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.RequestCodes;
+import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.databinding.ActivityMainBinding;
 import com.github.clans.fab.FloatingActionButton;
 
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity
     GoogleDriveDataExportManager googleDrive;
     List<Habit> habitList = new ArrayList<>();
 
-    List<CategoryHabitsContainer> categoryContainers = new ArrayList<>();
+    List<CategoryDataSample> categoryContainers = new ArrayList<>();
     Handler handler = new Handler();
     private GroupDecoration itemDecoration;
 
@@ -364,8 +364,7 @@ public class MainActivity extends AppCompatActivity
     private Runnable updateCards = new Runnable() {
         @Override
         public void run() {
-            List<SessionEntry> entries = sessionManager.getActiveSessionList();
-            habitAdapter.updateHabitViews(entries);
+            updateActivityContent();
 
             handler.postDelayed(updateCards, 1000);
         }
@@ -667,8 +666,14 @@ public class MainActivity extends AppCompatActivity
         showDatabase();
         startRepeatingTask();
 
+        updateActivityContent();
+    }
+
+    private void updateActivityContent() {
         List<SessionEntry> entries = sessionManager.getActiveSessionList();
-        habitAdapter.updateHabitViews(entries);
+
+        if (habitAdapter != null)
+            habitAdapter.updateHabitViews(entries);
     }
 
     public void processUserQuery(String query) {

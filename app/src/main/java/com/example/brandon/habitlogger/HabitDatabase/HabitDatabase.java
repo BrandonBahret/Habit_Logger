@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteStatement;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.example.brandon.habitlogger.HabitDatabase.DataModels.CategoryHabitsContainer;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
@@ -22,7 +21,6 @@ import com.example.brandon.habitlogger.data.HabitDataSample;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -1004,18 +1002,17 @@ public class HabitDatabase {
      * @param categoryId The category to fetch habits from.
      * @return an array list containing the habits.
      */
-    public Habit[] getHabits(long categoryId) {
+    public List<Habit> getHabits(long categoryId) {
         int numberOfHabits = getNumberOfHabits(categoryId);
-        Habit[] habits = new Habit[numberOfHabits];
+        List<Habit> habits = new ArrayList<>(numberOfHabits);
 
         Cursor c = readableDatabase.query(HabitsTableSchema.TABLE_NAME, null,
                 HabitsTableSchema.HABIT_CATEGORY + " =?", new String[]{String.valueOf(categoryId)},
                 null, null, null);
 
         int habitIndex = 0;
-        while (c.moveToNext()) {
-            habits[habitIndex++] = getHabitFromCursor(c);
-        }
+        while (c.moveToNext())
+            habits.add(habitIndex++, getHabitFromCursor(c));
 
         c.close();
 
@@ -1029,7 +1026,7 @@ public class HabitDatabase {
 
         for (int i = 0; i < numberOfCategories; i++) {
             long categoryId = getCategoryIdFromIndex(i);
-            habits.addAll(Arrays.asList(getHabits(categoryId)));
+            habits.addAll(getHabits(categoryId));
         }
 
         return habits;
@@ -1045,20 +1042,17 @@ public class HabitDatabase {
         return habits;
     }
 
-    public CategoryHabitsContainer getCategoryHabitsContainer(long categoryId) {
-        Set<Long> ids = getHabitIds(categoryId);
-        List<Habit> habits = lookUpHabits(ids);
-
-        return new CategoryHabitsContainer(getCategory(categoryId), habits);
+    public CategoryDataSample getCategoryData(long categoryId) {
+        return getCategoryDataSample(getCategory(categoryId));
     }
 
-    public List<CategoryHabitsContainer> getCategoryHabitsContainers() {
+    public List<CategoryDataSample> getCategoryHabitsContainers() {
         int size = getNumberOfCategories();
-        List<CategoryHabitsContainer> containers = new ArrayList<>(size);
+        List<CategoryDataSample> containers = new ArrayList<>(size);
 
         for (int i = 0; i < size; i++) {
             long id = getCategoryIdFromIndex(i);
-            containers.add(getCategoryHabitsContainer(id));
+            containers.add(getCategoryData(id));
         }
 
         return containers;
@@ -1201,7 +1195,7 @@ public class HabitDatabase {
     }
 
     public CategoryDataSample getCategoryDataSample(HabitCategory category, long dateFrom, long dateTo) {
-        Habit[] habits = getHabits(category.getDatabaseId());
+        List<Habit> habits = getHabits(category.getDatabaseId());
 
         for (Habit habit : habits) {
             long habitId = habit.getDatabaseId();
@@ -1211,6 +1205,10 @@ public class HabitDatabase {
         }
 
         return new CategoryDataSample(category, habits, dateFrom, dateTo);
+    }
+
+    private CategoryDataSample getCategoryDataSample(HabitCategory category) {
+        return getCategoryDataSample(category, 0, Long.MAX_VALUE);
     }
 
     public HabitDataSample getHabitDataSample(long dateFrom, long dateTo) {

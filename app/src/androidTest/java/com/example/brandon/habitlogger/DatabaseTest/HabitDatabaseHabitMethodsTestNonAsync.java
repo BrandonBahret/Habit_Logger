@@ -5,11 +5,12 @@ import android.test.RenamingDelegatingContext;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
-import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -112,14 +113,16 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
     }
 
     public void testGetHabits(){
-        Habit expectedHabits[] = {getDummyHabit(), getDummyHabit2()};
+        List<Habit> expectedHabits = new ArrayList<>(2);
+        expectedHabits.add(getDummyHabit());
+        expectedHabits.add(getDummyHabit2());
 
-        db.addHabitAndCategory(expectedHabits[0]);
-        db.addHabitAndCategory(expectedHabits[1]);
+        db.addHabitAndCategory(expectedHabits.get(0));
+        db.addHabitAndCategory(expectedHabits.get(1));
 
-        Habit actualHabits[] = db.getHabits(expectedHabits[0].getCategory().getDatabaseId());
+        List<Habit> actualHabits = db.getHabits(expectedHabits.get(0).getCategory().getDatabaseId());
 
-        assertTrue(Arrays.equals(expectedHabits, actualHabits));
+        assertTrue(expectedHabits.equals(actualHabits));
     }
 
     public void testUpdateHabitIsArchived(){
