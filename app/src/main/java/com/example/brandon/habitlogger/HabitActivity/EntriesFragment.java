@@ -72,13 +72,14 @@ public class EntriesFragment extends Fragment implements CallbackInterface.IUpda
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_entries, container, false);
-        mEntriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
 
         Context context = getContext();
         mDateFormat = new PreferenceChecker(context).stringGetDateFormat();
         mHabitDatabase = new HabitDatabase(context);
         mSessionEntries = mCallbackInterface.getSessionEntries().getSessionEntries();
         mEntryAdapter = new EntryViewAdapter(mSessionEntries, context, this);
+
+        mEntriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
 
         //region Add item decorations
         mEntriesContainer.addItemDecoration(new GroupDecoration(getContext(), R.dimen.entries_section_text_size, new GroupDecoration.Callback() {
@@ -151,8 +152,8 @@ public class EntriesFragment extends Fragment implements CallbackInterface.IUpda
                 mEntryAdapter.notifyItemChanged(index);
             }
             else {
-                int newIndex = getPositionForEntry(newEntry);
                 mSessionEntries.remove(index);
+                int newIndex = getPositionForEntry(newEntry);
                 mSessionEntries.add(newIndex, newEntry);
                 mEntryAdapter.notifyItemMoved(index, newIndex);
                 mEntryAdapter.notifyItemChanged(newIndex);
@@ -175,23 +176,24 @@ public class EntriesFragment extends Fragment implements CallbackInterface.IUpda
     }
     //endregion
 
-    //region Methods responsible for handling events
     @Override
     public void onEntryViewClick(long habitId, long entryId) {
-        final SessionEntry oldEntry = mSessionEntries.get(getSessionEntryIndex(entryId));
-        NewEntryForm dialog = NewEntryForm.newInstance(oldEntry);
+        SessionEntry oldEntry = mHabitDatabase.getEntry(entryId);
 
-        dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
+        EditEntryForm dialog = EditEntryForm.newInstance(oldEntry);
+
+        dialog.setOnFinishedListener(new EditEntryForm.OnFinishedListener() {
             @Override
-            public void onUpdateClicked(SessionEntry entry) {
+            public void onPositiveClicked(SessionEntry entry) {
                 if (entry != null) {
+                    SessionEntry oldEntry = mHabitDatabase.getEntry(entry.getDatabaseId());
                     mHabitDatabase.updateEntry(entry.getDatabaseId(), entry);
                     updateSessionEntryById(entry.getDatabaseId(), oldEntry, entry);
                 }
             }
 
             @Override
-            public void onDeleteClicked(SessionEntry entry) {
+            public void onNegativeClicked(SessionEntry entry) {
                 mHabitDatabase.deleteEntry(entry.getDatabaseId());
                 removeSessionEntryById(entry.getDatabaseId());
             }
@@ -199,7 +201,6 @@ public class EntriesFragment extends Fragment implements CallbackInterface.IUpda
 
         dialog.show(getFragmentManager(), "edit-entry");
     }
-    //endregion
 
     @Override
     public void updateEntries(SessionEntriesSample dataSample) {

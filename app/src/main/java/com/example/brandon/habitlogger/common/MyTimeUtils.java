@@ -85,5 +85,4 @@ public class MyTimeUtils {
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.getDefault());
         return formatter.format(new Date(timestamp));
     }
-
 }

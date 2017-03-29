@@ -29,7 +29,6 @@ public abstract class RecyclerViewScrollObserver extends RecyclerView.OnScrollLi
             onScrollDown();
             control = true;
         }
-
         else if (current < -threshold && control) {
             onScrollUp();
             control = false;

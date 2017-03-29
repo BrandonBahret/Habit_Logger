@@ -7,96 +7,74 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
 import android.view.InflateException;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.ui.NestedScrollObserver;
 import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class StatisticsFragment extends Fragment{
+public class StatisticsFragment extends Fragment {
 
-    private static View view;
-    private RecyclerViewScrollObserver.IScrollEvents listener;
-    int menuRes = R.menu.menu_habit;
+    private static View mFragmentView;
+    private RecyclerViewScrollObserver.IScrollEvents mListener;
 
     public StatisticsFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment EntriesFragment.
-     */
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
     }
 
+    //region Methods responsible for handling fragment lifecycle
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof RecyclerViewScrollObserver.IScrollEvents)
+            this.mListener = (RecyclerViewScrollObserver.IScrollEvents) context;
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (view != null) {
-            ViewGroup parent = (ViewGroup) view.getParent();
+        if (mFragmentView != null) {
+            ViewGroup parent = (ViewGroup) mFragmentView.getParent();
             if (parent != null)
-                parent.removeView(view);
+                parent.removeView(mFragmentView);
         }
         try {
-            view = inflater.inflate(R.layout.fragment_statistics, container, false);
-
-            NestedScrollView scrollView = (NestedScrollView) view.findViewById(R.id.statistics_container);
-            scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
-
-                int threshold = 2;
-                boolean control = false;
-
-                @Override
-                public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-
-                    int current = scrollY - oldScrollY;
-
-                    if (current > threshold && !control) {
-                        if(StatisticsFragment.this.listener != null)
-                            StatisticsFragment.this.listener.onScrollDown();
-                        control = true;
-                    }
-                    else if (current < -threshold && control) {
-                        if(StatisticsFragment.this.listener != null)
-                            StatisticsFragment.this.listener.onScrollUp();
-                        control = false;
-                    }
-                }
-            });
+            mFragmentView = inflater.inflate(R.layout.fragment_statistics, container, false);
+            NestedScrollView scrollView = (NestedScrollView) mFragmentView.findViewById(R.id.statistics_container);
+            scrollView.setOnScrollChangeListener(getOnScrollChangeListener());
 
         } catch (InflateException e) {
             // empty stub
         }
 
-        return view;
+        return mFragmentView;
     }
+    //endregion
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if(context instanceof RecyclerViewScrollObserver.IScrollEvents){
-            this.listener = (RecyclerViewScrollObserver.IScrollEvents)context;
-        }
-    }
+    //region Methods responsible for handling events
+    private NestedScrollObserver getOnScrollChangeListener() {
+        return new NestedScrollObserver() {
+            @Override
+            public void onScrollUp() {
+                if (mListener != null)
+                    mListener.onScrollUp();
+            }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(this.menuRes, menu);
-        menu.findItem(R.id.search).setVisible(false);
+            @Override
+            public void onScrollDown() {
+                if (mListener != null)
+                    mListener.onScrollDown();
+            }
+        };
     }
+    //endregion
 
-    public void setMenuRes(int res) {
-        this.menuRes = res;
-    }
 }

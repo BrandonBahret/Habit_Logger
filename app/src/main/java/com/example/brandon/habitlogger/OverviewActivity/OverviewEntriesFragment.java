@@ -68,7 +68,7 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
                         NewEntryForm dialog = NewEntryForm.newInstance(habitDatabase.getEntry(entryId));
                         dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
                             @Override
-                            public void onUpdateClicked(SessionEntry entry) {
+                            public void onPositiveClicked(SessionEntry entry) {
                                 if(entry != null){
                                     SessionEntry oldEntry = habitDatabase.getEntry(entry.getDatabaseId());
                                     habitDatabase.updateEntry(entry.getDatabaseId(), entry);
@@ -77,7 +77,7 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
                             }
 
                             @Override
-                            public void onDeleteClicked(SessionEntry entry) {
+                            public void onNegativeClicked(SessionEntry entry) {
                                 habitDatabase.deleteEntry(entry.getDatabaseId());
                                 removeSessionEntryById(entry.getDatabaseId());
                             }

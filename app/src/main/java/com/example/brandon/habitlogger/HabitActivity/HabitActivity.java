@@ -226,7 +226,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
                 NewEntryForm dialog = new NewEntryForm();
                 dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
                     @Override
-                    public void onUpdateClicked(SessionEntry entry) {
+                    public void onPositiveClicked(SessionEntry entry) {
                         if (entry != null) {
                             mHabitDatabase.addEntry(mHabitId, entry);
                             mSessionEntries.add(entry);
@@ -235,7 +235,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
                     }
 
                     @Override
-                    public void onDeleteClicked(SessionEntry entry) {
+                    public void onNegativeClicked(SessionEntry entry) {
 
                     }
                 });

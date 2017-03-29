@@ -10,7 +10,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.brandon.habitlogger.HabitActivity.StartingDateDialog;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
@@ -127,7 +126,7 @@ public class FloatingDateRangeWidgetManager {
     }
 
     public void showDialog(final boolean setDateFromTime, long currentTime) {
-        StartingDateDialog dialog = new StartingDateDialog();
+        MyDatePickerDialog dialog = new MyDatePickerDialog();
 
         Bundle args = new Bundle();
         args.putLong("date_in_milliseconds", currentTime);
@@ -139,9 +138,9 @@ public class FloatingDateRangeWidgetManager {
 
         dialog.setArguments(args);
 
-        dialog.setOnFinishedListener(new StartingDateDialog.OnFinishedListener() {
+        dialog.setOnFinishedListener(new MyDatePickerDialog.OnFinishedListener() {
             @Override
-            public void onFinishedWithResult(String monthName, int day, int year, long time) {
+            public void onFinished(long time) {
                 if (setDateFromTime) {
                     if (time < dateToTime)
                         dateFromTime = time;

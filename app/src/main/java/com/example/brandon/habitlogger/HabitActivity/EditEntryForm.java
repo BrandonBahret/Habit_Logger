@@ -4,11 +4,15 @@ import android.os.Bundle;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 
-@SuppressWarnings({"unused", "WeakerAccess"})
-public class NewEntryForm extends EntryFormDialogBase {
+/**
+ * Created by Brandon on 3/29/2017.
+ * Class for editing entries.
+ */
 
-    public static NewEntryForm newInstance(SessionEntry entry) {
-        NewEntryForm form = new NewEntryForm();
+public class EditEntryForm extends EntryFormDialogBase {
+
+    public static EditEntryForm newInstance(SessionEntry entry) {
+        EditEntryForm form = new EditEntryForm();
 
         Bundle args = new Bundle();
         args.putSerializable(EntryFormDialogBase.KEY_ENTRY, entry);
@@ -19,17 +23,17 @@ public class NewEntryForm extends EntryFormDialogBase {
 
     @Override
     String getTitle() {
-        return "New Entry";
+        return "Edit Entry";
     }
 
     @Override
     String getPositiveButtonText() {
-        return "Add Entry";
+        return "Update Entry";
     }
 
     @Override
     String getNegativeButtonText() {
-        return null;
+        return "Delete Entry";
     }
 
 }
