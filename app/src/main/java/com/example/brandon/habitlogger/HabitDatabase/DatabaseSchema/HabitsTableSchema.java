@@ -4,7 +4,7 @@ import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.DatabaseSche
 
 /**
  * Created by Brandon on 2/17/2017.
- * Schema defining habits table.
+ * Schema defining habits table
  */
 
 public class HabitsTableSchema {
@@ -16,7 +16,7 @@ public class HabitsTableSchema {
     public static final String HABIT_CATEGORY = "CATEGORY";
     public static final String HABIT_ICON_RES_ID = "ICON_RES_ID";
 
-    public static String getCreateTableStatement(){
+    public static String getCreateTableStatement() {
         // CREATE TABLE HABITS_TABLE (ID INTEGER PRIMARY KEY, ARCHIVED INTEGER, NAME TEXT NOT NULL, DESCRIPTION TEXT NOT NULL,
         // CATEGORY INTEGER NOT NULL, ICON_RES_ID TEXT NOT NULL)
         return "CREATE TABLE " + TABLE_NAME + " (" +
@@ -29,7 +29,7 @@ public class HabitsTableSchema {
                 ");";
     }
 
-    public static String getDropTableStatement(){
+    public static String getDropTableStatement() {
         return "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
 

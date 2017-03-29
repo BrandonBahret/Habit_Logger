@@ -4,7 +4,7 @@ import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.DatabaseSche
 
 /**
  * Created by Brandon on 2/17/2017.
- * Schema defining entries table.
+ * Schema defining entries table
  */
 
 public class EntriesTableSchema {

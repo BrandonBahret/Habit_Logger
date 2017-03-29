@@ -108,8 +108,9 @@ public class HabitCategory implements Serializable {
     /**
      * @param databaseId The row id of the category in the database, -1 if not available.
      */
-    public void setDatabaseId(long databaseId) {
+    public HabitCategory setDatabaseId(long databaseId) {
         this.databaseId = databaseId;
+        return this;
     }
 
     /**

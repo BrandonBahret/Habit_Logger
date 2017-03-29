@@ -15,7 +15,7 @@ import java.nio.channels.FileChannel;
 public class DatabaseSchema extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "habit_logger_database";
     public static final int DATABASE_VERSION = 4;
-    private Context context;
+    private final File mDatabasePath;
 
     class SQL_TYPES {
         public static final String NOT_NULL = " NOT NULL ";
@@ -26,7 +26,7 @@ public class DatabaseSchema extends SQLiteOpenHelper {
 
     public DatabaseSchema(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.context = context;
+        mDatabasePath = context.getDatabasePath(getDatabaseName());
     }
 
     @Override
@@ -46,7 +46,7 @@ public class DatabaseSchema extends SQLiteOpenHelper {
         resetDatabase(db);
     }
 
-    public void resetDatabase(SQLiteDatabase db) {
+    public static void resetDatabase(SQLiteDatabase db) {
         db.delete(HabitsTableSchema.TABLE_NAME, null, null);
         db.delete(CategoriesTableSchema.TABLE_NAME, null, null);
         db.delete(EntriesTableSchema.TABLE_NAME, null, null);
@@ -56,8 +56,9 @@ public class DatabaseSchema extends SQLiteOpenHelper {
         resetDatabase(getWritableDatabase());
     }
 
+    //region Getters {}
     public File getDatabasePath() {
-        return context.getDatabasePath(getDatabaseName());
+        return mDatabasePath;
     }
 
     /**
@@ -70,7 +71,9 @@ public class DatabaseSchema extends SQLiteOpenHelper {
         src.read(buffer);
         return buffer;
     }
+    //endregion
 
+    //region Setters {}
     /**
      * @param bytes A ByteBuffer representing the database.
      */
@@ -80,4 +83,6 @@ public class DatabaseSchema extends SQLiteOpenHelper {
         dst.write(bytes);
         dst.close();
     }
+    //endregion
+
 }
