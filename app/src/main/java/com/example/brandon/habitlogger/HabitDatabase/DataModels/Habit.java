@@ -136,7 +136,7 @@ public class Habit implements Serializable, Parcelable {
         dest.mIsArchived = source.mIsArchived;
 
         if (source.getEntries() != null) {
-            dest.mEntries = source.getEntries();
+            dest.mEntries = new ArrayList<>(source.getEntries());
             dest.mEntriesDuration = source.calculateEntriesDurationSum();
         }
     }

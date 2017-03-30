@@ -233,7 +233,7 @@ public class SessionEntry implements Serializable {
     }
 
     public long getStartingTimeIgnoreTimeOfDay() {
-        return MyTimeUtils.setTimePortion(getStartingTime(), false, 0, 0, 0, 0);
+        return MyTimeUtils.setTimePortion(getStartingTime(), true, 0, 0, 0, 0);
     }
 
     public String getStartTimeAsString(String dateFormat) {
