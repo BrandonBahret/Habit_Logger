@@ -14,12 +14,12 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.HabitViewHolder;
+import com.example.brandon.habitlogger.common.MyColorUtils;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.databinding.ActivitySessionBinding;
 
@@ -203,7 +203,7 @@ public class SessionActivity extends AppCompatActivity implements
     //region // Methods for changing the appearance of the UI
     public void applyHabitColorToTheme() {
         int color = mHabit.getColor();
-        int darkerColor = HabitCategory.darkenColor(color, 0.7f);
+        int darkerColor = MyColorUtils.setLightness(color, 0.7f);
 
         getWindow().setStatusBarColor(darkerColor);
 //        ui.sessionCancel.getBackground().setColorFilter(color, PorterDuff.Mode.SRC);

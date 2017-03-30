@@ -6,8 +6,11 @@ import android.test.RenamingDelegatingContext;
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
-import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Instrumentation test, which will execute on an Android device.
@@ -31,10 +34,10 @@ public class DatabaseExportLocalTest extends AndroidTestCase {
         // Add some junk data to the database
         HabitCategory mainCategory = new HabitCategory("color", "name");
 
-        SessionEntry entries[] = new SessionEntry[10];
+        List<SessionEntry> entries = new ArrayList<>(10);
 
-        for (int i = 0; i < entries.length; i++) {
-            entries[i] = new SessionEntry(0, 0, "note");
+        for (int i = 0; i < entries.size(); i++) {
+            entries.add(i, new SessionEntry(0, 0, "note"));
         }
 
         for (int i = 0; i < 10; i++) {
@@ -106,19 +109,7 @@ public class DatabaseExportLocalTest extends AndroidTestCase {
                 false
         );
 
-        assertEquals(expectedHabit.toString(), actualHabit.toString());
-
-        // Public storage
-
-        result = dataExportManager.exportHabit(expectedHabit, true);
-        assertNotNull(result);
-
-        actualHabit = dataExportManager.getHabit(
-                dataExportManager.getFilePathFromHabit(expectedHabit, true),
-                true
-        );
-
-        assertEquals(expectedHabit.toString(), actualHabit.toString());
+        assertEquals(expectedHabit, actualHabit);
     }
 
     public void testDeleteHabit() {

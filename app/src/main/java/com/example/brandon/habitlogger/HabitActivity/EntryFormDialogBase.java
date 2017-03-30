@@ -172,13 +172,13 @@ public abstract class EntryFormDialogBase extends DialogFragment {
                 MyDatePickerDialog dialog = new MyDatePickerDialog();
 
                 Bundle args = new Bundle();
-                args.putLong("date_in_milliseconds", mEntry.getStartTime());
+                args.putLong("date_in_milliseconds", mEntry.getStartingTime());
                 dialog.setArguments(args);
 
                 dialog.setOnFinishedListener(new MyDatePickerDialog.OnFinishedListener() {
                     @Override
                     public void onFinished(long time) {
-                        mEntry.setStartTime(time);
+                        mEntry.setStartingTime(time);
                         String dateString = mEntry.getStartTimeAsString(new PreferenceChecker(getContext()).stringGetDateFormat());
                         ui.sessionDate.setText(dateString);
                     }

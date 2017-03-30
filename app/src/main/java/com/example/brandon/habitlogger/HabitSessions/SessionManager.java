@@ -124,7 +124,7 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
 
     public static long calculateElapsedTimeForEntry(SessionEntry entry) {
         long currentTime = System.currentTimeMillis();
-        long startingTime = entry.getStartTime();
+        long startingTime = entry.getStartingTime();
         long duration = (currentTime - startingTime) - entry.getTotalPauseTime();
 
         if (entry.getIsPaused()) {
@@ -256,7 +256,7 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
             do sessions.add(getSessionEntryFromCursor(cursor)); while (cursor.moveToNext());
 
             // Sort the entries by Category Name
-            Collections.sort(sessions, SessionEntry.CategoryComparator);
+            Collections.sort(sessions, SessionEntry.ICompareCategoryNames);
         }
         cursor.close();
 

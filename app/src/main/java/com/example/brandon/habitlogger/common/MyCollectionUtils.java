@@ -33,10 +33,12 @@ public class MyCollectionUtils {
     }
 
     public static <T> void filter(List<T> list, Predicate<? super T> shouldRemove) {
-        Iterator<T> iterator = list.iterator();
-        while (iterator.hasNext()) {
-            if (shouldRemove.apply(iterator.next()))
-                iterator.remove();
+        if (list != null) {
+            Iterator<T> iterator = list.iterator();
+            while (iterator.hasNext()) {
+                if (shouldRemove.apply(iterator.next()))
+                    iterator.remove();
+            }
         }
     }
 
@@ -56,6 +58,14 @@ public class MyCollectionUtils {
         double sum = 0.0;
         for (In object : objects)
             sum += keyGetter.get(object).doubleValue();
+
+        return sum;
+    }
+
+    public static <In extends Number> double sum(In[] objects) {
+        double sum = 0.0;
+        for (In object : objects)
+            sum += object.doubleValue();
 
         return sum;
     }

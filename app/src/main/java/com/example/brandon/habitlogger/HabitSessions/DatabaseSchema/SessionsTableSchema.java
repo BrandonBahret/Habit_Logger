@@ -101,7 +101,7 @@ public class SessionsTableSchema {
         statement.bindString(3, entry.getCategoryName());        // HABIT_CATEGORY
         statement.bindString(4, entry.getHabit().getCategory().getColor());        // HABIT_COLOR
         statement.bindLong(5, entry.getDuration());              // DURATION
-        statement.bindLong(6, entry.getStartTime());             // STARTING_TIME
+        statement.bindLong(6, entry.getStartingTime());             // STARTING_TIME
         statement.bindLong(7, entry.getLastTimePaused());        // LAST_TIME_PAUSED
         statement.bindLong(8, entry.getTotalPauseTime());        // TOTAL_PAUSE_TIME
         statement.bindLong(9, entry.getIsPaused() ? 1L : 0L);    // IS_PAUSED

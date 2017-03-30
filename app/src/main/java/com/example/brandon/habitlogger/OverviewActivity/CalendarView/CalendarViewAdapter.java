@@ -72,7 +72,7 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
                 SessionEntry entry = entries.get(entryIndex);
 
                 if (entry.getStartingTimeMonth() == targetMonth && entry.getStartingTimeYear() == targetYear)
-                    dates.add(entry.getDateOfEntry());
+                    dates.add(entry.getStartingTimeDayOfMonth());
 
                 else break;
 

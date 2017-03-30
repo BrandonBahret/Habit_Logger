@@ -137,7 +137,7 @@ public class LineGraphCompletion extends Fragment implements CallbackInterface.I
         return MyCollectionUtils.binarySearch(sessionEntries, searchDate, new MyCollectionUtils.KeyComparator() {
             @Override
             public int compare(Object element, Object key) {
-                return Long.compare(((SessionEntry) element).getStartingTimeDate(), (long) key);
+                return Long.compare(((SessionEntry) element).getStartingTimeIgnoreTimeOfDay(), (long) key);
             }
         }) >= 0;
     }

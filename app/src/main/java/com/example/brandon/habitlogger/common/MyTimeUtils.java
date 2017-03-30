@@ -44,6 +44,7 @@ public class MyTimeUtils {
      * @return An array {hours, minutes, seconds}
      */
     public static int[] getTimePortion(long timestamp){
+
         timestamp /= 1000;
 
         int hours = (int)((timestamp - (timestamp % 3600)) / 3600);
@@ -73,6 +74,20 @@ public class MyTimeUtils {
                 .format(new Date(c.getTimeInMillis()));
     }
     //endregion
+
+    public static int getTimestampField(long timestamp, int field){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(timestamp);
+
+        return c.get(field);
+    }
+
+    public static long setTimestampField(long timestamp, int field, int value){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(timestamp);
+        c.set(field, value);
+        return c.getTimeInMillis();
+    }
 
     /**
      * Return date in specified format.

@@ -37,6 +37,10 @@ public class MyColorUtils {
         );
     }
 
+    public static String stringifyColor(int color){
+        return "#" + Integer.toHexString(color);
+    }
+
     //region Get color components {}
     public static int[] getRGBComponents(int color) {
         int red = Color.red(color);

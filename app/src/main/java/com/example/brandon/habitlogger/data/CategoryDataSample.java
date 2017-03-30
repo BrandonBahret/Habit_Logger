@@ -33,7 +33,7 @@ public final class CategoryDataSample extends ExpandableGroup<Habit> {
         super(category.getName(), habits);
         mCategory = category;
         mHabits = habits;
-        Collections.sort(mHabits, Habit.DurationComparator);
+        Collections.sort(mHabits, Habit.ICompareDuration);
         mDateFromTime = dateFromTime;
         mDateToTime = dateToTime;
     }
@@ -83,7 +83,7 @@ public final class CategoryDataSample extends ExpandableGroup<Habit> {
 
         for (int i = 0; i < mHabits.size(); i++) {
             habits.add(i, Habit.duplicate(mHabits.get(i)));
-            List<SessionEntry> entriesForDate = habits.get(i).getEntriesForDate(timestamp);
+            List<SessionEntry> entriesForDate = habits.get(i).filterEntriesForDate(timestamp);
             habits.get(i).setEntries(entriesForDate);
         }
 
@@ -105,7 +105,7 @@ public final class CategoryDataSample extends ExpandableGroup<Habit> {
             mSessionEntries = new ArrayList<>();
 
             for (Habit habit : mHabits) {
-                List<SessionEntry> entries = habit.getEntriesAsList();
+                List<SessionEntry> entries = habit.getEntries();
                 if (entries != null)
                     mSessionEntries.addAll(entries);
             }

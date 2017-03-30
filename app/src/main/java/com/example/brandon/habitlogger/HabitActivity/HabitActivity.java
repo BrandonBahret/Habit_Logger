@@ -18,7 +18,6 @@ import android.view.View;
 
 import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
@@ -27,6 +26,7 @@ import com.example.brandon.habitlogger.ModifyHabitActivity.EditHabitDialog;
 import com.example.brandon.habitlogger.ModifyHabitActivity.NewHabitDialog;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.ConfirmationDialog;
+import com.example.brandon.habitlogger.common.MyColorUtils;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.databinding.ActivityHabitBinding;
@@ -197,7 +197,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
         if (!mHabit.getIsArchived()) {
             color = mHabit.getCategory().getColorAsInt();
-            darkerColor = HabitCategory.darkenColor(color, 0.7f);
+            darkerColor = MyColorUtils.setLightness(color, 0.7f);
         }
 
         getWindow().setStatusBarColor(darkerColor);

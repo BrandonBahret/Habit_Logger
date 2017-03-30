@@ -1,6 +1,5 @@
 package com.example.brandon.habitlogger.HabitDatabase.DataModels;
 
-import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -14,7 +13,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -26,98 +24,93 @@ import java.util.Locale;
 
 @SuppressWarnings("WeakerAccess")
 public class Habit implements Serializable, Parcelable {
-    @NonNull private String name;
-    @NonNull private HabitCategory category;
-    @Nullable private String description;
-    @Nullable private String iconResId;
-    @Nullable private SessionEntry[] entries;
-    private long entriesDuration;
 
-    private int isArchived = 0;
-    private long databaseId = -1;
-    private boolean filter = false;
+    //region (Member attributes)
+    @NonNull private String mName;
+    @NonNull private HabitCategory mCategory;
+    @Nullable private String mDescription;
+    @Nullable private String mIconResId;
+    @Nullable private List<SessionEntry> mEntries;
+    private long mEntriesDuration;
 
-    public Habit(@NonNull String name, @NonNull HabitCategory category) {
-        this.name = name;
-        this.category = category;
-    }
+    private int mIsArchived = 0;
+    private long mDatabaseId = -1;
+    //endregion
 
-    public Habit(@NonNull String name, @Nullable String description, @NonNull HabitCategory category,
-                 @Nullable String iconResId, @Nullable SessionEntry[] entries) {
-        this.name = name;
-        this.description = description;
-        this.category = category;
-        this.iconResId = iconResId;
-        if (entries != null) {
-            this.entries = entries;
-            this.entriesDuration = calculateEntriesDurationSum();
+    //region (Static Helper Interfaces)
+    public static Comparator<Habit> ICompareCategoryName = new Comparator<Habit>() {
+        @Override
+        public int compare(Habit itemOne, Habit itemTwo) {
+            return itemOne.getCategory().getName().compareTo(itemTwo.getCategory().getName());
         }
+    };
+
+    public static Comparator<Habit> ICompareDuration = new Comparator<Habit>() {
+        @Override
+        public int compare(Habit itemOne, Habit itemTwo) {
+            return Long.compare(itemTwo.getEntriesDuration(), itemOne.getEntriesDuration());
+        }
+    };
+
+    public static Predicate<Habit> ICheckIfIsArchived = new Predicate<Habit>() {
+        @Override
+        public boolean apply(Habit item) {
+            return item.getIsArchived();
+        }
+    };
+
+    public static Predicate<Habit> ICheckIfIsNotArchived = new Predicate<Habit>() {
+        @Override
+        public boolean apply(Habit item) {
+            return !item.getIsArchived();
+        }
+    };
+    //endregion
+
+    //region Constructors {}
+    public Habit(@NonNull String name, @NonNull HabitCategory category) {
+        this.mName = name;
+        this.mCategory = category;
+        mIconResId = "none";
     }
 
     public Habit(@NonNull String name, @Nullable String description, @NonNull HabitCategory category,
-                 @Nullable String iconResId, @Nullable SessionEntry[] entries,
+                 @Nullable String iconResId, List<SessionEntry> entries) {
+        this.mName = name;
+        this.mDescription = description;
+        this.mCategory = category;
+        this.mIconResId = iconResId;
+        setEntries(entries);
+    }
+
+    public Habit(@NonNull String name, @Nullable String description, @NonNull HabitCategory category,
+                 @Nullable String iconResId, List<SessionEntry> entries,
                  int isArchived, long databaseId) {
 
-        this.name = name;
-        this.category = category;
-        this.description = description;
-        this.iconResId = iconResId;
-        this.isArchived = isArchived;
-        this.databaseId = databaseId;
-        if (entries != null) {
-            this.entries = entries;
-            this.entriesDuration = calculateEntriesDurationSum();
-        }
+        this.mName = name;
+        this.mCategory = category;
+        this.mDescription = description;
+        this.mIconResId = iconResId;
+        this.mIsArchived = isArchived;
+        this.mDatabaseId = databaseId;
+        setEntries(entries);
     }
 
     public Habit(Parcel in) {
-        Habit habit = (Habit) in.readSerializable();
-
-        this.name = habit.name;
-        this.description = habit.description;
-        this.category = habit.category;
-        this.iconResId = habit.iconResId;
-        this.databaseId = habit.databaseId;
-        this.isArchived = habit.isArchived;
-        if (entries != null) {
-            this.entries = entries;
-            this.entriesDuration = calculateEntriesDurationSum();
-        }
+        Habit habit = in.readParcelable(Habit.class.getClassLoader());
+        Habit.copy(this, habit);
     }
+    //endregion
 
-    public Habit(Context context) {
-        this.name = "";
-        this.description = "";
-        this.category = HabitCategory.getUncategorizedCategory(context);
-        this.iconResId = "";
-        this.databaseId = -1;
-        this.isArchived = 0;
-    }
-
-    public static Habit duplicate(Habit habit) {
-        Habit result = new Habit(habit.name, habit.category);
-
-        result.description = habit.description;
-        result.iconResId = habit.iconResId;
-        result.databaseId = habit.databaseId;
-        result.isArchived = habit.isArchived;
-
-        if (habit.entries != null) {
-            result.entries = habit.entries;
-            result.entriesDuration = habit.entriesDuration;
-        }
-
-        return result;
-    }
-
+    //region Methods responsible for making this object parcelable
     @Override
     public int describeContents() {
         return 0;
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeSerializable(this);
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeParcelable(this, flags);
     }
 
     public static final Creator<Habit> CREATOR = new Creator<Habit>() {
@@ -131,79 +124,59 @@ public class Habit implements Serializable, Parcelable {
             return new Habit[size];
         }
     };
+    //endregion
 
-    public static MyCollectionUtils.IGetKey<Habit, Long> IGetEntriesDuration = new MyCollectionUtils.IGetKey<Habit, Long>() {
-        @Override
-        public Long get(Habit habit) {
-            return habit.getEntriesDuration();
-        }
-    };
+    //region Methods responsible for enabling deep copying
+    private static void copy(Habit dest, Habit source) {
+        dest.mName = source.mName;
+        dest.mDescription = source.mDescription;
+        dest.mCategory = source.mCategory;
+        dest.mIconResId = source.mIconResId;
+        dest.mDatabaseId = source.mDatabaseId;
+        dest.mIsArchived = source.mIsArchived;
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Habit) {
-            Habit compare = (Habit) obj;
-
-            SessionEntry[] compareEntries = compare.getEntries();
-            boolean entriesEqual =
-                    !((this.entries != null) && (compare.getEntries() != null)) ||
-                            Arrays.equals(compareEntries, getEntries());
-
-            return (compare.getIsArchived() == getIsArchived()) &&
-                    compare.getName().equals(getName()) &&
-                    String.valueOf(compare.getDescription()).equals(String.valueOf(getDescription())) &&
-                    compare.getCategory().equals(getCategory()) &&
-                    String.valueOf(compare.getIconResId()).equals(String.valueOf(getIconResId())) &&
-                    entriesEqual;
-        }
-        else {
-            return false;
+        if (source.getEntries() != null) {
+            dest.mEntries = source.getEntries();
+            dest.mEntriesDuration = source.calculateEntriesDurationSum();
         }
     }
 
+    public static Habit duplicate(Habit habit) {
+        Habit result = new Habit("", new HabitCategory(0, ""));
+        Habit.copy(result, habit);
+        return result;
+    }
+    //endregion
+
+    //region Methods responsible for converting to and from CSV
+
+    //region Create from CSV
     /**
      * @param CSV The CSV form of a habit
      * @return a habit object created from the csv
      */
     @Nullable
     public static Habit fromCSV(String CSV) {
-
         Habit habit = null;
 
         try {
             CSVReader reader = new CSVReader(new StringReader(CSV));
 
             reader.readNext(); // Skip line
+
             String[] habitArray = reader.readNext();
-
-            int isArchived = Boolean.parseBoolean(habitArray[0]) ? 1 : 0;
-            String habitName = habitArray[1];
-            String habitDescription = habitArray[2];
-
-            String categoryName = habitArray[3];
-            String categoryColor = habitArray[4];
-
-            String habitIconResId = habitArray[5];
-
+            habit = createHabitFromStrings(habitArray);
             int numberOfEntries = Integer.parseInt(habitArray[6]);
 
             reader.readNext(); // Skip line
             reader.readNext(); // Skip line
 
-            SessionEntry entries[] = new SessionEntry[numberOfEntries];
-
+            List<SessionEntry> entries = new ArrayList<>(numberOfEntries);
             for (int entryIndex = 0; entryIndex < numberOfEntries; entryIndex++) {
-                String[] entryArray = reader.readNext();
-                long entryStartTime = Long.parseLong(entryArray[0]);
-                long entryDuration = Long.parseLong(entryArray[1]);
-                String comment = entryArray[2];
-
-                entries[entryIndex] = new SessionEntry(entryStartTime, entryDuration, comment);
+                SessionEntry entry = createSessionEntryFromStrings(reader.readNext());
+                entries.add(entryIndex,  entry);
             }
-
-            HabitCategory category = new HabitCategory(categoryColor, categoryName);
-            habit = new Habit(habitName, habitDescription, category,
-                    habitIconResId, entries, isArchived, -1);
+            habit.setEntries(entries);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -212,48 +185,26 @@ public class Habit implements Serializable, Parcelable {
         return habit;
     }
 
-    public static Comparator<Habit> CategoryNameComparator = new Comparator<Habit>() {
-        @Override
-        public int compare(Habit itemOne, Habit itemTwo) {
-            return itemOne.getCategory().getName().compareTo(itemTwo.getCategory().getName());
-        }
-    };
+    private static Habit createHabitFromStrings(String[] habitArray){
+        int isArchived = Boolean.parseBoolean(habitArray[0]) ? 1 : 0;
+        String habitName = habitArray[1];
+        String habitDescription = habitArray[2];
+        String categoryName = habitArray[3];
+        String categoryColor = habitArray[4];
+        String habitIconResId = habitArray[5];
+        HabitCategory category = new HabitCategory(categoryColor, categoryName);
 
-    public static Comparator<Habit> DurationComparator = new Comparator<Habit>() {
-        @Override
-        public int compare(Habit itemOne, Habit itemTwo) {
-            return Long.compare(itemTwo.getEntriesDuration(), itemOne.getEntriesDuration());
-        }
-    };
-
-    public static Predicate<Habit> FilterOutArchivedHabits = new Predicate<Habit>() {
-        @Override
-        public boolean apply(Habit item) {
-            return item.getIsArchived();
-        }
-    };
-
-    public static Predicate<Habit> FilterOutNonArchivedHabits = new Predicate<Habit>() {
-        @Override
-        public boolean apply(Habit item) {
-            return !item.getIsArchived();
-        }
-    };
-
-    @Override
-    public String toString() {
-        int entriesLength = 0;
-        if (getEntries() != null) {
-            entriesLength = getEntries().length;
-        }
-
-        HabitCategory category = getCategory();
-
-        String format = "%s{\n\tDescription: %s\n\tCategory: {\n\t\tName: %s,\n\t\tColor: %s\n\t}\n\tIconResId: %s\n\t" +
-                "Number of entries: %d\n\tIsArchived: %b\n}\n";
-        return String.format(Locale.US, format, getName(), getDescription(), category.getName(),
-                getCategory().getColor(), getIconResId(), entriesLength, getIsArchived());
+        return new Habit(habitName, habitDescription, category, habitIconResId, null, isArchived, -1);
     }
+
+    private static SessionEntry createSessionEntryFromStrings(String[] entryArray){
+        long entryStartTime = Long.parseLong(entryArray[0]);
+        long entryDuration = Long.parseLong(entryArray[1]);
+        String entryNote = entryArray[2];
+
+        return new SessionEntry(entryStartTime, entryDuration, entryNote);
+    }
+    //endregion
 
     /**
      * @return A csv form of the habit
@@ -274,11 +225,11 @@ public class Habit implements Serializable, Parcelable {
 
         String entryFormat = "%d,%d,\"%s\"\n";
 
-        SessionEntry entries[] = getEntries();
+        List<SessionEntry> entries = getEntries();
         if (entries != null) {
             for (SessionEntry eachEntry : entries) {
                 String appendEntry = String.format(Locale.US, entryFormat,
-                        eachEntry.getStartTime(), eachEntry.getDuration(), eachEntry.getNote());
+                        eachEntry.getStartingTime(), eachEntry.getDuration(), eachEntry.getNote());
 
                 csv.append(appendEntry);
             }
@@ -287,186 +238,183 @@ public class Habit implements Serializable, Parcelable {
         return csv.toString();
     }
 
-    /**
-     * @return Get the number of entries
-     */
-    public long getEntriesLength() {
-        if (getEntries() != null) {
-            return getEntries().length;
-        }
-        else {
-            return 0;
-        }
-    }
+    //endregion
 
-    public long getEntriesDuration() {
-        return this.entriesDuration;
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Habit) {
+            Habit compare = (Habit) obj;
+
+            return (compare.getIsArchived() == getIsArchived()) &&
+                    compare.getName().equals(getName()) &&
+                    String.valueOf(compare.getDescription()).equals(String.valueOf(getDescription())) &&
+                    compare.getCategory().equals(getCategory()) &&
+                    String.valueOf(compare.getIconResId()).equals(String.valueOf(getIconResId()));
+        }
+
+        else return false;
     }
 
     private long calculateEntriesDurationSum() {
-        long duration = 0;
-
-        if (entries != null) {
-            for (SessionEntry entry : entries) {
-                duration += entry.getDuration();
-            }
-
-            return duration;
-        }
-        else {
-            throw new RuntimeException("SessionEntries was null in " + this.getClass().getName());
-        }
+        return (long) MyCollectionUtils.sum(mEntries, SessionEntry.IGetSessionDuration);
     }
+
+    @Nullable
+    public List<SessionEntry> filterEntriesForDate(final long timestamp) {
+        if(mEntries != null) {
+            List<SessionEntry> entries = new ArrayList<>(mEntries);
+
+            MyCollectionUtils.filter(entries, new Predicate<SessionEntry>() {
+                @Override
+                public boolean apply(SessionEntry sessionEntry) {
+                    return !(sessionEntry.getStartingTimeIgnoreTimeOfDay() == timestamp);
+                }
+            });
+
+            return entries;
+        }
+
+        return null;
+    }
+
+    //region Getters {}
+    /**
+     * @return The habit mName
+     */
+    @NonNull
+    public String getName() {
+        return mName;
+    }
+
+    /**
+     * @return the habit mDescription
+     */
+    @Nullable
+    public String getDescription() {
+        return mDescription;
+    }
+
+    /**
+     * @return The mCategory object associated with this habit.
+     */
+    @NonNull
+    public HabitCategory getCategory() {
+        return mCategory;
+    }
+
+    //region Get fields related to SessionEntries
+    @Nullable
+    public List<SessionEntry> getEntries() {
+        return mEntries != null ? mEntries : null;
+    }
+
+    /**
+     * @return Get the number of mEntries
+     */
+    public long getEntriesLength() {
+        return getEntries() != null ? getEntries().size() : 0;
+    }
+
+    public long getEntriesDuration() {
+        return this.mEntriesDuration;
+    }
+
+    public static MyCollectionUtils.IGetKey<Habit, Long> IGetEntriesDuration = new MyCollectionUtils.IGetKey<Habit, Long>() {
+        @Override
+        public Long get(Habit habit) {
+            return habit.getEntriesDuration();
+        }
+    };
+    //endregion
 
     /**
      * @return the resource id for a drawable as a string. Ex: R.id.ic_launcher becomes "ic_launcher"
      */
     @Nullable
     public String getIconResId() {
-        return iconResId;
-    }
-
-    /**
-     * @param iconResId a stringified version of an resource id for a drawable.
-     *                  Ex: R.id.ic_launcher becomes "ic_launcher"
-     */
-    public void setIconResId(@NonNull String iconResId) {
-        this.iconResId = iconResId;
-    }
-
-    /**
-     * @return The habit name
-     */
-    @NonNull
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param name the new habit name
-     */
-    public void setName(@NonNull String name) {
-        this.name = name;
-    }
-
-    /**
-     * @return the habit description
-     */
-    @Nullable
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * @param newDescription The habit description
-     */
-    public void setDescription(@NonNull String newDescription) {
-        this.description = newDescription;
-    }
-
-    /**
-     * @return The category object associated with this habit.
-     */
-    @NonNull
-    public HabitCategory getCategory() {
-        return category;
+        return mIconResId;
     }
 
     public int getColor() {
-        return getIsArchived() ? 0xFFCCCCCC : category.getColorAsInt();
-    }
-
-    /**
-     * @param category The category object associated with this habit.
-     */
-    public void setCategory(@NonNull HabitCategory category) {
-        this.category = category;
-    }
-
-    public List<SessionEntry> getEntriesForDate(long dateInMillis) {
-        List<SessionEntry> entries = new ArrayList<>();
-
-        if (this.entries != null && !(this.entries.length == 0)) {
-            for (SessionEntry entry : this.entries) {
-                if (entry.getStartingTimeDate() == dateInMillis)
-                    entries.add(entry);
-            }
-        }
-
-        return entries;
-    }
-
-    /**
-     * @return all of the entries associated with the habit.
-     */
-    @Nullable
-    public SessionEntry[] getEntries() {
-        return entries;
-    }
-
-    @Nullable
-    public List<SessionEntry> getEntriesAsList(){
-        if(entries != null)
-            return Arrays.asList(entries);
-
-        return null;
-    }
-
-    /**
-     * @param newEntries The new entry array to replace the old entries.
-     */
-    public void setEntries(@NonNull SessionEntry[] newEntries) {
-        this.entries = newEntries;
-        this.entriesDuration = calculateEntriesDurationSum();
-    }
-
-    /**
-     * @param newEntries The new entry array to replace the old entries.
-     */
-    public void setEntries(@NonNull List<SessionEntry> newEntries) {
-        SessionEntry[] entries = new SessionEntry[newEntries.size()];
-        newEntries.toArray(entries);
-        this.entries = entries;
-        this.entriesDuration = calculateEntriesDurationSum();
+        return getIsArchived() ? 0xFFCCCCCC : mCategory.getColorAsInt();
     }
 
     /**
      * @return The row id of the Habit in the database, -1 when not available.
      */
     public long getDatabaseId() {
-        return databaseId;
-    }
-
-    /**
-     * @param databaseId The row id of the Habit in the database, -1 when not available.
-     */
-    public void setDatabaseId(long databaseId) {
-        this.databaseId = databaseId;
-    }
-
-    /**
-     * @param state 1 if archived, else 0.
-     */
-    public void setIsArchived(boolean state) {
-        this.isArchived = state ? 1 : 0;
+        return mDatabaseId;
     }
 
     /**
      * @return True if archived, else false.
      */
     public boolean getIsArchived() {
-        return (this.isArchived == 1);
+        return (this.mIsArchived == 1);
+    }
+    //endregion
+
+    //region Setters {}
+    /**
+     * @param name the new habit mName
+     */
+    public Habit setName(@NonNull String name) {
+        this.mName = name;
+        return this;
     }
 
-    public void setFilterBit(boolean b) {
-        this.filter = b;
+    /**
+     * @param newDescription The habit mDescription
+     */
+    public Habit setDescription(@NonNull String newDescription) {
+        this.mDescription = newDescription;
+        return this;
     }
 
-    public boolean getFilterBit() {
-        return this.filter;
+    /**
+     * @param category The mCategory object associated with this habit.
+     */
+    public Habit setCategory(@NonNull HabitCategory category) {
+        this.mCategory = category;
+        return this;
     }
 
-    public boolean hasEntries() {
-        return entries != null;
+    /**
+     * @param newEntries The new entry array to replace the old mEntries.
+     */
+    public Habit setEntries(List<SessionEntry> newEntries) {
+        if (newEntries != null) {
+            this.mEntries = newEntries;
+            this.mEntriesDuration = calculateEntriesDurationSum();
+        }
+
+        return this;
     }
+
+    /**
+     * @param iconResId a stringified version of an resource id for a drawable.
+     *                  Ex: R.id.ic_launcher becomes "ic_launcher"
+     */
+    public Habit setIconResId(@NonNull String iconResId) {
+        this.mIconResId = iconResId;
+        return this;
+    }
+
+    /**
+     * @param databaseId The row id of the Habit in the database, -1 when not available.
+     */
+    public Habit setDatabaseId(long databaseId) {
+        this.mDatabaseId = databaseId;
+        return this;
+    }
+
+    /**
+     * @param state 1 if archived, else 0.
+     */
+    public Habit setIsArchived(boolean state) {
+        this.mIsArchived = state ? 1 : 0;
+        return this;
+    }
+    //endregion
+
 }

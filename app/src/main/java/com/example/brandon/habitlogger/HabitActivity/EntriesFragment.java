@@ -86,7 +86,7 @@ public class EntriesFragment extends Fragment implements CallbackInterface.IUpda
             @Override
             public long getGroupId(int position) {
                 if (position >= 0 && position < mSessionEntries.size()) {
-                    return mSessionEntries.get(position).getStartingTimeDate();
+                    return mSessionEntries.get(position).getStartingTimeIgnoreTimeOfDay();
                 }
                 else {
                     return -1;
@@ -147,7 +147,7 @@ public class EntriesFragment extends Fragment implements CallbackInterface.IUpda
     public void updateSessionEntryById(long databaseId, SessionEntry oldEntry, SessionEntry newEntry) {
         int index = getSessionEntryIndex(databaseId);
         if (index != mSessionEntries.size()) {
-            if (oldEntry.isSameStartingTimeAs(newEntry)) {
+            if (oldEntry.getStartingTime() == newEntry.getStartingTime()) {
                 mSessionEntries.set(index, newEntry);
                 mEntryAdapter.notifyItemChanged(index);
             }
@@ -171,7 +171,7 @@ public class EntriesFragment extends Fragment implements CallbackInterface.IUpda
     }
 
     private int getPositionForEntry(SessionEntry newEntry) {
-        int foundPosition = MyCollectionUtils.binarySearch(mSessionEntries, newEntry.getStartTime(), SessionEntry.ICompareStartTime);
+        int foundPosition = MyCollectionUtils.binarySearch(mSessionEntries, newEntry.getStartingTime(), SessionEntry.IKeyCompareStartingTime);
         return foundPosition < 0 ?  (-foundPosition) - 1 : foundPosition;
     }
     //endregion

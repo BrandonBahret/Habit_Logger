@@ -1,7 +1,5 @@
 package com.example.brandon.habitlogger.HabitDatabase.DataModels;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 
@@ -21,89 +19,84 @@ import static com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager.
  * This object is used to store the session data for the habits.
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class SessionEntry implements Serializable, Parcelable {
+public class SessionEntry implements Serializable {
 
+    //region (Member attributes)
     private long mStartTime, mDuration;
     private boolean mIsPaused = false;
-    private long lastTimePaused;
-    private long totalPauseTime;
-    private long databaseId = -1;
-    @NonNull private String note;
+    private long mLastTimePaused;
+    private long mTotalPauseTime;
+    private long mDatabaseId = -1;
+    @NonNull private String mNote;
 
-    private Habit habit;
-    private long habitId;
+    private Habit mHabit;
+    private long mHabitId;
+    //endregion
 
-    /**
-     * @param startTime a time in milliseconds for the time the session was started.
-     * @param duration  a time in milliseconds for the getDatabaseLength of the session.
-     * @param note      an optional note to be associated with the session.
-     */
-    public SessionEntry(long startTime, long duration, @NonNull String note) {
-        this.mStartTime = startTime;
-        this.mDuration = duration;
-        this.note = note;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeSerializable(this);
-    }
-
-    public static final Creator<SessionEntry> CREATOR = new Creator<SessionEntry>() {
+    //region (Static Helper Interfaces)
+    public static Comparator<SessionEntry> ICompareStartingTimes = new Comparator<SessionEntry>() {
         @Override
-        public SessionEntry createFromParcel(Parcel in) {
-            return new SessionEntry(in);
-        }
-
-        @Override
-        public SessionEntry[] newArray(int size) {
-            return new SessionEntry[size];
+        public int compare(SessionEntry sessionOne, SessionEntry sessionTwo) {
+            return Long.compare(sessionOne.getStartingTime(), sessionTwo.getStartingTime());
         }
     };
 
-    public SessionEntry(Parcel in) {
-        SessionEntry entry = (SessionEntry) in.readSerializable();
-
-        this.mStartTime = entry.mStartTime;
-        this.mDuration = entry.mDuration;
-        this.note = entry.note;
-        this.databaseId = entry.databaseId;
-        this.mIsPaused = entry.mIsPaused;
-        this.lastTimePaused = entry.lastTimePaused;
-        this.totalPauseTime = entry.totalPauseTime;
-        this.habitId = entry.habitId;
-        this.habit = entry.habit;
-    }
-
-    public static Comparator<SessionEntry> StartingTimeComparator = new Comparator<SessionEntry>() {
+    public static MyCollectionUtils.KeyComparator IKeyCompareStartingTime = new MyCollectionUtils.KeyComparator() {
         @Override
-        public int compare(SessionEntry sessionOne, SessionEntry sessionTwo) {
-            return Long.compare(sessionOne.getStartTime(), sessionTwo.getStartTime());
+        public int compare(Object element, Object key) {
+            long elementStartTime = ((SessionEntry) element).getStartingTime();
+            return Long.compare(elementStartTime, (long) key);
         }
     };
 
-    public static Comparator<SessionEntry> CategoryComparator = new Comparator<SessionEntry>() {
+    public static Comparator<SessionEntry> ICompareCategoryNames = new Comparator<SessionEntry>() {
         @Override
         public int compare(SessionEntry sessionOne, SessionEntry sessionTwo) {
-            if (sessionOne.habit == null || sessionTwo.habit == null) {
-                throw new IllegalArgumentException("SessionEntry.CategoryComparator requires entries to have habit set.");
-            }
             return sessionOne.getCategoryName().compareTo(sessionTwo.getCategoryName());
         }
     };
 
-    public static Comparator<SessionEntry> Alphabetical = new Comparator<SessionEntry>() {
+    public static Comparator<SessionEntry> ICompareHabitNames = new Comparator<SessionEntry>() {
         @Override
         public int compare(SessionEntry sessionOne, SessionEntry sessionTwo) {
-            return sessionOne.habit.getName().compareTo(sessionTwo.habit.getName());
+            return sessionOne.mHabit.getName().compareTo(sessionTwo.mHabit.getName());
         }
     };
 
+    public static MyCollectionUtils.IGetKey<SessionEntry, Long> IGetSessionStartDate = new MyCollectionUtils.IGetKey<SessionEntry, Long>() {
+        @Override
+        public Long get(SessionEntry sessionEntry) {
+            return sessionEntry.getStartingTimeIgnoreTimeOfDay();
+        }
+    };
+
+    public static MyCollectionUtils.IGetKey<SessionEntry, Long> IGetSessionDuration = new MyCollectionUtils.IGetKey<SessionEntry, Long>() {
+        @Override
+        public Long get(SessionEntry sessionEntry) {
+            return sessionEntry.getDuration();
+        }
+    };
+    //endregion
+
+    //region Constructors {}
+    public SessionEntry(long startTime, long duration, @NonNull String note) {
+        this.mStartTime = startTime;
+        this.mDuration = duration;
+        this.mNote = note;
+    }
+
+    public static void copy(SessionEntry dest, SessionEntry source) {
+        dest.mStartTime = source.mStartTime;
+        dest.mDuration = source.mDuration;
+        dest.mNote = source.mNote;
+        dest.mDatabaseId = source.mDatabaseId;
+        dest.mIsPaused = source.mIsPaused;
+        dest.mLastTimePaused = source.mLastTimePaused;
+        dest.mTotalPauseTime = source.mTotalPauseTime;
+        dest.mHabitId = source.mHabitId;
+        dest.mHabit = source.mHabit;
+    }
+    //endregion
 
     @Override
     public boolean equals(Object obj) {
@@ -113,19 +106,19 @@ public class SessionEntry implements Serializable, Parcelable {
             return (compare.getHabitId() == this.getHabitId()) &&
                     String.valueOf(compare.getNote()).equals(String.valueOf(getNote())) &&
                     compare.getDuration() == getDuration() &&
-                    compare.getStartTime() == getStartTime();
+                    compare.getStartingTime() == getStartingTime();
         }
-        else {
-            return false;
-        }
+        else return false;
     }
 
+    @Override
     public String toString() {
         String format = "{\n\tStarting Time: %s,\n\tDuration: %s\n\tNote: %s\n}\n";
-        String startTimeString = getDate(getStartTime(), "MMMM/dd/yyyy");
+        String startTimeString = getDate(getStartingTime(), "MMMM/dd/yyyy");
         return String.format(Locale.US, format, startTimeString, getDurationAsString(), getNote());
     }
 
+    //region Static helper methods for formatting durations into readable strings
     public static String stringifyDuration(long duration) {
         int[] timeComponents = MyTimeUtils.getTimePortion(duration);
         int hours = timeComponents[0];
@@ -136,99 +129,39 @@ public class SessionEntry implements Serializable, Parcelable {
     }
 
     public String stringifyDuration() {
-        int[] timeComponents = MyTimeUtils.getTimePortion(this.mDuration);
-        int hours = timeComponents[0];
-        int minutes = timeComponents[1];
-        int seconds = timeComponents[2];
+        return stringifyDuration(getDuration());
+    }
+    //endregion
 
-        return String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds);
+    //region Methods responsible for setting fields in the timestamp
+    public void setStartingHour(int hour) {
+        mStartTime = MyTimeUtils.setTimestampField(getStartingTime(), Calendar.HOUR_OF_DAY, hour);
     }
 
-    public boolean isSameDayAs(SessionEntry entry) {
-        return entry.getStartingTimeDate() == getStartingTimeDate();
+    public void setStartingMinute(int minute) {
+        mStartTime = MyTimeUtils.setTimestampField(getStartingTime(), Calendar.MINUTE, minute);
     }
+    //endregion
 
-    public boolean isSameStartingTimeAs(SessionEntry entry) {
-        return entry.getStartTime() == getStartTime();
-    }
-
-    /**
-     * @param startTime a time in milliseconds for the time the session was started.
-     */
-    public void setStartTime(long startTime) {
-        this.mStartTime = startTime;
-    }
-
-    /**
-     * @return a time in milliseconds for the time the session was started.
-     */
-    public long getStartTime() {
-        return this.mStartTime;
-    }
-
-    public static MyCollectionUtils.KeyComparator ICompareStartTime = new MyCollectionUtils.KeyComparator() {
-        @Override
-        public int compare(Object element, Object key) {
-            long elementStartTime = ((SessionEntry)element).getStartTime();
-            return Long.compare(elementStartTime, (long)key);
-        }
-    };
-
-    public long getStartingTimeDate() {
-        Calendar c = Calendar.getInstance();
-
-        c.setTimeInMillis(getStartTime());
-
-        c.set(Calendar.AM_PM, 0);
-        c.set(Calendar.HOUR, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-
-        return c.getTimeInMillis();
-    }
-
-    public static MyCollectionUtils.IGetKey<SessionEntry, Long> IGetSessionStartDate = new MyCollectionUtils.IGetKey<SessionEntry, Long>() {
-        @Override
-        public Long get(SessionEntry sessionEntry) {
-            return sessionEntry.getStartingTimeDate();
-        }
-    };
-
-    public int getStartingTimeDayOfMonth() {
-        Calendar c = Calendar.getInstance();
-
-        c.setTimeInMillis(getStartTime());
-
-        return c.get(Calendar.DAY_OF_MONTH);
-    }
-
-    public int getStartingTimeMonth() {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(getStartTime());
-
-        return c.get(Calendar.MONTH);
-    }
-
-    public int getStartingTimeYear() {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(getStartTime());
-
-        return c.get(Calendar.YEAR);
+    //region Methods responsible for getting fields from the timestamp
+    public int getStartingTimeMinutes() {
+        return MyTimeUtils.getTimestampField(getStartingTime(), Calendar.MINUTE);
     }
 
     public int getStartingTimeHours() {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(getStartTime());
-
-        return c.get(Calendar.HOUR_OF_DAY);
+        return MyTimeUtils.getTimestampField(getStartingTime(), Calendar.HOUR_OF_DAY);
     }
 
-    public int getStartingTimeMinutes() {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(getStartTime());
+    public int getStartingTimeDayOfMonth() {
+        return MyTimeUtils.getTimestampField(getStartingTime(), Calendar.DAY_OF_MONTH);
+    }
 
-        return c.get(Calendar.MINUTE);
+    public int getStartingTimeMonth() {
+        return MyTimeUtils.getTimestampField(getStartingTime(), Calendar.MONTH);
+    }
+
+    public int getStartingTimeYear() {
+        return MyTimeUtils.getTimestampField(getStartingTime(), Calendar.YEAR);
     }
 
     /**
@@ -237,7 +170,7 @@ public class SessionEntry implements Serializable, Parcelable {
      */
     public long getStartingTimePortion() {
         Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(getStartTime());
+        c.setTimeInMillis(getStartingTime());
 
         long hours = c.get(Calendar.HOUR_OF_DAY) * DateUtils.HOUR_IN_MILLIS;
         long minutes = c.get(Calendar.MINUTE) * DateUtils.MINUTE_IN_MILLIS;
@@ -245,110 +178,94 @@ public class SessionEntry implements Serializable, Parcelable {
 
         return hours + minutes + seconds;
     }
+    //endregion
 
-    public int getDateOfEntry() {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(getStartTime());
-
-        return c.get(Calendar.DAY_OF_MONTH);
+    //region Setters {}
+    public void setStartingTime(long startTime) {
+        this.mStartTime = startTime;
     }
 
-    public void setStartingHour(int hour) {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(getStartTime());
-
-        c.set(Calendar.HOUR_OF_DAY, hour);
-
-        long time = c.getTimeInMillis();
-        setStartTime(time);
+    public SessionEntry setLastTimePaused(long milliseconds) {
+        mLastTimePaused = milliseconds;
+        return this;
     }
 
-    public void setStartingMinute(int minute) {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(getStartTime());
+    public SessionEntry setTotalPauseTime(long milliseconds) {
+        mTotalPauseTime = milliseconds;
+        return this;
+    }
 
-        c.set(Calendar.MINUTE, minute);
+    public SessionEntry setDuration(long duration) {
+        mDuration = duration;
+        return this;
+    }
 
-        long time = c.getTimeInMillis();
-        setStartTime(time);
+    public SessionEntry setNote(@NonNull String note) {
+        mNote = note;
+        return this;
+    }
+
+    public SessionEntry setDatabaseId(long databaseId) {
+        mDatabaseId = databaseId;
+        return this;
+    }
+
+    public SessionEntry setIsPaused(boolean isPaused) {
+        mIsPaused = isPaused;
+        return this;
+    }
+
+    public SessionEntry setHabit(Habit habit) {
+        this.mHabit = habit;
+        setHabitId(habit.getDatabaseId());
+        return this;
+    }
+
+    public SessionEntry setHabitId(long habitId) {
+        this.mHabitId = habitId;
+        return this;
+    }
+    //endregion
+
+    //region Getters {}
+    public long getStartingTime() {
+        return this.mStartTime;
+    }
+
+    public long getStartingTimeIgnoreTimeOfDay() {
+        return MyTimeUtils.setTimePortion(getStartingTime(), false, 0, 0, 0, 0);
+    }
+
+    public String getStartTimeAsString(String dateFormat) {
+        return MyTimeUtils.stringifyTimestamp(getStartingTime(), dateFormat);
     }
 
     public long getLastTimePaused() {
-        return lastTimePaused;
-    }
-
-    public void setLastTimePaused(long milliseconds) {
-        lastTimePaused = milliseconds;
+        return mLastTimePaused;
     }
 
     public long getTotalPauseTime() {
-        return totalPauseTime;
-    }
-
-    public void setTotalPauseTime(long milliseconds) {
-        totalPauseTime = milliseconds;
+        return mTotalPauseTime;
     }
 
     public long getHabitId() {
-        return habitId;
+        return mHabitId;
     }
 
-    public static MyCollectionUtils.IGetKey<SessionEntry, Long> IGetSessionDuration = new MyCollectionUtils.IGetKey<SessionEntry, Long>() {
-        @Override
-        public Long get(SessionEntry sessionEntry) {
-            return sessionEntry.getDuration();
-        }
-    };
-
-    /**
-     * @param duration a time in milliseconds for the getDatabaseLength of the session.
-     */
-    public void setDuration(long duration) {
-        this.mDuration = duration;
+    public String getNote() {
+        return this.mNote;
     }
 
-    /**
-     * @return a time in milliseconds for the getDatabaseLength of the session.
-     */
     public long getDuration() {
         return this.mDuration;
     }
 
-    /**
-     * @param note an optional note to be associated with the session.
-     */
-    public void setNote(@NonNull String note) {
-        this.note = note;
-    }
-
-    /**
-     * @return Get the note for this entry, this can potentially be a null value.
-     */
-    @NonNull
-    public String getNote() {
-        return this.note;
-    }
-
-    /**
-     * @param databaseId The row id of the entry object in the database
-     */
-    public void setDatabaseId(long databaseId) {
-        this.databaseId = databaseId;
-    }
-
-    /**
-     * @return The row id of the entry object in the database
-     */
     public long getDatabaseId() {
-        return databaseId;
+        return mDatabaseId;
     }
 
     public String getCategoryName() {
-        return this.habit.getCategory().getName();
-    }
-
-    public void setIsPaused(boolean isPaused) {
-        this.mIsPaused = isPaused;
+        return this.mHabit.getCategory().getName();
     }
 
     public boolean getIsPaused() {
@@ -359,20 +276,9 @@ public class SessionEntry implements Serializable, Parcelable {
         return stringifyDuration(getDuration());
     }
 
-    public String getStartTimeAsString(String dateFormat) {
-        return MyTimeUtils.stringifyTimestamp(getStartTime(), dateFormat);
-    }
-
     public Habit getHabit() {
-        return habit;
+        return mHabit;
     }
+    //endregion
 
-    public void setHabit(Habit habit) {
-        this.habit = habit;
-        setHabitId(habit.getDatabaseId());
-    }
-
-    public void setHabitId(long habitId) {
-        this.habitId = habitId;
-    }
 }

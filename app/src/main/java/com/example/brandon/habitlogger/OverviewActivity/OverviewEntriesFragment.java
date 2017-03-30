@@ -91,7 +91,7 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
             @Override
             public long getGroupId(int position) {
                 if(position >= 0 && position < sessionEntries.size()) {
-                    return sessionEntries.get(position).getStartingTimeDate();
+                    return sessionEntries.get(position).getStartingTimeIgnoreTimeOfDay();
                 } else{
                     return -1;
                 }
@@ -166,7 +166,7 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
     public void updateSessionEntryById(long databaseId, SessionEntry oldEntry, SessionEntry newEntry){
         int index = getSessionEntryIndex(databaseId);
         if (index != sessionEntries.size()) {
-            if (oldEntry.isSameStartingTimeAs(newEntry)) {
+            if (oldEntry.getStartingTime() == newEntry.getStartingTime()) {
                 sessionEntries.set(index, newEntry);
                 entryAdapter.notifyItemChanged(index);
             }
@@ -185,13 +185,13 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
         if (sessionEntries.size() <= 1)
             return 0;
 
-        if (newEntry.getStartTime() < sessionEntries.get(0).getStartTime())
+        if (newEntry.getStartingTime() < sessionEntries.get(0).getStartingTime())
             return 0;
 
         for (int i = sessionEntries.size()-1; i >= 0; i--) {
             SessionEntry entry = sessionEntries.get(i);
 
-            if (newEntry.getStartTime() > entry.getStartTime()) {
+            if (newEntry.getStartingTime() > entry.getStartingTime()) {
                 return i + 1;
             }
         }

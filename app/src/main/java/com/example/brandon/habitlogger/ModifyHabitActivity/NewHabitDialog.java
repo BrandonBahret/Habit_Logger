@@ -48,8 +48,9 @@ public class NewHabitDialog extends DialogFragment implements DialogInterface.On
         return dialog;
     }
 
-    public Habit getWorkingHabit(){
-        return new Habit(getContext());
+    public Habit getWorkingHabit() {
+        HabitCategory category = new HabitCategory("#ff000000", getString(R.string.uncategorized));
+        return new Habit("", category);
     }
 
     @NonNull
@@ -82,7 +83,7 @@ public class NewHabitDialog extends DialogFragment implements DialogInterface.On
     }
 
 
-    public void onBeforeSetView(){
+    public void onBeforeSetView() {
         // Empty stub
     }
 

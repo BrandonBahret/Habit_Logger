@@ -65,8 +65,8 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
 
         sessionEntries = sessionManager.getActiveSessionList();
 
-        Collections.sort(sessionEntries, SessionEntry.Alphabetical);
-        Collections.sort(sessionEntries, SessionEntry.CategoryComparator);
+        Collections.sort(sessionEntries, SessionEntry.ICompareHabitNames);
+        Collections.sort(sessionEntries, SessionEntry.ICompareCategoryNames);
 
         sessionViewAdapter = new ActiveSessionViewAdapter(sessionEntries, this, this);
 
@@ -256,8 +256,8 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
 
                                 sessionEntriesUndoStack.clear();
 
-//                                Collections.sort(sessionEntries, SessionEntry.Alphabetical);
-//                                Collections.sort(sessionEntries, SessionEntry.CategoryComparator);
+//                                Collections.sort(sessionEntries, SessionEntry.ICompareHabitNames);
+//                                Collections.sort(sessionEntries, SessionEntry.ICompareCategoryNames);
 //                                sessionViewAdapter.notifyDataSetChanged();
                             }
                         })

@@ -16,6 +16,7 @@ import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.CategoriesTa
 import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.DatabaseSchema;
 import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.EntriesTableSchema;
 import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.HabitsTableSchema;
+import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.HabitDataSample;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
@@ -330,7 +331,7 @@ public class HabitDatabase {
 
         cursor.close();
 
-        categories.add(0, HabitCategory.getUncategorizedCategory(mContext));
+        categories.add(0, new HabitCategory("#ff000000", mContext.getString(R.string.uncategorized)));
 
         return categories;
     }
@@ -409,7 +410,7 @@ public class HabitDatabase {
 
     private void bindValuesForEntryObject(SQLiteStatement insert, SessionEntry entry, long habitId) {
         insert.bindLong(1, habitId);
-        insert.bindLong(2, entry.getStartTime());
+        insert.bindLong(2, entry.getStartingTime());
         insert.bindLong(3, entry.getDuration());
         insert.bindString(4, entry.getNote());
     }
@@ -431,7 +432,7 @@ public class HabitDatabase {
         return id;
     }
 
-    public void addEntries(long habitId, @NonNull SessionEntry entries[]) {
+    public void addEntries(long habitId, @NonNull List<SessionEntry> entries) {
 
         SQLiteStatement insert = getEntryInsertStatement();
         writableDatabase.beginTransaction();
@@ -468,7 +469,7 @@ public class HabitDatabase {
         String whereClause = EntriesTableSchema.ENTRY_START_TIME + " =? AND " +
                 EntriesTableSchema.ENTRY_DURATION + " =? AND " +
                 EntriesTableSchema.ENTRY_NOTE + "=?";
-        String selectionArgs[] = new String[]{String.valueOf(entry.getStartTime()),
+        String selectionArgs[] = new String[]{String.valueOf(entry.getStartingTime()),
                 String.valueOf(entry.getDuration()), entry.getNote()};
 
         long rowId = getRowIdByIndex(0, EntriesTableSchema.TABLE_NAME, EntriesTableSchema.ENTRY_ID,
@@ -557,7 +558,7 @@ public class HabitDatabase {
             entries.add(getEntry(id));
         }
 
-        Collections.sort(entries, SessionEntry.StartingTimeComparator);
+        Collections.sort(entries, SessionEntry.ICompareStartingTimes);
 
         return entries;
     }
@@ -637,7 +638,7 @@ public class HabitDatabase {
             entries.add(i, getEntry(getEntryId(habitId, i)));
         }
 
-        Collections.sort(entries, SessionEntry.StartingTimeComparator);
+        Collections.sort(entries, SessionEntry.ICompareStartingTimes);
 
         return entries;
     }
@@ -699,7 +700,7 @@ public class HabitDatabase {
         SessionEntry oldEntry = getEntry(entryId);
 
         if (oldEntry != null) {
-            updateEntryStartTime(entryId, newEntry.getStartTime());
+            updateEntryStartTime(entryId, newEntry.getStartingTime());
             updateEntryDuration(entryId, newEntry.getDuration());
             updateEntryNote(entryId, newEntry.getNote());
 
@@ -790,10 +791,9 @@ public class HabitDatabase {
         insert.close();
 
         // Add entries to the new habit
-        SessionEntry entries[] = habit.getEntries();
-        if (entries != null) {
+        List<SessionEntry> entries = habit.getEntries();
+        if (entries != null)
             addEntries(habitId, entries);
-        }
 
         return habitId;
     }

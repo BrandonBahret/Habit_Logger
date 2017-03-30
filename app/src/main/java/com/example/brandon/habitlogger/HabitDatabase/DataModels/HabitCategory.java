@@ -1,10 +1,9 @@
 package com.example.brandon.habitlogger.HabitDatabase.DataModels;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 
-import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.MyColorUtils;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -16,28 +15,25 @@ import java.util.Locale;
  */
 
 public class HabitCategory implements Serializable {
-    @NonNull private String color = "";
-    @NonNull private String name = "";
 
-    private long databaseId = -1;
+    //region (Member attributes)
+    @NonNull private String mColor = "#ff000000";
+    @NonNull private String mName = "NAME_NOT_SET";
 
-    /**
-     * @param color A color in hexadecimal format. Ex: "#ffffff"
-     * @param name  The name of the category
-     */
+    private long mDatabaseId = -1;
+    //endregion
+
+    //region Constructors {}
     public HabitCategory(@NonNull String color, @NonNull String name) {
-        this.color = color;
-        this.name = name;
+        this.mColor = color;
+        this.mName = name;
     }
 
-    /**
-     * @param color A color represented by an int
-     * @param name  The name of the category
-     */
     public HabitCategory(int color, @NonNull String name) {
-        this.color = "#" + Integer.toHexString(color);
-        this.name = name;
+        this.mColor = MyColorUtils.stringifyColor(color);
+        this.mName = name;
     }
+    //endregion
 
     @Override
     public boolean equals(Object obj) {
@@ -46,81 +42,61 @@ public class HabitCategory implements Serializable {
             return compare.getName().equals(getName()) &&
                     compare.getColor().equals(getColor());
         }
-        else {
-            return false;
-        }
+        else return false;
     }
 
+    @Override
     public String toString() {
         String format = "%s {\n\tColor: %s\n}\n";
         return String.format(Locale.US, format, getName(), getColor());
     }
 
-    /**
-     * @param color A color in hexadecimal form Ex: "#ffffff"
-     */
-    public void setColor(@NonNull String color) {
-        this.color = color;
-    }
-
-    public void setColor(int color) {
-        setColor("#" + Integer.toHexString(color));
-    }
-
-    /**
-     * @return A color in hexadecimal form Ex: "#ffffff"
-     */
-    @NonNull
-    public String getColor() {
-        return this.color;
-    }
-
-    /**
-     * @return A color stored as an int
-     */
-    public int getColorAsInt() {
-        return Color.parseColor(getColor());
-    }
-
-    public static int darkenColor(int color, float scale) {
-        int r = Color.red(color);
-        int b = Color.blue(color);
-        int g = Color.green(color);
-
-        return Color.rgb((int) (r * scale), (int) (g * scale), (int) (b * scale));
-    }
-
-    /**
-     * @param name The name of the category
-     */
-    public void setName(@NonNull String name) {
-        this.name = name;
-    }
-
-    /**
-     * @return The name of the category
-     */
-    @NonNull
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * @param databaseId The row id of the category in the database, -1 if not available.
-     */
-    public HabitCategory setDatabaseId(long databaseId) {
-        this.databaseId = databaseId;
+    //region Setters {}
+    public HabitCategory setColor(@NonNull String color) {
+        this.mColor = color;
         return this;
     }
 
-    /**
-     * @return The row id of the category in the database, -1 if not available.
-     */
-    public long getDatabaseId() {
-        return databaseId;
+    public HabitCategory setColor(int color) {
+        setColor(MyColorUtils.stringifyColor(color));
+        return this;
     }
 
-    public static HabitCategory getUncategorizedCategory(Context context) {
-        return new HabitCategory("#ff000000", context.getString(R.string.uncategorized));
+    public HabitCategory setName(@NonNull String name) {
+        this.mName = name;
+        return this;
     }
+
+    public HabitCategory setDatabaseId(long databaseId) {
+        this.mDatabaseId = databaseId;
+        return this;
+    }
+    //endregion
+
+    //region Getters {}
+    @NonNull
+    public String getColor() {
+        return mColor;
+    }
+
+    public int getColorAsInt() {
+        int result = 0xFFCCCCCC;
+        try {
+            result = Color.parseColor(getColor());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    @NonNull
+    public String getName() {
+        return mName;
+    }
+
+    public long getDatabaseId() {
+        return mDatabaseId;
+    }
+    //endregion
 }

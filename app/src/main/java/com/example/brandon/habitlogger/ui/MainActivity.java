@@ -849,12 +849,12 @@ public class MainActivity extends AppCompatActivity
             habitAdapter = new HabitViewAdapter(habitList, this, menuItemClickListener, buttonClickListener);
 
             if (habitDisplayMode == ONLY_ARCHIVED_HABITS)
-                MyCollectionUtils.filter(habitList, Habit.FilterOutNonArchivedHabits);
+                MyCollectionUtils.filter(habitList, Habit.ICheckIfIsNotArchived);
 
             else if (habitDisplayMode == NO_ARCHIVED_HABITS)
-                MyCollectionUtils.filter(habitList, Habit.FilterOutArchivedHabits);
+                MyCollectionUtils.filter(habitList, Habit.ICheckIfIsArchived);
 
-            Collections.sort(habitList, Habit.CategoryNameComparator);
+            Collections.sort(habitList, Habit.ICompareCategoryName);
 
             habitCardContainer.setAdapter(habitAdapter);
         }

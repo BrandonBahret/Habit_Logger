@@ -33,7 +33,7 @@ public class HabitDataSample {
         for (CategoryDataSample categoryDataSample : mData)
             entries.addAll(categoryDataSample.buildSessionEntriesList());
 
-        Collections.sort(entries, SessionEntry.StartingTimeComparator);
+        Collections.sort(entries, SessionEntry.ICompareStartingTimes);
 
         return new SessionEntriesSample(entries, mDateFrom, mDateTo);
     }

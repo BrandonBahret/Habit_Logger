@@ -232,10 +232,10 @@ public class FloatingDateRangeWidgetManager {
 
     public void updateMinMaxTimestamps(List<SessionEntry> sessionEntries) {
         if (sessionEntries != null && !sessionEntries.isEmpty()) {
-            this.minimumTime = Collections.min(sessionEntries, SessionEntry.StartingTimeComparator).getStartTime();
+            this.minimumTime = Collections.min(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
             this.minimumTime = MyTimeUtils.setTimePortion(this.minimumTime, true, 0, 0, 0, 0);
 
-            this.maximumTime = Collections.max(sessionEntries, SessionEntry.StartingTimeComparator).getStartTime();
+            this.maximumTime = Collections.max(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
             this.maximumTime = MyTimeUtils.setTimePortion(this.minimumTime, false, 11, 59, 59, 999);
         }
         else {
@@ -245,12 +245,12 @@ public class FloatingDateRangeWidgetManager {
     }
 
     public void entryChanged(SessionEntry oldEntry, SessionEntry newEntry) {
-        if (newEntry.getStartTime() > maximumTime) {
-            this.maximumTime = MyTimeUtils.setTimePortion(newEntry.getStartTime(), false, 11, 59, 59, 999);
+        if (newEntry.getStartingTime() > maximumTime) {
+            this.maximumTime = MyTimeUtils.setTimePortion(newEntry.getStartingTime(), false, 11, 59, 59, 999);
             refreshDateRange(false);
         }
-        else if (newEntry.getStartTime() < minimumTime) {
-            this.minimumTime = MyTimeUtils.setTimePortion(newEntry.getStartTime(), true, 0, 0, 0, 0);
+        else if (newEntry.getStartingTime() < minimumTime) {
+            this.minimumTime = MyTimeUtils.setTimePortion(newEntry.getStartingTime(), true, 0, 0, 0, 0);
             refreshDateRange(false);
         }
     }
