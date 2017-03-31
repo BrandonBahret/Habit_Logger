@@ -19,6 +19,7 @@ import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.HabitViewHolder;
+import com.example.brandon.habitlogger.common.ConfirmationDialog;
 import com.example.brandon.habitlogger.common.MyColorUtils;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.databinding.ActivitySessionBinding;
@@ -321,12 +322,12 @@ public class SessionActivity extends AppCompatActivity implements
                 mSessionManager.setPauseState(habitId, true);
         }
 
-        mConfirmationDialog = new AlertDialog.Builder(this)
+        mConfirmationDialog = new ConfirmationDialog(this)
                 .setIcon(iconRes)
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("Yes", onYesMethod)
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                .setOnYesClickListener(onYesMethod)
+                .setOnNoClickListener(new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mDialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, false);
@@ -344,7 +345,8 @@ public class SessionActivity extends AppCompatActivity implements
                             mSessionManager.setPauseState(mHabit.getDatabaseId(), initialPauseState);
                     }
                 })
-                .show();
+                .show()
+                .create();
 
         mDialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, true);
     }
