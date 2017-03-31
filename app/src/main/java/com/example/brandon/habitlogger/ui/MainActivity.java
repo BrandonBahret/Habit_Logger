@@ -443,7 +443,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void applySpaceItemDecorator() {
-        int sessionCount = (int) sessionManager.getSessionCount();
+        int sessionCount = (int) sessionManager.getNumberOfActiveSessions();
         boolean useLargeOffset =
                 (preferenceChecker.doShowCurrentSessions() && sessionCount > 0) ||
                         (sessionCount >= 0 && preferenceChecker.doAlwaysShowCurrentSessions() && preferenceChecker.doShowCurrentSessions());
@@ -728,7 +728,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startActiveSessionsActivity() {
-        long count = sessionManager.getSessionCount();
+        long count = sessionManager.getNumberOfActiveSessions();
         if (count != 0) {
             Intent startTargetActivity = new Intent(this, ActiveSessionsActivity.class);
             startActivity(startTargetActivity);
@@ -812,7 +812,7 @@ public class MainActivity extends AppCompatActivity
 
 
 //        currentSession.setAlpha(count == 0 ? 0.5f : 1.0f);
-        int sessionCount = (int) sessionManager.getSessionCount();
+        int sessionCount = (int) sessionManager.getNumberOfActiveSessions();
         CurrentSessionsCardViewHolder cardViewHolder = new CurrentSessionsCardViewHolder(currentSession);
         cardViewHolder.updateColor(sessionCount);
 

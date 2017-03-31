@@ -36,10 +36,10 @@ public class EntriesTableSchema {
         return "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
 
-    public static MyDatabaseUtils.GetRecordFromCursor<? extends SessionEntry> IGetFromCursor =
-            new MyDatabaseUtils.GetRecordFromCursor<SessionEntry>() {
+    public static MyDatabaseUtils.GetRecordFromContentValues<? extends SessionEntry> IGetFromContentValues =
+            new MyDatabaseUtils.GetRecordFromContentValues<SessionEntry>() {
                 @Override
-                public SessionEntry getRecordFromCursor(ContentValues contentValues) {
+                public SessionEntry getRecordFromContentValues(ContentValues contentValues) {
                     return getObjectFromContentValues(contentValues);
                 }
             };

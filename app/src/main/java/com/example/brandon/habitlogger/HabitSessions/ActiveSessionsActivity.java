@@ -107,7 +107,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
 
-        if (mSessionManager.getSessionCount() == 0)
+        if (mSessionManager.getNumberOfActiveSessions() == 0)
             finish();
 
         startRepeatingTask();
@@ -228,7 +228,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
                             public void onDismissed(Snackbar transientBottomBar, int event) {
                                 super.onDismissed(transientBottomBar, event);
 
-                                if (mSessionManager.getSessionCount() == 0)
+                                if (mSessionManager.getNumberOfActiveSessions() == 0)
                                     finish();
 
                                 if (event != DISMISS_EVENT_CONSECUTIVE)

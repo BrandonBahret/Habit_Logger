@@ -19,8 +19,8 @@ public class MyDatabaseUtils {
         int setAttribute(long recordId, String columnKey, Object object);
     }
 
-    public interface GetRecordFromCursor<Out> {
-        Out getRecordFromCursor(ContentValues cursor);
+    public interface GetRecordFromContentValues<Out> {
+        Out getRecordFromContentValues(ContentValues cursor);
     }
 
     //region Methods to count records
@@ -48,7 +48,7 @@ public class MyDatabaseUtils {
     @Nullable
     public static <Out> Out getRecord(SQLiteDatabase readableDatabase, String tableName,
                                       String recordKey, long recordId,
-                                      GetRecordFromCursor<Out> recordGetter) {
+                                      GetRecordFromContentValues<Out> recordGetter) {
 
         Cursor c = readableDatabase.query(
                 tableName, null, recordKey + "=?",
@@ -59,7 +59,7 @@ public class MyDatabaseUtils {
         if (c != null && c.moveToFirst()) {
             ContentValues contentValues = new ContentValues(c.getColumnCount());
             DatabaseUtils.cursorRowToContentValues(c, contentValues);
-            Out result = recordGetter.getRecordFromCursor(contentValues);
+            Out result = recordGetter.getRecordFromContentValues(contentValues);
             c.close();
             return result;
         }

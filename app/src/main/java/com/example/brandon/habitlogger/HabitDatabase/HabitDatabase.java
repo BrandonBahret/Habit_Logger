@@ -143,7 +143,6 @@ public class HabitDatabase {
     //endregion
 
     //region Methods responsible for fetching record ids
-
     /**
      * @param index         The index of the record to be looked up.
      * @param tableName     The table name of the table to search.
@@ -786,7 +785,7 @@ public class HabitDatabase {
     public SessionEntry getEntry(long entryId) {
         return MyDatabaseUtils.getRecord(
                 mReadableDatabase, EntriesTableSchema.TABLE_NAME,
-                EntriesTableSchema.ENTRY_ID, entryId, EntriesTableSchema.IGetFromCursor
+                EntriesTableSchema.ENTRY_ID, entryId, EntriesTableSchema.IGetFromContentValues
         );
     }
 

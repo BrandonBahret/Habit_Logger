@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteStatement;
 import android.text.format.DateUtils;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
@@ -25,11 +24,14 @@ import java.util.List;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
-    DatabaseSchema databaseHelper;
-    private SQLiteDatabase writableDatabase;
-    private SQLiteDatabase readableDatabase;
 
-    //region // Provide interface methods
+    //region (Member attributes)
+    public DatabaseSchema databaseHelper;
+    private SQLiteDatabase mWritableDatabase;
+    private SQLiteDatabase mReadableDatabase;
+    //endregion
+
+    //region Code responsible for providing an interface to the database
     private static ArrayList<SessionChangeListeners> sessionChangeListeners = new ArrayList<>();
 
     public interface SessionChangeListeners {
@@ -53,70 +55,13 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
 
     public SessionManager(Context context) {
         databaseHelper = new DatabaseSchema(context);
-        writableDatabase = databaseHelper.getWritableDatabase();
-        readableDatabase = databaseHelper.getReadableDatabase();
+        mWritableDatabase = databaseHelper.getWritableDatabase();
+        mReadableDatabase = databaseHelper.getReadableDatabase();
     }
 
-    public long insertSession(SessionEntry entry) {
-        // Get insert statement
-        final String insertStatement = SessionsTableSchema.getInsertStatement();
-        SQLiteStatement insert = writableDatabase.compileStatement(insertStatement);
+    //region [ ---- Methods responsible for managing active sessions ---- ]
 
-        // Bind object values to the statement
-        SessionsTableSchema.bindObjectToStatement(insert, entry);
-        long result = insert.executeInsert();
-        insert.close();
-
-        long habitId = entry.getHabit().getDatabaseId();
-        for (SessionChangeListeners listener : sessionChangeListeners) {
-            listener.onSessionStarted(habitId);
-        }
-
-        return result;
-    }
-
-    private long deleteSession(long habitId) {
-
-        return writableDatabase.delete(
-                SessionsTableSchema.TABLE_NAME,
-                SessionsTableSchema.HABIT_ID + " =?",
-                new String[]{String.valueOf(habitId)}
-        );
-    }
-
-    /**
-     * @param habit the habit to start a session for.
-     * @return the row ID of the last row inserted, if this insert is successful. -1 otherwise.
-     */
-    public long startSession(Habit habit) {
-        SessionEntry entry = new SessionEntry(System.currentTimeMillis(), 0, "");
-        entry.setHabit(habit);
-
-        return insertSession(entry);
-    }
-
-    /**
-     * @param habitId The id of the habit for the session.
-     * @return the number of rows affected if a whereClause is passed in, 0 otherwise.
-     */
-    public long cancelSession(long habitId) {
-        if (sessionChangeListeners != null) {
-            for (SessionChangeListeners listener : sessionChangeListeners) {
-                listener.beforeSessionEnded(habitId, true);
-            }
-        }
-
-        long res = deleteSession(habitId);
-
-        if (sessionChangeListeners != null) {
-            for (SessionChangeListeners listener : sessionChangeListeners) {
-                listener.afterSessionEnded(habitId, true);
-            }
-        }
-
-        return res;
-    }
-
+    //region Methods responsible for calculating elapsed time
     public long calculateElapsedTimeForEntry(long habitId) {
         SessionEntry entry = getSession(habitId);
         return calculateElapsedTimeForEntry(entry);
@@ -128,7 +73,7 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         long duration = (currentTime - startingTime) - entry.getTotalPauseTime();
 
         if (entry.getIsPaused()) {
-            // If we're paused then also subtract the time since we last paused.
+            // If we're paused then also subtract the amount of time since we last paused.
             long lastPaused = entry.getLastTimePaused();
             long pausedTime = currentTime - lastPaused;
             duration -= pausedTime;
@@ -136,60 +81,50 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
 
         return duration;
     }
+    //endregion -- end --
 
-    /**
-     * Pause a session
-     *
-     * @param habitId The id of the habit for the session.
-     */
-    private void pauseSession(long habitId) {
-        setIsPaused(habitId, true);
-        setLastPauseTime(habitId, System.currentTimeMillis());
-        setDuration(habitId, calculateElapsedTimeForEntry(habitId));
+    //region Methods responsible for managing pause state
+    public void setPauseState(long habitId, boolean pause) {
+        if (pause) pauseSession(habitId);
+        else playSession(habitId);
+
+        if (sessionChangeListeners != null) {
+            for (SessionChangeListeners listener : sessionChangeListeners)
+                listener.onSessionPauseStateChanged(habitId, pause);
+        }
     }
 
-    /**
-     * Un-pause a session
-     *
-     * @param habitId The id of the habit for the session.
-     */
+    private void pauseSession(long habitId) {
+        setLastPauseTime(habitId, System.currentTimeMillis());
+        setDuration(habitId, calculateElapsedTimeForEntry(habitId));
+        setIsPaused(habitId, true);
+    }
+
     private void playSession(long habitId) {
         long lastPauseTime = getLastPauseTime(habitId);
         long pauseTimeDelta = System.currentTimeMillis() - lastPauseTime;
-
         long totalPauseTime = getTotalPauseTime(habitId) + pauseTimeDelta;
+
         setTotalPauseTime(habitId, totalPauseTime);
         setIsPaused(habitId, false);
     }
+    //endregion -- end --
 
-    public void setPauseState(long habitId, boolean pause) {
-        if (pause)
-            pauseSession(habitId);
-        else
-            playSession(habitId);
+    //region Methods responsible for starting and ending sessions
+    public long startSession(Habit habit) {
+        SessionEntry entry = new SessionEntry(System.currentTimeMillis(), 0, "");
+        entry.setHabit(habit);
 
-        if (sessionChangeListeners != null) {
-            for (SessionChangeListeners listener : sessionChangeListeners) {
-                listener.onSessionPauseStateChanged(habitId, pause);
-            }
-        }
+        return insertSession(entry);
     }
 
-    /**
-     * End an active session.
-     *
-     * @param habitId The id of the habit for the session.
-     * @return the entry created from the session.
-     */
     public SessionEntry finishSession(long habitId) {
-        if (getIsPaused(habitId)) {
+        if (getIsPaused(habitId))
             setPauseState(habitId, false);
-        }
 
         if (sessionChangeListeners != null) {
-            for (SessionChangeListeners listener : sessionChangeListeners) {
+            for (SessionChangeListeners listener : sessionChangeListeners)
                 listener.beforeSessionEnded(habitId, false);
-            }
         }
 
         SessionEntry entry = getSession(habitId);
@@ -199,84 +134,117 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         return entry;
     }
 
+    public long cancelSession(long habitId) {
+        if (sessionChangeListeners != null) {
+            for (SessionChangeListeners listener : sessionChangeListeners)
+                listener.beforeSessionEnded(habitId, true);
+        }
+
+        long res = deleteSession(habitId);
+
+        if (sessionChangeListeners != null) {
+            for (SessionChangeListeners listener : sessionChangeListeners)
+                listener.afterSessionEnded(habitId, true);
+        }
+
+        return res;
+    }
+    //endregion -- end --
+
+    //endregion [ ---------------- end ---------------- ]
+
+    //region [ ---- Methods responsible for manipulating the database ---- ]
+
+    public long getNumberOfActiveSessions() {
+        return DatabaseUtils.queryNumEntries(mReadableDatabase, SessionsTableSchema.TABLE_NAME);
+    }
+
     public List<SessionEntry> queryActiveSessionList(String query) {
         List<SessionEntry> sessions = new ArrayList<>();
 
-        if (query.isEmpty()) { // If the query is an empty string return null;
-            return sessions;
-        }
+        if (!query.isEmpty()) {
+            Cursor c = mReadableDatabase.rawQuery(
+                    SessionsTableSchema.getSearchByNameStatement(query), null
+            );
 
-        Cursor c = readableDatabase.rawQuery(
-                SessionsTableSchema.getSearchRecordsByHabitOrCategoryNameStatement(query), null
-        );
-
-        if (c.moveToFirst()) {
-            sessions = new ArrayList<>(c.getCount());
-            do sessions.add(getSessionEntryFromCursor(c)); while (c.moveToNext());
+            sessions = fetchEntriesAtCursor(c);
         }
-        c.close();
 
         return sessions;
     }
 
-    public long getSessionCount() {
-        return DatabaseUtils.queryNumEntries(readableDatabase, SessionsTableSchema.TABLE_NAME);
-    }
+    //region [ -- CRUD records -- ]
 
-    /**
-     * @param habitId The id of the habit for the session.
-     * @return Session entry
-     */
-    public SessionEntry getSession(long habitId) {
-        Cursor cursor = readableDatabase.query(
-                SessionsTableSchema.TABLE_NAME,
-                null,
-                SessionsTableSchema.HABIT_ID + " =?",
-                new String[]{String.valueOf(habitId)},
-                null, null, null
+    public long insertSession(SessionEntry entry) {
+        long recordId = mWritableDatabase.insert(
+                SessionsTableSchema.TABLE_NAME, null,
+                SessionsTableSchema.getContentValuesFromObject(entry)
         );
 
-        cursor.moveToFirst();
-        SessionEntry entry = getSessionEntryFromCursor(cursor);
-        cursor.close();
+        long habitId = entry.getHabit().getDatabaseId();
+        for (SessionChangeListeners listener : sessionChangeListeners)
+            listener.onSessionStarted(habitId);
 
-        return entry;
+        return recordId;
     }
 
-    public List<SessionEntry> getActiveSessionList() {
-        Cursor cursor = readableDatabase.query(
-                SessionsTableSchema.TABLE_NAME,
-                null, null, null, null, null, null
-        );
-
-        List<SessionEntry> sessions = new ArrayList<>(cursor.getCount());
-
-        if (cursor.moveToFirst()) {
-            // Load all the entries in the database into the ArrayList.
-            do sessions.add(getSessionEntryFromCursor(cursor)); while (cursor.moveToNext());
-
-            // Sort the entries by Category Name
-            Collections.sort(sessions, SessionEntry.ICompareCategoryNames);
-        }
-        cursor.close();
-
-        return sessions;
-    }
-
-    //region // Getters
-    @Override
-    public <Type> Type getAttribute(long habitId, String columnKey, Class<Type> clazz) {
-        return MyDatabaseUtils.getAttribute(
-                readableDatabase, SessionsTableSchema.TABLE_NAME, SessionsTableSchema.HABIT_ID,
-                habitId, columnKey, clazz
-        );
-    }
-
+    //region Read records
     private SessionEntry getSessionEntryFromCursor(Cursor cursor) {
         ContentValues contentValues = new ContentValues(cursor.getCount());
         DatabaseUtils.cursorRowToContentValues(cursor, contentValues);
 
-        return SessionsTableSchema.objectFromContentValues(contentValues);
+        return SessionsTableSchema.getObjectFromContentValues(contentValues);
+    }
+
+    public SessionEntry getSession(long habitId) {
+        return MyDatabaseUtils.getRecord(
+                mReadableDatabase, SessionsTableSchema.TABLE_NAME,
+                SessionsTableSchema.HABIT_ID, habitId, SessionsTableSchema.IGetFromContentValues);
+    }
+
+    public List<SessionEntry> getActiveSessionList() {
+        Cursor cursor = mReadableDatabase.query(
+                SessionsTableSchema.TABLE_NAME,
+                null, null, null, null, null, null
+        );
+
+        return fetchEntriesAtCursor(cursor);
+    }
+
+    private List<SessionEntry> fetchEntriesAtCursor(Cursor cursor) {
+        if (cursor.moveToFirst()) {
+            List<SessionEntry> resultList = new ArrayList<>(cursor.getCount());
+
+            // Load all the entries in the database into the ArrayList.
+            do resultList.add(getSessionEntryFromCursor(cursor)); while (cursor.moveToNext());
+
+            // Sort the entries by Category Name
+            Collections.sort(resultList, SessionEntry.ICompareCategoryNames);
+            cursor.close();
+
+            return resultList;
+        }
+
+        return new ArrayList<>();
+    }
+    //endregion -- end --
+
+    private long deleteSession(long habitId) {
+        return MyDatabaseUtils.deleteRecord(
+                mWritableDatabase, SessionsTableSchema.TABLE_NAME,
+                SessionsTableSchema.HABIT_ID, habitId
+        );
+    }
+
+    //endregion [ -- end -- ]
+
+    //region Get attributes
+    @Override
+    public <Type> Type getAttribute(long habitId, String columnKey, Class<Type> clazz) {
+        return MyDatabaseUtils.getAttribute(
+                mReadableDatabase, SessionsTableSchema.TABLE_NAME, SessionsTableSchema.HABIT_ID,
+                habitId, columnKey, clazz
+        );
     }
 
     public long getDuration(long habitId) {
@@ -292,7 +260,7 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
     }
 
     public String getCategoryName(long habitId) {
-        return getAttribute(habitId, SessionsTableSchema.HABIT_CATEGORY, String.class);
+        return getAttribute(habitId, SessionsTableSchema.HABIT_CATEGORY_NAME, String.class);
     }
 
     public boolean getIsSessionActive(long habitId) {
@@ -316,11 +284,11 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
     }
     //endregion
 
-    //region // Setters
+    //region Set attributes
     @Override
     public int setAttribute(long habitId, String columnKey, Object object) {
         return MyDatabaseUtils.setAttribute(
-                writableDatabase, SessionsTableSchema.TABLE_NAME, SessionsTableSchema.HABIT_ID,
+                mWritableDatabase, SessionsTableSchema.TABLE_NAME, SessionsTableSchema.HABIT_ID,
                 habitId, columnKey, object
         );
     }
@@ -345,4 +313,7 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         return setAttribute(habitId, SessionsTableSchema.IS_PAUSED, state);
     }
     //endregion
+
+    //endregion [ ---------------- end ---------------- ]
+
 }

@@ -123,9 +123,8 @@ public class SessionNotificationManager {
     }
 
     public void launchNotificationsForAllActiveSessions() {
-        for (SessionEntry entry : sessionManager.getActiveSessionList()) {
+        for (SessionEntry entry : sessionManager.getActiveSessionList())
             launchSessionNotification(entry.getHabit());
-        }
     }
 
     public void updateNotification(Habit habit) {
