@@ -2,6 +2,7 @@ package com.example.brandon.habitlogger.common;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.DrawableRes;
 import android.support.v7.app.AlertDialog;
 
 /**
@@ -13,6 +14,7 @@ public class ConfirmationDialog {
 
     private AlertDialog.Builder mDialogBuilder;
     private String mTitle, mMessage;
+    private int mIconRes = -1;
 
     DialogInterface.OnClickListener onYesListener;
     DialogInterface.OnClickListener onNoListener;
@@ -30,10 +32,18 @@ public class ConfirmationDialog {
                 .setPositiveButton("Yes", this.onYesListener)
                 .setNegativeButton("No", this.onNoListener)
                 .setOnCancelListener(this.onCancelListener)
-                .setOnDismissListener(this.onDismissListener)
-                .show();
+                .setOnDismissListener(this.onDismissListener);
+
+        if(mIconRes != -1)
+            mDialogBuilder.setIcon(mIconRes);
+
+        mDialogBuilder.show();
 
         return this;
+    }
+
+    public AlertDialog create() {
+        return mDialogBuilder.create();
     }
 
     //region Setters {}
@@ -46,6 +56,12 @@ public class ConfirmationDialog {
         this.mMessage = message;
         return this;
     }
+
+    public ConfirmationDialog setIcon(@DrawableRes int iconRes) {
+        this.mIconRes = iconRes;
+        return this;
+    }
+    //endregion
 
     //region Set listeners
     public ConfirmationDialog setOnYesClickListener(DialogInterface.OnClickListener listener) {
@@ -67,6 +83,5 @@ public class ConfirmationDialog {
         this.onDismissListener = listener;
         return this;
     }
-    //endregion
     //endregion
 }

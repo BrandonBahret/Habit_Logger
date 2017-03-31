@@ -83,7 +83,7 @@ public class SessionActivity extends AppCompatActivity implements
             getSupportActionBar().setTitle(mHabit.getName());
         }
 
-        updateTimeDisplay();
+        updateTimeDisplay(true);
 
         mSessionManager.addSessionChangedCallback(this);
         ui.sessionPausePlay.setOnClickListener(this);
@@ -101,7 +101,7 @@ public class SessionActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         updateSessionPlayButton(mSessionManager.getIsPaused(mHabit.getDatabaseId()));
-        updateTimeDisplay();
+        updateTimeDisplay(true);
 
         // Load note from database
         String note = mSessionManager.getNote(mHabit.getDatabaseId());
@@ -164,11 +164,11 @@ public class SessionActivity extends AppCompatActivity implements
         ui.sessionTimeDisplayLayout.setAlpha(alphaValue);
     }
 
-    public void updateTimeDisplay() {
+    public void updateTimeDisplay(boolean forceUpdate) {
         boolean shouldUpdate = mSessionManager.getIsSessionActive(mHabit.getDatabaseId()) &&
                 !mSessionManager.getIsPaused(mHabit.getDatabaseId());
 
-        if (shouldUpdate) {
+        if (forceUpdate || shouldUpdate) {
             SessionEntry entry = mSessionManager.getSession(mHabit.getDatabaseId());
 
             int time[] = MyTimeUtils.getTimePortion(entry.getDuration());
@@ -182,7 +182,7 @@ public class SessionActivity extends AppCompatActivity implements
     private Runnable updateTimeDisplayRunnable = new Runnable() {
         @Override
         public void run() {
-            updateTimeDisplay();
+            updateTimeDisplay(false);
             mUpdateHandler.postDelayed(updateTimeDisplayRunnable, 1000);
         }
     };
@@ -196,24 +196,16 @@ public class SessionActivity extends AppCompatActivity implements
     }
     //endregion -- end --
 
-    //region // Methods for changing the appearance of the UI
     public void applyHabitColorToTheme() {
         int color = mHabit.getColor();
-        int darkerColor = MyColorUtils.setLightness(color, 0.7f);
+        int darkerColor = MyColorUtils.setLightness(color, 0.35f);
 
         getWindow().setStatusBarColor(darkerColor);
-//        ui.sessionCancel.getBackground().setColorFilter(color, PorterDuff.Mode.SRC);
-
-//        Drawable drawable = ui.sessionNote.getBackground(); // get current EditText drawable
-//        drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP); // change the drawable color
-//        ui.sessionNote.setBackground(drawable);
 
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
+        if (actionBar != null)
             actionBar.setBackgroundDrawable(new ColorDrawable(color));
-        }
     }
-    //endregion // Methods for changing the appearance of the UI
 
     //endregion [ ---------------- end ---------------- ]
 
@@ -384,4 +376,5 @@ public class SessionActivity extends AppCompatActivity implements
     //endregion -- end --
 
     //endregion [ ---------------- end ---------------- ]
+
 }
