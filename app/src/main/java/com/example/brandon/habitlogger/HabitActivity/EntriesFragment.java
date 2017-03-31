@@ -97,7 +97,7 @@ public class EntriesFragment extends Fragment implements CallbackInterface.IUpda
             @NonNull
             public String getGroupFirstLine(int position) {
                 if (position >= 0 && position < mSessionEntries.size()) {
-                    return mSessionEntries.get(position).getStartTimeAsString(mDateFormat);
+                    return mSessionEntries.get(position).stringifyStartingTime(mDateFormat);
                 }
                 else {
                     return "";

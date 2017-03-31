@@ -115,7 +115,7 @@ public class SessionEntry implements Serializable {
     public String toString() {
         String format = "{\n\tStarting Time: %s,\n\tDuration: %s\n\tNote: %s\n}\n";
         String startTimeString = getDate(getStartingTime(), "MMMM/dd/yyyy");
-        return String.format(Locale.US, format, startTimeString, getDurationAsString(), getNote());
+        return String.format(Locale.US, format, startTimeString, stringifyDuration(), getNote());
     }
 
     //region Static helper methods for formatting durations into readable strings
@@ -130,6 +130,10 @@ public class SessionEntry implements Serializable {
 
     public String stringifyDuration() {
         return stringifyDuration(getDuration());
+    }
+
+    public String stringifyStartingTime(String dateFormat) {
+        return MyTimeUtils.stringifyTimestamp(getStartingTime(), dateFormat);
     }
     //endregion
 
@@ -236,10 +240,6 @@ public class SessionEntry implements Serializable {
         return MyTimeUtils.setTimePortion(getStartingTime(), true, 0, 0, 0, 0);
     }
 
-    public String getStartTimeAsString(String dateFormat) {
-        return MyTimeUtils.stringifyTimestamp(getStartingTime(), dateFormat);
-    }
-
     public long getLastTimePaused() {
         return mLastTimePaused;
     }
@@ -270,10 +270,6 @@ public class SessionEntry implements Serializable {
 
     public boolean getIsPaused() {
         return this.mIsPaused;
-    }
-
-    public String getDurationAsString() {
-        return stringifyDuration(getDuration());
     }
 
     public Habit getHabit() {

@@ -108,8 +108,8 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         holder.entryId = item.getDatabaseId();
         holder.habitId = item.getHabitId();
 
-        holder.startTimeText.setText(item.getStartTimeAsString("h:mm a"));
-        holder.durationText.setText(item.getDurationAsString());
+        holder.startTimeText.setText(item.stringifyStartingTime("h:mm a"));
+        holder.durationText.setText(item.stringifyDuration());
 
         holder.accent.setBackgroundColor(habitDatabase.getHabitColor(holder.habitId));
 

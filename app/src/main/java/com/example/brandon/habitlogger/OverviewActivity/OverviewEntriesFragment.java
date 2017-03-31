@@ -101,7 +101,7 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
             public String getGroupFirstLine(int position) {
                 if(position >= 0 && position < sessionEntries.size()) {
                     String dateFormat = preferenceChecker.stringGetDateFormat();
-                    return sessionEntries.get(position).getStartTimeAsString(dateFormat);
+                    return sessionEntries.get(position).stringifyStartingTime(dateFormat);
                 } else{
                     return "";
                 }

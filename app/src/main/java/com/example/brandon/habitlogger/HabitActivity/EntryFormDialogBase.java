@@ -111,11 +111,11 @@ public abstract class EntryFormDialogBase extends DialogFragment {
     }
 
     private void setStartingTime() {
-        ui.startingTime.setText(mEntry.getStartTimeAsString("h:mm a"));
+        ui.startingTime.setText(mEntry.stringifyStartingTime("h:mm a"));
         ui.note.setText(mEntry.getNote());
 
         String dateFormat = new PreferenceChecker(getContext()).stringGetDateFormat();
-        ui.sessionDate.setText(mEntry.getStartTimeAsString(dateFormat));
+        ui.sessionDate.setText(mEntry.stringifyStartingTime(dateFormat));
     }
     //endregion
 
@@ -157,7 +157,7 @@ public abstract class EntryFormDialogBase extends DialogFragment {
                         mEntry.setStartingHour(hours);
                         mEntry.setStartingMinute(minutes);
 
-                        ui.startingTime.setText(mEntry.getStartTimeAsString("h:mm a"));
+                        ui.startingTime.setText(mEntry.stringifyStartingTime("h:mm a"));
                     }
                 });
                 dialog.show(getFragmentManager(), "get-date");
@@ -179,7 +179,7 @@ public abstract class EntryFormDialogBase extends DialogFragment {
                     @Override
                     public void onFinished(long time) {
                         mEntry.setStartingTime(time);
-                        String dateString = mEntry.getStartTimeAsString(new PreferenceChecker(getContext()).stringGetDateFormat());
+                        String dateString = mEntry.stringifyStartingTime(new PreferenceChecker(getContext()).stringGetDateFormat());
                         ui.sessionDate.setText(dateString);
                     }
                 });

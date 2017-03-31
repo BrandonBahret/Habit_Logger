@@ -92,7 +92,7 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
             holder.habitId = habitId;
             holder.name.setText(item.getHabit().getName());
             holder.time.setText(item.stringifyDuration());
-            holder.timeStarted.setText(item.getStartTimeAsString("h:mm a"));
+            holder.timeStarted.setText(item.stringifyStartingTime("h:mm a"));
 
             int color = habitDatabase.getHabitColor(habitId);
             holder.accent.setColorFilter(color);
