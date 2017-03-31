@@ -399,7 +399,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     //region Methods to handle search events
     public void processQuery(String query) {
         List<SessionEntry> entries = mHabitDatabase.lookUpEntries(
-                mHabitDatabase.searchEntryIdsByComment(mHabitId, query)
+                mHabitDatabase.findEntryIdsByComment(mHabitId, query)
         );
 
         dateRangeManager.updateSessionEntries(entries);
@@ -443,7 +443,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         return new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
             @Override
             public void onDateRangeChanged(long dateFrom, long dateTo) {
-                Set<Long> ids = mHabitDatabase.searchEntriesWithTimeRangeForAHabit(mHabitId, dateFrom, dateTo);
+                Set<Long> ids = mHabitDatabase.findEntriesWithinTimeRange(mHabitId, dateFrom, dateTo);
                 HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
                 dateRangeManager.updateSessionEntries(HabitActivity.this.mSessionEntries);
                 updateEntries(HabitActivity.this.mSessionEntries);
@@ -457,7 +457,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
         return new HabitDatabase.OnEntryChangedListener() {
             @Override
             public void onEntryDeleted(SessionEntry removedEntry) {
-                Set<Long> ids = mHabitDatabase.searchEntriesWithTimeRangeForAHabit(mHabitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+                Set<Long> ids = mHabitDatabase.findEntriesWithinTimeRange(mHabitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
                 HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
                 dateRangeManager.updateSessionEntries(HabitActivity.this.mSessionEntries);
             }
@@ -466,7 +466,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
             public void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
                 dateRangeManager.entryChanged(oldEntry, newEntry);
 
-                Set<Long> ids = mHabitDatabase.searchEntriesWithTimeRangeForAHabit(mHabitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+                Set<Long> ids = mHabitDatabase.findEntriesWithinTimeRange(mHabitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
                 HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
                 dateRangeManager.updateSessionEntries(HabitActivity.this.mSessionEntries);
             }

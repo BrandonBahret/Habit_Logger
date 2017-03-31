@@ -16,7 +16,7 @@ import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 public class SessionsTableSchema {
     public static final String TABLE_NAME = "SESSIONS_TABLE";
     public static final String HABIT_NAME = "HABIT_NAME";
-    public static final String HABIT_CATEGORY = "HABIT_CATEGORY";
+    public static final String HABIT_CATEGORY = "HABIT_CATEGORY_ID";
     public static final String HABIT_COLOR = "HABIT_COLOR";
     public static final String HABIT_ID = "HABIT_ID";
     public static final String DURATION = "DURATION";
@@ -98,7 +98,7 @@ public class SessionsTableSchema {
 
         statement.bindLong(1, entry.getHabitId());               // HABIT_ID
         statement.bindString(2, entry.getHabit().getName());     // HABIT_NAME
-        statement.bindString(3, entry.getCategoryName());        // HABIT_CATEGORY
+        statement.bindString(3, entry.getCategoryName());        // HABIT_CATEGORY_ID
         statement.bindString(4, entry.getHabit().getCategory().getColor());        // HABIT_COLOR
         statement.bindLong(5, entry.getDuration());              // DURATION
         statement.bindLong(6, entry.getStartingTime());             // STARTING_TIME

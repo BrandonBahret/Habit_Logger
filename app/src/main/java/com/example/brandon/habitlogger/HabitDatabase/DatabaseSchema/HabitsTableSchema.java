@@ -18,7 +18,7 @@ public class HabitsTableSchema {
     public static final String HABIT_IS_ARCHIVED = "ARCHIVED";
     public static final String HABIT_NAME = "NAME";
     public static final String HABIT_DESCRIPTION = "DESCRIPTION";
-    public static final String HABIT_CATEGORY = "CATEGORY";
+    public static final String HABIT_CATEGORY_ID = "CATEGORY";
     public static final String HABIT_ICON_RES_ID = "ICON_RES_ID";
 
     public static String getCreateTableStatement() {
@@ -29,7 +29,7 @@ public class HabitsTableSchema {
                 HABIT_IS_ARCHIVED + SQL_TYPES.INTEGER + ", " +
                 HABIT_NAME + SQL_TYPES.TEXT + SQL_TYPES.NOT_NULL + ", " +
                 HABIT_DESCRIPTION + SQL_TYPES.TEXT + SQL_TYPES.NOT_NULL + ", " +
-                HABIT_CATEGORY + SQL_TYPES.INTEGER + SQL_TYPES.NOT_NULL + ", " +
+                HABIT_CATEGORY_ID + SQL_TYPES.INTEGER + SQL_TYPES.NOT_NULL + ", " +
                 HABIT_ICON_RES_ID + SQL_TYPES.TEXT + SQL_TYPES.NOT_NULL +
                 ");";
     }
@@ -44,14 +44,14 @@ public class HabitsTableSchema {
                 ", " + HabitsTableSchema.HABIT_NAME +
                 ", " + HabitsTableSchema.HABIT_DESCRIPTION +
                 ", " + HabitsTableSchema.HABIT_ICON_RES_ID +
-                ", " + HabitsTableSchema.HABIT_CATEGORY + ") VALUES(?, ?, ?, ?, ?)";
+                ", " + HabitsTableSchema.HABIT_CATEGORY_ID + ") VALUES(?, ?, ?, ?, ?)";
     }
 
     public static Habit getObjectFromContentValues(ContentValues contentValues, HabitDatabase dao) {
         boolean isArchived = contentValues.getAsLong(HABIT_IS_ARCHIVED) == 1;
         String name = contentValues.getAsString(HABIT_NAME);
         String description = contentValues.getAsString(HABIT_DESCRIPTION);
-        long categoryId = contentValues.getAsLong(HABIT_CATEGORY);
+        long categoryId = contentValues.getAsLong(HABIT_CATEGORY_ID);
         String iconResId = contentValues.getAsString(HABIT_ICON_RES_ID);
 
         long habitId = contentValues.getAsLong(HABIT_ID);
@@ -64,5 +64,16 @@ public class HabitsTableSchema {
                     .setIsArchived(isArchived);
         }
         else return null;
+    }
+
+    public static ContentValues getContentValuesFromObject(Habit habit) {
+        ContentValues values = new ContentValues();
+        values.put(HABIT_IS_ARCHIVED, habit.getIsArchived() ? 1 : 0);
+        values.put(HABIT_NAME, habit.getName());
+        values.put(HABIT_DESCRIPTION, habit.getDescription());
+        values.put(HABIT_CATEGORY_ID, habit.getCategory().getDatabaseId());
+        values.put(HABIT_ICON_RES_ID, habit.getIconResId());
+
+        return values;
     }
 }

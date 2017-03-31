@@ -72,7 +72,7 @@ public class HabitDatabaseNonAsyncEntryMethodsTest extends AndroidTestCase {
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "2"));
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "3"));
         long expectedId  = db.addEntry(mainHabitId, new SessionEntry(0, 0, "4"));
-        Set<Long> actualIds = db.searchEntryIdsByComment(mainHabitId, "4");
+        Set<Long> actualIds = db.findEntryIdsByComment(mainHabitId, "4");
 
         assertNotNull(actualIds);
         assertEquals(expectedId, actualIds.toArray()[0]);
@@ -86,7 +86,7 @@ public class HabitDatabaseNonAsyncEntryMethodsTest extends AndroidTestCase {
         expectedIds.add(db.addEntry(mainHabitId, new SessionEntry(600, 0, "5")));
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "7"));
 
-        Set<Long> actualIds = db.searchEntriesWithTimeRangeForAHabit(mainHabitId, 500, 1000);
+        Set<Long> actualIds = db.findEntriesWithinTimeRange(mainHabitId, 500, 1000);
 
         assertNotNull(expectedIds);
         assertNotNull(actualIds);
@@ -106,7 +106,7 @@ public class HabitDatabaseNonAsyncEntryMethodsTest extends AndroidTestCase {
         expectedIds.add(db.addEntry(mainHabitId, new SessionEntry(600, 0, "6")));
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "7"));
 
-        Set<Long> actualIds = db.searchAllEntriesWithTimeRange(500, 1000);
+        Set<Long> actualIds = db.findEntriesWithinTimeRange(500, 1000);
 
         assertNotNull(expectedIds);
         assertNotNull(actualIds);

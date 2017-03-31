@@ -59,7 +59,7 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
         habitDatabase = new HabitDatabase(getContext());
 
         entriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
-        sessionEntries = habitDatabase.lookUpEntries(habitDatabase.searchAllEntriesWithTimeRange(0, Long.MAX_VALUE));
+        sessionEntries = habitDatabase.lookUpEntries(habitDatabase.findEntriesWithinTimeRange(0, Long.MAX_VALUE));
 
         entryAdapter = new EntryViewAdapter(sessionEntries, getContext(),
                 new EntryViewAdapter.OnClickListeners() {

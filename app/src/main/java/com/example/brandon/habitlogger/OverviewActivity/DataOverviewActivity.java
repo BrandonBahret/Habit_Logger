@@ -43,7 +43,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
         //region // Gather dependencies
         habitDatabase = new HabitDatabase(this);
         HabitDatabase.addOnEntryChangedListener(this);
-        List<SessionEntry> sessionEntries = habitDatabase.lookUpEntries(habitDatabase.searchAllEntriesWithTimeRange(0, Long.MAX_VALUE));
+        List<SessionEntry> sessionEntries = habitDatabase.lookUpEntries(habitDatabase.findEntriesWithinTimeRange(0, Long.MAX_VALUE));
         dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), sessionEntries);
         dateRangeManager.hideView(false);
         exportManager = new LocalDataExportManager(this);
@@ -97,7 +97,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
     @Override
     public boolean onQueryTextChange(String query) {
         List<SessionEntry> entries = habitDatabase.lookUpEntries(
-                habitDatabase.searchEntryIdsByComment(query)
+                habitDatabase.findEntryIdsByComment(query)
         );
 
         dateRangeManager.updateSessionEntries(entries);

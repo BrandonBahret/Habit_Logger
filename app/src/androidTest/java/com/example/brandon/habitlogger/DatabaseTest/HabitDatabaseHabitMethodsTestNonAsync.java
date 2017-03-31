@@ -97,7 +97,7 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
         expectedIds.add(db.addHabitAndCategory(new Habit("three", "", getDummyHabit().getCategory(), "", null)));
         db.addHabitAndCategory(new Habit("four", "", getDummyHabit().getCategory(), "", null));
 
-        assertTrue(expectedIds.equals(db.searchHabitIdsByName("t")));
+        assertTrue(expectedIds.equals(db.findHabitIdsByName("t")));
     }
 
     public void testGetHabit(){

@@ -23,6 +23,16 @@ public class MyDatabaseUtils {
         Out getRecordFromCursor(ContentValues cursor);
     }
 
+    public static long getNumberOfRows(SQLiteDatabase readableDatabase, String tableName,
+                                String whereClause, String selectionArgs[]) {
+        return DatabaseUtils.queryNumEntries(readableDatabase, tableName, whereClause, selectionArgs);
+    }
+
+    public static long getNumberOfRows(SQLiteDatabase readableDatabase, String tableName) {
+        return DatabaseUtils.queryNumEntries(readableDatabase, tableName, null, null);
+    }
+
+    //region Methods to manipulate records
     /**
      * @param readableDatabase Sqlite database object to query.
      * @param tableName        The name of the table to query.
@@ -57,6 +67,7 @@ public class MyDatabaseUtils {
                 tableName, recordKey + " =?", new String[]{String.valueOf(recordId)}
         );
     }
+    //endregion
 
     //region Get attributes from a database {}
 

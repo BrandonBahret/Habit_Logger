@@ -71,7 +71,7 @@ public class HabitDatabaseNonAsyncCategoryMethodsTest extends AndroidTestCase {
         long expectedId = db.addCategory(new HabitCategory("color", "two"));
         db.addCategory(new HabitCategory("color", "three"));
 
-        Set<Long> ids = db.searchCategoryIdsByName("wo");
+        Set<Long> ids = db.findCategoryIdsByName("wo");
 
         assertEquals(expectedId, ids.toArray()[0]);
     }
