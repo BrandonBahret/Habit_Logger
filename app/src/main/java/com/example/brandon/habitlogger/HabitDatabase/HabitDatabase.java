@@ -17,6 +17,7 @@ import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.DatabaseSche
 import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.EntriesTableSchema;
 import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.HabitsTableSchema;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.MyDatabaseUtils;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.HabitDataSample;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
@@ -34,56 +35,39 @@ import java.util.Set;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class HabitDatabase {
+
+    //region (Member attributes)
     public DatabaseSchema databaseHelper;
-    private SQLiteDatabase writableDatabase;
-    private SQLiteDatabase readableDatabase;
-    private Context mContext;
+    private SQLiteDatabase mWritableDatabase;
+    private SQLiteDatabase mReadableDatabase;
+    private HabitCategory mDefaultCategory;
+    //endregion
 
-    public SessionEntriesSample getEntriesSample(long habitId, long dateFrom, long dateTo) {
-        List<SessionEntry> entries = lookUpEntries(
-                searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo)
-        );
-
-        return new SessionEntriesSample(entries, dateFrom, dateTo);
-    }
-
-    //region // Interface methods for database
+    //region Code responsible for providing an interface to the database
 
     public interface OnEntryChangedListener {
-        /**
-         * This method is only called when individual entries are removed.
-         */
         void onEntryDeleted(SessionEntry removedEntry);
 
-        /**
-         * Called after the database clears all entries for some habit.
-         */
         void onEntriesReset(long habitId);
 
-        /**
-         * This method is only called when individual entries are updated.
-         */
         void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry);
     }
 
     private static List<OnEntryChangedListener> onEntryChangedListeners = new ArrayList<>();
 
     private void notifyEntryDeleted(SessionEntry removedEntry) {
-        for (OnEntryChangedListener listener : onEntryChangedListeners) {
+        for (OnEntryChangedListener listener : onEntryChangedListeners)
             listener.onEntryDeleted(removedEntry);
-        }
     }
 
     private void notifyEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
-        for (OnEntryChangedListener listener : onEntryChangedListeners) {
+        for (OnEntryChangedListener listener : onEntryChangedListeners)
             listener.onEntryUpdated(oldEntry, newEntry);
-        }
     }
 
     private void notifyEntriesReset(long habitId) {
-        for (OnEntryChangedListener listener : onEntryChangedListeners) {
+        for (OnEntryChangedListener listener : onEntryChangedListeners)
             listener.onEntriesReset(habitId);
-        }
     }
 
     public static void addOnEntryChangedListener(OnEntryChangedListener listener) {
@@ -98,10 +82,60 @@ public class HabitDatabase {
     public HabitDatabase(Context context) {
         databaseHelper = new DatabaseSchema(context);
 
-        mContext = context;
-        writableDatabase = databaseHelper.getWritableDatabase();
-        readableDatabase = databaseHelper.getReadableDatabase();
+        mDefaultCategory = new HabitCategory("#ff000000", context.getString(R.string.uncategorized));
+        mWritableDatabase = databaseHelper.getWritableDatabase();
+        mReadableDatabase = databaseHelper.getReadableDatabase();
     }
+
+    //region Helper methods responsible for getting and setting attributes
+    //region Get attributes
+    public <Type> Type getHabitAttribute(long habitId, String columnKey, Class<Type> clazz) {
+        return MyDatabaseUtils.getAttribute(
+                mReadableDatabase, HabitsTableSchema.TABLE_NAME,
+                HabitsTableSchema.HABIT_ID, habitId, columnKey, clazz
+        );
+    }
+
+    public <Type> Type getCategoryAttribute(long categoryId, String columnKey, Class<Type> clazz) {
+        return MyDatabaseUtils.getAttribute(
+                mReadableDatabase, CategoriesTableSchema.TABLE_NAME,
+                CategoriesTableSchema.CATEGORY_ID, categoryId, columnKey, clazz
+        );
+    }
+
+    public <Type> Type getEntryAttribute(long entryId, String columnKey, Class<Type> clazz) {
+        return MyDatabaseUtils.getAttribute(
+                mReadableDatabase, EntriesTableSchema.TABLE_NAME,
+                EntriesTableSchema.ENTRY_ID, entryId, columnKey, clazz
+        );
+    }
+    //endregion
+
+    //region Set attributes
+    public int setHabitAttribute(long habitId, String columnKey, Object object) {
+        return MyDatabaseUtils.setAttribute(
+                mWritableDatabase, HabitsTableSchema.TABLE_NAME,
+                HabitsTableSchema.HABIT_ID, habitId, columnKey, object
+        );
+    }
+
+    public int setCategoryAttribute(long categoryId, String columnKey, Object object) {
+        return MyDatabaseUtils.setAttribute(
+                mWritableDatabase, CategoriesTableSchema.TABLE_NAME,
+                CategoriesTableSchema.CATEGORY_ID, categoryId, columnKey, object
+        );
+    }
+
+    public int setEntryAttribute(long entryId, String columnKey, Object object) {
+        return MyDatabaseUtils.setAttribute(
+                mWritableDatabase, EntriesTableSchema.TABLE_NAME,
+                EntriesTableSchema.ENTRY_ID, entryId, columnKey, object
+        );
+    }
+    //endregion
+    //endregion
+
+    //region Methods responsible for counting the number of rows in tables
 
     /**
      * @param tableName     The name of the table to search.
@@ -113,7 +147,7 @@ public class HabitDatabase {
     private int getNumberOfRows(String tableName, @Nullable String columns[],
                                 @Nullable String whereClause, @Nullable String selectionArgs[]) {
 
-        Cursor c = readableDatabase.query(tableName, columns, whereClause, selectionArgs,
+        Cursor c = mReadableDatabase.query(tableName, columns, whereClause, selectionArgs,
                 null, null, null);
 
         int count = -1;
@@ -125,30 +159,29 @@ public class HabitDatabase {
         return count;
     }
 
-    /**
-     * @param index             The index of the record to be looked up.
-     * @param tableName         The table name of the table to search.
-     * @param rowIdColumnString The name of the row id.
-     * @param whereClause       The where clause used to filter the table.
-     * @param selectionArgs     The args to the where clause.
-     * @return The found row id, -1 if found nothing.
-     */
-    private long getRowIdByIndex(int index, String tableName, String rowIdColumnString,
-                                 @Nullable String whereClause, @Nullable String selectionArgs[],
-                                 String limit) {
-
-        Cursor c = readableDatabase.query(tableName, new String[]{rowIdColumnString}, whereClause,
-                selectionArgs, null, null, null, limit);
-
-        long rowId = -1;
-        if (c.moveToPosition(index)) {
-            rowId = c.getLong(0);
-        }
-
-        c.close();
-
-        return rowId;
+    public int getNumberOfHabits(long categoryId) {
+        return getNumberOfRows(HabitsTableSchema.TABLE_NAME,
+                new String[]{HabitsTableSchema.HABIT_ID},
+                HabitsTableSchema.HABIT_CATEGORY + "=?",
+                new String[]{String.valueOf(categoryId)});
     }
+
+    /**
+     * @return The total number of categories stored in the database.
+     */
+    public int getNumberOfCategories() {
+        return getNumberOfRows(CategoriesTableSchema.TABLE_NAME,
+                new String[]{CategoriesTableSchema.CATEGORY_ID}, null, null);
+    }
+
+    public int getNumberOfEntries(long habitId) {
+        return getNumberOfRows(EntriesTableSchema.TABLE_NAME,
+                new String[]{EntriesTableSchema.ENTRY_HABIT_ID},
+                EntriesTableSchema.ENTRY_HABIT_ID + "=?",
+                new String[]{String.valueOf(habitId)});
+    }
+    //endregion
+
 
     /**
      * @param index             The index of the record to be looked up.
@@ -161,8 +194,18 @@ public class HabitDatabase {
     private long getRowIdByIndex(int index, String tableName, String rowIdColumnString,
                                  @Nullable String whereClause, @Nullable String selectionArgs[]) {
 
-        return getRowIdByIndex(index, tableName, rowIdColumnString, whereClause, selectionArgs, null);
+        Cursor c = mReadableDatabase.query(tableName, new String[]{rowIdColumnString}, whereClause,
+                selectionArgs, null, null, null, null);
+
+        long rowId = -1;
+        if (c.moveToPosition(index)) rowId = c.getLong(0);
+
+        c.close();
+
+        return rowId;
     }
+
+    //region Methods responsible for fetching record ids
 
     /**
      * @param SQL            The SQL string to be executed
@@ -172,7 +215,7 @@ public class HabitDatabase {
     @Nullable
     private Set<Long> searchTableForIdsByName(String SQL, String[] values, String idColumnString) {
 
-        Cursor c = readableDatabase.rawQuery(SQL, values);
+        Cursor c = mReadableDatabase.rawQuery(SQL, values);
 
         if (c != null) {
             Set<Long> ids = new HashSet<>(c.getCount());
@@ -189,44 +232,394 @@ public class HabitDatabase {
         return null;
     }
 
-    // ---- categories methods ----
+    public Set<Long> getHabitIds(long categoryId) {
+        return searchTableForIdsByName("SELECT " + HabitsTableSchema.HABIT_ID + " FROM " +
+                        HabitsTableSchema.TABLE_NAME + " WHERE " +
+                        HabitsTableSchema.HABIT_CATEGORY + " =?",
+                new String[]{String.valueOf(categoryId)}, HabitsTableSchema.HABIT_ID);
+    }
+    //endregion
 
-    private SQLiteStatement getCategoryInsertStatement() {
-        return writableDatabase.compileStatement(CategoriesTableSchema.getInsertStatement());
+    //region Methods responsible for sampling data from the database
+    public List<CategoryDataSample> getAllData() {
+        int size = getNumberOfCategories();
+        List<CategoryDataSample> containers = new ArrayList<>(size);
+
+        for (int i = 0; i < size; i++) {
+            long categoryId = getCategoryIdFromIndex(i);
+            CategoryDataSample data = getCategoryDataSample(getCategory(categoryId), 0, Long.MAX_VALUE);
+            containers.add(data);
+        }
+
+        return containers;
+    }
+
+    public HabitDataSample getHabitDataSample(long dateFrom, long dateTo) {
+        List<CategoryDataSample> data = new ArrayList<>();
+
+        for (HabitCategory category : getCategories()) {
+            data.add(getCategoryDataSample(category, dateFrom, dateTo));
+        }
+
+        return new HabitDataSample(data, dateFrom, dateTo);
+    }
+
+    public CategoryDataSample getCategoryDataSample(HabitCategory category, long dateFrom, long dateTo) {
+        List<Habit> habits = getHabits(category.getDatabaseId());
+
+        for (Habit habit : habits) {
+            long habitId = habit.getDatabaseId();
+            Set<Long> ids = searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo);
+            List<SessionEntry> entries = lookUpEntries(ids);
+            habit.setEntries(entries);
+        }
+
+        return new CategoryDataSample(category, habits, dateFrom, dateTo);
+    }
+
+    public SessionEntriesSample getEntriesSample(long habitId, long dateFrom, long dateTo) {
+        List<SessionEntry> entries = lookUpEntries(
+                searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo)
+        );
+
+        return new SessionEntriesSample(entries, dateFrom, dateTo);
+    }
+    //endregion
+
+    //region Methods for manipulating the habits table
+    private SQLiteStatement getHabitInsertStatement() {
+        return mWritableDatabase.compileStatement(HabitsTableSchema.getInsertStatement());
     }
 
     /**
-     * @return The total number of categories stored in the database.
+     * @param habit The habit to be added to the database.
+     * @return The row id of the new habit.
      */
-    public int getNumberOfCategories() {
-        return getNumberOfRows(CategoriesTableSchema.TABLE_NAME,
-                new String[]{CategoriesTableSchema.CATEGORY_ID}, null, null);
+    public long addHabitIfNotExists(Habit habit) {
+        long habitId = getHabitIdFromObject(habit);
+
+        if (habitId == -1) {
+            addHabit(habit);
+        }
+
+        return habitId;
     }
 
-    private void addCategories(HabitCategory categories[], boolean whenExists) {
-        writableDatabase.beginTransaction();
+    private void bindValuesForHabitObject(SQLiteStatement insert, Habit habit) {
+        long categoryId = habit.getCategory().getDatabaseId();
+        if (categoryId == -1) {
+            throw new IllegalArgumentException("Category database id is -1.");
+        }
 
-        if (whenExists) {
-            for (HabitCategory category : categories) {
-                addCategory(category);
+        insert.bindLong(1, habit.getIsArchived() ? 1 : 0);
+        insert.bindString(2, habit.getName());
+        insert.bindString(3, habit.getDescription());
+        insert.bindString(4, habit.getIconResId());
+        insert.bindLong(5, habit.getCategory().getDatabaseId());
+    }
+
+    /**
+     * @param habit The habit to be added to the database.
+     * @return The row id of the new habit.
+     */
+    public long addHabit(Habit habit) {
+        SQLiteStatement insert = getHabitInsertStatement();
+        bindValuesForHabitObject(insert, habit);
+
+        long habitId = insert.executeInsert();
+        habit.setDatabaseId(habitId);
+        insert.close();
+
+        // Add entries to the new habit
+        List<SessionEntry> entries = habit.getEntries();
+        if (entries != null)
+            addEntries(habitId, entries);
+
+        return habitId;
+    }
+
+    /**
+     * @param habit The habit to be added to the database.
+     * @return The row id of the new habit.
+     */
+    public long addHabitAndCategory(Habit habit) {
+        HabitCategory category = habit.getCategory();
+        addCategoryIfNotExists(category);
+
+        return addHabit(habit);
+    }
+
+    /**
+     * @param index The habit index to look up.
+     * @return The unique habit id of the row.
+     */
+    public long getHabitIdFromIndex(long categoryId, int index) {
+        return getRowIdByIndex(index, HabitsTableSchema.TABLE_NAME, HabitsTableSchema.HABIT_ID,
+                HabitsTableSchema.HABIT_CATEGORY + "=?", new String[]{String.valueOf(categoryId)});
+    }
+
+    /**
+     * @param habit The object to look up in the database.
+     * @return The row id of the object in the database if found, else -1.
+     */
+    public long getHabitIdFromObject(Habit habit) {
+        long habitId = habit.getDatabaseId();
+
+        if (habitId == -1) {
+            long categoryId = getCategoryIdByObject(habit.getCategory());
+
+            String whereClause = HabitsTableSchema.HABIT_NAME + "=? AND " +
+                    HabitsTableSchema.HABIT_CATEGORY + "=?";
+
+            String selectionArgs[] = {habit.getName(), String.valueOf(categoryId)};
+
+            habitId = getRowIdByIndex(0, HabitsTableSchema.TABLE_NAME, HabitsTableSchema.HABIT_ID,
+                    whereClause, selectionArgs);
+
+            habit.setDatabaseId(habitId);
+        }
+
+        return habitId;
+    }
+
+    /**
+     * @param name The name of the habit to look up.
+     * @return The found habit ids.
+     */
+    public Set<Long> searchHabitIdsByName(String name) {
+        return searchTableForIdsByName("SELECT " + HabitsTableSchema.HABIT_ID + " FROM " +
+                        HabitsTableSchema.TABLE_NAME + " WHERE " +
+                        HabitsTableSchema.HABIT_NAME + " LIKE  ?",
+
+                new String[]{"%" + name + "%"}, HabitsTableSchema.HABIT_ID);
+    }
+
+    /**
+     * @param name The name of the category to look up.
+     * @return The found category ids as an array.
+     */
+    public Set<Long> searchCategoryIdsByName(String name) {
+        return searchTableForIdsByName(
+                "SELECT " + CategoriesTableSchema.CATEGORY_ID + " FROM " +
+                        CategoriesTableSchema.TABLE_NAME + " WHERE " +
+                        CategoriesTableSchema.CATEGORY_NAME + " LIKE  ?",
+
+                new String[]{"%" + name + "%"}, CategoriesTableSchema.CATEGORY_ID
+        );
+    }
+
+    /**
+     * @param query The name of the habit to look up.
+     * @return The found habit ids.
+     */
+    public Set<Long> searchHabitDatabase(String query) {
+        Set<Long> habitIds = searchHabitIdsByName(query);
+        Set<Long> categoryIds = searchCategoryIdsByName(query);
+
+        Set<Long> habitIdsByCategory = new HashSet<>();
+        for (long id : categoryIds) habitIdsByCategory.addAll(getHabitIds(id));
+
+        Set<Long> ids = new HashSet<>(habitIds.size() + habitIdsByCategory.size());
+        ids.addAll(habitIds);
+        ids.addAll(habitIdsByCategory);
+
+        return ids;
+    }
+
+    private Habit getHabitFromCursor(Cursor c) {
+        ContentValues contentValues = new ContentValues(c.getColumnCount());
+        DatabaseUtils.cursorRowToContentValues(c, contentValues);
+
+        return HabitsTableSchema.getObjectFromContentValues(contentValues, this);
+    }
+
+    /**
+     * @param habitId The row id of the habit you wish to receive.
+     * @return The habit object found.
+     */
+    public Habit getHabit(long habitId) throws RuntimeException {
+        String selectionArgs[] = {String.valueOf(habitId)};
+
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        Cursor c = db.query(HabitsTableSchema.TABLE_NAME, null, HabitsTableSchema.HABIT_ID + "=?",
+                selectionArgs, null, null, null);
+
+        Habit habit = null;
+        if (c != null) {
+            if (c.moveToFirst()) {
+                habit = getHabitFromCursor(c);
+                c.close();
             }
         }
+
+        return habit;
+    }
+
+    //region Get habit attributes
+    public String getHabitName(long habitId) {
+        return getHabitAttribute(habitId, HabitsTableSchema.HABIT_NAME, String.class);
+    }
+
+    public boolean getIsHabitArchived(long habitId) {
+        return getHabitAttribute(habitId, HabitsTableSchema.HABIT_IS_ARCHIVED, Long.class) == 1;
+    }
+
+    public long getHabitCategoryId(long habitId) {
+        return getHabitAttribute(habitId, HabitsTableSchema.HABIT_CATEGORY, Long.class);
+    }
+
+    public int getHabitColor(long habitId) {
+        if (getIsHabitArchived(habitId)) return 0xFFCCCCCC;
         else {
-            for (HabitCategory category : categories) {
-                addCategoryIfNotExists(category);
-            }
+            HabitCategory category = getCategory(getHabitCategoryId(habitId));
+            if (category != null) return category.getColorAsInt();
         }
 
-        writableDatabase.setTransactionSuccessful();
-        writableDatabase.endTransaction();
+        return -1;
+    }
+    //endregion
+
+    //region Set habit attributes
+
+    /**
+     * @param habitId The row id to be updated.
+     * @param state   Set true to archive the habit, false to unarchive.
+     * @return The number of rows changed, -1 if error.
+     */
+    public long updateHabitIsArchived(long habitId, Boolean state) {
+        return setHabitAttribute(habitId, HabitsTableSchema.HABIT_IS_ARCHIVED, state);
     }
 
-    public void addCategories(HabitCategory categories[]) {
-        addCategories(categories, true);
+    /**
+     * @param habitId The row id to be updated.
+     * @param name    The new name to replace the old one.
+     * @return The number of rows changed, -1 if error.
+     */
+    public long updateHabitName(long habitId, String name) {
+        ContentValues values = new ContentValues(1);
+        values.put(HabitsTableSchema.HABIT_NAME, name);
+
+        String whereClause = HabitsTableSchema.HABIT_ID + " =?";
+        String whereArgs[] = {String.valueOf(habitId)};
+
+        return mWritableDatabase.update(HabitsTableSchema.TABLE_NAME, values,
+                whereClause, whereArgs);
     }
 
-    public void addCategoriesWhenNotExists(HabitCategory categories[]) {
-        addCategories(categories, false);
+    /**
+     * @param habitId     The row id to be updated.
+     * @param description The new description to replace the old one.
+     * @return The number of rows changed, -1 if error.
+     */
+    public long updateHabitDescription(long habitId, String description) {
+        return setHabitAttribute(habitId, HabitsTableSchema.HABIT_DESCRIPTION, description);
+    }
+
+    /**
+     * @param habitId    The row id to be updated.
+     * @param categoryId The new categoryId to replace the old one.
+     * @return The number of rows changed, -1 if error.
+     */
+    public long updateHabitCategory(long habitId, @Nullable Long categoryId) {
+        return setHabitAttribute(habitId, HabitsTableSchema.HABIT_CATEGORY, categoryId);
+    }
+
+    /**
+     * @param habitId   The row id to be updated.
+     * @param iconResId The new iconResId to replace the old one.
+     * @return The number of rows changed, -1 if error.
+     */
+    public long updateHabitIconResId(long habitId, String iconResId) {
+        return setHabitAttribute(habitId, HabitsTableSchema.HABIT_ICON_RES_ID, iconResId);
+    }
+    //endregion
+
+    /**
+     * @param categoryId The category to fetch habits from.
+     * @return an array list containing the habits.
+     */
+    public List<Habit> getHabits(long categoryId) {
+        int numberOfHabits = getNumberOfHabits(categoryId);
+        List<Habit> habits = new ArrayList<>(numberOfHabits);
+
+        Cursor c = mReadableDatabase.query(HabitsTableSchema.TABLE_NAME, null,
+                HabitsTableSchema.HABIT_CATEGORY + " =?", new String[]{String.valueOf(categoryId)},
+                null, null, null);
+
+        int habitIndex = 0;
+        while (c.moveToNext())
+            habits.add(habitIndex++, getHabitFromCursor(c));
+
+        c.close();
+
+        return habits;
+    }
+
+    public ArrayList<Habit> getHabits() {
+        ArrayList<Habit> habits = new ArrayList<>();
+
+        int numberOfCategories = getNumberOfCategories();
+
+        for (int i = 0; i < numberOfCategories; i++) {
+            long categoryId = getCategoryIdFromIndex(i);
+            habits.addAll(getHabits(categoryId));
+        }
+
+        return habits;
+    }
+
+    public List<Habit> lookUpHabits(Set<Long> ids) {
+        List<Habit> habits = new ArrayList<>(ids.size());
+
+        for (long id : ids) {
+            habits.add(getHabit(id));
+        }
+
+        return habits;
+    }
+
+    /**
+     * @param habitId The id of the habit to edit.
+     * @param habit   A new habit to replace the old one.
+     * @return The number of rows removed, -1 if error.
+     */
+    public long updateHabit(long habitId, Habit habit) {
+        if (getHabit(habitId) != null) {
+            updateHabitName(habitId, habit.getName());
+            updateHabitDescription(habitId, habit.getDescription());
+
+            HabitCategory category = habit.getCategory();
+            long categoryId = getCategoryIdByObject(category);
+            if (categoryId == -1) categoryId = addCategory(category);
+
+            updateHabitCategory(habitId, categoryId);
+            updateHabitIconResId(habitId, habit.getIconResId());
+            return 1;
+        }
+
+        return -1;
+    }
+
+    /**
+     * @param habitId The row id of the habit to be removed.
+     * @return The number of rows removed, -1 if error.
+     */
+    public long deleteHabit(long habitId) {
+        // Delete all of the habit's entries
+        deleteEntriesForHabit(habitId);
+
+        // Delete the habit itself
+        String whereClause = HabitsTableSchema.HABIT_ID + "=?";
+        String whereArgs[] = {String.valueOf(habitId)};
+
+        return mWritableDatabase.delete(HabitsTableSchema.TABLE_NAME,
+                whereClause, whereArgs);
+    }
+    //endregion
+
+    //region Methods for manipulating the categories table
+    private SQLiteStatement getCategoryInsertStatement() {
+        return mWritableDatabase.compileStatement(CategoriesTableSchema.getInsertStatement());
     }
 
     /**
@@ -299,20 +692,13 @@ public class HabitDatabase {
         String columns[] = {CategoriesTableSchema.CATEGORY_NAME, CategoriesTableSchema.CATEGORY_COLOR};
         String selectionArgs[] = {String.valueOf(categoryId)};
 
-        Cursor c = readableDatabase.query(CategoriesTableSchema.TABLE_NAME, columns,
+        Cursor c = mReadableDatabase.query(CategoriesTableSchema.TABLE_NAME, columns,
                 CategoriesTableSchema.CATEGORY_ID + "=?", selectionArgs, null, null, null);
 
         HabitCategory category = null;
 
         if (c != null) {
-            if (c.moveToFirst()) {
-                String name = c.getString(0); // The name field is 1st in the db
-                String color = c.getString(1); // The color field is 2nd in the db
-
-                category = new HabitCategory(color, name);
-                category.setDatabaseId(categoryId);
-            }
-
+            if (c.moveToFirst()) category = getHabitCategoryFromCursor(c).setDatabaseId(categoryId);
             c.close();
         }
 
@@ -320,7 +706,7 @@ public class HabitDatabase {
     }
 
     public List<HabitCategory> getCategories() {
-        Cursor cursor = readableDatabase.query(CategoriesTableSchema.TABLE_NAME,
+        Cursor cursor = mReadableDatabase.query(CategoriesTableSchema.TABLE_NAME,
                 null, null, null, null, null, null);
 
         int size = cursor.getCount();
@@ -331,7 +717,7 @@ public class HabitDatabase {
 
         cursor.close();
 
-        categories.add(0, new HabitCategory("#ff000000", mContext.getString(R.string.uncategorized)));
+        categories.add(0, mDefaultCategory);
 
         return categories;
     }
@@ -343,20 +729,15 @@ public class HabitDatabase {
         return CategoriesTableSchema.getObjectFromContentValues(contentValues);
     }
 
+    //region Set attributes
+
     /**
      * @param categoryId The database id for the category to update.
      * @param name       The new name for the category.
      * @return The number of rows changed, -1 if fail.
      */
     public long updateCategoryName(long categoryId, String name) {
-        ContentValues values = new ContentValues(1);
-        values.put(CategoriesTableSchema.CATEGORY_NAME, name);
-
-        String whereClause = CategoriesTableSchema.CATEGORY_ID + "=?";
-        String whereArgs[] = {String.valueOf(categoryId)};
-
-        return writableDatabase.update(CategoriesTableSchema.TABLE_NAME, values,
-                whereClause, whereArgs);
+        return setCategoryAttribute(categoryId, CategoriesTableSchema.CATEGORY_NAME, name);
     }
 
     /**
@@ -365,15 +746,9 @@ public class HabitDatabase {
      * @return The number of rows changed, -1 if fail.
      */
     public long updateCategoryColor(long categoryId, String color) {
-        ContentValues values = new ContentValues(1);
-        values.put(CategoriesTableSchema.CATEGORY_COLOR, color);
-
-        String whereClause = CategoriesTableSchema.CATEGORY_ID + "=?";
-        String whereArgs[] = {String.valueOf(categoryId)};
-
-        return writableDatabase.update(CategoriesTableSchema.TABLE_NAME, values,
-                whereClause, whereArgs);
+        return setCategoryAttribute(categoryId, CategoriesTableSchema.CATEGORY_COLOR, color);
     }
+    //endregion
 
     /**
      * @param categoryId The database id for the category to update
@@ -398,14 +773,14 @@ public class HabitDatabase {
         String whereClause = CategoriesTableSchema.CATEGORY_ID + "=?";
         String whereArgs[] = {String.valueOf(categoryId)};
 
-        return writableDatabase.delete(CategoriesTableSchema.TABLE_NAME,
+        return mWritableDatabase.delete(CategoriesTableSchema.TABLE_NAME,
                 whereClause, whereArgs);
     }
+    //endregion
 
-    // ---- Entries methods ----
-
+    //region Methods for manipulating the entries table
     private SQLiteStatement getEntryInsertStatement() {
-        return writableDatabase.compileStatement(EntriesTableSchema.getInsertStatement());
+        return mWritableDatabase.compileStatement(EntriesTableSchema.getInsertStatement());
     }
 
     private void bindValuesForEntryObject(SQLiteStatement insert, SessionEntry entry, long habitId) {
@@ -435,7 +810,7 @@ public class HabitDatabase {
     public void addEntries(long habitId, @NonNull List<SessionEntry> entries) {
 
         SQLiteStatement insert = getEntryInsertStatement();
-        writableDatabase.beginTransaction();
+        mWritableDatabase.beginTransaction();
 
 
         for (SessionEntry entry : entries) {
@@ -447,8 +822,8 @@ public class HabitDatabase {
         }
 
         insert.close();
-        writableDatabase.setTransactionSuccessful();
-        writableDatabase.endTransaction();
+        mWritableDatabase.setTransactionSuccessful();
+        mWritableDatabase.endTransaction();
     }
 
     /**
@@ -507,13 +882,13 @@ public class HabitDatabase {
     }
 
     /**
-     * @param habitId   The row id for the habit to search entries for.
-     * @param beginTime The starting time for the query.
-     * @param endTime   The ending time for the query.
+     * @param habitId  The row id for the habit to search entries for.
+     * @param timeFrom The starting time for the query.
+     * @param timeTo   The ending time for the query.
      * @return An array of entry ids found by the search, null if results were empty.
      */
     @Nullable
-    public Set<Long> searchEntriesWithTimeRangeForAHabit(long habitId, long beginTime, long endTime) {
+    public Set<Long> searchEntriesWithTimeRangeForAHabit(long habitId, long timeFrom, long timeTo) {
         // SELECT ENTRY_ID FROM ENTRIES_TABLE WHERE HABIT_ID=habitId
         // AND START_TIME >= BEGIN AND START_TIME <= END
         String SQL = "SELECT " + EntriesTableSchema.ENTRY_ID +
@@ -524,19 +899,19 @@ public class HabitDatabase {
 
         String[] values = new String[]{
                 String.valueOf(habitId),
-                String.valueOf(beginTime),
-                String.valueOf(endTime)
+                String.valueOf(timeFrom),
+                String.valueOf(timeTo)
         };
 
         return searchTableForIdsByName(SQL, values, EntriesTableSchema.ENTRY_ID);
     }
 
     /**
-     * @param beginTime The starting time for the query.
-     * @param endTime   The ending time for the query.
+     * @param timeFrom The starting time for the query.
+     * @param timeTo   The ending time for the query.
      * @return An array of entry ids found by the search, null if results were empty.
      */
-    public Set<Long> searchAllEntriesWithTimeRange(long beginTime, long endTime) {
+    public Set<Long> searchAllEntriesWithTimeRange(long timeFrom, long timeTo) {
         // SELECT ENTRY_ID FROM ENTRIES_TABLE WHERE START_TIME >= BEGIN AND START_TIME <= END
         String SQL = "SELECT " + EntriesTableSchema.ENTRY_ID +
                 " FROM " + EntriesTableSchema.TABLE_NAME + " WHERE " +
@@ -544,8 +919,8 @@ public class HabitDatabase {
                 EntriesTableSchema.ENTRY_START_TIME + "<=?";
 
         String[] values = new String[]{
-                String.valueOf(beginTime),
-                String.valueOf(endTime)
+                String.valueOf(timeFrom),
+                String.valueOf(timeTo)
         };
 
         return searchTableForIdsByName(SQL, values, EntriesTableSchema.ENTRY_ID);
@@ -569,41 +944,10 @@ public class HabitDatabase {
      */
     @Nullable
     private SessionEntry getEntryFromCursor(Cursor c) {
-        long databaseId = c.getLong(0);
-        long habitId = c.getLong(1);
-        long startTime = c.getLong(2);
-        long duration = c.getLong(3);
-        String note = c.getString(4);
+        ContentValues contentValues = new ContentValues(c.getColumnCount());
+        DatabaseUtils.cursorRowToContentValues(c, contentValues);
 
-        SessionEntry entry = new SessionEntry(startTime, duration, note);
-        entry.setHabitId(habitId);
-        entry.setDatabaseId(databaseId);
-
-        return entry;
-    }
-
-    /**
-     * @param habitId    The id of the habit which to look for it's entries.
-     * @param entryIndex The index of the entry to be retrieved from the habit.
-     * @return The found session entry row id.
-     */
-    public long getEntryId(long habitId, int entryIndex) {
-        String selection = EntriesTableSchema.ENTRY_HABIT_ID + "=?";
-        String selectionArgs[] = {String.valueOf(habitId)};
-
-        Cursor c = readableDatabase.query(EntriesTableSchema.TABLE_NAME, null, selection,
-                selectionArgs, null, null, null);
-
-        long entryId = -1;
-        if (c != null) {
-            if (c.move(entryIndex + 1)) {
-                int idInd = c.getColumnIndex(EntriesTableSchema.ENTRY_ID);
-                entryId = c.getLong(idInd);
-            }
-            c.close();
-        }
-
-        return entryId;
+        return EntriesTableSchema.getObjectFromContentValues(contentValues);
     }
 
     /**
@@ -612,26 +956,17 @@ public class HabitDatabase {
      */
     @Nullable
     public SessionEntry getEntry(long entryId) {
-        String selection = EntriesTableSchema.ENTRY_ID + "=?";
-        String selectionArgs[] = {String.valueOf(entryId)};
-
-        Cursor c = readableDatabase.query(EntriesTableSchema.TABLE_NAME, null, selection,
-                selectionArgs, null, null, null);
-
-        SessionEntry entry = null;
-        if (c != null) {
-            if (c.moveToFirst()) {
-                entry = getEntryFromCursor(c);
-            }
-
-            c.close();
-        }
-
-        return entry;
+        return MyDatabaseUtils.getRecord(
+                mReadableDatabase, EntriesTableSchema.TABLE_NAME,
+                EntriesTableSchema.ENTRY_ID, entryId, EntriesTableSchema.IGetFromCursor
+        );
     }
 
     public List<SessionEntry> getEntries(long habitId) {
-        int size = getNumberOfEntries(habitId);
+        int size = (int) DatabaseUtils.queryNumEntries(mReadableDatabase, EntriesTableSchema.TABLE_NAME, EntriesTableSchema.ENTRY_HABIT_ID + "=?",
+                new String[]{String.valueOf(habitId)});
+
+//        int size = getNumberOfEntries(habitId);
         List<SessionEntry> entries = new ArrayList<>(size);
 
         for (int i = 0; i < size; i++) {
@@ -643,20 +978,29 @@ public class HabitDatabase {
         return entries;
     }
 
+    //region Get attributes
+
+    /**
+     * @param habitId    The id of the habit which to look for it's entries.
+     * @param entryIndex The index of the entry to be retrieved from the habit.
+     * @return The found session entry row id.
+     */
+    public long getEntryId(long habitId, int entryIndex) {
+        return MyDatabaseUtils.getAttribute(
+                mReadableDatabase, EntriesTableSchema.TABLE_NAME,
+                EntriesTableSchema.ENTRY_HABIT_ID, habitId, EntriesTableSchema.ENTRY_ID, Long.class);
+    }
+    //endregion
+
+    //region Set attributes
+
     /**
      * @param entryId   The id of the entry to edit.
      * @param startTime The new start time to replace the old one.
      * @return The number of rows changed, -1 if error.
      */
     public long updateEntryStartTime(long entryId, long startTime) {
-        ContentValues values = new ContentValues(1);
-        values.put(EntriesTableSchema.ENTRY_START_TIME, startTime);
-
-        String whereClause = EntriesTableSchema.ENTRY_ID + " =?";
-        String whereArgs[] = {String.valueOf(entryId)};
-
-        return writableDatabase.update(EntriesTableSchema.TABLE_NAME, values,
-                whereClause, whereArgs);
+        return setEntryAttribute(entryId, EntriesTableSchema.ENTRY_START_TIME, startTime);
     }
 
     /**
@@ -665,14 +1009,7 @@ public class HabitDatabase {
      * @return The number of rows changed, -1 if error.
      */
     public long updateEntryDuration(long entryId, long duration) {
-        ContentValues values = new ContentValues(1);
-        values.put(EntriesTableSchema.ENTRY_DURATION, duration);
-
-        String whereClause = EntriesTableSchema.ENTRY_ID + " =?";
-        String whereArgs[] = {String.valueOf(entryId)};
-
-        return writableDatabase.update(EntriesTableSchema.TABLE_NAME, values,
-                whereClause, whereArgs);
+        return setEntryAttribute(entryId, EntriesTableSchema.ENTRY_DURATION, duration);
     }
 
     /**
@@ -681,15 +1018,9 @@ public class HabitDatabase {
      * @return The number of rows changed, -1 if error.
      */
     public long updateEntryNote(long entryId, String note) {
-        ContentValues values = new ContentValues(1);
-        values.put(EntriesTableSchema.ENTRY_NOTE, note);
-
-        String whereClause = EntriesTableSchema.ENTRY_ID + " =?";
-        String whereArgs[] = {String.valueOf(entryId)};
-
-        return writableDatabase.update(EntriesTableSchema.TABLE_NAME, values,
-                whereClause, whereArgs);
+        return setEntryAttribute(entryId, EntriesTableSchema.ENTRY_NOTE, note);
     }
+    //endregion
 
     /**
      * @param entryId  The id of the entry to edit.
@@ -718,11 +1049,11 @@ public class HabitDatabase {
     public long deleteEntry(long entryId) {
         SessionEntry removedEntry = getEntry(entryId);
 
-        String whereClause = EntriesTableSchema.ENTRY_ID + " =?";
-        String whereArgs[] = {String.valueOf(entryId)};
-
-        long res = writableDatabase.delete(EntriesTableSchema.TABLE_NAME,
-                whereClause, whereArgs);
+        long res = MyDatabaseUtils.deleteRecord(
+                mWritableDatabase,
+                EntriesTableSchema.TABLE_NAME,
+                EntriesTableSchema.ENTRY_ID, entryId
+        );
 
         notifyEntryDeleted(removedEntry);
 
@@ -737,487 +1068,13 @@ public class HabitDatabase {
         String whereClause = EntriesTableSchema.ENTRY_HABIT_ID + " =?";
         String whereArgs[] = {String.valueOf(habitId)};
 
-        long res = writableDatabase.delete(EntriesTableSchema.TABLE_NAME,
+        long res = mWritableDatabase.delete(EntriesTableSchema.TABLE_NAME,
                 whereClause, whereArgs);
 
         notifyEntriesReset(habitId);
 
         return res;
     }
+    //endregion
 
-    // ---- habits methods ----
-
-    private SQLiteStatement getHabitInsertStatement() {
-        return writableDatabase.compileStatement(HabitsTableSchema.getInsertStatement());
-    }
-
-    /**
-     * @param habit The habit to be added to the database.
-     * @return The row id of the new habit.
-     */
-    public long addHabitIfNotExists(Habit habit) {
-        long habitId = getHabitIdFromObject(habit);
-
-        if (habitId == -1) {
-            addHabit(habit);
-        }
-
-        return habitId;
-    }
-
-    private void bindValuesForHabitObject(SQLiteStatement insert, Habit habit) {
-        long categoryId = habit.getCategory().getDatabaseId();
-        if (categoryId == -1) {
-            throw new IllegalArgumentException("Category database id is -1.");
-        }
-
-        insert.bindLong(1, habit.getIsArchived() ? 1 : 0);
-        insert.bindString(2, habit.getName());
-        insert.bindString(3, habit.getDescription());
-        insert.bindString(4, habit.getIconResId());
-        insert.bindLong(5, habit.getCategory().getDatabaseId());
-    }
-
-    /**
-     * @param habit The habit to be added to the database.
-     * @return The row id of the new habit.
-     */
-    public long addHabit(Habit habit) {
-        SQLiteStatement insert = getHabitInsertStatement();
-        bindValuesForHabitObject(insert, habit);
-
-        long habitId = insert.executeInsert();
-        habit.setDatabaseId(habitId);
-        insert.close();
-
-        // Add entries to the new habit
-        List<SessionEntry> entries = habit.getEntries();
-        if (entries != null)
-            addEntries(habitId, entries);
-
-        return habitId;
-    }
-
-    /**
-     * @param habit The habit to be added to the database.
-     * @return The row id of the new habit.
-     */
-    public long addHabitAndCategory(Habit habit) {
-        HabitCategory category = habit.getCategory();
-        addCategoryIfNotExists(category);
-
-        return addHabit(habit);
-    }
-
-    public int getNumberOfHabits(long categoryId) {
-        return getNumberOfRows(HabitsTableSchema.TABLE_NAME,
-                new String[]{HabitsTableSchema.HABIT_ID},
-                HabitsTableSchema.HABIT_CATEGORY + "=?",
-                new String[]{String.valueOf(categoryId)});
-    }
-
-    public int getNumberOfEntries(long habitId) {
-        return getNumberOfRows(EntriesTableSchema.TABLE_NAME,
-                new String[]{EntriesTableSchema.ENTRY_HABIT_ID},
-                EntriesTableSchema.ENTRY_HABIT_ID + "=?",
-                new String[]{String.valueOf(habitId)});
-    }
-
-    /**
-     * @param index The habit index to look up.
-     * @return The unique habit id of the row.
-     */
-    public long getHabitIdFromIndex(long categoryId, int index) {
-        return getRowIdByIndex(index, HabitsTableSchema.TABLE_NAME, HabitsTableSchema.HABIT_ID,
-                HabitsTableSchema.HABIT_CATEGORY + "=?", new String[]{String.valueOf(categoryId)});
-    }
-
-    /**
-     * @param habit The object to look up in the database.
-     * @return The row id of the object in the database if found, else -1.
-     */
-    public long getHabitIdFromObject(Habit habit) {
-        long habitId = habit.getDatabaseId();
-
-        if (habitId == -1) {
-            long categoryId = getCategoryIdByObject(habit.getCategory());
-
-            String whereClause = HabitsTableSchema.HABIT_NAME + "=? AND " +
-                    HabitsTableSchema.HABIT_CATEGORY + "=?";
-
-            String selectionArgs[] = {habit.getName(), String.valueOf(categoryId)};
-
-            habitId = getRowIdByIndex(0, HabitsTableSchema.TABLE_NAME, HabitsTableSchema.HABIT_ID,
-                    whereClause, selectionArgs);
-
-            habit.setDatabaseId(habitId);
-        }
-
-        return habitId;
-    }
-
-    /**
-     * @param name The name of the habit to look up.
-     * @return The found habit ids.
-     */
-    public Set<Long> searchHabitIdsByName(String name) {
-        return searchTableForIdsByName("SELECT " + HabitsTableSchema.HABIT_ID + " FROM " +
-                        HabitsTableSchema.TABLE_NAME + " WHERE " +
-                        HabitsTableSchema.HABIT_NAME + " LIKE  ?",
-
-                new String[]{"%" + name + "%"}, HabitsTableSchema.HABIT_ID);
-    }
-
-    /**
-     * @param name The name of the category to look up.
-     * @return The found category ids as an array.
-     */
-    public Set<Long> searchCategoryIdsByName(String name) {
-        return searchTableForIdsByName(
-                "SELECT " + CategoriesTableSchema.CATEGORY_ID + " FROM " +
-                        CategoriesTableSchema.TABLE_NAME + " WHERE " +
-                        CategoriesTableSchema.CATEGORY_NAME + " LIKE  ?",
-
-                new String[]{"%" + name + "%"}, CategoriesTableSchema.CATEGORY_ID
-        );
-    }
-
-    /**
-     * @param query The name of the habit to look up.
-     * @return The found habit ids.
-     */
-    public Set<Long> queryDatabaseByTheUser(String query) {
-        Set<Long> habitIds = searchHabitIdsByName(query);
-        Set<Long> categoryIds = searchCategoryIdsByName(query);
-
-        Set<Long> habitIdsByCategory = new HashSet<>();
-        for (long id : categoryIds) {
-            habitIdsByCategory.addAll(getHabitIds(id));
-        }
-
-        Set<Long> ids = new HashSet<>(habitIds.size() + habitIdsByCategory.size());
-        ids.addAll(habitIds);
-        ids.addAll(habitIdsByCategory);
-
-        return ids;
-    }
-
-    public String getHabitName(long id) {
-        Cursor c = readableDatabase.query(HabitsTableSchema.TABLE_NAME, new String[]{HabitsTableSchema.HABIT_NAME},
-                HabitsTableSchema.HABIT_ID + "=?", new String[]{String.valueOf(id)}, null, null, null);
-
-        String name = null;
-
-        if (c != null) {
-            if (c.moveToFirst()) {
-                int nameInd = c.getColumnIndex(HabitsTableSchema.HABIT_NAME);
-                name = c.getString(nameInd);
-                c.close();
-            }
-        }
-
-        return name;
-    }
-
-    private Habit getHabitFromCursor(Cursor c) {
-        Habit habit = null;
-
-        long habitId = c.getLong(0);       // c.getColumnIndex(HabitsTableSchema.HABIT_ID);
-        boolean isArchived = (c.getInt(1) == 1); // c.getColumnIndex(HabitsTableSchema.HABIT_IS_ARCHIVED);
-        String name = c.getString(2);     // c.getColumnIndex(HabitsTableSchema.HABIT_NAME);
-        String description = c.getString(3);     // c.getColumnIndex(HabitsTableSchema.HABIT_DESCRIPTION);
-        long categoryId = c.getLong(4);       // c.getColumnIndex(HabitsTableSchema.HABIT_CATEGORY);
-        String iconResId = c.getString(5);     // c.getColumnIndex(HabitsTableSchema.HABIT_ICON_RES_ID);
-
-        HabitCategory category = getCategory(categoryId);
-
-        if (category != null) {
-            habit = new Habit(name, description, category, iconResId, null);
-            habit.setDatabaseId(habitId);
-            habit.setIsArchived(isArchived);
-        }
-
-        return habit;
-    }
-
-    /**
-     * @param habitId The row id of the habit you wish to receive.
-     * @return The habit object found.
-     */
-    public Habit getHabit(long habitId) throws RuntimeException {
-        String selectionArgs[] = {String.valueOf(habitId)};
-
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
-        Cursor c = db.query(HabitsTableSchema.TABLE_NAME, null, HabitsTableSchema.HABIT_ID + "=?",
-                selectionArgs, null, null, null);
-
-        Habit habit = null;
-        if (c != null) {
-            if (c.moveToFirst()) {
-                habit = getHabitFromCursor(c);
-                c.close();
-            }
-        }
-
-        return habit;
-    }
-
-    public long getHabitCategoryId(long habitId) {
-        Cursor c = readableDatabase.query(HabitsTableSchema.TABLE_NAME, new String[]{HabitsTableSchema.HABIT_CATEGORY},
-                HabitsTableSchema.HABIT_ID + "=?", new String[]{String.valueOf(habitId)}, null, null, null);
-
-        long categoryId = -1;
-
-        if (c != null) {
-            if (c.moveToFirst()) {
-                int categoryInd = c.getColumnIndex(HabitsTableSchema.HABIT_CATEGORY);
-                categoryId = c.getLong(categoryInd);
-                c.close();
-            }
-        }
-
-        return categoryId;
-    }
-
-    public int getHabitColor(long habitId) {
-        if (getIsHabitArchived(habitId)) return 0xFFCCCCCC;
-        else {
-            HabitCategory category = getCategory(getHabitCategoryId(habitId));
-            if (category != null) {
-                return category.getColorAsInt();
-            }
-        }
-
-        return -1;
-    }
-
-    public Set<Long> getHabitIds(long categoryId) {
-        return searchTableForIdsByName("SELECT " + HabitsTableSchema.HABIT_ID + " FROM " +
-                        HabitsTableSchema.TABLE_NAME + " WHERE " +
-                        HabitsTableSchema.HABIT_CATEGORY + " =?",
-                new String[]{String.valueOf(categoryId)}, HabitsTableSchema.HABIT_ID);
-    }
-
-    /**
-     * @param categoryId The category to fetch habits from.
-     * @return an array list containing the habits.
-     */
-    public List<Habit> getHabits(long categoryId) {
-        int numberOfHabits = getNumberOfHabits(categoryId);
-        List<Habit> habits = new ArrayList<>(numberOfHabits);
-
-        Cursor c = readableDatabase.query(HabitsTableSchema.TABLE_NAME, null,
-                HabitsTableSchema.HABIT_CATEGORY + " =?", new String[]{String.valueOf(categoryId)},
-                null, null, null);
-
-        int habitIndex = 0;
-        while (c.moveToNext())
-            habits.add(habitIndex++, getHabitFromCursor(c));
-
-        c.close();
-
-        return habits;
-    }
-
-    public ArrayList<Habit> getHabits() {
-        ArrayList<Habit> habits = new ArrayList<>();
-
-        int numberOfCategories = getNumberOfCategories();
-
-        for (int i = 0; i < numberOfCategories; i++) {
-            long categoryId = getCategoryIdFromIndex(i);
-            habits.addAll(getHabits(categoryId));
-        }
-
-        return habits;
-    }
-
-    public List<Habit> lookUpHabits(Set<Long> ids) {
-        List<Habit> habits = new ArrayList<>(ids.size());
-
-        for (long id : ids) {
-            habits.add(getHabit(id));
-        }
-
-        return habits;
-    }
-
-    public CategoryDataSample getCategoryData(long categoryId) {
-        return getCategoryDataSample(getCategory(categoryId));
-    }
-
-    public List<CategoryDataSample> getCategoryHabitsContainers() {
-        int size = getNumberOfCategories();
-        List<CategoryDataSample> containers = new ArrayList<>(size);
-
-        for (int i = 0; i < size; i++) {
-            long id = getCategoryIdFromIndex(i);
-            containers.add(getCategoryData(id));
-        }
-
-        return containers;
-    }
-
-    public boolean getIsHabitArchived(long habitId) {
-        Cursor c = readableDatabase.query(HabitsTableSchema.TABLE_NAME, new String[]{HabitsTableSchema.HABIT_IS_ARCHIVED},
-                HabitsTableSchema.HABIT_ID + "=?", new String[]{String.valueOf(habitId)}, null, null, null);
-
-        boolean isArchived = false;
-
-        if (c != null) {
-            if (c.moveToFirst()) {
-                isArchived = c.getInt(0) != 0;
-                c.close();
-            }
-        }
-
-        return isArchived;
-    }
-
-    /**
-     * @param habitId The row id to be updated.
-     * @param state   Set true to archive the habit, false to unarchive.
-     * @return The number of rows changed, -1 if error.
-     */
-    public long updateHabitIsArchived(long habitId, boolean state) {
-        ContentValues values = new ContentValues(1);
-        values.put(HabitsTableSchema.HABIT_IS_ARCHIVED, state);
-
-        String whereClause = HabitsTableSchema.HABIT_ID + " =?";
-        String whereArgs[] = {String.valueOf(habitId)};
-
-        return writableDatabase.update(HabitsTableSchema.TABLE_NAME, values,
-                whereClause, whereArgs);
-    }
-
-    /**
-     * @param habitId The row id to be updated.
-     * @param name    The new name to replace the old one.
-     * @return The number of rows changed, -1 if error.
-     */
-    public long updateHabitName(long habitId, String name) {
-        ContentValues values = new ContentValues(1);
-        values.put(HabitsTableSchema.HABIT_NAME, name);
-
-        String whereClause = HabitsTableSchema.HABIT_ID + " =?";
-        String whereArgs[] = {String.valueOf(habitId)};
-
-        return writableDatabase.update(HabitsTableSchema.TABLE_NAME, values,
-                whereClause, whereArgs);
-    }
-
-    /**
-     * @param habitId     The row id to be updated.
-     * @param description The new description to replace the old one.
-     * @return The number of rows changed, -1 if error.
-     */
-    public long updateHabitDescription(long habitId, String description) {
-        ContentValues values = new ContentValues(1);
-        values.put(HabitsTableSchema.HABIT_DESCRIPTION, description);
-
-        String whereClause = HabitsTableSchema.HABIT_ID + " =?";
-        String whereArgs[] = {String.valueOf(habitId)};
-
-        return writableDatabase.update(HabitsTableSchema.TABLE_NAME, values,
-                whereClause, whereArgs);
-    }
-
-    /**
-     * @param habitId    The row id to be updated.
-     * @param categoryId The new categoryId to replace the old one.
-     * @return The number of rows changed, -1 if error.
-     */
-    public long updateHabitCategory(long habitId, @Nullable Long categoryId) {
-        ContentValues values = new ContentValues(1);
-        values.put(HabitsTableSchema.HABIT_CATEGORY, categoryId);
-
-        String whereClause = HabitsTableSchema.HABIT_ID + " =?";
-        String whereArgs[] = {String.valueOf(habitId)};
-
-        return writableDatabase.update(HabitsTableSchema.TABLE_NAME, values,
-                whereClause, whereArgs);
-    }
-
-    /**
-     * @param habitId   The row id to be updated.
-     * @param iconResId The new iconResId to replace the old one.
-     * @return The number of rows changed, -1 if error.
-     */
-    public long updateHabitIconResId(long habitId, String iconResId) {
-        ContentValues values = new ContentValues(1);
-        values.put(HabitsTableSchema.HABIT_ICON_RES_ID, iconResId);
-
-        String whereClause = HabitsTableSchema.HABIT_ID + " =?";
-        String whereArgs[] = {String.valueOf(habitId)};
-
-        return writableDatabase.update(HabitsTableSchema.TABLE_NAME, values,
-                whereClause, whereArgs);
-    }
-
-    /**
-     * @param habitId The id of the habit to edit.
-     * @param habit   A new habit to replace the old one.
-     * @return The number of rows removed, -1 if error.
-     */
-    public long updateHabit(long habitId, Habit habit) {
-        if (getHabit(habitId) != null) {
-            updateHabitName(habitId, habit.getName());
-            updateHabitDescription(habitId, habit.getDescription());
-
-            HabitCategory category = habit.getCategory();
-            long categoryId = getCategoryIdByObject(category);
-            if (categoryId == -1) {
-                categoryId = addCategory(category);
-            }
-
-            updateHabitCategory(habitId, categoryId);
-            updateHabitIconResId(habitId, habit.getIconResId());
-            return 1;
-        }
-
-        return -1;
-    }
-
-    /**
-     * @param habitId The row id of the habit to be removed.
-     * @return The number of rows removed, -1 if error.
-     */
-    public long deleteHabit(long habitId) {
-        // Delete all of the habit's entries
-        deleteEntriesForHabit(habitId);
-
-        // Delete the habit itself
-        String whereClause = HabitsTableSchema.HABIT_ID + "=?";
-        String whereArgs[] = {String.valueOf(habitId)};
-
-        return writableDatabase.delete(HabitsTableSchema.TABLE_NAME,
-                whereClause, whereArgs);
-    }
-
-    public CategoryDataSample getCategoryDataSample(HabitCategory category, long dateFrom, long dateTo) {
-        List<Habit> habits = getHabits(category.getDatabaseId());
-
-        for (Habit habit : habits) {
-            long habitId = habit.getDatabaseId();
-            Set<Long> ids = searchEntriesWithTimeRangeForAHabit(habitId, dateFrom, dateTo);
-            List<SessionEntry> entries = lookUpEntries(ids);
-            habit.setEntries(entries);
-        }
-
-        return new CategoryDataSample(category, habits, dateFrom, dateTo);
-    }
-
-    private CategoryDataSample getCategoryDataSample(HabitCategory category) {
-        return getCategoryDataSample(category, 0, Long.MAX_VALUE);
-    }
-
-    public HabitDataSample getHabitDataSample(long dateFrom, long dateTo) {
-        List<CategoryDataSample> data = new ArrayList<>();
-
-        for (HabitCategory category : getCategories()) {
-            data.add(getCategoryDataSample(category, dateFrom, dateTo));
-        }
-
-        return new HabitDataSample(data, dateFrom, dateTo);
-    }
 }

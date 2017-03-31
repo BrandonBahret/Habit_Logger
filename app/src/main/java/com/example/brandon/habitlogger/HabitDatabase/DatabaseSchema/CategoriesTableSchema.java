@@ -40,7 +40,8 @@ public class CategoriesTableSchema {
     public static HabitCategory getObjectFromContentValues(@NonNull ContentValues contentValues) {
         String categoryName = contentValues.getAsString(CATEGORY_NAME);
         String categoryColor = contentValues.getAsString(CATEGORY_COLOR);
-        long databaseId = contentValues.getAsLong(CATEGORY_ID);
+        boolean isDatabaseIdNull = contentValues.get(CATEGORY_ID) == null;
+        Long databaseId = isDatabaseIdNull ? -1 : contentValues.getAsLong(CATEGORY_ID);
 
         return new HabitCategory(categoryColor, categoryName)
                 .setDatabaseId(databaseId);

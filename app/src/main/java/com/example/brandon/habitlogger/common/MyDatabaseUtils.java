@@ -2,7 +2,9 @@ package com.example.brandon.habitlogger.common;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.Nullable;
 
 /**
  * Created by Brandon on 2/18/2017.
@@ -17,7 +19,47 @@ public class MyDatabaseUtils {
         int setAttribute(long recordId, String columnKey, Object object);
     }
 
+    public interface GetRecordFromCursor<Out> {
+        Out getRecordFromCursor(ContentValues cursor);
+    }
+
+    /**
+     * @param readableDatabase Sqlite database object to query.
+     * @param tableName        The name of the table to query.
+     * @param recordKey        The name of the column that holds your record ids.
+     * @param recordId         The id of the record to select.
+     * @return A cursor pointing to the selected record
+     */
+    @Nullable
+    public static <Out> Out getRecord(SQLiteDatabase readableDatabase, String tableName,
+                                      String recordKey, long recordId,
+                                      GetRecordFromCursor<Out> recordGetter) {
+
+        Cursor c = readableDatabase.query(
+                tableName, null, recordKey + "=?",
+                new String[]{String.valueOf(recordId)},
+                null, null, null
+        );
+
+        if (c != null && c.moveToFirst()) {
+            ContentValues contentValues = new ContentValues(c.getColumnCount());
+            DatabaseUtils.cursorRowToContentValues(c, contentValues);
+            Out result = recordGetter.getRecordFromCursor(contentValues);
+            c.close();
+            return result;
+        }
+
+        return null;
+    }
+
+    public static long deleteRecord(SQLiteDatabase writableDatabase, String tableName, String recordKey, long recordId){
+        return writableDatabase.delete(
+                tableName, recordKey + " =?", new String[]{String.valueOf(recordId)}
+        );
+    }
+
     //region Get attributes from a database {}
+
     /**
      * @param readableDatabase Sqlite database object to query.
      * @param tableName        The name of the table to query.
@@ -39,9 +81,7 @@ public class MyDatabaseUtils {
                 null, null, null);
 
         Object result = null;
-        if (c.moveToFirst()) {
-            result = MyDatabaseUtils.getObjectFromCursor(c, 0);
-        }
+        if (c.moveToFirst()) result = MyDatabaseUtils.getObjectFromCursor(c, 0);
         c.close();
 
         return clazz.cast(result);
@@ -70,6 +110,7 @@ public class MyDatabaseUtils {
     //endregion
 
     //region Set attributes in a database {}
+
     /**
      * @param writableDatabase Sqlite database object to update.
      * @param tableName        The name of the table to update.
@@ -80,8 +121,7 @@ public class MyDatabaseUtils {
      * @return The number of rows effected.
      */
     public static int setAttribute(SQLiteDatabase writableDatabase, String tableName,
-                                   String recordKey, long recordId, String columnKey,
-                                   Object object) {
+                                   String recordKey, long recordId, String columnKey, Object object) {
 
         ContentValues value = new ContentValues(1);
 

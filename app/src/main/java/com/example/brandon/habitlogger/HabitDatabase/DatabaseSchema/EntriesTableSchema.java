@@ -1,6 +1,11 @@
 package com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema;
 
+import android.content.ContentValues;
+import android.support.annotation.NonNull;
+
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.DatabaseSchema.SQL_TYPES;
+import com.example.brandon.habitlogger.common.MyDatabaseUtils;
 
 /**
  * Created by Brandon on 2/17/2017.
@@ -38,5 +43,25 @@ public class EntriesTableSchema {
                 ENTRY_DURATION + ", " +
                 ENTRY_NOTE +
                 ") VALUES(?, ?, ?, ?);";
+    }
+
+    public static MyDatabaseUtils.GetRecordFromCursor<? extends SessionEntry> IGetFromCursor =
+            new MyDatabaseUtils.GetRecordFromCursor<SessionEntry>() {
+                @Override
+                public SessionEntry getRecordFromCursor(ContentValues contentValues) {
+                    return getObjectFromContentValues(contentValues);
+                }
+            };
+
+    public static SessionEntry getObjectFromContentValues(@NonNull ContentValues contentValues) {
+        Long startTime = contentValues.getAsLong(ENTRY_START_TIME);
+        Long duration = contentValues.getAsLong(ENTRY_DURATION);
+        String note = contentValues.getAsString(ENTRY_NOTE);
+        long databaseId = contentValues.getAsLong(ENTRY_ID);
+        long habitId = contentValues.getAsLong(ENTRY_HABIT_ID);
+
+        return new SessionEntry(startTime, duration, note)
+                .setDatabaseId(databaseId)
+                .setHabitId(habitId);
     }
 }

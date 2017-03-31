@@ -97,7 +97,7 @@ public class Habit implements Serializable, Parcelable {
     }
 
     public Habit(Parcel in) {
-        Habit habit = in.readParcelable(Habit.class.getClassLoader());
+        Habit habit = (Habit)in.readSerializable();
         Habit.copy(this, habit);
     }
     //endregion
@@ -110,7 +110,7 @@ public class Habit implements Serializable, Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeParcelable(this, flags);
+        parcel.writeSerializable(this);
     }
 
     public static final Creator<Habit> CREATOR = new Creator<Habit>() {

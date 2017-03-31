@@ -1,6 +1,11 @@
 package com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema;
 
+import android.content.ContentValues;
+
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.DatabaseSchema.DatabaseSchema.SQL_TYPES;
+import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 
 /**
  * Created by Brandon on 2/17/2017.
@@ -40,5 +45,24 @@ public class HabitsTableSchema {
                 ", " + HabitsTableSchema.HABIT_DESCRIPTION +
                 ", " + HabitsTableSchema.HABIT_ICON_RES_ID +
                 ", " + HabitsTableSchema.HABIT_CATEGORY + ") VALUES(?, ?, ?, ?, ?)";
+    }
+
+    public static Habit getObjectFromContentValues(ContentValues contentValues, HabitDatabase dao) {
+        boolean isArchived = contentValues.getAsLong(HABIT_IS_ARCHIVED) == 1;
+        String name = contentValues.getAsString(HABIT_NAME);
+        String description = contentValues.getAsString(HABIT_DESCRIPTION);
+        long categoryId = contentValues.getAsLong(HABIT_CATEGORY);
+        String iconResId = contentValues.getAsString(HABIT_ICON_RES_ID);
+
+        long habitId = contentValues.getAsLong(HABIT_ID);
+
+        HabitCategory category = dao.getCategory(categoryId);
+
+        if (category != null) {
+            return new Habit(name, description, category, iconResId, null)
+                    .setDatabaseId(habitId)
+                    .setIsArchived(isArchived);
+        }
+        else return null;
     }
 }

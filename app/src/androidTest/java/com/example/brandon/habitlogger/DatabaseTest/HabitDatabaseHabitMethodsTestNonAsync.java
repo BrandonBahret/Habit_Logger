@@ -135,7 +135,7 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
         long actualId = db.updateHabitIsArchived(id, true);
         Habit actualHabit = db.getHabit(actualId);
 
-        assertEquals(expectedHabit, actualHabit);
+        assertTrue(expectedHabit.equals(actualHabit));
     }
 
     public void testUpdateHabitName(){

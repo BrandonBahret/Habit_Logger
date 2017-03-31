@@ -336,7 +336,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         if (preferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_CARDS) {
-            categoryContainers = habitDatabase.getCategoryHabitsContainers();
+            categoryContainers = habitDatabase.getAllData();
             categoryAdapter = new CategoryCardAdapter(categoryContainers, menuItemClickListener, buttonClickListener);
 
             habitCardContainer.setAdapter(categoryAdapter);
@@ -678,7 +678,7 @@ public class MainActivity extends AppCompatActivity
 
     public void processUserQuery(String query) {
         if (query.length() != 0) {
-            Set<Long> ids = habitDatabase.queryDatabaseByTheUser(query);
+            Set<Long> ids = habitDatabase.searchHabitDatabase(query);
 
             List<Habit> allHabits = habitDatabase.getHabits();
 
