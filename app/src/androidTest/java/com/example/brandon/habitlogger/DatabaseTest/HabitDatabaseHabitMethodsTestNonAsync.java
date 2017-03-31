@@ -46,7 +46,7 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
     public void testAddHabit(){
         Habit dummyHabit = getDummyHabit();
 
-        long id = db.addHabitAndCategory(dummyHabit);
+        long id = db.addHabit(dummyHabit);
         Habit actualHabit = db.getHabit(id);
 
         assertNotNull(actualHabit);
@@ -56,13 +56,13 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
 
     public void testGetNumberOfHabits(){
         Habit dummyHabit = getDummyHabit();
-        db.addHabitAndCategory(dummyHabit);
+        db.addHabit(dummyHabit);
 
         assertEquals(1, db.getNumberOfHabits(dummyHabit.getCategory().getDatabaseId()));
     }
 
     public void testGetNumberOfEntries(){
-        long id = db.addHabitAndCategory(getDummyHabit());
+        long id = db.addHabit(getDummyHabit());
 
         db.addEntry(id, new SessionEntry(0, 0, ""));
         db.addEntry(id, new SessionEntry(0, 0, ""));
@@ -75,7 +75,7 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
     public void testGetHabitIdFromIndex(){
         Habit dummyHabit = getDummyHabit();
 
-        long expectedId = db.addHabitAndCategory(dummyHabit);
+        long expectedId = db.addHabit(dummyHabit);
 
         assertEquals(expectedId, db.getHabitIdFromIndex(dummyHabit.getCategory().getDatabaseId(), 0));
     }
@@ -83,7 +83,7 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
     public void testGetHabitIdFromObject(){
         Habit dummyHabit = getDummyHabit();
 
-        long expectedId = db.addHabitAndCategory(dummyHabit);
+        long expectedId = db.addHabit(dummyHabit);
 
         assertEquals(expectedId, db.getHabitIdFromObject(dummyHabit));
     }
@@ -92,10 +92,10 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
 
         Set<Long> expectedIds = new HashSet<>(2);
 
-        db.addHabitAndCategory(new Habit("one", "", getDummyHabit().getCategory(), "", null));
-        expectedIds.add(db.addHabitAndCategory(new Habit("two", "", getDummyHabit().getCategory(), "", null)));
-        expectedIds.add(db.addHabitAndCategory(new Habit("three", "", getDummyHabit().getCategory(), "", null)));
-        db.addHabitAndCategory(new Habit("four", "", getDummyHabit().getCategory(), "", null));
+        db.addHabit(new Habit("one", "", getDummyHabit().getCategory(), "", null));
+        expectedIds.add(db.addHabit(new Habit("two", "", getDummyHabit().getCategory(), "", null)));
+        expectedIds.add(db.addHabit(new Habit("three", "", getDummyHabit().getCategory(), "", null)));
+        db.addHabit(new Habit("four", "", getDummyHabit().getCategory(), "", null));
 
         assertTrue(expectedIds.equals(db.findHabitIdsByName("t")));
     }
@@ -104,7 +104,7 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
 
         Habit expectedHabit = getDummyHabit();
 
-        long id = db.addHabitAndCategory(expectedHabit);
+        long id = db.addHabit(expectedHabit);
         Habit actualHabit = db.getHabit(id);
 
         assertNotNull(actualHabit);
@@ -117,8 +117,8 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
         expectedHabits.add(getDummyHabit());
         expectedHabits.add(getDummyHabit2());
 
-        db.addHabitAndCategory(expectedHabits.get(0));
-        db.addHabitAndCategory(expectedHabits.get(1));
+        db.addHabit(expectedHabits.get(0));
+        db.addHabit(expectedHabits.get(1));
 
         List<Habit> actualHabits = db.getHabits(expectedHabits.get(0).getCategory().getDatabaseId());
 
@@ -127,7 +127,7 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
 
     public void testUpdateHabitIsArchived(){
         Habit origHabit = getDummyHabit();
-        long id = db.addHabitAndCategory(origHabit);
+        long id = db.addHabit(origHabit);
 
         Habit expectedHabit = getDummyHabit();
         expectedHabit.setIsArchived(true);
@@ -141,7 +141,7 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
     public void testUpdateHabitName(){
         Habit origHabit = getDummyHabit();
 
-        long id = db.addHabitAndCategory(origHabit);
+        long id = db.addHabit(origHabit);
 
         Habit expectedHabit = getDummyHabit();
         expectedHabit.setName("New Name");
@@ -156,7 +156,7 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
     public void testUpdateHabitDescription(){
         Habit origHabit = getDummyHabit();
 
-        long id = db.addHabitAndCategory(origHabit);
+        long id = db.addHabit(origHabit);
 
         Habit expectedHabit = getDummyHabit();
         expectedHabit.setDescription("New Description");
@@ -170,7 +170,7 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
 
     public void testUpdateHabitCategory(){
         Habit origHabit = getDummyHabit();
-        long id = db.addHabitAndCategory(origHabit);
+        long id = db.addHabit(origHabit);
 
         Habit expectedHabit = getDummyHabit();
         expectedHabit.setCategory(new HabitCategory("color", "New Category"));
@@ -186,7 +186,7 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
     public void testUpdateHabitIconResId(){
         Habit origHabit = getDummyHabit();
 
-        long id = db.addHabitAndCategory(origHabit);
+        long id = db.addHabit(origHabit);
 
         Habit expectedHabit = getDummyHabit();
         expectedHabit.setIconResId("New Icon");
@@ -200,7 +200,7 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
 
     public void testUpdateHabit(){
         Habit origHabit = getDummyHabit();
-        long id = db.addHabitAndCategory(origHabit);
+        long id = db.addHabit(origHabit);
 
         Habit expectedHabit = getDummyHabit2();
         db.updateHabit(id, getDummyHabit2());
@@ -212,7 +212,7 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
 
     public void testDeleteHabit(){
         Habit origHabit = getDummyHabit();
-        long id = db.addHabitAndCategory(origHabit);
+        long id = db.addHabit(origHabit);
 
         assertNotNull(db.getHabit(id));
 

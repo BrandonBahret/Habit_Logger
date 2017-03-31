@@ -29,7 +29,7 @@ public class HabitDatabaseNonAsyncEntryMethodsTest extends AndroidTestCase {
 
         HabitCategory mainCategory = new HabitCategory("color", "name");
         Habit mainHabit = new Habit("name", "", mainCategory, "", null);
-        mainHabitId = db.addHabitAndCategory(mainHabit);
+        mainHabitId = db.addHabit(mainHabit);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class HabitDatabaseNonAsyncEntryMethodsTest extends AndroidTestCase {
     public void testSearchAllEntriesWithTimeRange(){
         Set<Long> expectedIds = new HashSet<>(4);
 
-        long newHabitId = db.addHabitAndCategory(new Habit("new habit", "", new HabitCategory("color", "name"), "", null));
+        long newHabitId = db.addHabit(new Habit("new habit", "", new HabitCategory("color", "name"), "", null));
 
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "1"));
         db.addEntry(mainHabitId, new SessionEntry(0, 0, "2"));

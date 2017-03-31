@@ -36,15 +36,6 @@ public class EntriesTableSchema {
         return "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
 
-    public static String getInsertStatement() {
-        return "INSERT INTO ENTRIES_TABLE (" +
-                ENTRY_HABIT_ID + ", " +
-                ENTRY_START_TIME + ", " +
-                ENTRY_DURATION + ", " +
-                ENTRY_NOTE +
-                ") VALUES(?, ?, ?, ?);";
-    }
-
     public static MyDatabaseUtils.GetRecordFromCursor<? extends SessionEntry> IGetFromCursor =
             new MyDatabaseUtils.GetRecordFromCursor<SessionEntry>() {
                 @Override
@@ -57,11 +48,21 @@ public class EntriesTableSchema {
         Long startTime = contentValues.getAsLong(ENTRY_START_TIME);
         Long duration = contentValues.getAsLong(ENTRY_DURATION);
         String note = contentValues.getAsString(ENTRY_NOTE);
-        long databaseId = contentValues.getAsLong(ENTRY_ID);
         long habitId = contentValues.getAsLong(ENTRY_HABIT_ID);
+        long databaseId = contentValues.getAsLong(ENTRY_ID);
 
         return new SessionEntry(startTime, duration, note)
                 .setDatabaseId(databaseId)
                 .setHabitId(habitId);
+    }
+
+    public static ContentValues getContentValuesFromObject(SessionEntry entry, long habitId) {
+        ContentValues values = new ContentValues(4);
+        values.put(ENTRY_START_TIME, entry.getStartingTime());
+        values.put(ENTRY_DURATION, entry.getDuration());
+        values.put(ENTRY_NOTE, entry.getNote());
+        values.put(ENTRY_HABIT_ID, habitId);
+
+        return values;
     }
 }

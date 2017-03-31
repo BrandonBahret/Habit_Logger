@@ -30,13 +30,6 @@ public class CategoriesTableSchema {
         return "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
 
-    public static String getInsertStatement() {
-        return "INSERT INTO " + CategoriesTableSchema.TABLE_NAME +
-                " (" + CategoriesTableSchema.CATEGORY_NAME +
-                ", " + CategoriesTableSchema.CATEGORY_COLOR +
-                ") VALUES(?, ?)";
-    }
-
     public static HabitCategory getObjectFromContentValues(@NonNull ContentValues contentValues) {
         String categoryName = contentValues.getAsString(CATEGORY_NAME);
         String categoryColor = contentValues.getAsString(CATEGORY_COLOR);
@@ -45,5 +38,13 @@ public class CategoriesTableSchema {
 
         return new HabitCategory(categoryColor, categoryName)
                 .setDatabaseId(databaseId);
+    }
+
+    public static ContentValues getContentValuesFromObject(HabitCategory category) {
+        ContentValues values = new ContentValues(2);
+        values.put(CATEGORY_COLOR, category.getColor());
+        values.put(CATEGORY_NAME, category.getName());
+
+        return values;
     }
 }

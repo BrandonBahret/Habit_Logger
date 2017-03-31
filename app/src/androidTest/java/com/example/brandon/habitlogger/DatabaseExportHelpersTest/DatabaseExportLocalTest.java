@@ -41,7 +41,7 @@ public class DatabaseExportLocalTest extends AndroidTestCase {
         }
 
         for (int i = 0; i < 10; i++) {
-            db.addHabitAndCategory(new Habit("name " + i, "description", mainCategory, "none", entries));
+            db.addHabit(new Habit("name " + i, "description", mainCategory, "none", entries));
         }
     }
 

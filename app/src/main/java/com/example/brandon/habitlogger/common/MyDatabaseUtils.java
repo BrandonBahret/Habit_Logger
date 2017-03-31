@@ -23,14 +23,19 @@ public class MyDatabaseUtils {
         Out getRecordFromCursor(ContentValues cursor);
     }
 
+    //region Methods to count records
     public static long getNumberOfRows(SQLiteDatabase readableDatabase, String tableName,
-                                String whereClause, String selectionArgs[]) {
-        return DatabaseUtils.queryNumEntries(readableDatabase, tableName, whereClause, selectionArgs);
+                                String recordKey, long recordId) {
+        return DatabaseUtils.queryNumEntries(
+                readableDatabase, tableName,
+                recordKey + "=?", new String[]{String.valueOf(recordId)}
+        );
     }
 
     public static long getNumberOfRows(SQLiteDatabase readableDatabase, String tableName) {
         return DatabaseUtils.queryNumEntries(readableDatabase, tableName, null, null);
     }
+    //endregion
 
     //region Methods to manipulate records
     /**
@@ -69,7 +74,7 @@ public class MyDatabaseUtils {
     }
     //endregion
 
-    //region Get attributes from a database {}
+    //region Methods to get attributes from a database
 
     /**
      * @param readableDatabase Sqlite database object to query.
@@ -120,7 +125,7 @@ public class MyDatabaseUtils {
     }
     //endregion
 
-    //region Set attributes in a database {}
+    //region Methods to set attributes in a database
 
     /**
      * @param writableDatabase Sqlite database object to update.
@@ -150,4 +155,5 @@ public class MyDatabaseUtils {
                 recordKey + " =?", new String[]{String.valueOf(recordId)});
     }
     //endregion
+
 }

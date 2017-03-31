@@ -38,15 +38,6 @@ public class HabitsTableSchema {
         return "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
 
-    public static String getInsertStatement() {
-        return "INSERT INTO " + HabitsTableSchema.TABLE_NAME +
-                " (" + HabitsTableSchema.HABIT_IS_ARCHIVED +
-                ", " + HabitsTableSchema.HABIT_NAME +
-                ", " + HabitsTableSchema.HABIT_DESCRIPTION +
-                ", " + HabitsTableSchema.HABIT_ICON_RES_ID +
-                ", " + HabitsTableSchema.HABIT_CATEGORY_ID + ") VALUES(?, ?, ?, ?, ?)";
-    }
-
     public static Habit getObjectFromContentValues(ContentValues contentValues, HabitDatabase dao) {
         boolean isArchived = contentValues.getAsLong(HABIT_IS_ARCHIVED) == 1;
         String name = contentValues.getAsString(HABIT_NAME);

@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity
                 NewHabitDialog dialog = NewHabitDialog.newInstance(new NewHabitDialog.OnFinishedListener() {
                     @Override
                     public void onFinishedWithResult(Habit habit) {
-                        habitDatabase.addHabitAndCategory(habit);
+                        habitDatabase.addHabit(habit);
                         showDatabase();
                     }
                 });

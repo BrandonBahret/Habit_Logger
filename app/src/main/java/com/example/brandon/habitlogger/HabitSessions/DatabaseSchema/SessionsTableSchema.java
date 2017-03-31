@@ -16,7 +16,7 @@ import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 public class SessionsTableSchema {
     public static final String TABLE_NAME = "SESSIONS_TABLE";
     public static final String HABIT_NAME = "HABIT_NAME";
-    public static final String HABIT_CATEGORY = "HABIT_CATEGORY_ID";
+    public static final String HABIT_CATEGORY = "HABIT_CATEGORY";
     public static final String HABIT_COLOR = "HABIT_COLOR";
     public static final String HABIT_ID = "HABIT_ID";
     public static final String DURATION = "DURATION";
