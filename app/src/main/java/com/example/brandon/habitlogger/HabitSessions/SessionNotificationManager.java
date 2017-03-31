@@ -25,40 +25,30 @@ import java.io.Serializable;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class SessionNotificationManager {
 
-    Context context;
-    SessionManager sessionManager;
-    NotificationManager notificationManager;
+    //region (Member attributes)
+    private Context mContext;
+    private SessionManager mSessionManager;
+    private NotificationManager mNotificationManager;
+    //endregion
 
     public SessionNotificationManager(Context context) {
-        this.context = context;
-        sessionManager = new SessionManager(context);
-        notificationManager = (NotificationManager)
+        mContext = context;
+        mSessionManager = new SessionManager(context);
+        mNotificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
-    public static class SessionToggle extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent data) {
-            Habit habit = data.getParcelableExtra("habit");
-
-            SessionNotificationManager manager = new SessionNotificationManager(context);
-            boolean isPaused = manager.sessionManager.getIsPaused(habit.getDatabaseId());
-            manager.sessionManager.setPauseState(habit.getDatabaseId(), !isPaused);
-
-            manager.updateNotification(habit);
-        }
-    }
-
-    public RemoteViews createRemoteViews(Habit habit) {
-        final int habitId = (int) habit.getDatabaseId();
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.notification_layout);
+    //region Methods responsible for building notifications
+    private RemoteViews createRemoteViews(Habit habit) {
+        RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.notification_layout);
         remoteViews.setInt(R.id.card_accent, "setBackgroundColor", habit.getColor());
         remoteViews.setTextViewText(R.id.active_session_habit_name, habit.getName());
 
-        if (sessionManager.getIsSessionActive(habitId)) {
-            SessionEntry entry = sessionManager.getSession(habitId);
+        final long habitId = habit.getDatabaseId();
+        if (mSessionManager.getIsSessionActive(habitId)) {
+            SessionEntry entry = mSessionManager.getSession(habitId);
             remoteViews.setTextViewText(R.id.active_habit_time, entry.stringifyDuration());
-            remoteViews.setTextViewText(R.id.time_started, entry.getStartTimeAsString("h:mm a"));
+            remoteViews.setTextViewText(R.id.time_started, entry.stringifyStartingTime("h:mm a"));
             remoteViews.setOnClickPendingIntent(R.id.session_pause_play, getPendingIntentForSessionToggle(habit));
             remoteViews.setInt(
                     R.id.session_pause_play, "setImageResource",
@@ -70,20 +60,13 @@ public class SessionNotificationManager {
     }
 
     private PendingIntent getPendingIntentForSessionToggle(Habit habit) {
-        Intent resultIntent = new Intent("session_toggle_pressed");
-        resultIntent.putExtra("habit", (Parcelable) habit);
-        return PendingIntent.getBroadcast(context, (int) habit.getDatabaseId(), resultIntent, 0);
-    }
-
-    private PendingIntent getPendingIntentForSessionActivity(Habit habit) {
-        Intent resultIntent = new Intent(context, SessionActivity.class);
-        resultIntent.putExtra(SessionActivity.BundleKeys.SERIALIZED_HABIT, (Serializable) habit);
-        return PendingIntent.getActivity
-                (context, (int) habit.getDatabaseId(), resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent resultIntent = new Intent(SessionToggle.ACTION_STRING);
+        resultIntent.putExtra(SessionToggle.PARCELABLE_HABIT, (Parcelable) habit);
+        return PendingIntent.getBroadcast(mContext, (int) habit.getDatabaseId(), resultIntent, 0);
     }
 
     private Notification createNotification(Habit habit) {
-        return new NotificationCompat.Builder(context)
+        return new NotificationCompat.Builder(mContext)
                 .setSmallIcon(R.drawable.ic_notification_icon)
                 .setContentText("")
                 .setContentTitle("")
@@ -97,6 +80,17 @@ public class SessionNotificationManager {
                 .build();
     }
 
+    private PendingIntent getPendingIntentForSessionActivity(Habit habit) {
+        Intent resultIntent = new Intent(mContext, SessionActivity.class);
+        resultIntent.putExtra(SessionActivity.BundleKeys.SERIALIZED_HABIT, (Serializable) habit);
+        return PendingIntent.getActivity
+                (mContext, (int) habit.getDatabaseId(), resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+    //endregion -- end --
+
+    //region [ ---- Methods responsible for managing notifications ---- ]
+
+    //region Methods responsible for launching notifications
     public void launchSessionNotification(final Habit habit) {
         new Thread(
                 new Runnable() {
@@ -104,8 +98,8 @@ public class SessionNotificationManager {
                     public void run() {
                         final int habitId = (int) habit.getDatabaseId();
 
-                        if (sessionManager.getIsSessionActive(habitId)) {
-                            notificationManager.notify(habitId, createNotification(habit));
+                        if (mSessionManager.getIsSessionActive(habitId)) {
+                            mNotificationManager.notify(habitId, createNotification(habit));
 
                             try {
                                 Thread.sleep(1000);
@@ -114,28 +108,47 @@ public class SessionNotificationManager {
                                 e.printStackTrace();
                             }
                         }
-                        else {
-                            notificationManager.cancel(habitId);
-                        }
+                        else mNotificationManager.cancel(habitId);
                     }
                 }
         ).start();
     }
 
     public void launchNotificationsForAllActiveSessions() {
-        for (SessionEntry entry : sessionManager.getActiveSessionList())
+        for (SessionEntry entry : mSessionManager.getActiveSessionList())
             launchSessionNotification(entry.getHabit());
     }
+    //endregion -- end --
 
-    public void updateNotification(Habit habit) {
-        notificationManager.notify((int) habit.getDatabaseId(), createNotification(habit));
-    }
-
+    //region Methods responsible for canceling notifications
     public void cancel(int habitId) {
-        notificationManager.cancel(habitId);
+        mNotificationManager.cancel(habitId);
     }
 
     public void cancelAllNotifications() {
-        notificationManager.cancelAll();
+        mNotificationManager.cancelAll();
+    }
+    //endregion -- end --
+
+    public void updateNotification(Habit habit) {
+        mNotificationManager.notify((int) habit.getDatabaseId(), createNotification(habit));
+    }
+
+    //endregion [ ---------------- end ---------------- ]
+
+    public static class SessionToggle extends BroadcastReceiver {
+        public static final String ACTION_STRING = "session_toggle_pressed";
+        public static final String PARCELABLE_HABIT = "habit";
+
+        @Override
+        public void onReceive(Context context, Intent data) {
+            Habit habit = data.getParcelableExtra(PARCELABLE_HABIT);
+
+            SessionNotificationManager manager = new SessionNotificationManager(context);
+            boolean isPaused = manager.mSessionManager.getIsPaused(habit.getDatabaseId());
+            manager.mSessionManager.setPauseState(habit.getDatabaseId(), !isPaused);
+
+            manager.updateNotification(habit);
+        }
     }
 }
