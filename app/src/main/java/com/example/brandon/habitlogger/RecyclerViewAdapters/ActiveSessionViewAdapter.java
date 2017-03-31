@@ -33,9 +33,9 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
     OnClickListeners listener;
 
     public interface OnClickListeners {
-        void onRootClick(long habitId);
+        void onSessionViewClick(long habitId);
 
-        void onPauseClick(ViewHolder holder, long habitId);
+        void onSessionPauseButtonClick(ViewHolder holder, long habitId);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -110,14 +110,14 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
             holder.rootView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    listener.onRootClick(holder.habitId);
+                    listener.onSessionViewClick(holder.habitId);
                 }
             });
 
             holder.pauseButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    listener.onPauseClick(holder, holder.habitId);
+                    listener.onSessionPauseButtonClick(holder, holder.habitId);
                 }
             });
         }

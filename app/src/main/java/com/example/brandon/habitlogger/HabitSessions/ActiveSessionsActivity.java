@@ -38,21 +38,19 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
         SessionManager.SessionChangeListeners, ActiveSessionViewAdapter.OnClickListeners,
         SearchView.OnQueryTextListener {
 
-    List<Pair<SessionEntry, Integer>> sessionEntriesUndoStack = new ArrayList<>();
+    //region (Member attributes)
+    private List<Pair<SessionEntry, Integer>> mUndoStack = new ArrayList<>();
+    private List<SessionEntry> mActiveSessions;
+    private SessionManager mSessionManager;
 
-
-    List<SessionEntry> sessionEntries;
-    SessionManager sessionManager;
-
-    ActiveSessionViewAdapter sessionViewAdapter;
-
+    private Handler mUpdateHandler = new Handler();
+    private ActiveSessionViewAdapter mSessionViewAdapter;
     private ActivityActiveSessionsBinding ui;
-    Handler handler = new Handler();
+    //endregion
 
-    //region // Methods responsible for handling the lifecycle of the activity.
+    //region [ ---- Methods responsible for handling the lifecycle of the activity. ---- ]
 
-    //region // entire lifetime (onCreate - onDestroy)
-
+    //region entire lifetime (onCreate - onDestroy)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,19 +59,19 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        sessionManager = new SessionManager(this);
+        mSessionManager = new SessionManager(this);
 
-        sessionEntries = sessionManager.getActiveSessionList();
+        mActiveSessions = mSessionManager.getActiveSessionList();
 
-        Collections.sort(sessionEntries, SessionEntry.ICompareHabitNames);
-        Collections.sort(sessionEntries, SessionEntry.ICompareCategoryNames);
+        Collections.sort(mActiveSessions, SessionEntry.ICompareHabitNames);
+        Collections.sort(mActiveSessions, SessionEntry.ICompareCategoryNames);
 
-        sessionViewAdapter = new ActiveSessionViewAdapter(sessionEntries, this, this);
+        mSessionViewAdapter = new ActiveSessionViewAdapter(mActiveSessions, this, this);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         ui.sessionViewContainer.setLayoutManager(layoutManager);
         ui.sessionViewContainer.setItemAnimator(new DefaultItemAnimator());
-        ui.sessionViewContainer.setAdapter(sessionViewAdapter);
+        ui.sessionViewContainer.setAdapter(mSessionViewAdapter);
 
         ItemTouchHelper touchHelper = new ItemTouchHelper(createItemTouchCallback());
         touchHelper.attachToRecyclerView(ui.sessionViewContainer);
@@ -88,32 +86,28 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
 
         return super.onCreateOptionsMenu(menu);
     }
+    //endregion -- end --
 
-    //endregion // entire lifetime
-
-    //region // visible lifetime (onStart - onStop)
-
+    //region visible lifetime (onStart - onStop)
     @Override
     protected void onStart() {
         super.onStart();
-        sessionManager.addSessionChangedCallback(this);
+        mSessionManager.addSessionChangedCallback(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        sessionManager.removeSessionChangedCallback(this);
+        mSessionManager.removeSessionChangedCallback(this);
     }
+    //endregion -- end --
 
-    //endregion // visible lifetime
-
-    //region // foreground lifetime (onResume - onPause)
-
+    //region foreground lifetime (onResume - onPause)
     @Override
     protected void onResume() {
         super.onResume();
 
-        if (sessionManager.getSessionCount() == 0)
+        if (mSessionManager.getSessionCount() == 0)
             finish();
 
         startRepeatingTask();
@@ -124,32 +118,31 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
         super.onPause();
         stopRepeatingTask();
     }
+    //endregion -- end --
 
-    //endregion // foreground lifetime
+    //endregion [ ---------------- end ---------------- ]
 
-    //endregion // Methods responsible for handling the lifecycle of the activity.
-
-    //region // Methods responsible for updating the ui.
+    //region Methods responsible for updating the ui
 
     void startRepeatingTask() {
-        updateCards.run();
+        mUpdateCards.run();
     }
 
     void stopRepeatingTask() {
-        handler.removeCallbacks(updateCards);
+        mUpdateHandler.removeCallbacks(mUpdateCards);
     }
 
-    private Runnable updateCards = new Runnable() {
+    private Runnable mUpdateCards = new Runnable() {
         @Override
         public void run() {
 
-            int size = sessionEntries.size();
+            int size = mActiveSessions.size();
             for (int i = 0; i < size; i++) {
 
-                long habitId = sessionEntries.get(i).getHabitId();
-                if (sessionManager.getIsSessionActive(habitId)) {
-                    SessionEntry entry = sessionManager.getSession(habitId);
-                    sessionEntries.set(i, entry);
+                long habitId = mActiveSessions.get(i).getHabitId();
+                if (mSessionManager.getIsSessionActive(habitId)) {
+                    SessionEntry entry = mSessionManager.getSession(habitId);
+                    mActiveSessions.set(i, entry);
 
                     View item = ui.sessionViewContainer.getChildAt(i);
 
@@ -159,19 +152,19 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
                     }
                 }
                 else {
-                    sessionEntries.remove(i);
-                    sessionViewAdapter.notifyItemRemoved(i);
+                    mActiveSessions.remove(i);
+                    mSessionViewAdapter.notifyItemRemoved(i);
                     size--;
                 }
             }
 
-            handler.postDelayed(updateCards, 1000);
+            mUpdateHandler.postDelayed(mUpdateCards, 1000);
         }
     };
 
     //endregion
 
-    //region // Methods for handling events
+    //region [ ---- Methods for handling events ---- ]
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -222,12 +215,12 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                long habitId = sessionEntries.get(position).getHabitId();
-                sessionEntriesUndoStack.add(0, new Pair<>(sessionManager.getSession(habitId), position));
+                long habitId = mActiveSessions.get(position).getHabitId();
+                mUndoStack.add(0, new Pair<>(mSessionManager.getSession(habitId), position));
 
-                sessionManager.cancelSession(habitId);
-                sessionEntries.remove(position);
-                sessionViewAdapter.notifyItemRemoved(position);
+                mSessionManager.cancelSession(habitId);
+                mActiveSessions.remove(position);
+                mSessionViewAdapter.notifyItemRemoved(position);
 
                 Snackbar.make(findViewById(R.id.activity_active_sessions), "Session canceled", Snackbar.LENGTH_LONG)
                         .addCallback(new Snackbar.Callback() {
@@ -235,11 +228,11 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
                             public void onDismissed(Snackbar transientBottomBar, int event) {
                                 super.onDismissed(transientBottomBar, event);
 
-                                if (sessionManager.getSessionCount() == 0)
+                                if (mSessionManager.getSessionCount() == 0)
                                     finish();
 
                                 if (event != DISMISS_EVENT_CONSECUTIVE)
-                                    sessionEntriesUndoStack.clear();
+                                    mUndoStack.clear();
 
                             }
                         })
@@ -247,18 +240,18 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
                             @Override
                             public void onClick(View view) {
 
-                                for (Pair entryPair : sessionEntriesUndoStack) {
-                                    sessionManager.insertSession((SessionEntry) entryPair.first);
+                                for (Pair entryPair : mUndoStack) {
+                                    mSessionManager.insertSession((SessionEntry) entryPair.first);
 
-                                    sessionEntries.add((Integer) entryPair.second, (SessionEntry) entryPair.first);
-                                    sessionViewAdapter.notifyItemInserted((Integer) entryPair.second);
+                                    mActiveSessions.add((Integer) entryPair.second, (SessionEntry) entryPair.first);
+                                    mSessionViewAdapter.notifyItemInserted((Integer) entryPair.second);
                                 }
 
-                                sessionEntriesUndoStack.clear();
+                                mUndoStack.clear();
 
-//                                Collections.sort(sessionEntries, SessionEntry.ICompareHabitNames);
-//                                Collections.sort(sessionEntries, SessionEntry.ICompareCategoryNames);
-//                                sessionViewAdapter.notifyDataSetChanged();
+//                                Collections.sort(mActiveSessions, SessionEntry.ICompareHabitNames);
+//                                Collections.sort(mActiveSessions, SessionEntry.ICompareCategoryNames);
+//                                mSessionViewAdapter.notifyDataSetChanged();
                             }
                         })
                         .setActionTextColor(ContextCompat.getColor(ActiveSessionsActivity.this, R.color.colorAccent))
@@ -267,31 +260,31 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
         };
     }
 
-    //region // SearchView listeners
+    //region Methods responsible for handling search events
     @Override
     public boolean onQueryTextSubmit(String query) {
-        return false;
+        return onQueryTextChange(query);
     }
 
     @Override
     public boolean onQueryTextChange(String query) {
-        List<SessionEntry> entries = sessionManager.queryActiveSessionList(query);
 
-        if (entries.isEmpty()) {
-            entries = sessionManager.getActiveSessionList();
-        }
+        List<SessionEntry> entries = mSessionManager.queryActiveSessionList(query);
 
-        sessionEntries.clear();
-        sessionEntries.addAll(entries);
+        if (query.isEmpty())
+            entries = mSessionManager.getActiveSessionList();
 
-        sessionViewAdapter.notifyDataSetChanged();
+        mActiveSessions.clear();
+        mActiveSessions.addAll(entries);
+
+        mSessionViewAdapter.notifyDataSetChanged();
         return true;
     }
     //endregion
 
-    //region // Adapter Listeners
+    //region Methods responsible for handling RecyclerView adapter events
     @Override
-    public void onRootClick(long habitId) {
+    public void onSessionViewClick(long habitId) {
         Habit habit = new HabitDatabase(this).getHabit(habitId);
         Intent startSession = new Intent(this, SessionActivity.class);
         startSession.putExtra(SessionActivity.BundleKeys.SERIALIZED_HABIT, (Serializable) habit);
@@ -299,21 +292,21 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onPauseClick(ActiveSessionViewAdapter.ViewHolder holder, long habitId) {
-        boolean isPaused = sessionManager.getIsPaused(habitId);
+    public void onSessionPauseButtonClick(ActiveSessionViewAdapter.ViewHolder holder, long habitId) {
+        boolean isPaused = mSessionManager.getIsPaused(habitId);
 
-        sessionManager.setPauseState(habitId, !isPaused);
-        sessionViewAdapter.notifyItemChanged(holder.getAdapterPosition());
+        mSessionManager.setPauseState(habitId, !isPaused);
+        mSessionViewAdapter.notifyItemChanged(holder.getAdapterPosition());
     }
     //endregion
 
-    //region // SessionManager listeners
+    //region Methods responsible for handling SessionManager events
     @Override
     public void onSessionPauseStateChanged(long habitId, boolean isPaused) {
-        for (SessionEntry entry : sessionEntries) {
+        for (SessionEntry entry : mActiveSessions) {
             if (entry.getHabit().getDatabaseId() == habitId) {
-                int position = sessionEntries.indexOf(entry);
-                sessionViewAdapter.notifyItemChanged(position);
+                int position = mActiveSessions.indexOf(entry);
+                mSessionViewAdapter.notifyItemChanged(position);
                 break;
             }
         }
@@ -329,5 +322,6 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     public void onSessionStarted(long habitId) {}
     //endregion
 
-    //endregion // Methods for handling events
+    //endregion [ ---------------- end ---------------- ]
+
 }

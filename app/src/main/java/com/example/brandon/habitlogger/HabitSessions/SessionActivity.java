@@ -33,26 +33,28 @@ public class SessionActivity extends AppCompatActivity implements
         public static final String SERIALIZED_HABIT = "SERIALIZED_HABIT_KEY";
     }
 
-    AlertDialog confirmationDialog;
-    Bundle dialogSettings = new Bundle();
-
     private static class DialogSettingKeys {
-        final static String DIALOG_SETTINGS_BUNDLE = "DIALOG_SETTINGS_BUNDLE";
-        final static String SHOW_DIALOG = "SHOW_DIALOG";
-        final static String SHOW_CANCEL_DIALOG = "IS_CANCEL";
-        final static String SHOULD_PAUSE = "SHOULD_PAUSE";
-        public static String INITIAL_PAUSE_STATE = "INITIAL_PAUSE_STATE";
+        static final String DIALOG_SETTINGS_BUNDLE = "DIALOG_SETTINGS_BUNDLE";
+        static final String SHOW_DIALOG = "SHOW_DIALOG";
+        static final String SHOW_CANCEL_DIALOG = "IS_CANCEL";
+        static final String SHOULD_PAUSE = "SHOULD_PAUSE";
+        static final String INITIAL_PAUSE_STATE = "INITIAL_PAUSE_STATE";
     }
+
+    //region (Member attributes)
+    private AlertDialog mConfirmationDialog;
+    private Bundle mDialogSettings = new Bundle();
 
     private SessionManager mSessionManager;
     private Habit mHabit;
 
+    private Handler mUpdateHandler = new Handler();
     ActivitySessionBinding ui;
-    Handler handler = new Handler();
+    //endregion
 
-    //region // Methods responsible for handling the lifecycle of the activity
+    //region [ ---- Methods responsible for handling the lifecycle of the activity ---- ]
 
-    //region // Set-up activity
+    //region entire lifetime (onCreate - onDestroy)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +67,9 @@ public class SessionActivity extends AppCompatActivity implements
         getMenuInflater().inflate(R.menu.menu_session_activity, menu);
         return super.onCreateOptionsMenu(menu);
     }
+    //endregion -- end --
 
+    //region visible lifetime (onStart - onStop)
     @Override
     protected void onStart() {
         super.onStart();
@@ -79,32 +83,34 @@ public class SessionActivity extends AppCompatActivity implements
             getSupportActionBar().setTitle(mHabit.getName());
         }
 
-        updateTimeDisplay(true);
+        updateTimeDisplay();
 
         mSessionManager.addSessionChangedCallback(this);
         ui.sessionPausePlay.setOnClickListener(this);
     }
-    //endregion // Set-up activity
 
-    //region // Restore activity
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mSessionManager.removeSessionChangedCallback(this);
+    }
+    //endregion -- end --
+
+    //region foreground lifetime (onResume - onPause)
     @Override
     protected void onResume() {
         super.onResume();
         updateSessionPlayButton(mSessionManager.getIsPaused(mHabit.getDatabaseId()));
-        updateTimeDisplay(true);
+        updateTimeDisplay();
 
         // Load note from database
         String note = mSessionManager.getNote(mHabit.getDatabaseId());
-        if (!note.isEmpty()) {
-            ui.sessionNote.setText(note);
-        }
+        if (!note.isEmpty()) ui.sessionNote.setText(note);
 
         applyHabitColorToTheme();
         startRepeatingTask();
     }
-    //endregion // Restore activity
 
-    //region // Tear-down activity
     @Override
     protected void onPause() {
         super.onPause();
@@ -113,24 +119,18 @@ public class SessionActivity extends AppCompatActivity implements
         mSessionManager.setNote(mHabit.getDatabaseId(), ui.sessionNote.getText().toString());
         stopRepeatingTask();
     }
+    //endregion -- end --
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mSessionManager.removeSessionChangedCallback(this);
-    }
-    //endregion // Tear-down activity
-
+    //region Methods responsible for maintaining state
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if (dialogSettings != null) {
-            if (confirmationDialog != null && confirmationDialog.isShowing()) {
-                confirmationDialog.dismiss();
-            }
+        if (mDialogSettings != null) {
+            if (mConfirmationDialog != null && mConfirmationDialog.isShowing())
+                mConfirmationDialog.dismiss();
 
-            outState.putBundle(DialogSettingKeys.DIALOG_SETTINGS_BUNDLE, dialogSettings);
+            outState.putBundle(DialogSettingKeys.DIALOG_SETTINGS_BUNDLE, mDialogSettings);
         }
     }
 
@@ -138,26 +138,22 @@ public class SessionActivity extends AppCompatActivity implements
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
-        dialogSettings = savedInstanceState.getBundle(DialogSettingKeys.DIALOG_SETTINGS_BUNDLE);
-        if (dialogSettings == null) throw new RuntimeException();
+        mDialogSettings = savedInstanceState.getBundle(DialogSettingKeys.DIALOG_SETTINGS_BUNDLE);
 
-        else {
-            if (dialogSettings.getBoolean(DialogSettingKeys.SHOW_DIALOG)) {
-                if (dialogSettings.getBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG)) {
-                    onCancelSessionClicked();
-                }
-                else {
-                    onFinishSessionClicked();
-                }
-            }
+        if (mDialogSettings != null && mDialogSettings.getBoolean(DialogSettingKeys.SHOW_DIALOG)) {
+            if (mDialogSettings.getBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG))
+                onCancelSessionClicked();
+            else
+                onFinishSessionClicked();
         }
     }
+    //endregion -- end --
 
-    //endregion // Methods responsible for handling the lifecycle of the activity
+    //endregion [ ---------------- end ---------------- ]
 
-    //region // Methods responsible for updating the UI
+    //region [ ---- Methods responsible for updating the UI ---- ]
 
-    //region // Methods for updating the timer.
+    //region Methods responsible for updating the timer
     private void updateSessionPlayButton(boolean isPaused) {
         ui.sessionPausePlay.setImageResource(
                 HabitViewHolder.getResourceIdForPauseButton(isPaused)
@@ -168,16 +164,16 @@ public class SessionActivity extends AppCompatActivity implements
         ui.sessionTimeDisplayLayout.setAlpha(alphaValue);
     }
 
-    public void updateTimeDisplay(boolean forceUpdate) {
+    public void updateTimeDisplay() {
         boolean shouldUpdate = mSessionManager.getIsSessionActive(mHabit.getDatabaseId()) &&
                 !mSessionManager.getIsPaused(mHabit.getDatabaseId());
 
-        if (forceUpdate || shouldUpdate) {
+        if (shouldUpdate) {
             SessionEntry entry = mSessionManager.getSession(mHabit.getDatabaseId());
 
             int time[] = MyTimeUtils.getTimePortion(entry.getDuration());
 
-            ui.sessionHoursView.setText(String.format(Locale.US, "%02d",   time[0]));
+            ui.sessionHoursView.setText(String.format(Locale.US, "%02d", time[0]));
             ui.sessionMinutesView.setText(String.format(Locale.US, "%02d", time[1]));
             ui.sessionSecondsView.setText(String.format(Locale.US, "%02d", time[2]));
         }
@@ -186,8 +182,8 @@ public class SessionActivity extends AppCompatActivity implements
     private Runnable updateTimeDisplayRunnable = new Runnable() {
         @Override
         public void run() {
-            updateTimeDisplay(false);
-            handler.postDelayed(updateTimeDisplayRunnable, 1000);
+            updateTimeDisplay();
+            mUpdateHandler.postDelayed(updateTimeDisplayRunnable, 1000);
         }
     };
 
@@ -196,9 +192,9 @@ public class SessionActivity extends AppCompatActivity implements
     }
 
     void stopRepeatingTask() {
-        handler.removeCallbacks(updateTimeDisplayRunnable);
+        mUpdateHandler.removeCallbacks(updateTimeDisplayRunnable);
     }
-    //endregion // Methods for updating the timer.
+    //endregion -- end --
 
     //region // Methods for changing the appearance of the UI
     public void applyHabitColorToTheme() {
@@ -219,37 +215,34 @@ public class SessionActivity extends AppCompatActivity implements
     }
     //endregion // Methods for changing the appearance of the UI
 
-    //endregion // Methods responsible for updating the UI
+    //endregion [ ---------------- end ---------------- ]
 
-    //region // Methods responsible for handling events
+    //region [ ---- Methods responsible for handling events ---- ]
 
-    //region // Handle onClick events
+    //region [ -- Handle onClick events -- ]
 
-    //region // Get events
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         final int id = item.getItemId();
 
         switch (id) {
-            case (R.id.finish_session_button): {
+            case R.id.finish_session_button:
                 onFinishSessionClicked();
-            }
-            break;
+                break;
 
-            case (R.id.cancel_session_button): {
+            case R.id.cancel_session_button:
                 onCancelSessionClicked();
-            }
-            break;
+                break;
 
-            case (android.R.id.home): {
+            case android.R.id.home:
                 finish();
-            }
-            break;
+                break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    //region Handle events
     @Override
     public void onClick(View v) {
         final int id = v.getId();
@@ -263,9 +256,7 @@ public class SessionActivity extends AppCompatActivity implements
             break;
         }
     }
-    //endregion
 
-    //region // Handle events
     private void onFinishSessionClicked() {
         boolean shouldAsk = new PreferenceChecker(this).doAskBeforeFinish();
 
@@ -282,7 +273,7 @@ public class SessionActivity extends AppCompatActivity implements
                         }
                     });
 
-            dialogSettings.putBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG, false);
+            mDialogSettings.putBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG, false);
         }
         else {
             finishSession();
@@ -305,7 +296,7 @@ public class SessionActivity extends AppCompatActivity implements
                         }
                     });
 
-            dialogSettings.putBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG, true);
+            mDialogSettings.putBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG, true);
         }
         else {
             mSessionManager.cancelSession(mHabit.getDatabaseId());
@@ -324,13 +315,15 @@ public class SessionActivity extends AppCompatActivity implements
 
         finish();
     }
-    //endregion
+    //endregion -- end --
 
-    private void askForConfirmation(String title, String message, final boolean shouldPause, int iconRes, DialogInterface.OnClickListener onYesMethod) {
+    private void askForConfirmation(String title, String message, final boolean shouldPause,
+                                    int iconRes, DialogInterface.OnClickListener onYesMethod) {
+
         long habitId = mHabit.getDatabaseId();
 
-        if (!dialogSettings.getBoolean(DialogSettingKeys.SHOW_DIALOG)) {
-            dialogSettings.putBoolean(DialogSettingKeys.INITIAL_PAUSE_STATE, mSessionManager.getIsPaused(habitId));
+        if (!mDialogSettings.getBoolean(DialogSettingKeys.SHOW_DIALOG)) {
+            mDialogSettings.putBoolean(DialogSettingKeys.INITIAL_PAUSE_STATE, mSessionManager.getIsPaused(habitId));
         }
 
         if (shouldPause) {
@@ -338,7 +331,7 @@ public class SessionActivity extends AppCompatActivity implements
                 mSessionManager.setPauseState(habitId, true);
         }
 
-        confirmationDialog = new AlertDialog.Builder(this)
+        mConfirmationDialog = new AlertDialog.Builder(this)
                 .setIcon(iconRes)
                 .setTitle(title)
                 .setMessage(message)
@@ -346,8 +339,8 @@ public class SessionActivity extends AppCompatActivity implements
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        dialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, false);
-                        boolean initialPauseState = dialogSettings.getBoolean(DialogSettingKeys.INITIAL_PAUSE_STATE);
+                        mDialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, false);
+                        boolean initialPauseState = mDialogSettings.getBoolean(DialogSettingKeys.INITIAL_PAUSE_STATE);
                         if (mSessionManager.getIsPaused(mHabit.getDatabaseId()) != initialPauseState)
                             mSessionManager.setPauseState(mHabit.getDatabaseId(), initialPauseState);
                     }
@@ -355,20 +348,20 @@ public class SessionActivity extends AppCompatActivity implements
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialog) {
-                        dialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, false);
-                        boolean initialPauseState = dialogSettings.getBoolean(DialogSettingKeys.INITIAL_PAUSE_STATE);
+                        mDialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, false);
+                        boolean initialPauseState = mDialogSettings.getBoolean(DialogSettingKeys.INITIAL_PAUSE_STATE);
                         if (mSessionManager.getIsPaused(mHabit.getDatabaseId()) != initialPauseState)
                             mSessionManager.setPauseState(mHabit.getDatabaseId(), initialPauseState);
                     }
                 })
                 .show();
 
-        dialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, true);
+        mDialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, true);
     }
 
-    //endregion // Handle onClick events
+    //endregion [ -- end -- ]
 
-    //region // Handle SessionManager events
+    //region Handle SessionManager events
     @Override
     public void onSessionPauseStateChanged(long habitId, boolean isPaused) {
         if (habitId == this.mHabit.getDatabaseId())
@@ -388,7 +381,7 @@ public class SessionActivity extends AppCompatActivity implements
 
     @Override
     public void onSessionStarted(long habitId) {}
-    //endregion // Handle SessionManager events
+    //endregion -- end --
 
-    //endregion // Methods responsible for handling events
+    //endregion [ ---------------- end ---------------- ]
 }

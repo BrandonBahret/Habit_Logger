@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.sqlite.SQLiteStatement;
 import android.support.annotation.NonNull;
 
+import com.example.brandon.habitlogger.HabitSessions.DatabaseSchema.DatabaseSchema.SQL_TYPES;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
@@ -11,6 +12,7 @@ import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 
 /**
  * Created by Brandon on 2/18/2017.
+ * Schema defining the sessions table.
  */
 
 public class SessionsTableSchema {
@@ -28,16 +30,16 @@ public class SessionsTableSchema {
 
     public static String getCreateTableStatement() {
         return "CREATE TABLE " + TABLE_NAME + " (" +
-                HABIT_ID + " INTEGER UNIQUE, " +
-                HABIT_NAME + " TEXT, " +
-                HABIT_CATEGORY + " TEXT, " +
-                HABIT_COLOR + " TEXT, " +
-                DURATION + " INTEGER, " +
-                STARTING_TIME + " INTEGER, " +
-                LAST_TIME_PAUSED + " INTEGER," +
-                TOTAL_PAUSE_TIME + " INTEGER," +
-                IS_PAUSED + " INTEGER," +
-                NOTE + " TEXT" +
+                HABIT_ID + SQL_TYPES.INTEGER + SQL_TYPES.UNIQUE + ", " +
+                HABIT_NAME + SQL_TYPES.TEXT + ", " +
+                HABIT_CATEGORY + SQL_TYPES.TEXT + ", " +
+                HABIT_COLOR + SQL_TYPES.TEXT + ", " +
+                DURATION + SQL_TYPES.INTEGER + ", " +
+                STARTING_TIME + SQL_TYPES.INTEGER + ", " +
+                LAST_TIME_PAUSED + SQL_TYPES.INTEGER + ", " +
+                TOTAL_PAUSE_TIME + SQL_TYPES.INTEGER + ", " +
+                IS_PAUSED + SQL_TYPES.INTEGER + ", " +
+                NOTE + SQL_TYPES.TEXT +
                 ");";
     }
 

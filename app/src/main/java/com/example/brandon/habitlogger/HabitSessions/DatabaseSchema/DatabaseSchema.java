@@ -14,6 +14,13 @@ public class DatabaseSchema extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "habit_session_database";
     public static final int DATABASE_VERSION = 5;
 
+    class SQL_TYPES {
+        public static final String NOT_NULL = " NOT NULL ";
+        public static final String PRI_INT_KEY = " INTEGER PRIMARY KEY ";
+        public static final String INTEGER = " INTEGER ";
+        public static final String TEXT = " TEXT ";
+        public static final String UNIQUE = " UNIQUE ";
+    }
 
     public DatabaseSchema(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
