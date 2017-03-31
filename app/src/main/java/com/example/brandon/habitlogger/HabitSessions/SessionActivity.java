@@ -213,6 +213,7 @@ public class SessionActivity extends AppCompatActivity implements
 
     //region [ -- Handle onClick events -- ]
 
+    //region Actionbar events
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         final int id = item.getItemId();
@@ -234,21 +235,6 @@ public class SessionActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    //region Handle events
-    @Override
-    public void onClick(View v) {
-        final int id = v.getId();
-
-        switch (id) {
-
-            case (R.id.session_pause_play): {
-                boolean isPaused = !mSessionManager.getIsPaused(mHabit.getDatabaseId());
-                mSessionManager.setPauseState(mHabit.getDatabaseId(), isPaused);
-            }
-            break;
-        }
-    }
-
     private void onFinishSessionClicked() {
         boolean shouldAsk = new PreferenceChecker(this).doAskBeforeFinish();
 
@@ -267,9 +253,7 @@ public class SessionActivity extends AppCompatActivity implements
 
             mDialogSettings.putBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG, false);
         }
-        else {
-            finishSession();
-        }
+        else finishSession();
     }
 
     private void onCancelSessionClicked() {
@@ -307,7 +291,21 @@ public class SessionActivity extends AppCompatActivity implements
 
         finish();
     }
-    //endregion -- end --
+    //endregion
+
+    @Override
+    public void onClick(View v) {
+        final int id = v.getId();
+
+        switch (id) {
+
+            case (R.id.session_pause_play): {
+                boolean isPaused = !mSessionManager.getIsPaused(mHabit.getDatabaseId());
+                mSessionManager.setPauseState(mHabit.getDatabaseId(), isPaused);
+            }
+            break;
+        }
+    }
 
     private void askForConfirmation(String title, String message, final boolean shouldPause,
                                     int iconRes, DialogInterface.OnClickListener onYesMethod) {
@@ -368,11 +366,12 @@ public class SessionActivity extends AppCompatActivity implements
 
     @Override
     public void afterSessionEnded(long habitId, boolean wasCanceled) {
-
     }
 
     @Override
-    public void onSessionStarted(long habitId) {}
+    public void onSessionStarted(long habitId) {
+
+    }
     //endregion -- end --
 
     //endregion [ ---------------- end ---------------- ]
