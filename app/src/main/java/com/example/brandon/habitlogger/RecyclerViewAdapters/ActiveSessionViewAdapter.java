@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * Created by Brandon on 12/26/2016.
- * RecyclerView adapter for active session activity.
+ * RecyclerView mAdapter for active session activity.
  */
 
 public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSessionViewAdapter.ViewHolder> {

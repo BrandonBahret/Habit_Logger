@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * Created by Brandon on 12/26/2016.
- * RecyclerView adapter for displaying habit cards.
+ * RecyclerView mAdapter for displaying habit cards.
  */
 
 @SuppressWarnings({"unused", "WeakerAccess"})

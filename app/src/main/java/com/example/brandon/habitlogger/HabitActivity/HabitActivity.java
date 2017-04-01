@@ -22,8 +22,8 @@ import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
 import com.example.brandon.habitlogger.HabitSessions.SessionManager;
-import com.example.brandon.habitlogger.ModifyHabitDialog.EditHabitDialog;
-import com.example.brandon.habitlogger.ModifyHabitDialog.NewHabitDialog;
+import com.example.brandon.habitlogger.HabitDialog.EditHabitDialog;
+import com.example.brandon.habitlogger.HabitDialog.NewHabitDialog;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.ConfirmationDialog;
 import com.example.brandon.habitlogger.common.MyColorUtils;
@@ -75,8 +75,6 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     public void addUpdateCategoryDataSampleCallback(IUpdateCategorySample callback) {
         mCategoryDataSampleCallbacks.add(callback);
     }
-
-    ;
 
     @Override
     public void removeUpdateCategoryDataSampleCallback(IUpdateCategorySample callback) {

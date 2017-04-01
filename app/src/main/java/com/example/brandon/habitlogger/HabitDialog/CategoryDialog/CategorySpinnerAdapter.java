@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ModifyHabitDialog;
+package com.example.brandon.habitlogger.HabitDialog.CategoryDialog;
 
 import android.content.Context;
 import android.view.LayoutInflater;

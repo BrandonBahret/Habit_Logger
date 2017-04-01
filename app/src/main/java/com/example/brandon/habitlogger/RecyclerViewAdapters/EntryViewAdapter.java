@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  * Created by Brandon on 12/26/2016.
- * RecyclerView adapter for displaying entries.
+ * RecyclerView mAdapter for displaying entries.
  */
 
 public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.ViewHolder> {

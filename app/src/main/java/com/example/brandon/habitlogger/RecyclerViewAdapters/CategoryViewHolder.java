@@ -10,7 +10,7 @@ import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder;
 
 /**
  * Created by Brandon on 2/6/2017.
- * Category card view holder for CategoryCardAdapter adapter
+ * Category card view holder for CategoryCardAdapter mAdapter
  */
 
 public class CategoryViewHolder extends GroupViewHolder {

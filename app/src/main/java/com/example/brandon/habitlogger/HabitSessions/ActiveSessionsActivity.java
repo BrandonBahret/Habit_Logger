@@ -282,7 +282,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     }
     //endregion
 
-    //region Methods responsible for handling RecyclerView adapter events
+    //region Methods responsible for handling RecyclerView mAdapter events
     @Override
     public void onSessionViewClick(long habitId) {
         Habit habit = new HabitDatabase(this).getHabit(habitId);

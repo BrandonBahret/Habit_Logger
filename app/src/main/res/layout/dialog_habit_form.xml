@@ -40,7 +40,7 @@
 
         </android.support.design.widget.TextInputLayout>
 
-        <com.example.brandon.habitlogger.ModifyHabitDialog.CategorySpinner
+        <com.example.brandon.habitlogger.HabitDialog.CategoryDialog.CategorySpinner
             android:id="@+id/spinner_category_selector"
             android:spinnerMode="dialog"
             android:layout_width="match_parent"
