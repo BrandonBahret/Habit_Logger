@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ModifyHabitActivity;
+package com.example.brandon.habitlogger.ModifyHabitDialog;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,7 +14,9 @@ import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 
 public class EditHabitDialog extends NewHabitDialog {
 
-    private Habit editHabit;
+    //region (Member attributes)
+    private Habit mEditHabit;
+    //endregion
 
     public static EditHabitDialog newInstance(OnFinishedListener listener, Habit editHabit) {
         EditHabitDialog dialog = new EditHabitDialog();
@@ -30,7 +32,7 @@ public class EditHabitDialog extends NewHabitDialog {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.editHabit = (Habit) getArguments().getSerializable("HABIT");
+        this.mEditHabit = (Habit) getArguments().getSerializable("HABIT");
     }
 
     @Override
@@ -54,6 +56,6 @@ public class EditHabitDialog extends NewHabitDialog {
 
     @Override
     public Habit getWorkingHabit() {
-        return this.editHabit;
+        return this.mEditHabit;
     }
 }

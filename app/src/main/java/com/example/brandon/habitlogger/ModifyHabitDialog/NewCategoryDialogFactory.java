@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ModifyHabitActivity;
+package com.example.brandon.habitlogger.ModifyHabitDialog;
 
 import android.content.Context;
 import android.content.DialogInterface;
