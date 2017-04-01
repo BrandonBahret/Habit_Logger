@@ -10,12 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.ui.NestedScrollObserver;
 import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
 
 public class OverviewStatisticsFragment extends Fragment {
 
-    private static View view;
-    private RecyclerViewScrollObserver.IScrollEvents listener;
+    //region (Member attributes)
+    private static View mContentView;
+    private RecyclerViewScrollObserver.IScrollEvents mListener;
+    //endregion
 
     public OverviewStatisticsFragment() {
         // Required empty public constructor
@@ -25,51 +28,51 @@ public class OverviewStatisticsFragment extends Fragment {
         return new OverviewStatisticsFragment();
     }
 
+    //region Methods responsible for handling the fragment lifecycle
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof RecyclerViewScrollObserver.IScrollEvents)
+            mListener = (RecyclerViewScrollObserver.IScrollEvents) context;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (view != null) {
-            ViewGroup parent = (ViewGroup) view.getParent();
+        if (mContentView != null) {
+            ViewGroup parent = (ViewGroup) mContentView.getParent();
             if (parent != null)
-                parent.removeView(view);
+                parent.removeView(mContentView);
         }
         try {
-            view = inflater.inflate(R.layout.fragment_overall_statistics, container, false);
+            mContentView = inflater.inflate(R.layout.fragment_overall_statistics, container, false);
+            NestedScrollView scrollView = (NestedScrollView) mContentView.findViewById(R.id.statistics_container);
 
-            NestedScrollView scrollView = (NestedScrollView) view.findViewById(R.id.statistics_container);
-            scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
-
-                int threshold = 2;
-                boolean control = false;
-
-                @Override
-                public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-
-                    int current = scrollY - oldScrollY;
-
-                    if (current > threshold && !control) {
-                        if(OverviewStatisticsFragment.this.listener != null)
-                            OverviewStatisticsFragment.this.listener.onScrollDown();
-                        control = true;
-                    }
-                    else if (current < -threshold && control) {
-                        if(OverviewStatisticsFragment.this.listener != null)
-                            OverviewStatisticsFragment.this.listener.onScrollUp();
-                        control = false;
-                    }
-                }
-            });
+            scrollView.setOnScrollChangeListener(getScrollEventListener());
 
         } catch (InflateException e) {
             // empty stub
         }
-        return view;
-    }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if(context instanceof RecyclerViewScrollObserver.IScrollEvents){
-            this.listener = (RecyclerViewScrollObserver.IScrollEvents)context;
-        }
+        return mContentView;
     }
+    //endregion -- end --
+
+    //region Methods responsible for handling events
+    private NestedScrollObserver getScrollEventListener() {
+        return new NestedScrollObserver() {
+            @Override
+            public void onScrollUp() {
+                if (OverviewStatisticsFragment.this.mListener != null)
+                    OverviewStatisticsFragment.this.mListener.onScrollUp();
+            }
+
+            @Override
+            public void onScrollDown() {
+                if (OverviewStatisticsFragment.this.mListener != null)
+                    OverviewStatisticsFragment.this.mListener.onScrollDown();
+            }
+        };
+    }
+    //endregion -- end --
+
 }

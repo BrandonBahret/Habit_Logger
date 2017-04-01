@@ -159,7 +159,7 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
 
     private int getPositionForEntry(SessionEntry newEntry) {
         int foundPosition = MyCollectionUtils.binarySearch(mSessionEntries, newEntry.getStartingTime(), SessionEntry.IKeyCompareStartingTime);
-        return foundPosition < 0 ?  (-foundPosition) - 1 : foundPosition;
+        return foundPosition < 0 ? (-foundPosition) - 1 : foundPosition;
     }
 
     private int getSessionEntryIndex(long entryId) {

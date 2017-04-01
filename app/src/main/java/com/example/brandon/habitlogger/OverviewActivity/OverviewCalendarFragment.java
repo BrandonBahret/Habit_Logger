@@ -67,7 +67,7 @@ public class OverviewCalendarFragment extends Fragment implements IDataOverviewC
 
     @Override
     public void updateHabitDataSample(HabitDataSample dataSample) {
-        if(mCalendarViewContainer != null) {
+        if (mCalendarViewContainer != null) {
             CalendarViewAdapter adapter = new CalendarViewAdapter(dataSample, getContext());
             mCalendarViewContainer.setAdapter(adapter);
         }

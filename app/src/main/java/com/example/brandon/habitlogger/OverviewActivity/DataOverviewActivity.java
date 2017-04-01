@@ -2,6 +2,9 @@ package com.example.brandon.habitlogger.OverviewActivity;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -230,4 +233,39 @@ public class DataOverviewActivity extends AppCompatActivity implements
 
     //endregion [ ---------------- end ---------------- ]
 
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        public final String[] titles = getResources().getStringArray(R.array.tab_titles);
+
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0:
+                    return OverviewEntriesFragment.newInstance();
+
+                case 1:
+                    return OverviewCalendarFragment.newInstance();
+
+                case 2:
+                    return OverviewStatisticsFragment.newInstance();
+            }
+
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            // Show 3 pages in total
+            return 3;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return titles[position];
+        }
+    }
 }

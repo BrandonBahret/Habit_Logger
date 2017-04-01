@@ -14,7 +14,9 @@ public interface IDataOverviewCallback {
     }
 
     HabitDataSample getDataSample();
+
     void addCallback(IUpdateHabitSample callback);
+
     void removeCallback(IUpdateHabitSample callback);
 
 }
