@@ -793,16 +793,39 @@ public class HabitDatabase {
         int size = (int) DatabaseUtils.queryNumEntries(mReadableDatabase, EntriesTableSchema.TABLE_NAME, EntriesTableSchema.ENTRY_HABIT_ID + "=?",
                 new String[]{String.valueOf(habitId)});
 
-//        int size = getNumberOfEntries(habitId);
         List<SessionEntry> entries = new ArrayList<>(size);
-
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++)
             entries.add(i, getEntry(getEntryId(habitId, i)));
-        }
 
         Collections.sort(entries, SessionEntry.ICompareStartingTimes);
 
         return entries;
+    }
+
+    private List<SessionEntry> fetchEntriesAtCursor(Cursor cursor) {
+        if (cursor.moveToFirst()) {
+            List<SessionEntry> resultList = new ArrayList<>(cursor.getCount());
+
+            // Load all the entries in the database into the ArrayList.
+            do resultList.add(getEntryFromCursor(cursor)); while (cursor.moveToNext());
+
+            // Sort the entries by Category Name
+            Collections.sort(resultList, SessionEntry.ICompareStartingTimes);
+            cursor.close();
+
+            return resultList;
+        }
+
+        return new ArrayList<>();
+    }
+
+    public List<SessionEntry> getEntries() {
+        Cursor c = mReadableDatabase.query(
+                EntriesTableSchema.TABLE_NAME,
+                null, null, null, null, null, null
+        );
+
+        return fetchEntriesAtCursor(c);
     }
     //endregion
 

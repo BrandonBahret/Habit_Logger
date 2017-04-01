@@ -15,9 +15,9 @@ import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.HabitDataSample;
 
 
-public class OverviewCalendarFragment extends Fragment implements UpdateHabitDataSampleInterface {
+public class OverviewCalendarFragment extends Fragment implements IDataOverviewCallback.IUpdateHabitSample {
 
-    CallbackInterface callbackInterface;
+    IDataOverviewCallback callbackInterface;
 
     public OverviewCalendarFragment() {
         // Required empty public constructor
@@ -62,7 +62,7 @@ public class OverviewCalendarFragment extends Fragment implements UpdateHabitDat
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        callbackInterface = (CallbackInterface)context;
+        callbackInterface = (IDataOverviewCallback)context;
         callbackInterface.addCallback(this);
     }
 
@@ -76,7 +76,7 @@ public class OverviewCalendarFragment extends Fragment implements UpdateHabitDat
     //endregion
 
     @Override
-    public void updateDataSample(HabitDataSample data) {
+    public void updateHabitDataSample(HabitDataSample dataSample) {
 
     }
 

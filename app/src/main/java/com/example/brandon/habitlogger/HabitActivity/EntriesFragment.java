@@ -25,10 +25,10 @@ import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
 import java.util.List;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class EntriesFragment extends Fragment implements CallbackInterface.IUpdateEntries, EntryViewAdapter.OnClickListeners {
+public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateEntries, EntryViewAdapter.OnClickListeners {
 
     //region (Member attributes)
-    private CallbackInterface mCallbackInterface;
+    private IHabitCallback mCallbackInterface;
     private RecyclerViewScrollObserver.IScrollEvents mListener;
 
     private String mDateFormat;
@@ -54,7 +54,7 @@ public class EntriesFragment extends Fragment implements CallbackInterface.IUpda
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        mCallbackInterface = (CallbackInterface) context;
+        mCallbackInterface = (IHabitCallback) context;
         mCallbackInterface.addUpdateEntriesCallback(this);
 
         if (context instanceof RecyclerViewScrollObserver.IScrollEvents)

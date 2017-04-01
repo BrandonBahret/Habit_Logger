@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
+import com.example.brandon.habitlogger.HabitActivity.IHabitCallback;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
@@ -26,10 +26,10 @@ import java.util.Locale;
 import java.util.Set;
 
 
-public class PieGraphCompletion extends Fragment implements CallbackInterface.IUpdateEntries {
+public class PieGraphCompletion extends Fragment implements IHabitCallback.IUpdateEntries {
 
     private FragmentPieGraphCompletionBinding ui;
-    CallbackInterface callbackInterface;
+    IHabitCallback callbackInterface;
 
     private int mChartHoleColor;
     private int mCompletedColor;
@@ -67,7 +67,7 @@ public class PieGraphCompletion extends Fragment implements CallbackInterface.IU
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        callbackInterface = (CallbackInterface) context;
+        callbackInterface = (IHabitCallback) context;
         callbackInterface.addUpdateEntriesCallback(this);
 
         mCompletedColor = callbackInterface.getDefaultColor();

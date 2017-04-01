@@ -8,7 +8,7 @@ import com.example.brandon.habitlogger.data.SessionEntriesSample;
  * Interface to communicate with fragments within HabitActivity
  */
 
-public interface CallbackInterface {
+public interface IHabitCallback {
 
     interface IUpdateEntries {
         void updateEntries(SessionEntriesSample dataSample);

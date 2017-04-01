@@ -25,14 +25,14 @@ import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
 import java.util.List;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class OverviewEntriesFragment extends Fragment implements UpdateHabitDataSampleInterface {
+public class OverviewEntriesFragment extends Fragment implements IDataOverviewCallback.IUpdateHabitSample {
     HabitDatabase habitDatabase;
     RecyclerView entriesContainer;
     List<SessionEntry> sessionEntries;
     EntryViewAdapter entryAdapter;
 
     PreferenceChecker preferenceChecker;
-    private CallbackInterface callbackInterface;
+    private IDataOverviewCallback callbackInterface;
     private RecyclerViewScrollObserver.IScrollEvents listener;
 
     public OverviewEntriesFragment() {
@@ -141,7 +141,7 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        callbackInterface = (CallbackInterface)context;
+        callbackInterface = (IDataOverviewCallback)context;
         callbackInterface.addCallback(this);
 
         if(context instanceof RecyclerViewScrollObserver.IScrollEvents){
@@ -201,9 +201,9 @@ public class OverviewEntriesFragment extends Fragment implements UpdateHabitData
     //endregion
 
     @Override
-    public void updateDataSample(HabitDataSample data) {
+    public void updateHabitDataSample(HabitDataSample dataSample) {
         if(entryAdapter != null) {
-            this.sessionEntries = data.buildSessionEntriesList().getSessionEntries();
+            this.sessionEntries = dataSample.buildSessionEntriesList().getSessionEntries();
             entryAdapter = new EntryViewAdapter(this.sessionEntries, getContext(), entryAdapter.getListener());
             entriesContainer.setAdapter(entryAdapter);
         }

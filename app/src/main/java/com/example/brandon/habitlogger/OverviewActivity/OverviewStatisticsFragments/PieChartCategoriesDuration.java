@@ -10,8 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.OverviewActivity.CallbackInterface;
-import com.example.brandon.habitlogger.OverviewActivity.UpdateHabitDataSampleInterface;
+import com.example.brandon.habitlogger.OverviewActivity.IDataOverviewCallback;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
@@ -27,11 +26,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class PieChartCategoriesDuration extends Fragment implements UpdateHabitDataSampleInterface {
+public class PieChartCategoriesDuration extends Fragment implements IDataOverviewCallback.IUpdateHabitSample {
 
     //region (Member attributes)
     FragmentPieChartCategoriesDurationBinding ui;
-    CallbackInterface ICallback;
+    IDataOverviewCallback ICallback;
     //endregion
 
     public PieChartCategoriesDuration() {
@@ -60,7 +59,7 @@ public class PieChartCategoriesDuration extends Fragment implements UpdateHabitD
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        ICallback = (CallbackInterface) context;
+        ICallback = (IDataOverviewCallback) context;
         ICallback.addCallback(this);
     }
 
@@ -75,18 +74,18 @@ public class PieChartCategoriesDuration extends Fragment implements UpdateHabitD
     @Override
     public void onStart() {
         super.onStart();
-        updateDataSample(ICallback.getDataSample());
+        updateHabitDataSample(ICallback.getDataSample());
     }
     //endregion -- end --
 
     //endregion --- end ---
 
     @Override
-    public void updateDataSample(HabitDataSample data) {
+    public void updateHabitDataSample(HabitDataSample dataSample) {
         List<PieEntry> entries = new ArrayList<>();
-        final long totalDuration = data.calculateTotalDuration();
+        final long totalDuration = dataSample.calculateTotalDuration();
 
-        for (CategoryDataSample categoryDataSample : data.getData()) {
+        for (CategoryDataSample categoryDataSample : dataSample.getData()) {
             float ratio = 100 * categoryDataSample.calculateTotalDuration() / (float) totalDuration;
             if (ratio > 0) {
                 String categoryName = categoryDataSample.getCategoryName();

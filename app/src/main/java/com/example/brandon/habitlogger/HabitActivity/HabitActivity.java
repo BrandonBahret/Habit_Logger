@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class HabitActivity extends AppCompatActivity implements CallbackInterface, RecyclerViewScrollObserver.IScrollEvents {
+public class HabitActivity extends AppCompatActivity implements IHabitCallback, RecyclerViewScrollObserver.IScrollEvents {
 
     //region (Member attributes)
     public static String HABIT_ID = "HABIT_ID";
@@ -58,7 +58,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     private List<IUpdateCategorySample> mCategoryDataSampleCallbacks = new ArrayList<>();
     //endregion
 
-    //region Methods responsible for communication between this activity and fragments
+    //region [ ---- Code responsible for providing an interface to this activity ---- ]
 
     //region Methods to add and remove callback methods
     @Override
@@ -80,7 +80,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     public void removeUpdateCategoryDataSampleCallback(IUpdateCategorySample callback) {
         mCategoryDataSampleCallbacks.remove(callback);
     }
-    //endregion
+    //endregion -- end --
 
     @Override
     public SessionEntriesSample getSessionEntries() {
@@ -98,7 +98,8 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     public int getDefaultColor() {
         return mHabit.getColor();
     }
-    //endregion
+
+    //endregion [ ---------------- end ---------------- ]
 
     //region Methods responsible for handling the activity lifecycle
     @Override
@@ -173,7 +174,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
 
         return super.onPrepareOptionsMenu(menu);
     }
-    //endregion
+    //endregion -- end --
 
     //region Methods responsible for changing the appearance of the activity
     private void updateActivity() {
@@ -214,7 +215,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     }
     //endregion
 
-    //region Methods responsible for handling events
+    //region [ ---- Methods responsible for handling events ---- ]
 
     //region Methods to handle new entry fab events
     private View.OnClickListener getOnCreateEntryFabClickedListener() {
@@ -480,7 +481,7 @@ public class HabitActivity extends AppCompatActivity implements CallbackInterfac
     }
     //endregion
 
-    //endregion
+    //endregion [ ---------------- end ---------------- ]
 
     public void startSession() {
         Intent startSession = new Intent(this, SessionActivity.class);

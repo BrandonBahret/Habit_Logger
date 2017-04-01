@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
+import com.example.brandon.habitlogger.HabitActivity.IHabitCallback;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
@@ -25,10 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class PieGraphDuration extends Fragment implements CallbackInterface.IUpdateCategorySample {
+public class PieGraphDuration extends Fragment implements IHabitCallback.IUpdateCategorySample {
 
     private FragmentPieGraphDurationBinding ui;
-    CallbackInterface callbackInterface;
+    IHabitCallback callbackInterface;
 
     public PieGraphDuration() {
         // Required empty public constructor
@@ -64,7 +64,7 @@ public class PieGraphDuration extends Fragment implements CallbackInterface.IUpd
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        callbackInterface = (CallbackInterface) context;
+        callbackInterface = (IHabitCallback) context;
         callbackInterface.addUpdateCategoryDataSampleCallback(this);
     }
 

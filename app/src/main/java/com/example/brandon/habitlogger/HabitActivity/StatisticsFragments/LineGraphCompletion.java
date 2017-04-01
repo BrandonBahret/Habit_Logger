@@ -19,7 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.HabitActivity.CallbackInterface;
+import com.example.brandon.habitlogger.HabitActivity.IHabitCallback;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
@@ -39,10 +39,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class LineGraphCompletion extends Fragment implements CallbackInterface.IUpdateEntries {
+public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpdateEntries {
 
     private FragmentLineGraphCompletionBinding ui;
-    CallbackInterface callbackInterface;
+    IHabitCallback callbackInterface;
     private int mColor;
 
     public LineGraphCompletion() {
@@ -97,7 +97,7 @@ public class LineGraphCompletion extends Fragment implements CallbackInterface.I
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        callbackInterface = (CallbackInterface) context;
+        callbackInterface = (IHabitCallback) context;
         callbackInterface.addUpdateEntriesCallback(this);
 
         mColor = callbackInterface.getDefaultColor();

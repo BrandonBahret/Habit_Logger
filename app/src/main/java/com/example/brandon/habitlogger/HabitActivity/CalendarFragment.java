@@ -14,10 +14,10 @@ import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.ui.CalendarView.CalendarViewAdapter;
 
-public class CalendarFragment extends Fragment implements CallbackInterface.IUpdateEntries {
+public class CalendarFragment extends Fragment implements IHabitCallback.IUpdateEntries {
 
     //region (Member attributes)
-    CallbackInterface callbackInterface;
+    IHabitCallback callbackInterface;
 
     private RecyclerView mCalendarViewContainer;
     private CalendarViewAdapter mAdapter;
@@ -38,7 +38,7 @@ public class CalendarFragment extends Fragment implements CallbackInterface.IUpd
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        callbackInterface = (CallbackInterface)context;
+        callbackInterface = (IHabitCallback)context;
         callbackInterface.addUpdateEntriesCallback(this);
     }
 
