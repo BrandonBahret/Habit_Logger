@@ -14,17 +14,20 @@ import static java.lang.Integer.parseInt;
  */
 
 public class PreferenceChecker {
+
+    //region (Member attributes)
+    public static final int AS_CARDS = 0, AS_SECTIONS = 1, WITHOUT_CATEGORIES = 2;
+
     public SharedPreferences preferences;
     private Context mContext;
-
-    public static final int AS_CARDS = 0, AS_SECTIONS = 1, WITHOUT_CATEGORIES = 2;
+    //endregion
 
     public PreferenceChecker(Context context){
         mContext = context;
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    //region // Main Screen Settings
+    //region Methods related to main screen settings
     public int howToDisplayCategories(){
         String displayCategories = preferences.getString(
                 mContext.getString(R.string.pref_show_categories), String.valueOf(AS_SECTIONS)
@@ -56,9 +59,9 @@ public class PreferenceChecker {
                 mContext.getString(R.string.pref_hide_fab_on_scroll), true
         );
     }
-    //endregion
+    //endregion -- end --
 
-    //region // Session Activity Settings
+    //region Methods related to session activity settings
     public boolean doAskBeforeCancel(){
         return preferences.getBoolean(
                 mContext.getString(R.string.pref_ask_cancel), true
@@ -70,9 +73,9 @@ public class PreferenceChecker {
                 mContext.getString(R.string.pref_ask_finish), true
         );
     }
-    //endregion
+    //endregion -- end --
 
-    //region // Notifications
+    //region Methods related to notification settings
     public boolean doShowNotifications(){
         return preferences.getBoolean(
                 mContext.getString(R.string.pref_do_show_notifications), true
@@ -84,10 +87,9 @@ public class PreferenceChecker {
                 mContext.getString(R.string.pref_do_show_notifications_auto), true
         );
     }
-    //endregion
+    //endregion -- end --
 
-    //region // Appearances
-
+    //region Methds related to appearance settings
     public boolean isNightMode(){
         return preferences.getBoolean(
                 mContext.getString(R.string.pref_is_night_mode), false
@@ -101,6 +103,6 @@ public class PreferenceChecker {
         );
         return dateOptions[optionIndex];
     }
+    //endregion -- end --
 
-    //endregion
 }

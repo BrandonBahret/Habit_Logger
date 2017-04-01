@@ -6,7 +6,6 @@ import android.preference.PreferenceFragment;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.brandon.habitlogger.HabitSessions.SessionNotificationManager;
@@ -15,8 +14,10 @@ import com.example.brandon.habitlogger.R;
 public class SettingsActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    PreferenceChecker preferenceChecker;
-    SessionNotificationManager sessionNotificationManager;
+    //region (Member attributes)
+    private PreferenceChecker mPreferenceChecker;
+    private SessionNotificationManager mSessionNotificationManager;
+    //endregion
 
     public static class SettingsFragment extends PreferenceFragment {
         @Override
@@ -28,53 +29,56 @@ public class SettingsActivity extends AppCompatActivity
         }
     }
 
-    //region // Activity lifecycle methods
+    //region [ ---- Methods to handle the activity lifecycle ---- ]
+
+    //region entire lifetime (onCreate - onDestroy)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        preferenceChecker = new PreferenceChecker(this);
+        mPreferenceChecker = new PreferenceChecker(this);
 
         AppCompatDelegate.setDefaultNightMode(
-                preferenceChecker.isNightMode() ? AppCompatDelegate.MODE_NIGHT_YES :
+                mPreferenceChecker.isNightMode() ? AppCompatDelegate.MODE_NIGHT_YES :
                         AppCompatDelegate.MODE_NIGHT_NO
         );
 
         super.onCreate(savedInstanceState);
 
-        if (getSupportActionBar() != null) {
+        if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
 
         // Display the fragment as the main content.
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
 
-        String foo = getIntent().getDataString();
-        if (foo != null)
-            Log.d("foobar", foo);
     }
+    //endregion -- end --
 
+    //region foreground lifetime (onPause - onResume)
     @Override
     public void onResume() {
         super.onResume();
-        preferenceChecker.preferences.registerOnSharedPreferenceChangeListener(this);
+        mPreferenceChecker.preferences.registerOnSharedPreferenceChangeListener(this);
     }
+    //endregion -- end --
 
+    //region visible lifetime (onStart - onStop)
     @Override
     protected void onStart() {
         super.onStart();
-        sessionNotificationManager = new SessionNotificationManager(this);
+        mSessionNotificationManager = new SessionNotificationManager(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        preferenceChecker.preferences.unregisterOnSharedPreferenceChangeListener(this);
+        mPreferenceChecker.preferences.unregisterOnSharedPreferenceChangeListener(this);
     }
+    //endregion -- end --
 
-    //endregion // Activity lifecycle methods
+    //endregion [ ---------------- end ---------------- ]
 
-    //region // Methods to handle events
+    //region Methods to handle events
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -91,21 +95,19 @@ public class SettingsActivity extends AppCompatActivity
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.pref_do_show_notifications))) {
 
-            if (preferenceChecker.doShowNotifications())
-                sessionNotificationManager.launchNotificationsForAllActiveSessions();
+            if (mPreferenceChecker.doShowNotifications())
+                mSessionNotificationManager.launchNotificationsForAllActiveSessions();
 
             else
-                sessionNotificationManager.cancelAllNotifications();
+                mSessionNotificationManager.cancelAllNotifications();
         }
 
-        else if (key.equals(getString(R.string.pref_do_show_notifications_auto)) && preferenceChecker.doShowNotificationsAutomatically()) {
-            sessionNotificationManager.launchNotificationsForAllActiveSessions();
-        }
+        else if (key.equals(getString(R.string.pref_do_show_notifications_auto)) && mPreferenceChecker.doShowNotificationsAutomatically())
+            mSessionNotificationManager.launchNotificationsForAllActiveSessions();
 
-        else if (key.equals(getString(R.string.pref_is_night_mode))) {
+        else if (key.equals(getString(R.string.pref_is_night_mode)))
             recreate();
-        }
     }
-    //endregion // Methods to handle events
+    //endregion -- end --
 
 }
