@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.OverviewActivity.CalendarView;
+package com.example.brandon.habitlogger.ui.OverviewCalendarView;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -17,13 +17,6 @@ public class CalendarPieDataSet {
     private List<CalendarPieEntry> calendarPieEntries;
     private Paint mCurrentPaint;
     private int mDate;
-
-    public CalendarPieDataSet(List<Float> values, List<Integer> colors, int date){
-        calendarPieEntries = CalendarPieEntry.getDataSet(values, colors);
-        mCurrentPaint = new Paint();
-        mCurrentPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-        mDate = date;
-    }
 
     public CalendarPieDataSet(List<CalendarPieEntry> entries, int date) {
         calendarPieEntries = entries;

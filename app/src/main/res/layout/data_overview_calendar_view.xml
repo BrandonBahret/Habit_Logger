@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.brandon.habitlogger.OverviewActivity.CalendarView.CalendarView
+<com.example.brandon.habitlogger.ui.OverviewCalendarView.CalendarView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:calendar_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/calendar_view"

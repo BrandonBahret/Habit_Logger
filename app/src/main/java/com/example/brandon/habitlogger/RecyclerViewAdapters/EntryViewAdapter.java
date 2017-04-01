@@ -5,7 +5,6 @@ import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -149,26 +148,6 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
                         R.drawable.ic_arrow_drop_down_black_24dp);
             }
         });
-    }
-
-    /**
-     * SO http://stackoverflow.com/a/15567519/3589791
-     *
-     * @return True when TextView has been condensed, otherwise False.
-     */
-    public boolean isTextViewEllipsized(TextView textview) {
-        Layout layout = textview.getLayout();
-        if (layout != null) {
-            int lines = layout.getLineCount();
-            if (lines > 0) {
-                int ellipsisCount = layout.getEllipsisCount(lines - 1);
-                if (ellipsisCount > 0) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     @Override

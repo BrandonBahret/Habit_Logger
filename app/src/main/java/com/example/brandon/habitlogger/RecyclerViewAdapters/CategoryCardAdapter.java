@@ -14,17 +14,17 @@ import java.util.List;
 
 /**
  * Created by Brandon on 2/6/2017.
- * RecyclerView mAdapter for category cards.
+ * RecyclerView adapter for category cards.
  */
 
 public class CategoryCardAdapter extends ExpandableRecyclerViewAdapter<CategoryViewHolder, HabitViewHolder> {
 
     private HabitViewAdapter.MenuItemClickListener menuItemClickListener;
-    private HabitViewAdapter.ButtonClickListener buttonClickListener;
+    private HabitViewAdapter.ButtonClickCallback buttonClickListener;
 
     public CategoryCardAdapter(List<? extends ExpandableGroup> groups,
                                HabitViewAdapter.MenuItemClickListener menuItemClickListener,
-                               HabitViewAdapter.ButtonClickListener buttonClickListener) {
+                               HabitViewAdapter.ButtonClickCallback buttonClickListener) {
         super(groups);
 
         this.menuItemClickListener = menuItemClickListener;

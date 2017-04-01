@@ -6,6 +6,7 @@ import android.view.View;
 
 /**
  * Created by Brandon on 3/5/2017.
+ * Item decorator to add spacers into RecyclerViews
  */
 
 public class SpaceOffsetDecoration extends RecyclerView.ItemDecoration {
@@ -22,15 +23,15 @@ public class SpaceOffsetDecoration extends RecyclerView.ItemDecoration {
         super.getItemOffsets(outRect, view, parent, state);
         int dataSize = state.getItemCount();
         int position = parent.getChildAdapterPosition(view);
-        if (dataSize > 0 && position != 0 && position == dataSize - 1) {
+
+        if (dataSize > 0 && position != 0 && position == dataSize - 1)
             outRect.set(0, 0, 0, mBottomOffset);
-        }
-        else if (dataSize > 0 && position == 0){
+
+        else if (dataSize > 0 && position == 0)
             outRect.set(0, mTopOffset, 0, 0);
-        }
-        else{
+
+        else
             outRect.set(0, 0, 0, 0);
-        }
 
     }
 }

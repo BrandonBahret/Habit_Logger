@@ -19,12 +19,14 @@ import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder;
  */
 
 public class HabitViewHolder extends ChildViewHolder {
+
+    //region (Member attributes)
     public CardView rootView;
     public ImageView categoryAccent;
     public Toolbar toolbar;
     public ImageButton playButton;
     public TextView time;
-    private String placeholderTime = "00:00:00";
+    //endregion
 
     public HabitViewHolder(View view) {
         super(view);
@@ -35,112 +37,110 @@ public class HabitViewHolder extends ChildViewHolder {
         this.rootView = (CardView) view;
     }
 
-    public void bindItem(final Habit item,
-                         final HabitViewAdapter.MenuItemClickListener menuItemClickListener,
-                         final HabitViewAdapter.ButtonClickListener buttonClickListener) {
+    //region Bind habit object
+    public void bindItem(
+            final Habit item,
+            final HabitViewAdapter.MenuItemClickListener menuItemClickListener,
+            final HabitViewAdapter.ButtonClickCallback buttonClickCallback) {
 
         // Make sure menu hasn't been inflated yet.
         int menuSize = toolbar.getMenu().size();
         if (menuSize == 0) {
-            if (item.getIsArchived()) {
-                toolbar.inflateMenu(R.menu.menu_archived_habit_card);
-            }
-            else {
-                toolbar.inflateMenu(R.menu.menu_habit_card);
-            }
+            if (item.getIsArchived()) toolbar.inflateMenu(R.menu.menu_archived_habit_card);
+
+            else toolbar.inflateMenu(R.menu.menu_habit_card);
         }
 
         categoryAccent.setBackgroundColor(item.getColor());
         toolbar.setTitle(item.getName());
 
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+        setListeners(item, menuItemClickListener, buttonClickCallback);
+    }
+
+    private void setListeners(
+            Habit item,
+            HabitViewAdapter.MenuItemClickListener menuItemClickListener,
+            HabitViewAdapter.ButtonClickCallback buttonClickCallback) {
+
+        toolbar.setOnMenuItemClickListener(
+                getMenuItemClickListener(item, menuItemClickListener)
+        );
+
+        long habitId = item.getDatabaseId();
+        playButton.setOnClickListener(
+                buttonClickCallback.getPlayButtonClickedListener(habitId)
+        );
+
+        playButton.setOnLongClickListener(
+                buttonClickCallback.getPlayButtonLongClickedListener(habitId)
+        );
+
+        rootView.setOnClickListener(
+                buttonClickCallback.getHabitViewClickedListener(habitId)
+        );
+    }
+
+    private Toolbar.OnMenuItemClickListener getMenuItemClickListener
+            (final Habit item, final HabitViewAdapter.MenuItemClickListener menuItemClickListener) {
+
+        return new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 int id = menuItem.getItemId();
-
                 long habitId = item.getDatabaseId();
 
                 switch (id) {
-                    case (R.id.habit_menu_edit): {
+                    case R.id.habit_menu_edit:
                         menuItemClickListener.onEditClick(habitId);
-                    }
-                    break;
+                        break;
 
-                    case (R.id.menu_enter_session): {
+                    case R.id.menu_enter_session:
                         menuItemClickListener.onStartSession(habitId);
-                    }
-                    break;
+                        break;
 
-                    case (R.id.habit_menu_reset): {
+                    case R.id.habit_menu_reset:
                         menuItemClickListener.onResetClick(habitId);
-                    }
-                    break;
+                        break;
 
-                    case (R.id.habit_menu_delete): {
+                    case R.id.habit_menu_delete:
                         menuItemClickListener.onDeleteClick(habitId);
-                    }
-                    break;
+                        break;
 
-                    case (R.id.habit_menu_export): {
+                    case R.id.habit_menu_export:
                         menuItemClickListener.onExportClick(habitId);
-                    }
-                    break;
+                        break;
 
-                    case (R.id.habit_menu_archive): {
+                    case R.id.habit_menu_archive:
                         menuItemClickListener.onArchiveClick(habitId);
-                    }
-                    break;
+                        break;
                 }
 
                 return true;
             }
-        });
-
-        playButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                long habitId = item.getDatabaseId();
-                buttonClickListener.onPlayButtonClicked(habitId);
-            }
-        });
-
-        playButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                long habitId = item.getDatabaseId();
-
-                buttonClickListener.onPlayButtonLongClicked(habitId);
-                return true;
-            }
-        });
-
-        rootView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                long habitId = item.getDatabaseId();
-
-                buttonClickListener.onCardClicked(habitId);
-            }
-        });
+        };
     }
+    //endregion
 
-    public static int getResourceIdForPauseButton(boolean isPaused) {
-        return isPaused ? R.drawable.ic_play_black :
-                R.drawable.ic_pause_black;
-    }
-
-    public void setEntry(SessionEntry entry) {
-        if (entry!=null){
+    //region Bind session entry object
+    public void bindSessionEntry(SessionEntry entry) {
+        if (entry != null) {
             time.setText(entry.stringifyDuration());
             playButton.setImageResource(
                     getResourceIdForPauseButton(entry.getIsPaused())
             );
         }
         else {
-            time.setText(placeholderTime);
+            time.setText("00:00:00");
             playButton.setImageResource(
                     getResourceIdForPauseButton(true)
             );
         }
     }
+
+    public static int getResourceIdForPauseButton(boolean isPaused) {
+        return isPaused ? R.drawable.ic_play_black :
+                R.drawable.ic_pause_black;
+    }
+    //endregion
+
 }

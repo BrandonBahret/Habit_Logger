@@ -24,7 +24,7 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
     List<Habit> habitsList;
 
     private MenuItemClickListener menuItemClickListener;
-    private ButtonClickListener buttonClickListener;
+    private ButtonClickCallback buttonClickCallback;
     private static List<SessionEntry> currentEntries;
 
     public interface MenuItemClickListener {
@@ -41,21 +41,21 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
         void onStartSession(long habitId);
     }
 
-    public interface ButtonClickListener {
-        void onPlayButtonClicked(long habitId);
+    public interface ButtonClickCallback {
+        View.OnClickListener getPlayButtonClickedListener(final long habitId);
 
-        void onPlayButtonLongClicked(long habitId);
+        View.OnLongClickListener getPlayButtonLongClickedListener(final long habitId);
 
-        void onCardClicked(long habitId);
+        View.OnClickListener getHabitViewClickedListener(final long habitId);
     }
 
     public HabitViewAdapter(List<Habit> habitsList, MainActivity context, MenuItemClickListener menuItemClickListener,
-                            ButtonClickListener buttonClickListener) {
+                            ButtonClickCallback buttonClickCallback) {
 
         this.habitsList = habitsList;
 //        this.sessionManager = new SessionManager(context);
         this.menuItemClickListener = menuItemClickListener;
-        this.buttonClickListener = buttonClickListener;
+        this.buttonClickCallback = buttonClickCallback;
     }
 
     @Override
@@ -79,15 +79,15 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
     @Override
     public void onBindViewHolder(final HabitViewHolder holder, int position) {
         Habit item = habitsList.get(position);
-        holder.bindItem(item, menuItemClickListener, buttonClickListener);
-        holder.setEntry(getSessionForHabitId(item.getDatabaseId()));
+        holder.bindItem(item, menuItemClickListener, buttonClickCallback);
+        holder.bindSessionEntry(getSessionForHabitId(item.getDatabaseId()));
     }
 
     @Override
     public void onBindViewHolder(HabitViewHolder holder, int position, List<Object> payloads) {
         super.onBindViewHolder(holder, position, payloads);
         if (payloads != null && !payloads.isEmpty()) {
-            holder.setEntry((SessionEntry) payloads.get(0));
+            holder.bindSessionEntry((SessionEntry) payloads.get(0));
         }
     }
 

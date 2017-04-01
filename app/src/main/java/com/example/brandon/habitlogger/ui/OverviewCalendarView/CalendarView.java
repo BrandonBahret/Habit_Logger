@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.OverviewActivity.CalendarView;
+package com.example.brandon.habitlogger.ui.OverviewCalendarView;
 
 import android.content.Context;
 import android.content.res.TypedArray;

@@ -61,7 +61,6 @@ public class GroupDecoration extends RecyclerView.ItemDecoration {
         textPaint.setAntiAlias(true);
         textPaint.getFontMetrics(fontMetrics);
         textPaint.setTextAlign(Paint.Align.CENTER);
-//        textPaint.setShadowLayer(8f, 0f, 0f, shadowColor);
     }
 
     @Override

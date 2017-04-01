@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity
     HabitViewAdapter habitAdapter;
     CategoryCardAdapter categoryAdapter;
     HabitViewAdapter.MenuItemClickListener menuItemClickListener;
-    HabitViewAdapter.ButtonClickListener buttonClickListener;
+    HabitViewAdapter.ButtonClickCallback buttonClickListener;
 
     ActivityMainBinding ui;
 
@@ -275,29 +275,7 @@ public class MainActivity extends AppCompatActivity
             }
         };
 
-        buttonClickListener = new HabitViewAdapter.ButtonClickListener() {
-            @Override
-            public void onPlayButtonClicked(long habitId) {
-                if (!sessionManager.getIsSessionActive(habitId)) {
-                    startSession(habitDatabase.getHabit(habitId));
-                }
-                else {
-                    boolean isPaused = sessionManager.getIsPaused(habitId);
-                    sessionManager.setPauseState(habitId, !isPaused);
-                    updateCards.run();
-                }
-            }
-
-            @Override
-            public void onPlayButtonLongClicked(long habitId) {
-                startSession(habitDatabase.getHabit(habitId));
-            }
-
-            @Override
-            public void onCardClicked(long habitId) {
-                startHabitActivity(habitId);
-            }
-        };
+        buttonClickListener = getHabitButtonClickCallback();
 
         applyItemDecorationToRecyclerView();
 
@@ -359,6 +337,50 @@ public class MainActivity extends AppCompatActivity
             RecyclerView rv = ui.mainInclude.habitRecyclerView;
             rv.getLayoutManager().onRestoreInstanceState(savedInstanceState.getParcelable("LAST_POSITION"));
         }
+    }
+
+    private HabitViewAdapter.ButtonClickCallback getHabitButtonClickCallback() {
+        return new HabitViewAdapter.ButtonClickCallback() {
+
+            @Override
+            public View.OnClickListener getPlayButtonClickedListener(final long habitId) {
+                return new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (!sessionManager.getIsSessionActive(habitId)) {
+                            startSession(habitDatabase.getHabit(habitId));
+                        }
+                        else {
+                            boolean isPaused = sessionManager.getIsPaused(habitId);
+                            sessionManager.setPauseState(habitId, !isPaused);
+                            updateCards.run();
+                        }
+                    }
+                };
+            }
+
+            @Override
+            public View.OnLongClickListener getPlayButtonLongClickedListener(final long habitId) {
+                return new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        startSession(habitDatabase.getHabit(habitId));
+                        return true;
+                    }
+                };
+            }
+
+            @Override
+            public View.OnClickListener getHabitViewClickedListener(final long habitId) {
+                return new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startHabitActivity(habitId);
+                    }
+                };
+            }
+
+        };
     }
 
     private Runnable updateCards = new Runnable() {
