@@ -9,12 +9,13 @@ import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 
 /**
  * Created by Brandon on 3/6/2017.
- *
+ * Dialog to edit habits
  */
 
 public class EditHabitDialog extends NewHabitDialog {
 
     //region (Member attributes)
+    private static final String SERIALIZED_HABIT = "SERIALIZED_HABIT";
     private Habit mEditHabit;
     //endregion
 
@@ -22,22 +23,23 @@ public class EditHabitDialog extends NewHabitDialog {
         EditHabitDialog dialog = new EditHabitDialog();
 
         Bundle args = new Bundle(1);
-        args.putSerializable("HABIT", editHabit);
+        args.putSerializable(SERIALIZED_HABIT, editHabit);
         dialog.setArguments(args);
 
         dialog.setOnFinishedListener(listener);
         return dialog;
     }
 
+    //region Methods responsible for creating the dialog
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.mEditHabit = (Habit) getArguments().getSerializable("HABIT");
+        this.mEditHabit = (Habit) getArguments().getSerializable(SERIALIZED_HABIT);
     }
 
     @Override
     public void onBeforeSetView() {
-        Habit edit = this.habitResult;
+        Habit edit = mHabit;
 
         this.ui.habitName.setText(edit.getName());
         this.ui.spinnerCategorySelector.setSelection
@@ -50,7 +52,7 @@ public class EditHabitDialog extends NewHabitDialog {
         return new AlertDialog.Builder(getContext())
                 .setCancelable(true)
                 .setTitle("Edit Habit")
-                .setPositiveButton("Update", this)
+                .setPositiveButton("Update", this.OnCreateHabitButtonClicked)
                 .setNegativeButton("Cancel", null);
     }
 
@@ -58,4 +60,6 @@ public class EditHabitDialog extends NewHabitDialog {
     public Habit getWorkingHabit() {
         return this.mEditHabit;
     }
+    //endregion -- end --
+
 }

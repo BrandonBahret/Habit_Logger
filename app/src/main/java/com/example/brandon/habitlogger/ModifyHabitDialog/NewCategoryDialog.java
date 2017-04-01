@@ -15,25 +15,32 @@ import com.example.brandon.habitlogger.databinding.DialogNewCategoryBinding;
 
 /**
  * Created by Brandon on 2/26/2017.
+ *
  */
 
-public class NewCategoryDialogFactory implements DialogInterface.OnClickListener {
+public class NewCategoryDialog {
 
-    private OnFinishedListener onFinishedListener;
-    private Context context;
+    //region (Member attributes)
+    private Context mContext;
     private DialogNewCategoryBinding ui;
+    //endregion
 
+    //region Code responsible for providing an interface
     public interface OnFinishedListener {
         void onFinishedWithResult(HabitCategory category);
     }
 
-    public NewCategoryDialogFactory(Context context, OnFinishedListener listener) {
-        this.context = context;
-        this.onFinishedListener = listener;
+    private OnFinishedListener mOnFinishedListener;
+    //endregion
+
+    public NewCategoryDialog(Context context, OnFinishedListener listener) {
+        this.mContext = context;
+        this.mOnFinishedListener = listener;
     }
 
+    //region Methods responsible for constructing the dialog builder
     public AlertDialog.Builder createBuilder() {
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(mContext);
         ui = DataBindingUtil.inflate(inflater, R.layout.dialog_new_category, null, false);
 
         ui.categoryColor.addTextChangedListener(new TextWatcher() {
@@ -53,11 +60,11 @@ public class NewCategoryDialogFactory implements DialogInterface.OnClickListener
             }
         });
 
-        return new AlertDialog.Builder(context)
+        return new AlertDialog.Builder(mContext)
                 .setCancelable(true)
                 .setView(ui.getRoot())
                 .setTitle("New Category")
-                .setPositiveButton("Create", this);
+                .setPositiveButton("Create", OnPositiveButtonClicked);
     }
 
     private void setColorPreview(String color) {
@@ -69,14 +76,19 @@ public class NewCategoryDialogFactory implements DialogInterface.OnClickListener
         }
     }
 
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-        onFinishedListener.onFinishedWithResult(getCategory());
-    }
+    DialogInterface.OnClickListener OnPositiveButtonClicked =
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    mOnFinishedListener.onFinishedWithResult(getCategory());
+                }
+            };
+    //endregion
 
     public HabitCategory getCategory() {
         String color = ui.categoryColor.getText().toString();
         String name = ui.categoryName.getText().toString();
         return new HabitCategory(color, name);
     }
+
 }

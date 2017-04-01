@@ -74,13 +74,13 @@ public class CategorySpinner extends AppCompatSpinner {
             new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    NewCategoryDialogFactory dialog = new NewCategoryDialogFactory(mContext, OnCategoryDialogFinished);
+                    NewCategoryDialog dialog = new NewCategoryDialog(mContext, OnCategoryDialogFinished);
                     dialog.createBuilder().show();
                 }
             };
 
-    private NewCategoryDialogFactory.OnFinishedListener OnCategoryDialogFinished =
-            new NewCategoryDialogFactory.OnFinishedListener() {
+    private NewCategoryDialog.OnFinishedListener OnCategoryDialogFinished =
+            new NewCategoryDialog.OnFinishedListener() {
                 @Override
                 public void onFinishedWithResult(HabitCategory category) {
                     ((CategorySpinnerAdapter) getAdapter()).addCategory(category);

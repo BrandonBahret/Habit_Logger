@@ -19,45 +19,42 @@ import java.util.List;
 
 /**
  * Created by Brandon on 3/6/2017.
+ * Dialog to create new habits
  */
 
-public class NewHabitDialog extends DialogFragment implements DialogInterface.OnClickListener {
+public class NewHabitDialog extends DialogFragment {
+
+    //region (Member attributes)
+    protected Habit mHabit;
 
     DialogNewHabitBinding ui;
-
-    Habit habitResult;
     protected CategorySpinnerAdapter adapter;
+    //endregion
 
-    //region // Get a result from the dialog.
+    //region Code responsible for providing an interface
     private OnFinishedListener onFinishedListener;
-    private Habit resultHabit;
-
-    public void setOnFinishedListener(OnFinishedListener listener) {
-        onFinishedListener = listener;
-    }
 
     public interface OnFinishedListener {
         void onFinishedWithResult(Habit habit);
     }
+
+    public void setOnFinishedListener(OnFinishedListener listener) {
+        onFinishedListener = listener;
+    }
     //endregion
 
-    //region // Methods to create the dialog.
     public static NewHabitDialog newInstance(OnFinishedListener listener) {
         NewHabitDialog dialog = new NewHabitDialog();
         dialog.setOnFinishedListener(listener);
         return dialog;
     }
 
-    public Habit getWorkingHabit() {
-        HabitCategory category = new HabitCategory("#ff000000", getString(R.string.uncategorized));
-        return new Habit("", category);
-    }
-
+    //region Methods responsible for creating the dialog
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        habitResult = getWorkingHabit();
+        mHabit = getWorkingHabit();
 
         LayoutInflater layoutInflater = LayoutInflater.from(getContext()); //getLayoutInflater(savedInstanceState);
         ui = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_new_habit, null, false);
@@ -69,40 +66,46 @@ public class NewHabitDialog extends DialogFragment implements DialogInterface.On
         AlertDialog.Builder builder = getAlertDialogBuilder();
 
         onBeforeSetView();
-
         builder.setView(ui.getRoot());
+
         return builder.create();
+    }
+
+    public Habit getWorkingHabit() {
+        HabitCategory category = new HabitCategory("#ff000000", getString(R.string.uncategorized));
+        return new Habit("", category);
     }
 
     protected AlertDialog.Builder getAlertDialogBuilder() {
         return new AlertDialog.Builder(getContext())
                 .setCancelable(true)
                 .setTitle("New Habit")
-                .setPositiveButton("Create", this)
+                .setPositiveButton("Create", OnCreateHabitButtonClicked)
                 .setNegativeButton("Cancel", null);
     }
-
 
     public void onBeforeSetView() {
         // Empty stub
     }
 
-    //endregion
-
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-        Habit habit = getHabitFromDialog();
-        onFinishedListener.onFinishedWithResult(habit);
-    }
+    protected DialogInterface.OnClickListener OnCreateHabitButtonClicked =
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Habit habit = getHabitFromDialog();
+                    onFinishedListener.onFinishedWithResult(habit);
+                }
+            };
+    //endregion -- end --
 
     public Habit getHabitFromDialog() {
         String name = ui.habitName.getText().toString();
         String description = ui.habitDescription.getText().toString();
         HabitCategory category = (HabitCategory) ui.spinnerCategorySelector.getSelectedItem();
 
-        habitResult.setName(name);
-        habitResult.setDescription(description);
-        habitResult.setCategory(category);
-        return habitResult;
+        mHabit.setName(name);
+        mHabit.setDescription(description);
+        mHabit.setCategory(category);
+        return mHabit;
     }
 }
