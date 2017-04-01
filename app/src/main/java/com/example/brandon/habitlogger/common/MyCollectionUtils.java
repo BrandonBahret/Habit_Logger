@@ -2,6 +2,7 @@ package com.example.brandon.habitlogger.common;
 
 import com.android.internal.util.Predicate;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -42,6 +43,16 @@ public class MyCollectionUtils {
         }
     }
 
+    public static <ListType, Collect> List<Collect> collect
+            (List<ListType> list, IGetKey<ListType, Collect> keyGetter){
+
+        List<Collect> collection = new ArrayList<>();
+        for(ListType item: list)
+            collection.add(keyGetter.get(item));
+
+        return collection;
+    }
+
     /**
      * @return The non-negative index of the element, or a negative index which is the -index - 1 where the element would be inserted
      */
@@ -52,22 +63,6 @@ public class MyCollectionUtils {
                 return comparator.compare(obj, key);
             }
         });
-    }
-
-    public static <In> double sum(In[] objects, IGetKey<In, ? extends Number> keyGetter) {
-        double sum = 0.0;
-        for (In object : objects)
-            sum += keyGetter.get(object).doubleValue();
-
-        return sum;
-    }
-
-    public static <In extends Number> double sum(In[] objects) {
-        double sum = 0.0;
-        for (In object : objects)
-            sum += object.doubleValue();
-
-        return sum;
     }
 
     public static <In> double sum(Iterable<In> objects, IGetKey<In, ? extends Number> keyGetter) {
