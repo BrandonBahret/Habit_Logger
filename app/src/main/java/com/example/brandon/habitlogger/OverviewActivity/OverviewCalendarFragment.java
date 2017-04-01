@@ -14,10 +14,12 @@ import com.example.brandon.habitlogger.ui.OverviewCalendarView.CalendarViewAdapt
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.HabitDataSample;
 
-
 public class OverviewCalendarFragment extends Fragment implements IDataOverviewCallback.IUpdateHabitSample {
 
-    IDataOverviewCallback callbackInterface;
+    //region (Member attributes)
+    private IDataOverviewCallback mCallback;
+    private RecyclerView mCalendarViewContainer;
+    //endregion
 
     public OverviewCalendarFragment() {
         // Required empty public constructor
@@ -27,57 +29,48 @@ public class OverviewCalendarFragment extends Fragment implements IDataOverviewC
         return new OverviewCalendarFragment();
     }
 
-    //region // Methods responsible for handling the fragment lifecycle.
+    //region [ ---- Methods responsible for handling the fragment lifecycle ---- ]
 
-    //region // On create methods
+    //region start lifetime (onAttach, onCreateView)
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        mCallback = (IDataOverviewCallback) context;
+        mCallback.addCallback(this);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
         View v = inflater.inflate(R.layout.fragment_calendar, container, false);
-
-        RecyclerView calendarViewContainer = (RecyclerView) v.findViewById(R.id.calendar_view_container);
-
-        HabitDataSample sample = callbackInterface.getDataSample();
-
-        CalendarViewAdapter mAdapter = new CalendarViewAdapter(sample, getContext());
+        mCalendarViewContainer = (RecyclerView) v.findViewById(R.id.calendar_view_container);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        calendarViewContainer.setLayoutManager(layoutManager);
-        calendarViewContainer.setItemAnimator(new DefaultItemAnimator());
-        calendarViewContainer.setAdapter(mAdapter);
+        mCalendarViewContainer.setLayoutManager(layoutManager);
+        mCalendarViewContainer.setItemAnimator(new DefaultItemAnimator());
+
+        updateHabitDataSample(mCallback.getDataSample());
 
         return v;
     }
-    //endregion
-
-    //region // Attach - onStop
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        callbackInterface = (IDataOverviewCallback)context;
-        callbackInterface.addCallback(this);
-    }
+    //endregion -- end --
 
     @Override
     public void onStop() {
         super.onStop();
-        callbackInterface.removeCallback(this);
+        mCallback.removeCallback(this);
     }
-    //endregion
 
-    //endregion
+    //endregion [ -------- end -------- ]
 
     @Override
     public void updateHabitDataSample(HabitDataSample dataSample) {
-
+        if(mCalendarViewContainer != null) {
+            CalendarViewAdapter adapter = new CalendarViewAdapter(dataSample, getContext());
+            mCalendarViewContainer.setAdapter(adapter);
+        }
     }
 
 }

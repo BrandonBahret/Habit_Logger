@@ -138,7 +138,7 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
     //region Methods responsible for manipulating entries in the fragment
     public void removeSessionEntryById(long databaseId) {
         int index = getSessionEntryIndex(databaseId);
-        if (index != mSessionEntries.size()) {
+        if (index != -1) {
             mSessionEntries.remove(index);
             mEntryAdapter.notifyItemRemoved(index);
         }
