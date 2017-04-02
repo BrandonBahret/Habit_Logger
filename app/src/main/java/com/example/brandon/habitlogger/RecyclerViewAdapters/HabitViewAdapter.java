@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.ui.MainActivity;
 
 import java.util.List;
 
@@ -20,12 +19,14 @@ import java.util.List;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
 
-    //    private final SessionManager sessionManager;
-    List<Habit> habitsList;
+    //region (Memberr attributes)
+    private List<Habit> mHabitsList;
+    private static List<SessionEntry> mCurrentEntries;
+    //endregion
 
-    private MenuItemClickListener menuItemClickListener;
-    private ButtonClickCallback buttonClickCallback;
-    private static List<SessionEntry> currentEntries;
+    //region Code responsible for providing communication
+    private MenuItemClickListener mMenuItemClickListener;
+    private ButtonClickCallback mButtonClickCallback;
 
     public interface MenuItemClickListener {
         void onEditClick(long habitId);
@@ -48,16 +49,18 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
 
         View.OnClickListener getHabitViewClickedListener(final long habitId);
     }
+    //endregion -- end --
 
-    public HabitViewAdapter(List<Habit> habitsList, MainActivity context, MenuItemClickListener menuItemClickListener,
+    public HabitViewAdapter(List<Habit> habitsList,
+                            MenuItemClickListener menuItemClickListener,
                             ButtonClickCallback buttonClickCallback) {
 
-        this.habitsList = habitsList;
-//        this.sessionManager = new SessionManager(context);
-        this.menuItemClickListener = menuItemClickListener;
-        this.buttonClickCallback = buttonClickCallback;
+        mHabitsList = habitsList;
+        mMenuItemClickListener = menuItemClickListener;
+        mButtonClickCallback = buttonClickCallback;
     }
 
+    //region Methods responsible for creating and binding view holders
     @Override
     public HabitViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
@@ -68,18 +71,10 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
         return new HabitViewHolder(itemView);
     }
 
-    public static void setMargins(View v, int l, int t, int r, int b) {
-        if (v.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
-            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
-            p.setMargins(l, t, r, b);
-            v.requestLayout();
-        }
-    }
-
     @Override
     public void onBindViewHolder(final HabitViewHolder holder, int position) {
-        Habit item = habitsList.get(position);
-        holder.bindItem(item, menuItemClickListener, buttonClickCallback);
+        Habit item = mHabitsList.get(position);
+        holder.bindItem(item, mMenuItemClickListener, mButtonClickCallback);
         holder.bindSessionEntry(getSessionForHabitId(item.getDatabaseId()));
     }
 
@@ -91,27 +86,41 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
         }
     }
 
-    public void removeAt(int position) {
-        habitsList.remove(position);
-        notifyItemRemoved(position);
+    public static void setMargins(View v, int l, int t, int r, int b) {
+        if (v.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+            p.setMargins(l, t, r, b);
+            v.requestLayout();
+        }
+    }
+    //endregion -- end --
+
+    //region Methods responsible for exposing the data set
+    @Override
+    public int getItemCount() {
+        return mHabitsList.size();
     }
 
     public void updateHabitViews(List<SessionEntry> entries) {
-        currentEntries = entries;
+        mCurrentEntries = entries;
 
         for (SessionEntry entry : entries) {
             long habitId = entry.getHabitId();
-            int adapterPosition = this.getAdapterItemPosition(habitId);
+            int adapterPosition = getAdapterItemPosition(habitId);
             notifyItemChanged(adapterPosition, entry);
         }
     }
 
-    private SessionEntry getSessionForHabitId(long databaseId) {
-        if (currentEntries != null) {
-            for (SessionEntry entry : currentEntries) {
-                if (entry.getHabitId() == databaseId) {
+    public void removeAt(int position) {
+        mHabitsList.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    private SessionEntry getSessionForHabitId(long habitId) {
+        if (mCurrentEntries != null) {
+            for (SessionEntry entry : mCurrentEntries) {
+                if (entry.getHabitId() == habitId)
                     return entry;
-                }
             }
         }
 
@@ -120,16 +129,13 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
 
     private int getAdapterItemPosition(long habitId) {
         for (int position = 0; position < getItemCount(); position++) {
-            if (this.habitsList.get(position).getDatabaseId() == habitId)
+            if (mHabitsList.get(position).getDatabaseId() == habitId)
                 return position;
         }
 
-        return 0;
+        return -1;
     }
+    //endregion
 
-    @Override
-    public int getItemCount() {
-        return habitsList.size();
-    }
 }
 

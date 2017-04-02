@@ -10,42 +10,50 @@ import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder;
 
 /**
  * Created by Brandon on 2/6/2017.
- * Category card view holder for CategoryCardAdapter mAdapter
+ * Category card mRootView holder for CategoryCardAdapter mAdapter
  */
 
 public class CategoryViewHolder extends GroupViewHolder {
-    public CardView view;
-    public TextView title, numberOfHabits;
 
-    Callback callback;
+    //region (Member attributes)
+    private CardView mRootView;
+    private TextView mTitle, mNumberOfHabits;
+    //endregion
+
+    //region Code responsible for providing an interface
+    private Callback mOnBeforeGroupExpands;
 
     public interface Callback{
         void beforeExpand(String title);
     }
+    //endregion -- end --
 
-    public CategoryViewHolder(View view, Callback beforeExpand) {
+    public CategoryViewHolder(View view, Callback onBeforeGroupExpands) {
         super(view);
-        this.view = (CardView)view;
-        this.title = (TextView) view.findViewById(R.id.category_title);
-        this.numberOfHabits = (TextView) view.findViewById(R.id.number_of_habits);
-        this.callback = beforeExpand;
+        mRootView = (CardView)view;
+        mTitle = (TextView) view.findViewById(R.id.category_title);
+        mNumberOfHabits = (TextView) view.findViewById(R.id.number_of_habits);
+        mOnBeforeGroupExpands = onBeforeGroupExpands;
     }
 
     @Override
     public void onClick(View v) {
-        callback.beforeExpand(title.getText().toString());
+        mOnBeforeGroupExpands.beforeExpand(mTitle.getText().toString());
         super.onClick(v);
     }
 
+    //region Setters {}
     public void setTitle(ExpandableGroup group) {
-        title.setText(group.getTitle());
+        mTitle.setText(group.getTitle());
     }
 
     public void setColor(int color) {
-        view.setCardBackgroundColor(color);
+        mRootView.setCardBackgroundColor(color);
     }
 
     public void setNumberOfEntries(int itemCount) {
-        numberOfHabits.setText(String.valueOf(itemCount));
+        mNumberOfHabits.setText(String.valueOf(itemCount));
     }
+    //endregion
+
 }

@@ -320,7 +320,7 @@ public class MainActivity extends AppCompatActivity
             habitCardContainer.setAdapter(categoryAdapter);
         }
         else {
-            habitAdapter = new HabitViewAdapter(habitList, this, menuItemClickListener, buttonClickListener);
+            habitAdapter = new HabitViewAdapter(habitList, menuItemClickListener, buttonClickListener);
             habitCardContainer.setAdapter(habitAdapter);
             showDatabase();
         }
@@ -868,7 +868,7 @@ public class MainActivity extends AppCompatActivity
             habitList = habitDatabase.getHabits();
 
 
-            habitAdapter = new HabitViewAdapter(habitList, this, menuItemClickListener, buttonClickListener);
+            habitAdapter = new HabitViewAdapter(habitList, menuItemClickListener, buttonClickListener);
 
             if (habitDisplayMode == ONLY_ARCHIVED_HABITS)
                 MyCollectionUtils.filter(habitList, Habit.ICheckIfIsNotArchived);

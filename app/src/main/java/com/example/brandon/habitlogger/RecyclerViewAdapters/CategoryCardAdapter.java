@@ -19,18 +19,21 @@ import java.util.List;
 
 public class CategoryCardAdapter extends ExpandableRecyclerViewAdapter<CategoryViewHolder, HabitViewHolder> {
 
-    private HabitViewAdapter.MenuItemClickListener menuItemClickListener;
-    private HabitViewAdapter.ButtonClickCallback buttonClickListener;
+    //region (Member attributes)
+    private HabitViewAdapter.MenuItemClickListener mMenuItemClickListener;
+    private HabitViewAdapter.ButtonClickCallback mButtonClickCallback;
+    //endregion
 
-    public CategoryCardAdapter(List<? extends ExpandableGroup> groups,
-                               HabitViewAdapter.MenuItemClickListener menuItemClickListener,
-                               HabitViewAdapter.ButtonClickCallback buttonClickListener) {
+    public CategoryCardAdapter(
+            List<? extends ExpandableGroup> groups,
+            HabitViewAdapter.MenuItemClickListener menuItemClickListener,
+            HabitViewAdapter.ButtonClickCallback buttonClickCallback) {
         super(groups);
-
-        this.menuItemClickListener = menuItemClickListener;
-        this.buttonClickListener = buttonClickListener;
+        mMenuItemClickListener = menuItemClickListener;
+        mButtonClickCallback = buttonClickCallback;
     }
 
+    //region Methods responsible for creating view holders
     @Override
     public CategoryViewHolder onCreateGroupViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -40,10 +43,9 @@ public class CategoryCardAdapter extends ExpandableRecyclerViewAdapter<CategoryV
         return new CategoryViewHolder(view, new CategoryViewHolder.Callback() {
             @Override
             public void beforeExpand(String title) {
-                for(ExpandableGroup group:getGroups()){
-                    if(isGroupExpanded(group) && !group.getTitle().equals(title)){
+                for (ExpandableGroup group : getGroups()) {
+                    if (isGroupExpanded(group) && !group.getTitle().equals(title))
                         toggleGroup(group);
-                    }
                 }
             }
         });
@@ -58,21 +60,16 @@ public class CategoryCardAdapter extends ExpandableRecyclerViewAdapter<CategoryV
         return new HabitViewHolder(itemView);
     }
 
-    public static void setMargins (View v, int l, int t, int r, int b) {
-        if (v.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
-            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
-            p.setMargins(l, t, r, b);
-            v.requestLayout();
+    public static void setMargins(View view, int left, int top, int right, int bottom) {
+        if (view.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+            p.setMargins(left, top, right, bottom);
+            view.requestLayout();
         }
     }
+    //endregion -- end --
 
-    @Override
-    public void onBindChildViewHolder(HabitViewHolder holder, int flatPosition,
-                                      ExpandableGroup group, int childIndex) {
-        Habit item = (Habit)group.getItems().get(childIndex);
-        holder.bindItem(item, menuItemClickListener, buttonClickListener);
-    }
-
+    //region Methods responsible for binding objects
     @Override
     public void onBindGroupViewHolder(CategoryViewHolder holder, int flatPosition,
                                       ExpandableGroup group) {
@@ -83,4 +80,12 @@ public class CategoryCardAdapter extends ExpandableRecyclerViewAdapter<CategoryV
         holder.setColor(container.getCategory().getColorAsInt());
         holder.setNumberOfEntries(group.getItemCount());
     }
+
+    @Override
+    public void onBindChildViewHolder(HabitViewHolder holder, int flatPosition,
+                                      ExpandableGroup group, int childIndex) {
+        Habit item = (Habit) group.getItems().get(childIndex);
+        holder.bindItem(item, mMenuItemClickListener, mButtonClickCallback);
+    }
+    //endregion -- end --
 }

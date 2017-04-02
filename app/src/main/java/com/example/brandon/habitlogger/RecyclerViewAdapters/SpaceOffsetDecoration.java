@@ -10,8 +10,11 @@ import android.view.View;
  */
 
 public class SpaceOffsetDecoration extends RecyclerView.ItemDecoration {
+
+    //region (Member attributes)
     private int mBottomOffset;
     private int mTopOffset;
+    //endregion
 
     public SpaceOffsetDecoration(int bottomOffset, int topOffset) {
         mBottomOffset = bottomOffset;
@@ -32,6 +35,5 @@ public class SpaceOffsetDecoration extends RecyclerView.ItemDecoration {
 
         else
             outRect.set(0, 0, 0, 0);
-
     }
 }
