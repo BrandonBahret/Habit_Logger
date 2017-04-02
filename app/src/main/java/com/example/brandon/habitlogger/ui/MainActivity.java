@@ -575,7 +575,7 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // Handle navigation view item clicks here.
+        // Handle navigation rootView item clicks here.
         int id = item.getItemId();
 
         switch (id) {
@@ -662,7 +662,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -736,7 +735,6 @@ public class MainActivity extends AppCompatActivity
         habitCardContainer.removeAllViews();
         showDatabase();
     }
-
 
     public void startSession(long habitId) {
         Habit habit = habitDatabase.getHabit(habitId);
@@ -894,4 +892,5 @@ public class MainActivity extends AppCompatActivity
 
         return -1;
     }
+
 }

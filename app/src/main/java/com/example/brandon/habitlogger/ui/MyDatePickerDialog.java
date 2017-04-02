@@ -17,6 +17,10 @@ import java.util.Calendar;
 public class MyDatePickerDialog extends DialogFragment implements
         DatePickerDialog.OnDateSetListener {
 
+    public static final String KEY_DATE_MIN = "date_min";
+    public static final String KEY_DATE_MAX = "date_max";
+    public static final String KEY_DATE_MILLIS = "date_in_milliseconds";
+
     //region (Member attributes)
     private int mHour;
     private int mMinute;
@@ -35,15 +39,27 @@ public class MyDatePickerDialog extends DialogFragment implements
     }
     //endregion
 
+    public static MyDatePickerDialog newInstance(long dateMin, long dateMax, long dateInMillis) {
+        MyDatePickerDialog dialog = new MyDatePickerDialog();
+
+        Bundle args = new Bundle();
+        args.putLong(KEY_DATE_MIN, dateMin);
+        args.putLong(KEY_DATE_MAX, dateMax);
+        args.putLong(KEY_DATE_MILLIS, dateInMillis);
+        dialog.setArguments(args);
+
+        return dialog;
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current date as the default date in the picker
         Bundle args = getArguments();
 
-        long minTime = args.getLong("date_min", -1);
-        long maxTime = args.getLong("date_max", -1);
-        long time = args.getLong("date_in_milliseconds", minTime);
+        long minTime = args.getLong(KEY_DATE_MIN, -1);
+        long maxTime = args.getLong(KEY_DATE_MAX, -1);
+        long time = args.getLong(KEY_DATE_MILLIS, minTime);
 
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(time);

@@ -20,6 +20,7 @@ import com.example.brandon.habitlogger.RecyclerViewAdapters.GroupDecoration;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.SpaceOffsetDecoration;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
+import com.example.brandon.habitlogger.ui.IScrollEvents;
 import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
 
     //region (Member attributes)
     private IHabitCallback mCallbackInterface;
-    private RecyclerViewScrollObserver.IScrollEvents mListener;
+    private IScrollEvents mListener;
 
     private String mDateFormat;
     private HabitDatabase mHabitDatabase;
@@ -57,8 +58,8 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
         mCallbackInterface = (IHabitCallback) context;
         mCallbackInterface.addUpdateEntriesCallback(this);
 
-        if (context instanceof RecyclerViewScrollObserver.IScrollEvents)
-            this.mListener = (RecyclerViewScrollObserver.IScrollEvents) context;
+        if (context instanceof IScrollEvents)
+            this.mListener = (IScrollEvents) context;
     }
 
     @Override

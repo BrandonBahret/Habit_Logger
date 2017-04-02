@@ -72,7 +72,7 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         mListener = listener;
     }
 
-    //region Methods responsible for creating and binding view holders
+    //region Methods responsible for creating and binding rootView holders
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())

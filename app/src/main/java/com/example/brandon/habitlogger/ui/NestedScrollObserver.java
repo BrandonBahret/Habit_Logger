@@ -4,26 +4,27 @@ import android.support.v4.widget.NestedScrollView;
 
 /**
  * Created by Brandon on 3/28/2017.
- * Base class for scroll observers
+ * Class to easily watch scroll events in nested scroll views
  */
 
 public abstract class NestedScrollObserver implements NestedScrollView.OnScrollChangeListener {
 
-    final int threshold = 2;
-    boolean control = false;
+    private static final int THRESHOLD = 2;
+    private boolean mControl = false;
 
     public abstract void onScrollUp();
+
     public abstract void onScrollDown();
 
     public void onScrolled(int dy) {
-        if (dy > threshold && !control) {
+        if (dy > THRESHOLD && !mControl) {
             onScrollDown();
-            control = true;
+            mControl = true;
         }
 
-        else if (dy < -threshold && control) {
+        else if (dy < -THRESHOLD && mControl) {
             onScrollUp();
-            control = false;
+            mControl = false;
         }
     }
 

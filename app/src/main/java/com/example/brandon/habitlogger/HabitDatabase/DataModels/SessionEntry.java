@@ -11,8 +11,6 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Locale;
 
-import static com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager.getDate;
-
 /**
  * Created by Brandon on 10/26/2016.
  * This class defines the SessionEntry object.
@@ -114,7 +112,7 @@ public class SessionEntry implements Serializable {
     @Override
     public String toString() {
         String format = "{\n\tStarting Time: %s,\n\tDuration: %s\n\tNote: %s\n}\n";
-        String startTimeString = getDate(getStartingTime(), "MMMM/dd/yyyy");
+        String startTimeString = MyTimeUtils.stringifyTimestamp(getStartingTime(), "MMMM/dd/yyyy");
         return String.format(Locale.US, format, startTimeString, stringifyDuration(), getNote());
     }
 

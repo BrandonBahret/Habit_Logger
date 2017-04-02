@@ -21,6 +21,7 @@ import com.example.brandon.habitlogger.RecyclerViewAdapters.GroupDecoration;
 import com.example.brandon.habitlogger.RecyclerViewAdapters.SpaceOffsetDecoration;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.data.HabitDataSample;
+import com.example.brandon.habitlogger.ui.IScrollEvents;
 import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
     private HabitDatabase mHabitDatabase;
     private List<SessionEntry> mSessionEntries;
 
-    private RecyclerViewScrollObserver.IScrollEvents mListener;
+    private IScrollEvents mListener;
     private IDataOverviewCallback mCallback;
 
     private RecyclerView mEntriesContainer;
@@ -57,8 +58,8 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
         mCallback = (IDataOverviewCallback) context;
         mCallback.addCallback(this);
 
-        if (context instanceof RecyclerViewScrollObserver.IScrollEvents)
-            mListener = (RecyclerViewScrollObserver.IScrollEvents) context;
+        if (context instanceof IScrollEvents)
+            mListener = (IScrollEvents) context;
     }
 
     @Override

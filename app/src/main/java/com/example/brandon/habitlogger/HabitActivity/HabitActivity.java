@@ -20,10 +20,10 @@ import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
-import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.HabitDialog.EditHabitDialog;
 import com.example.brandon.habitlogger.HabitDialog.NewHabitDialog;
+import com.example.brandon.habitlogger.HabitSessions.SessionActivity;
+import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.ConfirmationDialog;
 import com.example.brandon.habitlogger.common.MyColorUtils;
@@ -31,7 +31,7 @@ import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.databinding.ActivityHabitBinding;
 import com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager;
-import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
+import com.example.brandon.habitlogger.ui.IScrollEvents;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class HabitActivity extends AppCompatActivity implements IHabitCallback, RecyclerViewScrollObserver.IScrollEvents {
+public class HabitActivity extends AppCompatActivity implements IHabitCallback, IScrollEvents {
 
     //region (Member attributes)
     public static String HABIT_ID = "HABIT_ID";
@@ -267,19 +267,19 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                 switch (position) {
                     case (0): {
                         ui.menuFab.showMenu(true);
-                        dateRangeManager.showView();
+                        dateRangeManager.showView(true);
                     }
                     break;
 
                     case (1): {
                         ui.menuFab.hideMenu(true);
-                        dateRangeManager.hideView();
+                        dateRangeManager.hideView(true);
                     }
                     break;
 
                     case (2): {
                         ui.menuFab.hideMenu(true);
-                        dateRangeManager.showView();
+                        dateRangeManager.showView(true);
                     }
                     break;
                 }
@@ -424,14 +424,14 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
     //region Methods to handle scroll events
     @Override
     public void onScrollUp() {
-        dateRangeManager.showView();
+        dateRangeManager.showView(true);
         if (ui.tabs.getSelectedTabPosition() == 0)
             ui.menuFab.showMenu(true);
     }
 
     @Override
     public void onScrollDown() {
-        dateRangeManager.hideView();
+        dateRangeManager.hideView(true);
         if (ui.tabs.getSelectedTabPosition() == 0)
             ui.menuFab.hideMenu(true);
     }

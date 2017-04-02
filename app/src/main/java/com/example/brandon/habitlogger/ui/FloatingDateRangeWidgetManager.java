@@ -1,6 +1,5 @@
 package com.example.brandon.habitlogger.ui;
 
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.format.DateUtils;
@@ -13,14 +12,11 @@ import android.widget.TextView;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by Brandon on 1/29/2017.
@@ -29,25 +25,39 @@ import java.util.Locale;
 
 public class FloatingDateRangeWidgetManager {
 
-    private AppCompatActivity activity;
+    //region (Member attributes)
+    private AppCompatActivity mActivity;
+    private ViewHolder mViewHolder;
 
-    private ViewHolder viewHolder;
-    private PreferenceChecker preferenceChecker;
+    private PreferenceChecker mPreferenceChecker;
 
-    private long dateFromTime, dateToTime, minimumTime, maximumTime;
+    private long mDateFromTime, mDateToTime, mMinimumTime, mMaximumTime;
+    public boolean mIsShown = true;
+    //endregion
 
-    private DateRangeChangeListener listener;
-    public boolean isShown = true;
+    //region Code responsible for providing an interface
+    private DateRangeChangeListener mListener;
 
     public interface DateRangeChangeListener {
         void onDateRangeChanged(long dateFrom, long dateTo);
     }
 
+    public void setDateRangeChangeListener(DateRangeChangeListener listener) {
+        this.mListener = listener;
+    }
+
+    public void notifyDateRangeChanged(long timeFrom, long timeTo) {
+        if (mListener != null) {
+            mListener.onDateRangeChanged(timeFrom, timeTo);
+        }
+    }
+    //endregion
+
     public class ViewHolder {
         public Spinner rangeType;
         public EditText dateFrom, dateTo;
         public TextView entriesCountText, totalTimeText;
-        public CardView view;
+        public CardView rootView;
 
         public ViewHolder(View view) {
             rangeType = (Spinner) view.findViewById(R.id.date_range_type_spinner);
@@ -55,51 +65,74 @@ public class FloatingDateRangeWidgetManager {
             dateTo = (EditText) view.findViewById(R.id.date_to);
             entriesCountText = (TextView) view.findViewById(R.id.entries_count_text);
             totalTimeText = (TextView) view.findViewById(R.id.total_time_text);
-            this.view = (CardView) view;
+            rootView = (CardView) view;
         }
     }
 
-    public FloatingDateRangeWidgetManager(AppCompatActivity activity_, View floatingDateRangeCardView,
+    public FloatingDateRangeWidgetManager(AppCompatActivity activity, View floatingDateRangeCardView,
                                           List<SessionEntry> sessionEntries) {
 
-        this.viewHolder = new ViewHolder(floatingDateRangeCardView);
-        this.activity = activity_;
-        this.preferenceChecker = new PreferenceChecker(activity);
+        mViewHolder = new ViewHolder(floatingDateRangeCardView);
+        mActivity = activity;
+        mPreferenceChecker = new PreferenceChecker(activity);
 
-        viewHolder.dateFrom.setOnClickListener(new View.OnClickListener() {
+        mViewHolder.dateFrom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showDialog(true, dateFromTime);
+                showDatePickerDialog(true, mDateFromTime);
             }
         });
 
-        viewHolder.dateTo.setOnClickListener(new View.OnClickListener() {
+        mViewHolder.dateTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showDialog(false, dateToTime);
+                showDatePickerDialog(false, mDateToTime);
             }
         });
 
-        viewHolder.rangeType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        mViewHolder.rangeType.setOnItemSelectedListener(getOnDateRangeTypeSelectedListener());
+
+        updateSessionEntries(sessionEntries);
+        updateMinMaxTimestamps(sessionEntries);
+        setStartRange(true);
+    }
+
+    public void showDatePickerDialog(final boolean shouldSetDateFrom, long currentTime) {
+        MyDatePickerDialog dialog;
+
+        if (shouldSetDateFrom)
+            dialog = MyDatePickerDialog.newInstance(-1, mDateToTime - DateUtils.DAY_IN_MILLIS, currentTime);
+        else
+            dialog = MyDatePickerDialog.newInstance(mDateFromTime + DateUtils.DAY_IN_MILLIS, -1, currentTime);
+
+        dialog.setOnFinishedListener(new MyDatePickerDialog.OnFinishedListener() {
+            @Override
+            public void onFinished(long time) {
+                if (shouldSetDateFrom) {
+                    if (time < mDateToTime)
+                        mDateFromTime = time;
+                }
+                else {
+                    if (time > mDateFromTime)
+                        mDateToTime = time;
+                }
+                updateDateRangeLabels(true);
+            }
+        });
+        dialog.show(mActivity.getSupportFragmentManager(), "text");
+    }
+
+    //region Methods responsible for handling events
+    private AdapterView.OnItemSelectedListener getOnDateRangeTypeSelectedListener() {
+        return new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
                 onItemSelectedMethod(position, true);
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-        updateSessionEntries(sessionEntries);
-        updateMinMaxTimestamps(sessionEntries);
-
-        setStartRange(true);
-    }
-
-    public void refreshDateRange(boolean shouldNotify) {
-        int pos = viewHolder.rangeType.getSelectedItemPosition();
-        onItemSelectedMethod(pos, shouldNotify);
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        };
     }
 
     private void onItemSelectedMethod(int position, boolean shouldNotify) {
@@ -124,191 +157,135 @@ public class FloatingDateRangeWidgetManager {
             }
         }
     }
+    //endregion -- end --
 
-    public void showDialog(final boolean setDateFromTime, long currentTime) {
-        MyDatePickerDialog dialog = new MyDatePickerDialog();
-
-        Bundle args = new Bundle();
-        args.putLong("date_in_milliseconds", currentTime);
-
-        if (setDateFromTime)
-            args.putLong("date_max", dateToTime - DateUtils.DAY_IN_MILLIS);
-        else
-            args.putLong("date_min", dateFromTime + DateUtils.DAY_IN_MILLIS);
-
-        dialog.setArguments(args);
-
-        dialog.setOnFinishedListener(new MyDatePickerDialog.OnFinishedListener() {
-            @Override
-            public void onFinished(long time) {
-                if (setDateFromTime) {
-                    if (time < dateToTime)
-                        dateFromTime = time;
-                }
-                else {
-                    if (time > dateFromTime)
-                        dateToTime = time;
-                }
-                updateDateRangeLabels(true);
-            }
-        });
-        dialog.show(activity.getSupportFragmentManager(), "text");
-    }
-
-    public void setDateRangeChangeListener(DateRangeChangeListener listener) {
-        this.listener = listener;
-    }
-
-    public void notifyDateRangeChanged(long timeFrom, long timeTo) {
-        if (listener != null) {
-            listener.onDateRangeChanged(timeFrom, timeTo);
-        }
-    }
-
-    public void callOnDateRangeChangedListener() {
-        notifyDateRangeChanged(dateFromTime, dateToTime);
-    }
-
-    private long getCurrentTime() {
-        return System.currentTimeMillis();
-    }
-
-    public static String getDate(long milliSeconds, String dateFormat) {
-        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.getDefault());
-        return formatter.format(new Date(milliSeconds));
-    }
-
-    //region // Animate view
-    public void setViewShown(boolean visible) {
-        if (visible)
-            showView();
-        else
-            hideView();
+    //region Methods responsible for hiding/showing the widget
+    public void setViewShown(boolean shouldShow) {
+        if (shouldShow) showView(true);
+        else hideView(true);
     }
 
     public void hideView(boolean animate) {
-        if (animate) {
-            hideView();
+        if (animate){
+            mViewHolder.rootView.animate()
+                    .setStartDelay(0)
+                    .setDuration(250)
+                    .alpha(0)
+                    .translationY(-mViewHolder.rootView.getHeight());
         }
         else {
-            viewHolder.view.setTranslationY(viewHolder.view.getHeight());
-            viewHolder.view.setAlpha(0);
+            mViewHolder.rootView.setTranslationY(mViewHolder.rootView.getHeight());
+            mViewHolder.rootView.setAlpha(0);
         }
+
+        mIsShown = false;
     }
 
-    public void hideView() {
-        viewHolder.view.animate()
-                .setStartDelay(0)
-                .setDuration(250)
-                .alpha(0)
-                .translationY(-viewHolder.view.getHeight());
-
-        isShown = false;
-    }
-
-    public void showView() {
-        viewHolder.view.animate()
-                .setStartDelay(0)
-                .setDuration(250)
-                .alpha(1)
-                .translationY(0);
-
-        isShown = true;
-    }
-    //endregion // Animate view
-
-    private void setDateRangeEnabled(boolean state) {
-        viewHolder.dateFrom.setEnabled(state);
-        viewHolder.dateTo.setEnabled(state);
-    }
-
-    private void updateDateRangeLabels(boolean shouldNotify) {
-        viewHolder.dateTo.setText(getDate(dateToTime, preferenceChecker.stringGetDateFormat()));
-        viewHolder.dateFrom.setText(getDate(dateFromTime, preferenceChecker.stringGetDateFormat()));
-
-        if (shouldNotify)
-            notifyDateRangeChanged(dateFromTime, dateToTime);
-    }
-
-    public void updateMinMaxTimestamps(List<SessionEntry> sessionEntries) {
-        if (sessionEntries != null && !sessionEntries.isEmpty()) {
-            this.minimumTime = Collections.min(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
-            this.minimumTime = MyTimeUtils.setTimePortion(this.minimumTime, true, 0, 0, 0, 0);
-
-            this.maximumTime = Collections.max(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
-            this.maximumTime = MyTimeUtils.setTimePortion(this.minimumTime, false, 11, 59, 59, 999);
+    public void showView(boolean animate) {
+        if (animate){
+            mViewHolder.rootView.animate()
+                    .setStartDelay(0)
+                    .setDuration(250)
+                    .alpha(1)
+                    .translationY(0);
         }
         else {
-            this.minimumTime = 0;
-            this.maximumTime = 0;
+            mViewHolder.rootView.setTranslationY(0);
+            mViewHolder.rootView.setAlpha(1);
         }
-    }
 
+        mIsShown = true;
+    }
+    //endregion -- end --
+
+    //region Methods responsible for updating the ui
     public void entryChanged(SessionEntry oldEntry, SessionEntry newEntry) {
-        if (newEntry.getStartingTime() > maximumTime) {
-            this.maximumTime = MyTimeUtils.setTimePortion(newEntry.getStartingTime(), false, 11, 59, 59, 999);
+        if (newEntry.getStartingTime() > mMaximumTime) {
+            this.mMaximumTime = MyTimeUtils.setTimePortion(newEntry.getStartingTime(), false, 11, 59, 59, 999);
             refreshDateRange(false);
         }
-        else if (newEntry.getStartingTime() < minimumTime) {
-            this.minimumTime = MyTimeUtils.setTimePortion(newEntry.getStartingTime(), true, 0, 0, 0, 0);
+        else if (newEntry.getStartingTime() < mMinimumTime) {
+            this.mMinimumTime = MyTimeUtils.setTimePortion(newEntry.getStartingTime(), true, 0, 0, 0, 0);
             refreshDateRange(false);
         }
     }
 
     public void updateSessionEntries(List<SessionEntry> sessionEntries) {
         int numberOfEntries = sessionEntries.size();
+        mViewHolder.entriesCountText.setText(String.valueOf(numberOfEntries));
 
-        long totalDuration = 0;
-        for (SessionEntry entry : sessionEntries) {
-            totalDuration += entry.getDuration();
-        }
-
-        viewHolder.entriesCountText.setText(String.valueOf(numberOfEntries));
+        long totalDuration = (long) MyCollectionUtils.sum(sessionEntries, SessionEntry.IGetSessionDuration);
         String totalTimeString = SessionEntry.stringifyDuration(totalDuration);
-        viewHolder.totalTimeText.setText(totalTimeString);
+        mViewHolder.totalTimeText.setText(totalTimeString);
 
         updateMinMaxTimestamps(sessionEntries);
         refreshDateRange(false);
     }
 
-    public void setPresetDateRange(long time, boolean shouldNotify) {
-        setDateRangeEnabled(false);
-
-        dateToTime = MyTimeUtils.setTimePortion(getCurrentTime(), false, 11, 59, 59, 999);
-        dateFromTime = MyTimeUtils.setTimePortion(dateToTime - time, true, 0, 0, 0, 0);
-        updateDateRangeLabels(shouldNotify);
+    private void refreshDateRange(boolean shouldNotifyListeners) {
+        int pos = mViewHolder.rangeType.getSelectedItemPosition();
+        onItemSelectedMethod(pos, shouldNotifyListeners);
     }
 
-    public void setStartRange(boolean shouldNotify) {
-        setDateRangeEnabled(false);
+    private void updateDateRangeLabels(boolean shouldNotifyListeners) {
+        mViewHolder.dateTo.setText(MyTimeUtils.stringifyTimestamp(mDateToTime, mPreferenceChecker.stringGetDateFormat()));
+        mViewHolder.dateFrom.setText(MyTimeUtils.stringifyTimestamp(mDateFromTime, mPreferenceChecker.stringGetDateFormat()));
 
-        dateToTime = MyTimeUtils.setTimePortion(getCurrentTime(), false, 11, 59, 59, 999);
-        dateFromTime = minimumTime;
-        updateDateRangeLabels(shouldNotify);
+        if (shouldNotifyListeners)
+            notifyDateRangeChanged(mDateFromTime, mDateToTime);
     }
 
-    public void setCustomRange(boolean shouldNotify) {
+    private void updateMinMaxTimestamps(List<SessionEntry> sessionEntries) {
+        if (sessionEntries != null && !sessionEntries.isEmpty()) {
+            mMinimumTime = Collections.min(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
+            mMinimumTime = MyTimeUtils.setTimePortion(this.mMinimumTime, true, 0, 0, 0, 0);
+
+            mMaximumTime = Collections.max(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
+            mMaximumTime = MyTimeUtils.setTimePortion(this.mMinimumTime, false, 11, 59, 59, 999);
+        }
+        else {
+            this.mMinimumTime = 0;
+            this.mMaximumTime = 0;
+        }
+    }
+    //endregion -- end --
+
+    //region Setters {}
+    private void setDateRangeEnabled(boolean state) {
+        mViewHolder.dateFrom.setEnabled(state);
+        mViewHolder.dateTo.setEnabled(state);
+    }
+
+    public void setPresetDateRange(long time, boolean shouldNotifyListeners) {
+        setDateRangeEnabled(false);
+
+        mDateToTime = MyTimeUtils.setTimePortion(System.currentTimeMillis(), false, 11, 59, 59, 999);
+        mDateFromTime = MyTimeUtils.setTimePortion(mDateToTime - time, true, 0, 0, 0, 0);
+        updateDateRangeLabels(shouldNotifyListeners);
+    }
+
+    public void setStartRange(boolean shouldNotifyListeners) {
+        setDateRangeEnabled(false);
+
+        mDateToTime = MyTimeUtils.setTimePortion(System.currentTimeMillis(), false, 11, 59, 59, 999);
+        mDateFromTime = mMinimumTime;
+        updateDateRangeLabels(shouldNotifyListeners);
+    }
+
+    public void setCustomRange(boolean shouldNotifyListeners) {
         setDateRangeEnabled(true);
-        updateDateRangeLabels(shouldNotify);
+        updateDateRangeLabels(shouldNotifyListeners);
     }
+    //endregion
 
-    public void setDateRangeForDate(int year, int month, int dayOfMonth, boolean shouldNotify) {
-        viewHolder.rangeType.setSelection(5);
-
-        Calendar c = Calendar.getInstance();
-        c.set(year, month, dayOfMonth);
-
-        dateToTime = MyTimeUtils.setTimePortion(c, false, 11, 59, 59, 999);
-        dateFromTime = MyTimeUtils.setTimePortion(dateToTime - DateUtils.DAY_IN_MILLIS, true, 0, 0, 0, 0);
-
-        updateDateRangeLabels(shouldNotify);
-    }
-
+    //region Getters {}
     public long getDateFrom() {
-        return this.dateFromTime;
+        return mDateFromTime;
     }
 
     public long getDateTo() {
-        return this.dateToTime;
+        return mDateToTime;
     }
+    //endregion
+
 }

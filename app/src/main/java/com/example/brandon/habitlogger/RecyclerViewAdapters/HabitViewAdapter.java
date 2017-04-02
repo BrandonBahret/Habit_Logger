@@ -60,7 +60,7 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
         mButtonClickCallback = buttonClickCallback;
     }
 
-    //region Methods responsible for creating and binding view holders
+    //region Methods responsible for creating and binding rootView holders
     @Override
     public HabitViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())

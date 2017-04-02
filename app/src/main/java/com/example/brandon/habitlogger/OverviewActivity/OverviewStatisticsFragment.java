@@ -10,14 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.ui.IScrollEvents;
 import com.example.brandon.habitlogger.ui.NestedScrollObserver;
-import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
 
 public class OverviewStatisticsFragment extends Fragment {
 
     //region (Member attributes)
     private static View mContentView;
-    private RecyclerViewScrollObserver.IScrollEvents mListener;
+    private IScrollEvents mListener;
     //endregion
 
     public OverviewStatisticsFragment() {
@@ -32,8 +32,8 @@ public class OverviewStatisticsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof RecyclerViewScrollObserver.IScrollEvents)
-            mListener = (RecyclerViewScrollObserver.IScrollEvents) context;
+        if (context instanceof IScrollEvents)
+            mListener = (IScrollEvents) context;
     }
 
     @Override

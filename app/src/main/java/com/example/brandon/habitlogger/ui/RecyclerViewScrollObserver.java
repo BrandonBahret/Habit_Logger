@@ -4,18 +4,13 @@ import android.support.v7.widget.RecyclerView;
 
 /**
  * Created by Brandon on 3/8/2017.
+ * Class to easily watch scroll events in recycler views
  */
 
 public abstract class RecyclerViewScrollObserver extends RecyclerView.OnScrollListener {
 
-    public interface IScrollEvents {
-        void onScrollUp();
-
-        void onScrollDown();
-    }
-
-    int threshold = 2;
-    boolean control = false;
+    private static final int THRESHOLD = 2;
+    private boolean mControl = false;
 
     public abstract void onScrollUp();
 
@@ -25,13 +20,13 @@ public abstract class RecyclerViewScrollObserver extends RecyclerView.OnScrollLi
     public void onScrolled(RecyclerView recyclerView, int dx, int current) {
         super.onScrolled(recyclerView, dx, current);
 
-        if (current > threshold && !control) {
+        if (current > THRESHOLD && !mControl) {
             onScrollDown();
-            control = true;
+            mControl = true;
         }
-        else if (current < -threshold && control) {
+        else if (current < -THRESHOLD && mControl) {
             onScrollUp();
-            control = false;
+            mControl = false;
         }
     }
 }

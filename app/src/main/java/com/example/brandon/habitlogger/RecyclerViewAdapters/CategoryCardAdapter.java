@@ -33,7 +33,7 @@ public class CategoryCardAdapter extends ExpandableRecyclerViewAdapter<CategoryV
         mButtonClickCallback = buttonClickCallback;
     }
 
-    //region Methods responsible for creating view holders
+    //region Methods responsible for creating rootView holders
     @Override
     public CategoryViewHolder onCreateGroupViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())

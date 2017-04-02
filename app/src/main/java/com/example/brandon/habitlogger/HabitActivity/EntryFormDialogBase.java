@@ -169,11 +169,7 @@ public abstract class EntryFormDialogBase extends DialogFragment {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MyDatePickerDialog dialog = new MyDatePickerDialog();
-
-                Bundle args = new Bundle();
-                args.putLong("date_in_milliseconds", mEntry.getStartingTime());
-                dialog.setArguments(args);
+                MyDatePickerDialog dialog = MyDatePickerDialog.newInstance(-1, -1, mEntry.getStartingTime());
 
                 dialog.setOnFinishedListener(new MyDatePickerDialog.OnFinishedListener() {
                     @Override

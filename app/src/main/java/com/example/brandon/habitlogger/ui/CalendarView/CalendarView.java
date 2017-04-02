@@ -15,12 +15,12 @@ import com.example.brandon.habitlogger.R;
 import java.util.Calendar;
 
 /**
- * A view to represent entry data of a habit in a month-long calendar space.
+ * A rootView to represent entry data of a habit in a month-long calendar space.
  */
 
 public class CalendarView extends View {
 
-    // This data contains the content of the view (Text elements, etc.)
+    // This data contains the content of the rootView (Text elements, etc.)
     private CalendarViewData mCalendarData;
     CalendarViewMonthModel model;
     public static final int NUMBER_OF_CELLS = 42;

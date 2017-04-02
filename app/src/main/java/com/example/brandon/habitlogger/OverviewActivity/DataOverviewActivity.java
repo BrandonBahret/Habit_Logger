@@ -20,13 +20,13 @@ import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.HabitDataSample;
 import com.example.brandon.habitlogger.databinding.ActivityDataOverviewBinding;
 import com.example.brandon.habitlogger.ui.FloatingDateRangeWidgetManager;
-import com.example.brandon.habitlogger.ui.RecyclerViewScrollObserver;
+import com.example.brandon.habitlogger.ui.IScrollEvents;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DataOverviewActivity extends AppCompatActivity implements
-        IDataOverviewCallback, RecyclerViewScrollObserver.IScrollEvents {
+        IDataOverviewCallback, IScrollEvents {
 
     //region (Member attributes)
     private FloatingDateRangeWidgetManager mDateRangeManager;
@@ -127,12 +127,12 @@ public class DataOverviewActivity extends AppCompatActivity implements
     //region Methods responsible for handling scroll events
     @Override
     public void onScrollUp() {
-        mDateRangeManager.showView();
+        mDateRangeManager.showView(true);
     }
 
     @Override
     public void onScrollDown() {
-        mDateRangeManager.hideView();
+        mDateRangeManager.hideView(true);
     }
     //endregion -- end --
 

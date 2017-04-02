@@ -66,7 +66,7 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
         }
     }
 
-    //region Methods responsible for creating and binding view holders
+    //region Methods responsible for creating and binding rootView holders
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())

@@ -15,15 +15,15 @@ import com.example.brandon.habitlogger.R;
 
 public class AboutActivity extends AppCompatActivity {
 
+    //region Methods to handle the activity lifecycle
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
         ActionBar toolbar = getSupportActionBar();
-        if (toolbar != null) {
+        if (toolbar != null)
             toolbar.setDisplayHomeAsUpEnabled(true);
-        }
 
         String version = getVersionNumber();
         TextView versionText = (TextView) findViewById(R.id.versionNumber);
@@ -40,26 +40,47 @@ public class AboutActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.about_activity_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    //endregion -- end --
+
+    //region Methods responsible for handling events
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.share:
+                share();
+                break;
+
+            case android.R.id.home:
+                finish();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     public void linkButtonClicked(View view) {
         String tag = (String) view.getTag();
-
         switch (tag) {
-            case "Github": {
+            case "Github":
                 openLink("https://github.com/BrandonBahret");
-            }
-            break;
+                break;
 
-            case "LinkedIn": {
+            case "LinkedIn":
                 openLink("https://www.linkedin.com/in/brandon-bahret-436012125");
-            }
-            break;
+                break;
 
-            case "Freelancer": {
+            case "Freelancer":
                 openLink("https://www.freelancer.com/u/brandonbahretfre.html");
-            }
-            break;
+                break;
         }
     }
+    //endregion -- end --
 
     private void openLink(String url) {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -81,28 +102,4 @@ public class AboutActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.about_activity_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch (id) {
-            case (R.id.share): {
-                share();
-            }
-            break;
-
-            case (android.R.id.home): {
-                finish();
-            }
-            break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }
