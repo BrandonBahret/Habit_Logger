@@ -15,6 +15,8 @@ import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -61,8 +63,9 @@ public class MainActivity extends AppCompatActivity
 
     //region (Member attributes)
     final int NO_ARCHIVED_HABITS = 0, ONLY_ARCHIVED_HABITS = 1;
-    int habitDisplayMode = NO_ARCHIVED_HABITS;
+    private int mHabitDisplayMode = NO_ARCHIVED_HABITS;
 
+    private List<Habit> mHabitList = new ArrayList<>();
     private HabitDatabase mHabitDatabase;
     private SessionManager mSessionManager;
     private SessionNotificationManager mSessionNotificationManager;
@@ -71,215 +74,89 @@ public class MainActivity extends AppCompatActivity
     private GoogleDriveDataExportManager mGoogleDriveExportManager;
     private CurrentSessionCardManager mCurrentSessionCard;
 
-    private List<Habit> habitList = new ArrayList<>();
-    private Handler handler = new Handler();
-    private GroupDecoration itemDecoration;
-    private HabitViewAdapter habitAdapter;
-    private CategoryCardAdapter categoryAdapter;
-    private HabitViewAdapter.MenuItemClickListener menuItemClickListener;
-    private SpaceOffsetDecoration spaceOffsetItemDecorator;
-    private HabitViewAdapter.ButtonClickCallback buttonClickListener;
-
     ActivityMainBinding ui;
-//    private CardView mCurrentSession;
     private RecyclerView mHabitCardContainer;
+
+    private Handler mUpdateHandler = new Handler();
+    private GroupDecoration mGroupDecoration;
+    private SpaceOffsetDecoration mSpaceDecoration;
+    private HabitViewAdapter mHabitAdapter;
+    private CategoryCardAdapter mCategoryAdapter;
     //endregion
 
-    //region Methods responsible for handling the lifecycle of the activity
+    //region [ ---- Methods responsible for handling the lifecycle of the activity ---- ]
+
     //region entire lifetime (onCreate - onDestroy)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        mPreferenceChecker = new PreferenceChecker(this);
-        AppCompatDelegate.setDefaultNightMode(
-                mPreferenceChecker.isNightMode() ? AppCompatDelegate.MODE_NIGHT_YES :
-                        AppCompatDelegate.MODE_NIGHT_NO
-        );
+
+        setActivityTheme();
 
         super.onCreate(savedInstanceState);
+
         ui = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        mCurrentSessionCard = new CurrentSessionCardManager(ui.mainInclude.currentSessionsCard.itemRoot);
-        mHabitCardContainer = ui.mainInclude.habitRecyclerView;
+        gatherDependencies();
 
+        setListeners();
+
+        setUpActivity();
+
+    }
+
+    private void setActivityTheme() {
+        mPreferenceChecker = new PreferenceChecker(this);
+        int themeMode = mPreferenceChecker.isNightMode() ?
+                AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO;
+        AppCompatDelegate.setDefaultNightMode(themeMode);
+    }
+
+    private void setUpActivity() {
         setSupportActionBar(ui.toolbar);
 
-        ui.mainInclude.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NewHabitDialog dialog = NewHabitDialog.newInstance(new NewHabitDialog.OnFinishedListener() {
-                    @Override
-                    public void onFinishedWithResult(Habit habit) {
-                        mHabitDatabase.addHabit(habit);
-                        showDatabase();
-                    }
-                });
-
-                dialog.show(getSupportFragmentManager(), "new-habit");
-            }
-        });
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, ui.drawerLayout, ui.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, ui.drawerLayout, ui.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         ui.drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-
-        ui.navView.setNavigationItemSelectedListener(this);
-
-        mHabitDatabase = new HabitDatabase(MainActivity.this);
-        mSessionNotificationManager = new SessionNotificationManager(this);
-        mSessionManager = new SessionManager(this);
-        mSessionManager.addSessionChangedCallback(new SessionManager.SessionChangeListeners() {
-            @Override
-            public void onSessionPauseStateChanged(long habitId, boolean isPaused) {}
-
-            @Override
-            public void beforeSessionEnded(long habitId, boolean wasCanceled) {
-                mSessionNotificationManager.cancel((int) habitId);
-
-                for (int i = 0; i < habitList.size(); i++) {
-                    if (habitList.get(i).getDatabaseId() == habitId) {
-                        View item = mHabitCardContainer.getChildAt(i);
-                        if (item != null) {
-                            TextView timeTextView = (TextView) item.findViewById(R.id.habit_card_time_display);
-                            timeTextView.setText(getString(R.string.time_display_placeholder));
-
-                            ImageButton pauseButton = (ImageButton) item.findViewById(R.id.session_control_button);
-                            pauseButton.setImageResource(R.drawable.ic_play_black);
-                        }
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void afterSessionEnded(long habitId, boolean wasCanceled) {
-
-            }
-
-            @Override
-            public void onSessionStarted(long habitId) {
-                if (mPreferenceChecker.doShowNotificationsAutomatically() && mPreferenceChecker.doShowNotifications()) {
-                    Habit habit = mHabitDatabase.getHabit(habitId);
-                    mSessionNotificationManager.updateNotification(habit);
-                }
-
-                updateCurrentSessionCard();
-                applySpaceItemDecorator();
-            }
-        });
-
-
-        mLocalExportManager = new LocalDataExportManager(MainActivity.this);
-        mGoogleDriveExportManager = new GoogleDriveDataExportManager(MainActivity.this);
-        mGoogleDriveExportManager.connect();
-
-        menuItemClickListener = new HabitViewAdapter.MenuItemClickListener() {
-            @Override
-            public void onEditClick(long habitId) {
-                Habit habit = mHabitDatabase.getHabit(habitId);
-
-                EditHabitDialog dialog = EditHabitDialog.newInstance(new EditHabitDialog.OnFinishedListener() {
-                    @Override
-                    public void onFinishedWithResult(Habit habit) {
-                        mHabitDatabase.updateHabit(habit.getDatabaseId(), habit);
-
-                        int position = getHabitPositionInList(habit.getDatabaseId());
-                        habitList.set(position, habit);
-                        habitAdapter.notifyItemChanged(position);
-                    }
-                }, habit);
-
-                dialog.show(getSupportFragmentManager(), "edit-habit");
-            }
-
-            @Override
-            public void onResetClick(final long habitId) {
-                String habitName = mHabitDatabase.getHabitName(habitId);
-
-                new ConfirmationDialog(MainActivity.this)
-                        .setTitle("Confirm Data Reset")
-                        .setMessage("Do you really want to delete all entries for '" + habitName + "'?")
-                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mHabitDatabase.deleteEntriesForHabit(habitId);
-                            }
-                        })
-                        .show();
-
-            }
-
-            @Override
-            public void onDeleteClick(final long habitId) {
-
-                String habitName = mHabitDatabase.getHabitName(habitId);
-
-                new ConfirmationDialog(MainActivity.this)
-                        .setTitle("Confirm Delete")
-                        .setMessage("Do you really want to delete '" + habitName + "'?")
-                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (mSessionManager.getIsSessionActive(habitId)) {
-                                    mSessionManager.cancelSession(habitId);
-                                    updateCurrentSessionCard();
-                                }
-
-                                mHabitDatabase.deleteHabit(habitId);
-
-                                int position = getItemPosition(habitId);
-                                habitList.remove(position);
-                                habitAdapter.notifyItemRemoved(position);
-                            }
-                        })
-                        .show();
-            }
-
-            @Override
-            public void onExportClick(long habitId) {
-                Habit habit = mHabitDatabase.getHabit(habitId);
-                mLocalExportManager.shareExportHabit(habit);
-            }
-
-            @Override
-            public void onArchiveClick(final long habitId) {
-                String habitName = mHabitDatabase.getHabitName(habitId);
-                final boolean archivedState = mHabitDatabase.getIsHabitArchived(habitId);
-                String actionName = archivedState ? "Unarchive" : "Archive";
-                String actionNameLower = archivedState ? "unarchive" : "archive";
-
-                new ConfirmationDialog(MainActivity.this)
-                        .setTitle("Confirm " + actionName)
-                        .setMessage("Do you really want to " + actionNameLower + " '" + habitName + "'? ")
-                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mHabitDatabase.updateHabitIsArchived(habitId, !archivedState);
-
-                                int position = getItemPosition(habitId);
-                                habitList.remove(position);
-                                habitAdapter.notifyItemRemoved(position);
-                            }
-                        })
-                        .show();
-            }
-
-            @Override
-            public void onStartSession(long habitId) {
-                startSession(habitId);
-            }
-        };
-
-        buttonClickListener = getHabitButtonClickCallback();
-
-        applyItemDecorationToRecyclerView();
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         mHabitCardContainer.setLayoutManager(layoutManager);
         mHabitCardContainer.setItemAnimator(new DefaultItemAnimator());
 
+        if (mPreferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_CARDS) {
+            List<CategoryDataSample> categoryContainers = mHabitDatabase.getAllData();
+            MyCollectionUtils.filter(categoryContainers, CategoryDataSample.IFilterEmptySamples);
+            mCategoryAdapter = new CategoryCardAdapter(categoryContainers, getMenuItemClickListener(), getHabitButtonClickCallback());
+            mHabitCardContainer.setAdapter(mCategoryAdapter);
+        }
+        else {
+            mHabitAdapter = new HabitViewAdapter(mHabitList, getMenuItemClickListener(), getHabitButtonClickCallback());
+            mHabitCardContainer.setAdapter(mHabitAdapter);
+            showDatabase();
+        }
 
-        mHabitCardContainer.addOnScrollListener(new RecyclerViewScrollObserver() {
+        applyItemDecorationToRecyclerView();
+        updateCurrentSessionCard();
+    }
+
+    private View.OnClickListener getOnSessionsCardClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActiveSessionsActivity();
+            }
+        };
+    }
+
+    private void setListeners() {
+        mSessionManager.addSessionChangedCallback(getOnSessionChangedListener());
+        ui.mainInclude.fab.setOnClickListener(getOnNewHabitButtonClicked());
+        ui.navView.setNavigationItemSelectedListener(this);
+        mHabitCardContainer.addOnScrollListener(getOnScrollListener());
+        mCurrentSessionCard.setOnClickListener(getOnSessionsCardClickListener());
+    }
+
+    private RecyclerViewScrollObserver getOnScrollListener() {
+        return new RecyclerViewScrollObserver() {
             @Override
             public void onScrollUp() {
                 FloatingActionButton fab = ui.mainInclude.fab;
@@ -306,32 +183,188 @@ public class MainActivity extends AppCompatActivity
                     mCurrentSessionCard.hideView();
                 }
             }
-        });
+        };
+    }
 
-        if (mPreferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_CARDS) {
-            List<CategoryDataSample> categoryContainers = mHabitDatabase.getAllData();
-            categoryAdapter = new CategoryCardAdapter(categoryContainers, menuItemClickListener, buttonClickListener);
+    private void gatherDependencies() {
+        mCurrentSessionCard = new CurrentSessionCardManager(ui.mainInclude.currentSessionsCard.itemRoot);
+        mHabitCardContainer = ui.mainInclude.habitRecyclerView;
+        mSessionNotificationManager = new SessionNotificationManager(this);
+        mHabitDatabase = new HabitDatabase(this);
+        mSessionManager = new SessionManager(this);
+        mLocalExportManager = new LocalDataExportManager(this);
+        mGoogleDriveExportManager = new GoogleDriveDataExportManager(this);
+    }
 
-            mHabitCardContainer.setAdapter(categoryAdapter);
-        }
-        else {
-            habitAdapter = new HabitViewAdapter(habitList, menuItemClickListener, buttonClickListener);
-            mHabitCardContainer.setAdapter(habitAdapter);
-            showDatabase();
-        }
-
-        mCurrentSessionCard.setOnClickListener(new View.OnClickListener() {
+    private View.OnClickListener getOnNewHabitButtonClicked() {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActiveSessionsActivity();
-            }
-        });
+                NewHabitDialog dialog = NewHabitDialog.newInstance(new NewHabitDialog.OnFinishedListener() {
+                    @Override
+                    public void onFinishedWithResult(Habit habit) {
+                        mHabitDatabase.addHabit(habit);
+                        showDatabase();
+                    }
+                });
 
-        updateCurrentSessionCard();
-        if (savedInstanceState != null) {
-            RecyclerView rv = ui.mainInclude.habitRecyclerView;
-            rv.getLayoutManager().onRestoreInstanceState(savedInstanceState.getParcelable("LAST_POSITION"));
-        }
+                dialog.show(getSupportFragmentManager(), "new-habit");
+            }
+        };
+    }
+
+    private SessionManager.SessionChangeListeners getOnSessionChangedListener() {
+        return new SessionManager.SessionChangeListeners() {
+            @Override
+            public void onSessionPauseStateChanged(long habitId, boolean isPaused) {}
+
+            @Override
+            public void beforeSessionEnded(long habitId, boolean wasCanceled) {
+                mSessionNotificationManager.cancel((int) habitId);
+
+                for (int i = 0; i < mHabitList.size(); i++) {
+                    if (mHabitList.get(i).getDatabaseId() == habitId) {
+                        View item = mHabitCardContainer.getChildAt(i);
+                        if (item != null) {
+                            TextView timeTextView = (TextView) item.findViewById(R.id.habit_card_time_display);
+                            timeTextView.setText(getString(R.string.time_display_placeholder));
+
+                            ImageButton pauseButton = (ImageButton) item.findViewById(R.id.session_control_button);
+                            pauseButton.setImageResource(R.drawable.ic_play_black);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void afterSessionEnded(long habitId, boolean wasCanceled) {}
+
+            @Override
+            public void onSessionStarted(long habitId) {
+                if (mPreferenceChecker.doShowNotificationsAutomatically() && mPreferenceChecker.doShowNotifications()) {
+                    Habit habit = mHabitDatabase.getHabit(habitId);
+                    mSessionNotificationManager.updateNotification(habit);
+                }
+
+                updateCurrentSessionCard();
+                applySpaceItemDecorator();
+            }
+        };
+    }
+
+    private HabitViewAdapter.MenuItemClickListener getMenuItemClickListener() {
+        return new HabitViewAdapter.MenuItemClickListener() {
+            @Override
+            public void onEditClick(long habitId) {
+                onHabitMenuEditClick(habitId);
+            }
+
+            @Override
+            public void onResetClick(final long habitId) {
+                onHabitMenuResetClick(habitId);
+            }
+
+            @Override
+            public void onDeleteClick(final long habitId) {
+                onHabitMenuDeleteClick(habitId);
+            }
+
+            @Override
+            public void onExportClick(long habitId) {
+                onHabitMenuExportClick(habitId);
+            }
+
+            @Override
+            public void onArchiveClick(final long habitId) {
+                onHabitMenuArchiveClick(habitId);
+            }
+
+            @Override
+            public void onStartSession(long habitId) {
+                startSession(habitId);
+            }
+        };
+    }
+
+    private void onHabitMenuExportClick(long habitId) {
+        Habit habit = mHabitDatabase.getHabit(habitId);
+        mLocalExportManager.shareExportHabit(habit);
+    }
+
+    private void onHabitMenuArchiveClick(final long habitId) {
+        String habitName = mHabitDatabase.getHabitName(habitId);
+        final boolean archivedState = mHabitDatabase.getIsHabitArchived(habitId);
+        String actionName = archivedState ? "Unarchive" : "Archive";
+        String actionNameLower = archivedState ? "unarchive" : "archive";
+
+        new ConfirmationDialog(MainActivity.this)
+                .setTitle("Confirm " + actionName)
+                .setMessage("Do you really want to " + actionNameLower + " '" + habitName + "'? ")
+                .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mHabitDatabase.updateHabitIsArchived(habitId, !archivedState);
+
+                        int position = getItemPosition(habitId);
+                        mHabitList.remove(position);
+                        mHabitAdapter.notifyItemRemoved(position);
+                    }
+                })
+                .show();
+    }
+
+    private void onHabitMenuDeleteClick(final long habitId) {
+        String habitName = mHabitDatabase.getHabitName(habitId);
+        new ConfirmationDialog(MainActivity.this)
+                .setTitle("Confirm Delete")
+                .setMessage("Do you really want to delete '" + habitName + "'?")
+                .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (mSessionManager.getIsSessionActive(habitId)) {
+                            mSessionManager.cancelSession(habitId);
+                            updateCurrentSessionCard();
+                        }
+
+                        mHabitDatabase.deleteHabit(habitId);
+
+                        int position = getItemPosition(habitId);
+                        mHabitList.remove(position);
+                        mHabitAdapter.notifyItemRemoved(position);
+                    }
+                })
+                .show();
+    }
+
+    private void onHabitMenuResetClick(final long habitId) {
+        String habitName = mHabitDatabase.getHabitName(habitId);
+        new ConfirmationDialog(MainActivity.this)
+                .setTitle("Confirm Data Reset")
+                .setMessage("Do you really want to delete all entries for '" + habitName + "'?")
+                .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mHabitDatabase.deleteEntriesForHabit(habitId);
+                    }
+                })
+                .show();
+    }
+
+    private void onHabitMenuEditClick(long habitId) {
+        Habit habit = mHabitDatabase.getHabit(habitId);
+        EditHabitDialog dialog = EditHabitDialog.newInstance(new EditHabitDialog.OnFinishedListener() {
+            @Override
+            public void onFinishedWithResult(Habit habit) {
+                mHabitDatabase.updateHabit(habit.getDatabaseId(), habit);
+
+                int position = getHabitPositionInList(habit.getDatabaseId());
+                mHabitList.set(position, habit);
+                mHabitAdapter.notifyItemChanged(position);
+            }
+        }, habit);
+
+        dialog.show(getSupportFragmentManager(), "edit-habit");
     }
     //endregion
 
@@ -376,15 +409,26 @@ public class MainActivity extends AppCompatActivity
         getIntent().putExtra("LAST_POSITION", rv.getLayoutManager().onSaveInstanceState());
     }
     //endregion
-    //endregion -- end --
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+
+        SearchView search = (SearchView) menu.findItem(R.id.search).getActionView();
+        search.setOnQueryTextListener(getSearchListener());
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    //endregion [ ---------------- end ---------------- ]
 
     //region Methods responsible for maintaining state changes
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if (categoryAdapter != null) {
-            categoryAdapter.onSaveInstanceState(outState);
+        if (mCategoryAdapter != null) {
+            mCategoryAdapter.onSaveInstanceState(outState);
         }
 
         RecyclerView rv = ui.mainInclude.habitRecyclerView;
@@ -395,8 +439,8 @@ public class MainActivity extends AppCompatActivity
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
-        if (categoryAdapter != null) {
-            categoryAdapter.onRestoreInstanceState(savedInstanceState);
+        if (mCategoryAdapter != null) {
+            mCategoryAdapter.onRestoreInstanceState(savedInstanceState);
         }
     }
     //endregion -- end --
@@ -407,7 +451,7 @@ public class MainActivity extends AppCompatActivity
         public void run() {
             updateActivityContent();
 
-            handler.postDelayed(updateCards, 1000);
+            mUpdateHandler.postDelayed(updateCards, 1000);
         }
     };
 
@@ -416,7 +460,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     void stopRepeatingTask() {
-        handler.removeCallbacks(updateCards);
+        mUpdateHandler.removeCallbacks(updateCards);
     }
     //endregion -- end --
 
@@ -424,16 +468,16 @@ public class MainActivity extends AppCompatActivity
     private void applyItemDecorationToRecyclerView() {
         switch (mPreferenceChecker.howToDisplayCategories()) {
             case PreferenceChecker.AS_CARDS: {
-                mHabitCardContainer.removeItemDecoration(itemDecoration);
+                mHabitCardContainer.removeItemDecoration(mGroupDecoration);
             }
             break;
 
             case PreferenceChecker.AS_SECTIONS: {
-                itemDecoration = new GroupDecoration(this, R.dimen.category_section_text_size, new GroupDecoration.Callback() {
+                mGroupDecoration = new GroupDecoration(this, R.dimen.category_section_text_size, new GroupDecoration.Callback() {
                     @Override
                     public long getGroupId(int position) {
-                        if (position >= 0 && position < habitList.size()) {
-                            return habitList.get(position).getCategory().getDatabaseId();
+                        if (position >= 0 && position < mHabitList.size()) {
+                            return mHabitList.get(position).getCategory().getDatabaseId();
                         }
                         else {
                             return -1;
@@ -443,21 +487,21 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     @NonNull
                     public String getGroupFirstLine(int position) {
-                        if (position >= 0 && position < habitList.size()) {
-                            return habitList.get(position).getCategory().getName();
+                        if (position >= 0 && position < mHabitList.size()) {
+                            return mHabitList.get(position).getCategory().getName();
                         }
                         else {
                             return "";
                         }
                     }
                 });
-                mHabitCardContainer.addItemDecoration(itemDecoration);
+                mHabitCardContainer.addItemDecoration(mGroupDecoration);
 
             }
             break;
 
             case PreferenceChecker.WITHOUT_CATEGORIES: {
-                mHabitCardContainer.removeItemDecoration(itemDecoration);
+                mHabitCardContainer.removeItemDecoration(mGroupDecoration);
             }
             break;
         }
@@ -478,27 +522,40 @@ public class MainActivity extends AppCompatActivity
 
         int bottomOffset = (int) getResources().getDimension(R.dimen.bottom_offset_dp);
 
-        if (spaceOffsetItemDecorator != null)
-            mHabitCardContainer.removeItemDecoration(spaceOffsetItemDecorator);
+        if (mSpaceDecoration != null)
+            mHabitCardContainer.removeItemDecoration(mSpaceDecoration);
 
-        spaceOffsetItemDecorator = new SpaceOffsetDecoration(bottomOffset, topOffset);
-        mHabitCardContainer.addItemDecoration(spaceOffsetItemDecorator);
+        mSpaceDecoration = new SpaceOffsetDecoration(bottomOffset, topOffset);
+        mHabitCardContainer.addItemDecoration(mSpaceDecoration);
     }
     //endregion -- end --
 
     //region Methods responsible for handling events
     @Override
     public void onBackPressed() {
-        if (ui.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+        if (ui.drawerLayout.isDrawerOpen(GravityCompat.START))
             ui.drawerLayout.closeDrawer(GravityCompat.START);
-        }
-        else {
-            super.onBackPressed();
-        }
+        else super.onBackPressed();
+    }
+
+    private SearchView.OnQueryTextListener getSearchListener() {
+        return new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                onQueryTextChange(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                processUserQuery(newText);
+                return true;
+            }
+        };
     }
 
     @Override
-    public boolean  onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
 
         final int id = item.getItemId();
         switch (id) {
@@ -601,19 +658,19 @@ public class MainActivity extends AppCompatActivity
 
             List<Habit> allHabits = mHabitDatabase.getHabits();
 
-            habitList.clear();
+            mHabitList.clear();
 
             for (Habit habit : allHabits) {
                 if (ids.contains(habit.getDatabaseId())) {
-                    if (habitDisplayMode == ONLY_ARCHIVED_HABITS && habit.getIsArchived())
-                        habitList.add(habit);
+                    if (mHabitDisplayMode == ONLY_ARCHIVED_HABITS && habit.getIsArchived())
+                        mHabitList.add(habit);
 
-                    else if (habitDisplayMode == NO_ARCHIVED_HABITS && !habit.getIsArchived())
-                        habitList.add(habit);
+                    else if (mHabitDisplayMode == NO_ARCHIVED_HABITS && !habit.getIsArchived())
+                        mHabitList.add(habit);
                 }
             }
 
-            habitAdapter.notifyDataSetChanged();
+            mHabitAdapter.notifyDataSetChanged();
         }
         else {
             showDatabase();
@@ -668,8 +725,8 @@ public class MainActivity extends AppCompatActivity
     public int getItemPosition(long habitId) {
         int position;
 
-        for (position = 0; position < habitList.size(); position++) {
-            Habit habit = habitList.get(position);
+        for (position = 0; position < mHabitList.size(); position++) {
+            Habit habit = mHabitList.get(position);
             if (habit.getDatabaseId() == habitId)
                 break;
         }
@@ -708,7 +765,7 @@ public class MainActivity extends AppCompatActivity
             toolbar.setTitle("Archive");
         }
 
-        habitDisplayMode = ONLY_ARCHIVED_HABITS;
+        mHabitDisplayMode = ONLY_ARCHIVED_HABITS;
         showDatabase();
     }
 
@@ -770,27 +827,27 @@ public class MainActivity extends AppCompatActivity
 
     public void showDatabase() {
         if (mPreferenceChecker.howToDisplayCategories() != PreferenceChecker.AS_CARDS) {
-            habitList = mHabitDatabase.getHabits();
+            mHabitList = mHabitDatabase.getHabits();
 
 
-            habitAdapter = new HabitViewAdapter(habitList, menuItemClickListener, buttonClickListener);
+            mHabitAdapter = new HabitViewAdapter(mHabitList, getMenuItemClickListener(), getHabitButtonClickCallback());
 
-            if (habitDisplayMode == ONLY_ARCHIVED_HABITS)
-                MyCollectionUtils.filter(habitList, Habit.ICheckIfIsNotArchived);
+            if (mHabitDisplayMode == ONLY_ARCHIVED_HABITS)
+                MyCollectionUtils.filter(mHabitList, Habit.ICheckIfIsNotArchived);
 
-            else if (habitDisplayMode == NO_ARCHIVED_HABITS)
-                MyCollectionUtils.filter(habitList, Habit.ICheckIfIsArchived);
+            else if (mHabitDisplayMode == NO_ARCHIVED_HABITS)
+                MyCollectionUtils.filter(mHabitList, Habit.ICheckIfIsArchived);
 
-            Collections.sort(habitList, Habit.ICompareCategoryName);
+            Collections.sort(mHabitList, Habit.ICompareCategoryName);
 
-            mHabitCardContainer.setAdapter(habitAdapter);
+            mHabitCardContainer.setAdapter(mHabitAdapter);
         }
     }
 
     public int getHabitPositionInList(long habitId) {
         int position = 0;
 
-        for (Habit habit : habitList) {
+        for (Habit habit : mHabitList) {
             if (habit.getDatabaseId() == habitId) {
                 return position;
             }
@@ -803,8 +860,8 @@ public class MainActivity extends AppCompatActivity
     private void updateActivityContent() {
         List<SessionEntry> entries = mSessionManager.getActiveSessionList();
 
-        if (habitAdapter != null)
-            habitAdapter.updateHabitViews(entries);
+        if (mHabitAdapter != null)
+            mHabitAdapter.updateHabitViews(entries);
     }
 
     public void setInitialFragment() {
@@ -814,8 +871,8 @@ public class MainActivity extends AppCompatActivity
             toolbar.setTitle(getString(R.string.app_name));
         }
 
-        habitDisplayMode = NO_ARCHIVED_HABITS;
-        habitList.clear();
+        mHabitDisplayMode = NO_ARCHIVED_HABITS;
+        mHabitList.clear();
         mHabitCardContainer.removeAllViews();
         showDatabase();
     }

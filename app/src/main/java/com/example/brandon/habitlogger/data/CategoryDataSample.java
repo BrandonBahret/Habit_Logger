@@ -2,6 +2,7 @@ package com.example.brandon.habitlogger.data;
 
 import android.os.Parcel;
 
+import com.android.internal.util.Predicate;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
@@ -26,6 +27,15 @@ public final class CategoryDataSample extends ExpandableGroup<Habit> {
     private List<SessionEntry> mSessionEntries;
     private Long mDuration;
     //endregion
+
+    //region Static helper interface methods
+    public static Predicate<? super CategoryDataSample> IFilterEmptySamples = new Predicate<CategoryDataSample>() {
+        @Override
+        public boolean apply(CategoryDataSample dataSample) {
+            return dataSample.getNumberOfHabits() == 0;
+        }
+    };
+    //endregion -- end --
 
     public CategoryDataSample(HabitCategory category, List<Habit> habits,
                               long dateFromTime, long dateToTime) {
