@@ -1,11 +1,9 @@
 package com.example.brandon.habitlogger.RecyclerViewAdapters;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +13,6 @@ import android.widget.TextView;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.ui.LayoutCheckableTextView;
 
@@ -28,21 +25,24 @@ import java.util.List;
 
 public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.ViewHolder> {
 
-    List<SessionEntry> sessionEntries;
-    HabitDatabase habitDatabase;
-    SessionManager sessionManager;
+    //region (Member attributes)
+    private List<SessionEntry> mSessionEntries;
+    private HabitDatabase mHabitDatabase;
 
-    Context context;
+    private Context mContext;
+    //endregion
 
-    OnClickListeners listener;
+    //region Code responsible for providing an interface
+    OnClickListeners mListener;
 
     public interface OnClickListeners {
         void onEntryViewClick(long habitId, long entryId);
     }
 
     public OnClickListeners getListener() {
-        return listener;
+        return mListener;
     }
+    //endregion
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public LayoutCheckableTextView noteText;
@@ -66,67 +66,48 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
     }
 
     public EntryViewAdapter(List<SessionEntry> sessionEntries, Context context, OnClickListeners listener) {
-        this.sessionEntries = sessionEntries;
-        this.habitDatabase = new HabitDatabase(context);
-        this.sessionManager = new SessionManager(context);
-        this.context = context;
-        this.listener = listener;
+        mContext = context;
+        mSessionEntries = sessionEntries;
+        mHabitDatabase = new HabitDatabase(context);
+        mListener = listener;
     }
 
+    //region Methods responsible for creating and binding view holders
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.entry_card, parent, false);
-
         setMargins(itemView, 0, 4, 0, 4);
 
         return new ViewHolder(itemView);
     }
 
-    int getDP(int value) {
-        Resources res = context.getResources();
-        return (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                value,
-                res.getDisplayMetrics()
-        );
-    }
-
-    public void setMargins(View v, int l, int t, int r, int b) {
-        if (v.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
-            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
-
-            p.setMargins(getDP(l), getDP(t), getDP(r), getDP(b));
-            v.requestLayout();
-        }
-    }
-
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        final SessionEntry item = sessionEntries.get(position);
+        final SessionEntry item = mSessionEntries.get(position);
         holder.entryId = item.getDatabaseId();
         holder.habitId = item.getHabitId();
 
         holder.startTimeText.setText(item.stringifyStartingTime("h:mm a"));
         holder.durationText.setText(item.stringifyDuration());
 
-        holder.accent.setBackgroundColor(habitDatabase.getHabitColor(holder.habitId));
+        holder.accent.setBackgroundColor(mHabitDatabase.getHabitColor(holder.habitId));
 
         if (!item.getNote().equals("")) {
             holder.noteText.setText(item.getNote());
             holder.noteText.setTypeface(Typeface.DEFAULT);
-        }else{
-            holder.noteText.setText(context.getResources().getString(R.string.no_note_available_entry));
+        }
+        else {
+            holder.noteText.setText(mContext.getResources().getString(R.string.no_note_available_entry));
             holder.noteText.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
         }
 
-        final int maxLines = context.getResources().getInteger(R.integer.entry_card_note_max_lines);
+        final int maxLines = mContext.getResources().getInteger(R.integer.entry_card_note_max_lines);
         holder.noteText.setOnLayoutListener(new LayoutCheckableTextView.OnLayoutListener() {
             @Override
             public void onLayoutCreated(TextView view) {
-                if (view.getLineCount() >= maxLines) {
+                if (view.getLineCount() >= maxLines)
                     holder.expandNote.setVisibility(View.VISIBLE);
-                }
             }
         });
 
@@ -134,7 +115,7 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         holder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onEntryViewClick(holder.habitId, item.getDatabaseId());
+                mListener.onEntryViewClick(holder.habitId, item.getDatabaseId());
             }
         });
 
@@ -150,8 +131,17 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         });
     }
 
+    public static void setMargins(View view, int left, int top, int right, int bottom) {
+        if (view.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+            p.setMargins(left, top, right, bottom);
+            view.requestLayout();
+        }
+    }
+    //endregion -- end --
+
     @Override
     public int getItemCount() {
-        return sessionEntries.size();
+        return mSessionEntries.size();
     }
 }

@@ -19,23 +19,32 @@ import java.util.List;
 
 /**
  * Created by Brandon on 12/26/2016.
- * RecyclerView mAdapter for active session activity.
+ * RecyclerView adapter for active session activity.
  */
 
 public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSessionViewAdapter.ViewHolder> {
 
-    List<SessionEntry> sessionEntries;
-    HabitDatabase habitDatabase;
-    SessionManager sessionManager;
+    //region (Member attributes)
+    private List<SessionEntry> mSessionEntries;
+    private HabitDatabase mHabitDatabase;
+    private SessionManager mSessionManager;
+    //endregion
 
-    Context context;
-
-    OnClickListeners listener;
+    //region Code responsible for providing an interface
+    OnClickListeners mListener;
 
     public interface OnClickListeners {
         void onSessionViewClick(long habitId);
 
         void onSessionPauseButtonClick(ViewHolder holder, long habitId);
+    }
+    //endregion
+
+    public ActiveSessionViewAdapter(List<SessionEntry> sessionEntries, Context context, OnClickListeners listener) {
+        mSessionEntries = sessionEntries;
+        mHabitDatabase = new HabitDatabase(context);
+        mSessionManager = new SessionManager(context);
+        mListener = listener;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -57,47 +66,31 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
         }
     }
 
-    public ActiveSessionViewAdapter(List<SessionEntry> sessionEntries, Context context, OnClickListeners listener) {
-        this.sessionEntries = sessionEntries;
-        this.habitDatabase = new HabitDatabase(context);
-        this.sessionManager = new SessionManager(context);
-        this.context = context;
-        this.listener = listener;
-    }
-
+    //region Methods responsible for creating and binding view holders
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.active_session_card, parent, false);
-
         setMargins(itemView, 0, 20, 0, 20);
 
         return new ViewHolder(itemView);
     }
 
-    public static void setMargins(View v, int l, int t, int r, int b) {
-        if (v.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
-            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
-            p.setMargins(l, t, r, b);
-            v.requestLayout();
-        }
-    }
-
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        final SessionEntry item = sessionEntries.get(position);
+        final SessionEntry item = mSessionEntries.get(position);
         long habitId = item.getHabit().getDatabaseId();
 
-        if (sessionManager.getIsSessionActive(habitId)) {
+        if (mSessionManager.getIsSessionActive(habitId)) {
             holder.habitId = habitId;
             holder.name.setText(item.getHabit().getName());
             holder.time.setText(item.stringifyDuration());
             holder.timeStarted.setText(item.stringifyStartingTime("h:mm a"));
 
-            int color = habitDatabase.getHabitColor(habitId);
+            int color = mHabitDatabase.getHabitColor(habitId);
             holder.accent.setColorFilter(color);
 
-            boolean isPaused = sessionManager.getIsPaused(habitId);
+            boolean isPaused = mSessionManager.getIsPaused(habitId);
             int res = HabitViewHolder.getResourceIdForPauseButton(isPaused);
             holder.pauseButton.setImageResource(res);
 
@@ -110,30 +103,42 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
             holder.rootView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    listener.onSessionViewClick(holder.habitId);
+                    mListener.onSessionViewClick(holder.habitId);
                 }
             });
 
             holder.pauseButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    listener.onSessionPauseButtonClick(holder, holder.habitId);
+                    mListener.onSessionPauseButtonClick(holder, holder.habitId);
                 }
             });
         }
     }
 
+    public static void setMargins(View view, int left, int top, int right, int bottom) {
+        if (view.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+            p.setMargins(left, top, right, bottom);
+            view.requestLayout();
+        }
+    }
+    //endregion
+
+    //region Methods responsible for exposing the data set
     @Override
     public long getItemId(int position) {
-        return sessionEntries.get(position).getDatabaseId();
+        return mSessionEntries.get(position).getDatabaseId();
     }
 
     @Override
     public int getItemCount() {
-        return sessionEntries.size();
+        return mSessionEntries.size();
     }
 
     public List<SessionEntry> getSessionEntries() {
-        return sessionEntries;
+        return mSessionEntries;
     }
+    //endregion -- end --
+
 }
