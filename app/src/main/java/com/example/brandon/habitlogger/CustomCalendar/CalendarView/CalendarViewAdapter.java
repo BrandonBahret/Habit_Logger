@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.brandon.habitlogger.CustomCalendar.CalendarViewAdapterBase;
 import com.example.brandon.habitlogger.CustomCalendar.CalendarViewModelBase;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
@@ -19,15 +20,22 @@ import java.util.Set;
 
 /**
  * Created by Brandon on 3/17/2017.
+ * Class for adapting this calendar view to a recycler view
  */
 
-public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapter.ViewHolder> {
+public class CalendarViewAdapter extends CalendarViewAdapterBase<CalendarViewAdapter.ViewHolder> {
 
-    Context mContext;
     SessionEntriesSample mEntriesSample;
-    List<CalendarViewModelBase> monthData;
     private int mStreakColor = -1;
 
+    public CalendarViewAdapter(SessionEntriesSample entriesSample, int streakColor, Context context) {
+        super(context);
+        mEntriesSample = entriesSample;
+        mStreakColor = streakColor;
+        generateMonthDataFromEntries(mEntriesSample);
+    }
+
+    //region Code responsible for creating and binding view holders
     public class ViewHolder extends RecyclerView.ViewHolder {
         CalendarView calendarView;
 
@@ -39,13 +47,21 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         }
     }
 
-    public CalendarViewAdapter(SessionEntriesSample entriesSample, int streakColor, Context context) {
-        mEntriesSample = entriesSample;
-        mContext = context;
-        setStreakColor(streakColor);
+    @Override
+    protected ViewHolder onCreateViewHolder(LayoutInflater layoutInflater, ViewGroup parent) {
+        View itemView = layoutInflater.inflate(R.layout.calendar_view, parent, false);
 
-        generateMonthDataFromEntries(mEntriesSample);
+        if (mStreakColor != -1)
+            ((CalendarView) itemView).setStreakColor(mStreakColor);
+
+        return new ViewHolder(itemView);
     }
+
+    @Override
+    protected void bindModel(ViewHolder holder, CalendarViewModelBase model) {
+        holder.calendarView.bindModel(model);
+    }
+    //endregion -- end --
 
     private void generateMonthDataFromEntries(SessionEntriesSample entriesSample) {
         Calendar startCalendar = Calendar.getInstance();
@@ -57,7 +73,7 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         int diffYear = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
         int diffMonth = diffYear * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH) + 1;
 
-        monthData = new ArrayList<>(diffMonth);
+        mCalendarData = new ArrayList<>(diffMonth);
 
         int entryIndex = 0;
         List<SessionEntry> entries = entriesSample.getSessionEntries();
@@ -85,35 +101,10 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
             calendar.set(Calendar.YEAR, targetYear);
             calendar.set(Calendar.MONTH, targetMonth);
 
-            monthData.add(new CalendarViewModelBase(calendar, dates));
+            mCalendarData.add(new CalendarViewModelBase(calendar, dates));
 
             startCalendar.add(Calendar.MONTH, 1);
         }
     }
 
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.calendar_view, parent, false);
-
-        if (mStreakColor != -1)
-            ((CalendarView) itemView).setStreakColor(mStreakColor);
-
-        return new ViewHolder(itemView);
-    }
-
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        CalendarViewModelBase model = monthData.get(position);
-        holder.calendarView.bindModel(model);
-    }
-
-    public void setStreakColor(int color) {
-        mStreakColor = color;
-    }
-
-    @Override
-    public int getItemCount() {
-        return monthData.size();
-    }
 }

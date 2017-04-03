@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.brandon.habitlogger.CustomCalendar.CalendarViewAdapterBase;
+import com.example.brandon.habitlogger.CustomCalendar.CalendarViewModelBase;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
@@ -21,14 +23,14 @@ import java.util.Set;
 
 /**
  * Created by Brandon on 3/17/2017.
+ * Class for adapting this calendar view to a recycler view
  */
 
-public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapter.ViewHolder> {
+public class CalendarViewAdapter extends CalendarViewAdapterBase<CalendarViewAdapter.ViewHolder> {
 
-    Context mContext;
     HabitDataSample mDataSample;
-    List<CalendarViewMonthModel> calendarData;
 
+    //region Code responsible for creating and binding view holders
     public class ViewHolder extends RecyclerView.ViewHolder {
         CalendarView calendarView;
 
@@ -38,10 +40,21 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         }
     }
 
-    public CalendarViewAdapter(HabitDataSample habitDataSample, Context context) {
-        mDataSample = habitDataSample;
-        mContext = context;
+    @Override
+    protected ViewHolder onCreateViewHolder(LayoutInflater layoutInflater, ViewGroup parent) {
+        View itemView = layoutInflater.inflate(R.layout.data_overview_calendar_view, parent, false);
+        return new ViewHolder(itemView);
+    }
 
+    @Override
+    protected void bindModel(ViewHolder holder, CalendarViewModelBase model) {
+        holder.calendarView.bindModel((CalendarViewMonthModel) model);
+    }
+    //endregion -- end --
+
+    public CalendarViewAdapter(HabitDataSample habitDataSample, Context context) {
+        super(context);
+        mDataSample = habitDataSample;
         generateMonthDataFromEntries(mDataSample);
     }
 
@@ -55,7 +68,7 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         int diffYear = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
         int diffMonth = (diffYear * 12) + (endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH)) + 1;
 
-        calendarData = new ArrayList<>(diffMonth);
+        mCalendarData = new ArrayList<>(diffMonth);
 
         int entryIndex = 0;
         List<SessionEntry> entries = dataSample.buildSessionEntriesList().getSessionEntries();
@@ -85,7 +98,7 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
             calendar.set(Calendar.MONTH, targetMonth);
 
             List<CalendarPieDataSet> pieDataSet = getPieDataSets(targetMonth, targetYear, dates);
-            calendarData.add(new CalendarViewMonthModel(calendar, dates, pieDataSet));
+            mCalendarData.add(new CalendarViewMonthModel(calendar, dates, pieDataSet));
 
             startCalendar.add(Calendar.MONTH, 1);
         }
@@ -123,24 +136,5 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
         }
 
         return new CalendarPieDataSet(entries, date);
-    }
-
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.data_overview_calendar_view, parent, false);
-
-        return new ViewHolder(itemView);
-    }
-
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        CalendarViewMonthModel model = calendarData.get(position);
-        holder.calendarView.bindModel(model);
-    }
-
-    @Override
-    public int getItemCount() {
-        return calendarData.size();
     }
 }
