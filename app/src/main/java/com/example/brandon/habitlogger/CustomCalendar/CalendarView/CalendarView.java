@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ui.CalendarView;
+package com.example.brandon.habitlogger.CustomCalendar.CalendarView;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,6 +10,7 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.example.brandon.habitlogger.CustomCalendar.TextElement;
 import com.example.brandon.habitlogger.R;
 
 import java.util.Calendar;
@@ -304,7 +305,6 @@ public class CalendarView extends View {
             dayNames[i].draw(canvas, x, y);
         }
     }
-
 
     private void drawDateElements(Canvas canvas) {
 

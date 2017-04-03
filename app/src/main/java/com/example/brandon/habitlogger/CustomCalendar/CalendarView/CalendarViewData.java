@@ -1,6 +1,8 @@
-package com.example.brandon.habitlogger.ui.CalendarView;
+package com.example.brandon.habitlogger.CustomCalendar.CalendarView;
 
 import android.text.TextPaint;
+
+import com.example.brandon.habitlogger.CustomCalendar.TextElement;
 
 /**
  * Created by Brandon on 3/15/2017.

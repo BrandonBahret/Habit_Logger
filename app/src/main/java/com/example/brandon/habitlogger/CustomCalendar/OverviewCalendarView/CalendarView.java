@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ui.OverviewCalendarView;
+package com.example.brandon.habitlogger.CustomCalendar.OverviewCalendarView;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,6 +10,7 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.example.brandon.habitlogger.CustomCalendar.TextElement;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyColorUtils;
 

@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.ui.OverviewCalendarView.CalendarViewAdapter;
+import com.example.brandon.habitlogger.CustomCalendar.OverviewCalendarView.CalendarViewAdapter;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.HabitDataSample;
 

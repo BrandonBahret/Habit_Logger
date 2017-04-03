@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ui.CalendarView;
+package com.example.brandon.habitlogger.CustomCalendar.CalendarView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

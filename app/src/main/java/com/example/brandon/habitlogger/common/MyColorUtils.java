@@ -16,7 +16,7 @@ public class MyColorUtils {
     /**
      * @return True if the color's lightness is greater than the provided threshold. (recommended: 0.5f)
      */
-    public boolean isColorBright(int color, @FloatRange(from = 0.0, to = 1.0) float threshold) {
+    public static boolean isColorBright(int color, @FloatRange(from = 0.0, to = 1.0) float threshold) {
         return getLightness(color) > threshold;
     }
 

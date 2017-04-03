@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
-import com.example.brandon.habitlogger.ui.CalendarView.CalendarViewAdapter;
+import com.example.brandon.habitlogger.CustomCalendar.CalendarView.CalendarViewAdapter;
 
 public class CalendarFragment extends Fragment implements IHabitCallback.IUpdateEntries {
 

@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ui.OverviewCalendarView;
+package com.example.brandon.habitlogger.CustomCalendar.OverviewCalendarView;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

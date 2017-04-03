@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ui.OverviewCalendarView;
+package com.example.brandon.habitlogger.CustomCalendar;
 
 import android.graphics.Canvas;
 import android.support.annotation.Dimension;
