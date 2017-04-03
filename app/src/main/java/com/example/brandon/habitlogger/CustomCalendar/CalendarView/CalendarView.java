@@ -109,8 +109,8 @@ public class CalendarView extends View {
         // endregion
 
 
-        mCalendarData = new CalendarViewData()
-                .setTitle("January 2017", mTitlePaint);
+        mCalendarData = new CalendarViewData();
+        mCalendarData.setTitle("January 2017", mTitlePaint);
 
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(

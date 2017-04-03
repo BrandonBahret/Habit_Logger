@@ -117,7 +117,7 @@ public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpd
         List<Entry> values = new ArrayList<>(totalDays);
 
         long targetDate = dataSample.getDateFromTime();
-        int dayCounter = 0; // The number of days performed.
+        int dayCounter = 0; // The number of mDays performed.
 
         for (int dateIndex = 0; dateIndex < totalDays; dateIndex++) {
 

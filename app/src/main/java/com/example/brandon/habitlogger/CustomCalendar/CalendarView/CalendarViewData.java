@@ -2,77 +2,18 @@ package com.example.brandon.habitlogger.CustomCalendar.CalendarView;
 
 import android.text.TextPaint;
 
-import com.example.brandon.habitlogger.CustomCalendar.TextElement;
+import com.example.brandon.habitlogger.CustomCalendar.CalendarViewDataBase;
 
 /**
  * Created by Brandon on 3/15/2017.
  * Class for defining the layout of this custom calendar view
  */
 
-class CalendarViewData {
+public class CalendarViewData extends CalendarViewDataBase<DateElement> {
 
-    private TextElement mNoDataAvailableText;
-    private TextElement mTitle;
-
-    private String days[] = new String[]{"S", "M", "T", "W", "T", "F", "S"};
-    private TextElement[] mDayNameTextElements;
-    private float mContentMarginTop;
-
-    private DateElement mDateElements[];
-
-    public void makeMeasurements() {
-        if (getTitle() != null)
-            getTitle().makeMeasurements();
-
-        if (getNoDataAvailableText() != null)
-            getNoDataAvailableText().makeMeasurements();
-
-        if (mDayNameTextElements != null) {
-            for (TextElement textElement : mDayNameTextElements)
-                textElement.makeMeasurements();
-        }
-
-        if (mDateElements != null) {
-            for (DateElement dateElement : mDateElements)
-                dateElement.makeMeasurements();
-        }
-    }
-
-    //region Getters {}
-    public TextElement getTitle() {
-        return mTitle;
-    }
-
-    public TextElement getNoDataAvailableText() {
-        return mNoDataAvailableText;
-    }
-
-    public TextElement[] getDayNameTextElements() {
-        return mDayNameTextElements;
-    }
-
-    public DateElement[] getDateElements() {
-        return mDateElements;
-    }
-
-    public float getContentMarginTop() {
-        return mContentMarginTop;
-    }
-    //endregion
-
-    //region Setters {}
-    public CalendarViewData setDayNameHeaderPaint(TextPaint paint) {
-        mDayNameTextElements = new TextElement[days.length];
-
-        for (int i = 0; i < days.length; i++) {
-            mDayNameTextElements[i] = new TextElement(days[i], paint);
-        }
-
-        return this;
-    }
-
-    public CalendarViewData setDateElementsPaint(TextPaint paint) {
-        mDateElements = new DateElement[days.length * 6];
+    @Override
+    public void setDateElementsPaint(TextPaint paint) {
+        mDateElements = new DateElement[mDays.length * 6];
 
         for (int i = 0; i < mDateElements.length; i++) {
             if (mDateElements[i] == null)
@@ -80,31 +21,6 @@ class CalendarViewData {
             else
                 mDateElements[i].setTextPaint(paint);
         }
-
-        return this;
     }
 
-    public CalendarViewData setDateElementsRadius(float radius) {
-
-        for (DateElement dateElement : mDateElements) {
-            dateElement.setRadius(radius);
-        }
-
-        return this;
-    }
-
-    public CalendarViewData setTitle(String title, TextPaint paint) {
-        mTitle = new TextElement(title, paint);
-        return this;
-    }
-
-    public CalendarViewData setNoDataAvailableText(String text, TextPaint paint) {
-        mNoDataAvailableText = new TextElement(text, paint);
-        return this;
-    }
-
-    public void setContentMarginTop(float contentMarginTop) {
-        mContentMarginTop = contentMarginTop;
-    }
-    //endregion
 }
