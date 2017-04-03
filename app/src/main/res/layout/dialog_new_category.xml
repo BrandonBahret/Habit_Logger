@@ -15,7 +15,7 @@
                 android:id="@+id/category_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Category Name"/>
+                android:hint="@string/modify_category_name_hint"/>
 
         </android.support.design.widget.TextInputLayout>
 
@@ -28,14 +28,14 @@
                 android:id="@+id/category_color_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="#3ad6b6">
+                android:layout_weight="1">
 
                 <EditText
                     android:id="@+id/category_color"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Color"/>
+                    android:hint="@string/modify_category_color_hint"
+                    android:text="@string/modify_category_color_text"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -45,7 +45,7 @@
                 android:layout_height="48dp"
                 android:layout_gravity="center"
                 android:layout_marginStart="8dp"
-                android:src="@drawable/circle_background"
+                android:src="@drawable/background_ripple_circle"
                 android:tint="@color/colorPrimary"/>
 
         </LinearLayout>

@@ -50,7 +50,6 @@ public class DatabaseExportLocalTest extends AndroidTestCase {
         super.tearDown();
     }
 
-
     public void testBackupDatabase() {
         int numberOfCategories = db.getNumberOfCategories();
         dataExportManager.exportDatabase(true);

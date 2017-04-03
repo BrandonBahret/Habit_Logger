@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="@string/action_edit"
-        android:id="@+id/habit_menu_edit" />
+    <item
+        android:id="@+id/habit_menu_edit"
+        android:title="@string/action_edit"/>
 
-    <item android:title="@string/action_session"
-          android:id="@+id/menu_enter_session" />
+    <item
+        android:id="@+id/menu_enter_session"
+        android:title="@string/action_session"/>
 
-    <item android:title="@string/action_export"
-        android:id="@+id/habit_menu_export" />
+    <item
+        android:id="@+id/habit_menu_export"
+        android:title="@string/action_export"/>
 
-    <item android:title="@string/action_archive"
-        android:id="@+id/habit_menu_archive" />
+    <item
+        android:id="@+id/habit_menu_archive"
+        android:title="@string/action_archive"/>
 
-    <item android:title="@string/action_reset"
-          android:id="@+id/habit_menu_reset" />
+    <item
+        android:id="@+id/habit_menu_reset"
+        android:title="@string/action_reset"/>
 
-    <item android:title="@string/action_delete"
-          android:id="@+id/habit_menu_delete" />
+    <item
+        android:id="@+id/habit_menu_delete"
+        android:title="@string/action_delete"/>
 
 </menu>

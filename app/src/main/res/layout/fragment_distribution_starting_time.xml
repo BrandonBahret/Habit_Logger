@@ -22,8 +22,7 @@
                     style="@style/card_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Starting Time Distribution"/>
-
+                    android:text="@string/starting_time_distribution"/>
 
                 <com.github.mikephil.charting.charts.CombinedChart
                     android:id="@+id/chart"

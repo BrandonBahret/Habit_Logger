@@ -26,6 +26,5 @@
     <!--Calendar View colors-->
     <color name="calendar_view_title">#616161</color>
     <color name="calendar_view_date_label">#9e9e9e</color>
-    <color name="background_material_dark">#c1c1c1</color>
 
 </resources>

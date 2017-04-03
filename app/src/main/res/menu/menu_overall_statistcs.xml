@@ -1,7 +1,8 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto"
-      xmlns:tools="http://schemas.android.com/tools"
-      tools:context="com.example.brandon.habitlogger.OverallStatistics.OverallStatistcsActivity">
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.brandon.habitlogger.OverallStatistics.OverallStatistcsActivity">
 
     <item
         android:id="@+id/search"
@@ -12,15 +13,12 @@
 
     <item
         android:id="@+id/menu_backup_database"
-        android:orderInCategory="101"
-        android:title="Create Backup"/>
+        android:title="@string/export_database"/>
     <item
         android:id="@+id/menu_restore_database"
-        android:orderInCategory="102"
-        android:title="Restore Data"/>
+        android:title="@string/restore_database"/>
     <item
         android:id="@+id/menu_export_database_as_csv"
-        android:orderInCategory="103"
-        android:title="Export Data (CSV)"
-        app:showAsAction="never"/>
+        android:title="@string/action_export"/>
+
 </menu>

@@ -21,7 +21,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="Duration (Hour, Minute, Second)"
+                android:text="@string/modify_entry_duration_title"
                 android:textAlignment="center"
                 android:textColor="?android:textColorHint"/>
 
@@ -42,9 +42,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@string/colon"
                     android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:text=":"/>
+                    android:textStyle="bold"/>
 
                 <NumberPicker
                     android:id="@+id/minutes"
@@ -55,9 +55,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@string/colon"
                     android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:text=":"/>
+                    android:textStyle="bold"/>
 
                 <NumberPicker
                     android:id="@+id/seconds"
@@ -78,7 +78,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:focusable="false"
-                    android:hint="Session Date"
+                    android:hint="@string/modify_entry_session_date_hint"
                     android:inputType="date"/>
 
             </android.support.design.widget.TextInputLayout>
@@ -93,7 +93,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:focusable="false"
-                    android:hint="Starting time"
+                    android:hint="@string/modify_entry_starting_time_hint"
                     android:inputType="date"/>
 
             </android.support.design.widget.TextInputLayout>
@@ -107,7 +107,7 @@
                     android:id="@+id/note"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Note"/>
+                    android:hint="@string/modify_entry_note_hint"/>
 
             </android.support.design.widget.TextInputLayout>
 

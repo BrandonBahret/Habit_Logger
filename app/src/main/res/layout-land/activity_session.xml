@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools">
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
         android:id="@+id/activity_session"
@@ -16,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:background="@drawable/underline_background"
+            android:background="@drawable/background_simple_line"
 
             android:gravity="center_horizontal"
             android:orientation="horizontal"
@@ -29,12 +30,12 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center_vertical"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:layout_marginTop="2dp"
 
+                android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/session_pause_play_content_description"
                 android:scaleType="fitXY"
-                android:layout_marginTop="2dp"
-                android:src="@drawable/ic_play_black"
+                android:src="@drawable/ic_play_black_24dp"
                 android:tint="@color/habitCardButtonColor"/>
 
             <LinearLayout
@@ -111,14 +112,14 @@
         </LinearLayout>
 
         <!--<Button-->
-            <!--android:id="@+id/session_cancel"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentBottom="true"-->
-            <!--android:layout_alignParentStart="true"-->
-            <!--android:background="@drawable/flat_btn_ripple"-->
-            <!--android:text="@string/cancel"-->
-            <!--android:textColor="@android:color/white"/>-->
+        <!--android:id="@+id/session_cancel"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:background="@drawable/flat_btn_ripple"-->
+        <!--android:text="@string/cancel"-->
+        <!--android:textColor="@android:color/white"/>-->
 
         <EditText
             android:id="@+id/session_note"
@@ -132,7 +133,7 @@
 
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:background="@drawable/background_note"
+            android:background="@drawable/background_simple_rectangle"
             android:cropToPadding="false"
             android:elevation="3dp"
             android:fadingEdgeLength="@dimen/activity_vertical_margin"

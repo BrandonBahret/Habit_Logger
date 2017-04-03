@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/link_layout"
         android:layout_alignParentEnd="true"
-        android:background="@drawable/underline_background"
+        android:background="@drawable/background_simple_line"
         android:text="@string/links"
         android:textAlignment="center"
         android:textSize="12sp"/>
@@ -58,7 +58,7 @@
             android:onClick="linkButtonClicked"
             android:padding="4dp"
             android:scaleType="fitXY"
-            android:src="@drawable/ic_github"
+            android:src="@drawable/ic_github_black_24dp"
             android:tag="Github"/>
 
         <Space
@@ -74,7 +74,7 @@
             android:onClick="linkButtonClicked"
             android:padding="4dp"
             android:scaleType="fitXY"
-            android:src="@drawable/ic_linkedin"
+            android:src="@drawable/ic_linkedin_black_24dp"
             android:tag="LinkedIn"
             android:tint="#0077B5"/>
 
@@ -91,7 +91,7 @@
             android:onClick="linkButtonClicked"
             android:padding="4dp"
             android:scaleType="fitXY"
-            android:src="@drawable/ic_freelancer"
+            android:src="@drawable/ic_freelancer_black_24dp"
             android:tag="Freelancer"
             android:tint="#6dc0e6"/>
 

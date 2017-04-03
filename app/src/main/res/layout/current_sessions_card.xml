@@ -12,11 +12,11 @@
             android:id="@+id/item_root"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:clipToPadding="false"
             android:layout_marginBottom="34dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_marginTop="6dp"
+            android:clipToPadding="false"
             android:foreground="?android:attr/selectableItemBackground"
             app:cardBackgroundColor="@color/cardBackgroundColor"
             app:cardElevation="16dp">
@@ -34,7 +34,7 @@
                     android:contentDescription="@string/card_view_accent_description"
                     android:elevation="4dp"
                     android:padding="5dp"
-                    android:src="@drawable/ic_timer_black_24px"
+                    android:src="@drawable/ic_timer_black_24dp"
                     android:tint="@android:color/white"/>
 
                 <TextView

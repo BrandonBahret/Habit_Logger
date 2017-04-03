@@ -1,7 +1,9 @@
 <resources>
+
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="nav_header_vertical_spacing">16dp</dimen>
     <dimen name="nav_header_height">160dp</dimen>
+
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
@@ -11,9 +13,7 @@
     <dimen name="accent_strip_width">8dp</dimen>
     <dimen name="link_button_size">38dp</dimen>
     <dimen name="appbar_padding_top">8dp</dimen>
-
     <dimen name="land_time_display">40sp</dimen>
-
 
     <!-- Item decorators -->
     <dimen name="indent_pad_top">16dp</dimen>
@@ -31,4 +31,5 @@
     <dimen name="large_top_offset_dp">60dp</dimen>
     <dimen name="sections_top_offset_dp">14dp</dimen>
     <dimen name="extra_large_top_offset_dp">110dp</dimen>
+
 </resources>

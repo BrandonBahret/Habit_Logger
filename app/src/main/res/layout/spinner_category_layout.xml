@@ -12,14 +12,13 @@
         android:layout_gravity="center"
         android:layout_margin="8dp"
         android:scaleType="fitXY"
-        android:src="@drawable/ic_simple_circle"/>
+        android:src="@drawable/background_ripple_circle"/>
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-
         android:layout_margin="8dp"
         android:text="@string/value_placeholder"
         android:textSize="12sp"/>

@@ -542,7 +542,7 @@ public class MainActivity extends AppCompatActivity
                             timeTextView.setText(getString(R.string.time_display_placeholder));
 
                             ImageButton pauseButton = (ImageButton) item.findViewById(R.id.session_control_button);
-                            pauseButton.setImageResource(R.drawable.ic_play_black);
+                            pauseButton.setImageResource(R.drawable.ic_play_black_24dp);
                         }
                         break;
                     }

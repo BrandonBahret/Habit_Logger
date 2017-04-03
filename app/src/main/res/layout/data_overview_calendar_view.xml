@@ -7,12 +7,12 @@
     android:layout_height="390dp"
     android:layout_margin="4dp"
 
-    android:layout_marginTop="3dp"
     android:layout_marginBottom="3dp"
     android:layout_marginLeft="6dp"
     android:layout_marginRight="6dp"
+    android:layout_marginTop="3dp"
 
-    android:background="@drawable/background_calendar_view"
+    android:background="@drawable/background_simple_rectangle"
     android:textSize="20sp"
 
     calendar_view:content_margin_top="12dp"

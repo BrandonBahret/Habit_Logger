@@ -77,7 +77,7 @@
                 android:id="@+id/enter_session_fab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_timer_white_24px"
+                android:src="@drawable/ic_timer_white_24dp"
                 fab:fab_label="Enter Session"
                 fab:fab_size="mini"/>
 
@@ -85,7 +85,7 @@
                 android:id="@+id/create_entry_fab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_manually_create_entry"
+                android:src="@drawable/ic_manually_create_entry_white_24dp"
                 fab:fab_label="Manually Create Entry"
                 fab:fab_size="mini"/>
 

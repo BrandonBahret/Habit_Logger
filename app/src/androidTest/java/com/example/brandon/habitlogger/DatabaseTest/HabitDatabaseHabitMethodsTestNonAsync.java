@@ -30,7 +30,6 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
         return new Habit("dummy2", "I am a dummy2", new HabitCategory("#ffffffff", "dummy"), "", null);
     }
 
-
     @Override
     public void setUp() throws Exception {
         super.setUp();

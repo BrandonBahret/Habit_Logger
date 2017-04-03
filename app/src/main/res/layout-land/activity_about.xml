@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:id="@+id/activity_about"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                tools:context="com.example.brandon.habitlogger.ui.AboutActivity">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_about"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    tools:context="com.example.brandon.habitlogger.ui.AboutActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,6 +28,7 @@
                 android:id="@+id/imageView"
                 android:layout_width="130dp"
                 android:layout_height="130dp"
+                android:contentDescription="@string/app_icon_about_content_description"
                 android:scaleType="fitXY"
                 app:srcCompat="@mipmap/ic_launcher"/>
 
@@ -69,8 +71,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/link_layout"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:background="@drawable/underline_background"
+        android:background="@drawable/background_simple_line"
         android:text="@string/links"
         android:textAlignment="center"
         android:textSize="12sp"/>
@@ -100,7 +101,7 @@
             android:onClick="linkButtonClicked"
             android:padding="4dp"
             android:scaleType="fitXY"
-            android:src="@drawable/ic_github"
+            android:src="@drawable/ic_github_black_24dp"
             android:tag="Github"/>
 
         <Space
@@ -116,7 +117,7 @@
             android:onClick="linkButtonClicked"
             android:padding="4dp"
             android:scaleType="fitXY"
-            android:src="@drawable/ic_linkedin"
+            android:src="@drawable/ic_linkedin_black_24dp"
             android:tag="LinkedIn"
             android:tint="#0077B5"/>
 
@@ -133,7 +134,7 @@
             android:onClick="linkButtonClicked"
             android:padding="4dp"
             android:scaleType="fitXY"
-            android:src="@drawable/ic_freelancer"
+            android:src="@drawable/ic_freelancer_black_24dp"
             android:tag="Freelancer"
             android:tint="#6dc0e6"/>
 

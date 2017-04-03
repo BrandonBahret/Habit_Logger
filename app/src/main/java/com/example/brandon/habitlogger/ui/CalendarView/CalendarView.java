@@ -54,7 +54,7 @@ public class CalendarView extends View {
     //endregion
 
     //region (Drawables)
-    private Drawable mBackgroundDrawable = ContextCompat.getDrawable(getContext(), R.drawable.background_calendar_view);
+    private Drawable mBackgroundDrawable = ContextCompat.getDrawable(getContext(), R.drawable.background_simple_rectangle);
     //endregion
 
     //region (Dimensions)

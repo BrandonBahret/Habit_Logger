@@ -23,9 +23,10 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/pause_play_content_description"
         android:padding="3dp"
         android:scaleType="fitXY"
-        android:src="@drawable/ic_play_black"/>
+        android:src="@drawable/ic_play_black_24dp"/>
 
     <TextView
         android:id="@+id/active_session_habit_name"
@@ -63,6 +64,6 @@
         android:text="@string/time_display_placeholder"
         android:textAlignment="center"
         android:textColor="@android:color/black"
-        android:textSize="10sp"/>
+        android:textSize="12sp"/>
 
 </RelativeLayout>
