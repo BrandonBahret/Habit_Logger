@@ -53,7 +53,6 @@ public abstract class DateElementBase extends ViewElement {
     }
 
     public abstract void onDraw(Canvas canvas, float x, float y);
-
     @Override
     public void draw(Canvas canvas, float x, float y) {
         super.draw(canvas, x, y);

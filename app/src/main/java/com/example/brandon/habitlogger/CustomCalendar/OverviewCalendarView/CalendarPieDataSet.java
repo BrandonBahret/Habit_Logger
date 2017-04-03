@@ -4,32 +4,32 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Brandon on 3/18/2017.
- *
+ * A class to represent the pie charts used with this calendar view
  */
 
 public class CalendarPieDataSet {
 
-    private List<CalendarPieEntry> calendarPieEntries;
+    //region (Member attributes)
+    private List<CalendarPieEntry> mCalendarPieEntries;
     private Paint mCurrentPaint;
     private int mDate;
+    //endregion
 
     public CalendarPieDataSet(List<CalendarPieEntry> entries, int date) {
-        calendarPieEntries = entries;
+        mCalendarPieEntries = entries;
         mCurrentPaint = new Paint();
         mDate = date;
     }
 
     public void draw(Canvas canvas, float x, float y, float radius){
-
         RectF oval = new RectF(x - radius, y - radius, x + radius, y + radius);
 
         float startAngle = 0;
-        for(CalendarPieEntry entry : calendarPieEntries){
+        for(CalendarPieEntry entry : mCalendarPieEntries){
             int arc = (int)(entry.getValue() * 360);
 
             mCurrentPaint.setColor(entry.getColor());
@@ -38,9 +38,11 @@ public class CalendarPieDataSet {
         }
     }
 
+    //region Getters {}
     public int getDate() {
         return mDate;
     }
+    //endregion=
 
     public static class CalendarPieEntry {
         private float mValue;
@@ -50,17 +52,6 @@ public class CalendarPieDataSet {
             mValue = value;
             mColor = color;
         }
-
-        public static List<CalendarPieEntry> getDataSet(List<Float> values, List<Integer> colors){
-            List<CalendarPieEntry> entries = new ArrayList<>(values.size());
-
-            for(int i = 0; i < values.size(); i++){
-                entries.add(new CalendarPieEntry(values.get(i), colors.get(i)));
-            }
-
-            return entries;
-        }
-
 
         //region Getters {}
         public float getValue() {
@@ -73,12 +64,12 @@ public class CalendarPieDataSet {
         //endregion
 
         //region Setters {}
-        public void setValue(float mValue) {
-            this.mValue = mValue;
+        public void setValue(float value) {
+            mValue = value;
         }
 
-        public void setColor(int mColor) {
-            this.mColor = mColor;
+        public void setColor(int color) {
+            mColor = color;
         }
         //endregion
     }

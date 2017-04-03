@@ -10,12 +10,10 @@ import android.text.TextPaint;
  */
 
 public class TextElement extends ViewElement {
-    private String mText;
 
-    @Override
-    public String toString() {
-        return mText;
-    }
+    //region (Member attributes)
+    private String mText;
+    //endregion
 
     public TextElement(String text, TextPaint paint) {
         super(paint);
@@ -35,12 +33,17 @@ public class TextElement extends ViewElement {
     @Override
     public void draw(Canvas canvas, float x, float y) {
         super.draw(canvas, x, y);
-        canvas.drawText(mText, lastXValue, lastYValue, mTextPaint);
+        canvas.drawText(mText, mLastXValue, mLastYValue, mTextPaint);
     }
 
     public void draw(Canvas canvas, TextPaint paint,  float x, float y) {
         super.draw(canvas, x, y);
-        canvas.drawText(mText, lastXValue, lastYValue, paint);
+        canvas.drawText(mText, mLastXValue, mLastYValue, paint);
+    }
+
+    @Override
+    public String toString() {
+        return mText;
     }
 
     //region Setters {}

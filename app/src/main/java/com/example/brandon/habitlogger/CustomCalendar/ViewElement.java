@@ -6,16 +6,19 @@ import android.text.TextPaint;
 
 /**
  * Created by Brandon on 3/16/2017.
- *
+ * The base class of all custom view elements
  */
 
 abstract public class ViewElement {
+
+    //region (Member attributes)
     protected TextPaint mTextPaint;
     protected float mWidth;
     protected float mHeight;
-    protected float lastYValue = 0, lastXValue = 0;
+    protected float mLastYValue = 0, mLastXValue = 0;
 
     @Dimension protected float mMarginTop;
+    //endregion
 
     public ViewElement(TextPaint paint) {
         mTextPaint = paint;
@@ -24,8 +27,8 @@ abstract public class ViewElement {
     abstract public ViewElement makeMeasurements();
 
     public void draw(Canvas canvas, float x, float y) {
-        lastXValue = x;
-        lastYValue = y + getMarginTop();
+        mLastXValue = x;
+        mLastYValue = y + getMarginTop();
     }
 
     //region Setters {}
@@ -38,7 +41,6 @@ abstract public class ViewElement {
         mTextPaint.setColor(color);
         return this;
     }
-
 
     public ViewElement setMarginTop(float dp) {
         mMarginTop = dp;
@@ -65,11 +67,12 @@ abstract public class ViewElement {
     }
 
     public float getLastXValue() {
-        return lastXValue;
+        return mLastXValue;
     }
 
     public float getLastYValue() {
-        return lastYValue;
+        return mLastYValue;
     }
     //endregion
+
 }

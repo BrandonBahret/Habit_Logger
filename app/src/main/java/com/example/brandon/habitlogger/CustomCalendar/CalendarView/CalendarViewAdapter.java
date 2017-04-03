@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.brandon.habitlogger.CustomCalendar.CalendarViewModelBase;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
@@ -24,7 +25,7 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
 
     Context mContext;
     SessionEntriesSample mEntriesSample;
-    List<CalendarViewMonthModel> monthData;
+    List<CalendarViewModelBase> monthData;
     private int mStreakColor = -1;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -84,7 +85,7 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
             calendar.set(Calendar.YEAR, targetYear);
             calendar.set(Calendar.MONTH, targetMonth);
 
-            monthData.add(new CalendarViewMonthModel(calendar, dates));
+            monthData.add(new CalendarViewModelBase(calendar, dates));
 
             startCalendar.add(Calendar.MONTH, 1);
         }
@@ -103,7 +104,7 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        CalendarViewMonthModel model = monthData.get(position);
+        CalendarViewModelBase model = monthData.get(position);
         holder.calendarView.bindModel(model);
     }
 

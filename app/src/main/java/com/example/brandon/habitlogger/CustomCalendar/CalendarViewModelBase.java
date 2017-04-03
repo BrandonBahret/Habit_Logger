@@ -1,26 +1,27 @@
-package com.example.brandon.habitlogger.CustomCalendar.CalendarView;
+package com.example.brandon.habitlogger.CustomCalendar;
 
-import java.text.SimpleDateFormat;
+import com.example.brandon.habitlogger.common.MyTimeUtils;
+
 import java.util.Calendar;
-import java.util.Locale;
 import java.util.Set;
 
 /**
  * Created by Brandon on 3/17/2017.
- *
+ * The base data model for displaying custom calendar views
  */
 
-public class CalendarViewMonthModel {
+public class CalendarViewModelBase {
 
+    //region (Member attributes)
     private Calendar mCalendarMonth;
     private Set<Integer> mDatesWithEntries;
-    private SimpleDateFormat titleFormat = new SimpleDateFormat("MMMM, yyyy", Locale.US);
+    //endregion
 
     /**
      * @param calendar A calendar object representing the month to render
      * @param datesWithEntries A list of date's with entries available.
      */
-    public CalendarViewMonthModel(Calendar calendar, Set<Integer> datesWithEntries){
+    public CalendarViewModelBase(Calendar calendar, Set<Integer> datesWithEntries){
         mCalendarMonth = calendar;
         mDatesWithEntries = datesWithEntries;
     }
@@ -36,21 +37,11 @@ public class CalendarViewMonthModel {
     }
 
     public String getMonthTitle() {
-        return titleFormat.format(mCalendarMonth.getTimeInMillis());
+        return MyTimeUtils.stringifyTimestamp(mCalendarMonth.getTimeInMillis(), "MMMM, yyyy");
     }
 
     public Set<Integer> getDatesWithEntries(){
         return mDatesWithEntries;
-    }
-    //endregion
-
-    //region Setters ()
-    public void setCalendarMonth(Calendar calendarMonth){
-        mCalendarMonth = calendarMonth;
-    }
-
-    public void setDatesWithEntries(Set<Integer> datesWithEntries){
-        mDatesWithEntries = datesWithEntries;
     }
     //endregion
 

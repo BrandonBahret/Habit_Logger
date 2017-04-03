@@ -108,7 +108,7 @@ public class CalendarView extends View {
         // endregion
 
 
-        mCalendarData = new CalendarViewData()
+        mCalendarData = (CalendarViewData) new CalendarViewData()
                 .setTitle("January 2017", mTitlePaint);
 
         // Load attributes
@@ -305,7 +305,7 @@ public class CalendarView extends View {
 
     private void drawDateElements(Canvas canvas) {
 
-        DateElement dateElements[] = mCalendarData.getDateElements();
+        DateElement dateElements[] = (DateElement[]) mCalendarData.getDateElements();
 
         TextElement currentDayLabel = mCalendarData.getDayNameTextElements()[0];
         float yOrigin = currentDayLabel.getLastYValue() + currentDayLabel.getHeight() + mContentMarginTop;

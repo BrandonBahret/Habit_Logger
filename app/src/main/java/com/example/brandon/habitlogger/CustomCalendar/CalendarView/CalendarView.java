@@ -10,6 +10,7 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.example.brandon.habitlogger.CustomCalendar.CalendarViewModelBase;
 import com.example.brandon.habitlogger.CustomCalendar.TextElement;
 import com.example.brandon.habitlogger.R;
 
@@ -23,7 +24,7 @@ public class CalendarView extends View {
 
     // This data contains the content of the rootView (Text elements, etc.)
     private CalendarViewData mCalendarData;
-    CalendarViewMonthModel model;
+    CalendarViewModelBase model;
     public static final int NUMBER_OF_CELLS = 42;
 
     //region (Measurement Member Variables)
@@ -520,7 +521,7 @@ public class CalendarView extends View {
             mStreakPaint.setColor(streakColor);
     }
 
-    public void bindModel(CalendarViewMonthModel model) {
+    public void bindModel(CalendarViewModelBase model) {
         this.model = model;
         if (mCalendarData != null) {
             mCalendarData.getTitle().setText(model.getMonthTitle());
