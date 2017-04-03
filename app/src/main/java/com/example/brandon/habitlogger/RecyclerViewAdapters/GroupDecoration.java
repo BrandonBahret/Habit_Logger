@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.support.annotation.DimenRes;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextPaint;
 import android.view.View;
@@ -40,7 +39,6 @@ public class GroupDecoration extends RecyclerView.ItemDecoration {
     public interface Callback {
         long getGroupId(int position);
 
-        @NonNull
         String getGroupFirstLine(int position);
     }
     //endregion -- end --
@@ -125,7 +123,7 @@ public class GroupDecoration extends RecyclerView.ItemDecoration {
 
             // If there isn't any text to draw then skip
             final String textLine = mCallback.getGroupFirstLine(childPosition);
-            if (textLine.isEmpty()) continue;
+            if (textLine == null || textLine.isEmpty()) continue;
 
             float textY = view.getTop() + view.getPaddingTop() - mTextVerticalOffset;
 

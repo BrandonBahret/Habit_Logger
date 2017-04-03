@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.brandon.habitlogger.HabitSessions.SessionManager;
+import com.example.brandon.habitlogger.Preferences.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
 
 /**
@@ -85,6 +87,29 @@ public class CurrentSessionCardManager {
             mViewHolder.title.setAlpha(1);
             mViewHolder.captionValue.setAlpha(1);
             mViewHolder.captionDescription.setAlpha(1);
+        }
+    }
+
+    public void updateCard(SessionManager sessionManager, PreferenceChecker preferenceChecker) {
+        int sessionCount = (int) sessionManager.getNumberOfActiveSessions();
+        updateColor(sessionCount);
+
+        if(preferenceChecker.shouldShowCurrentSessions(sessionCount))
+            setVisibility(View.VISIBLE);
+        else
+            setVisibility(View.GONE);
+
+        if (sessionCount == 0) {
+            mViewHolder.captionValue.setText(R.string.no);
+            mViewHolder.captionDescription.setText(R.string.active_sessions);
+        }
+        else if (sessionCount == 1) {
+            mViewHolder.captionValue.setText(R.string.one);
+            mViewHolder.captionDescription.setText(R.string.active_session);
+        }
+        else {
+            mViewHolder.captionValue.setText(String.valueOf(sessionCount));
+            mViewHolder.captionDescription.setText(R.string.active_sessions);
         }
     }
 
