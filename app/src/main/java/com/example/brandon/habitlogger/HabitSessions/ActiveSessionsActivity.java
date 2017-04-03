@@ -1,6 +1,7 @@
 package com.example.brandon.habitlogger.HabitSessions;
 
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Canvas;
@@ -20,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
@@ -32,6 +34,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static android.widget.Toast.makeText;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class ActiveSessionsActivity extends AppCompatActivity implements
@@ -323,5 +327,16 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     //endregion
 
     //endregion [ ---------------- end ---------------- ]
+
+    public static void startActivity(Context context) {
+        long count = new SessionManager(context).getNumberOfActiveSessions();
+        if (count != 0) {
+            Intent intent = new Intent(context, ActiveSessionsActivity.class);
+            context.startActivity(intent);
+        }
+        else {
+            makeText(context, R.string.cannot_open_active_sessions_activity, Toast.LENGTH_SHORT).show();
+        }
+    }
 
 }

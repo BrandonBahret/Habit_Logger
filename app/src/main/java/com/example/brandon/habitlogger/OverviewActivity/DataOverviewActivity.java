@@ -1,5 +1,7 @@
 package com.example.brandon.habitlogger.OverviewActivity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -232,6 +234,11 @@ public class DataOverviewActivity extends AppCompatActivity implements
     }
 
     //endregion [ ---------------- end ---------------- ]
+
+    public static void startActivity(Context context) {
+        Intent startTargetActivity = new Intent(context, DataOverviewActivity.class);
+        context.startActivity(startTargetActivity);
+    }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 

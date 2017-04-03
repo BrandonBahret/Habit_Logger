@@ -502,6 +502,12 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
             callback.updateCategoryDataSample(categoryDataSample);
     }
 
+    public static void startActivity(AppCompatActivity activity, long habitId) {
+        Intent intent = new Intent(activity, HabitActivity.class);
+        intent.putExtra(HabitActivity.HABIT_ID, habitId);
+        activity.startActivity(intent);
+    }
+
     public class HabitActivityPagerAdapter extends FragmentPagerAdapter {
         public HabitActivityPagerAdapter(FragmentManager fm) {
             super(fm);

@@ -42,7 +42,7 @@ public class CurrentSessionCardManager {
         }
     }
 
-    CurrentSessionCardManager(View view){
+    CurrentSessionCardManager(View view) {
         Context context = view.getContext();
         mViewHolder = new ViewHolder(view);
 

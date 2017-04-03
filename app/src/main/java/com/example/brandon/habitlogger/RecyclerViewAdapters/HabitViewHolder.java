@@ -91,27 +91,27 @@ public class HabitViewHolder extends ChildViewHolder {
 
                 switch (id) {
                     case R.id.habit_menu_edit:
-                        menuItemClickListener.onEditClick(habitId);
+                        menuItemClickListener.onHabitEditClick(habitId);
                         break;
 
                     case R.id.menu_enter_session:
-                        menuItemClickListener.onStartSession(habitId);
+                        menuItemClickListener.onHabitStartSession(habitId);
                         break;
 
                     case R.id.habit_menu_reset:
-                        menuItemClickListener.onResetClick(habitId);
+                        menuItemClickListener.onHabitResetClick(habitId);
                         break;
 
                     case R.id.habit_menu_delete:
-                        menuItemClickListener.onDeleteClick(habitId);
+                        menuItemClickListener.onHabitDeleteClick(habitId);
                         break;
 
                     case R.id.habit_menu_export:
-                        menuItemClickListener.onExportClick(habitId);
+                        menuItemClickListener.onHabitExportClick(habitId);
                         break;
 
                     case R.id.habit_menu_archive:
-                        menuItemClickListener.onArchiveClick(habitId);
+                        menuItemClickListener.onHabitArchiveClick(habitId);
                         break;
                 }
 

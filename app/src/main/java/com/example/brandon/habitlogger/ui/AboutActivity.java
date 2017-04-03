@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.net.Uri;
@@ -81,6 +82,11 @@ public class AboutActivity extends AppCompatActivity {
         }
     }
     //endregion -- end --
+
+    public static void startActivity(Context context) {
+        Intent startAbout = new Intent(context, AboutActivity.class);
+        context.startActivity(startAbout);
+    }
 
     private void openLink(String url) {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));

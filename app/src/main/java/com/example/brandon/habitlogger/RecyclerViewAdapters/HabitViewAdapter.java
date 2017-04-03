@@ -19,7 +19,7 @@ import java.util.List;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
 
-    //region (Memberr attributes)
+    //region (Member attributes)
     private List<Habit> mHabitsList;
     private static List<SessionEntry> mCurrentEntries;
     //endregion
@@ -29,17 +29,17 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
     private ButtonClickCallback mButtonClickCallback;
 
     public interface MenuItemClickListener {
-        void onEditClick(long habitId);
+        void onHabitEditClick(long habitId);
 
-        void onResetClick(long habitId);
+        void onHabitResetClick(long habitId);
 
-        void onDeleteClick(long habitId);
+        void onHabitDeleteClick(long habitId);
 
-        void onExportClick(long habitId);
+        void onHabitExportClick(long habitId);
 
-        void onArchiveClick(long habitId);
+        void onHabitArchiveClick(long habitId);
 
-        void onStartSession(long habitId);
+        void onHabitStartSession(long habitId);
     }
 
     public interface ButtonClickCallback {
@@ -127,7 +127,7 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
         return null;
     }
 
-    private int getAdapterItemPosition(long habitId) {
+    public int getAdapterItemPosition(long habitId) {
         for (int position = 0; position < getItemCount(); position++) {
             if (mHabitsList.get(position).getDatabaseId() == habitId)
                 return position;

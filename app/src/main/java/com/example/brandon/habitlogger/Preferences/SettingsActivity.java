@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.Preferences;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
@@ -10,6 +11,7 @@ import android.view.MenuItem;
 
 import com.example.brandon.habitlogger.HabitSessions.SessionNotificationManager;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.RequestCodes;
 
 public class SettingsActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -109,5 +111,10 @@ public class SettingsActivity extends AppCompatActivity
             recreate();
     }
     //endregion -- end --
+
+    public static void startActivity(AppCompatActivity activity) {
+        Intent startSettings = new Intent(activity, SettingsActivity.class);
+        activity.startActivityForResult(startSettings, RequestCodes.SETTINGS_ACTIVITY);
+    }
 
 }

@@ -84,22 +84,6 @@ public final class CategoryDataSample extends ExpandableGroup<Habit> {
     };
     //endregion
 
-    /**
-     * @param timestamp Epoch timestamp for a certain date to search for.
-     */
-    public CategoryDataSample getDataSampleForDate(long timestamp) {
-
-        List<Habit> habits = new ArrayList<>(mHabits.size());
-
-        for (int i = 0; i < mHabits.size(); i++) {
-            habits.add(i, Habit.duplicate(mHabits.get(i)));
-            List<SessionEntry> entriesForDate = habits.get(i).filterEntriesForDate(timestamp);
-            habits.get(i).setEntries(entriesForDate);
-        }
-
-        return new CategoryDataSample(mCategory, habits, timestamp, timestamp);
-    }
-
     //region Methods With One Time Calculations {}
     public long calculateTotalDuration() {
 
@@ -124,6 +108,22 @@ public final class CategoryDataSample extends ExpandableGroup<Habit> {
         return mSessionEntries;
     }
     //endregion
+
+    /**
+     * @param timestamp Epoch timestamp for a certain date to search for.
+     */
+    public CategoryDataSample getDataSampleForDate(long timestamp) {
+
+        List<Habit> habits = new ArrayList<>(mHabits.size());
+
+        for (int i = 0; i < mHabits.size(); i++) {
+            habits.add(i, Habit.duplicate(mHabits.get(i)));
+            List<SessionEntry> entriesForDate = habits.get(i).filterEntriesForDate(timestamp);
+            habits.get(i).setEntries(entriesForDate);
+        }
+
+        return new CategoryDataSample(mCategory, habits, timestamp, timestamp);
+    }
 
     //region Getters {}
     public static MyCollectionUtils.IGetKey<CategoryDataSample, Long> IGetEntriesDuration = new MyCollectionUtils.IGetKey<CategoryDataSample, Long>() {

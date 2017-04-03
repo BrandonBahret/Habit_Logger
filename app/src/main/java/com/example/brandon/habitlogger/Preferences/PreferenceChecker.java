@@ -48,6 +48,14 @@ public class PreferenceChecker {
         );
     }
 
+    /**
+     * @param sessionCount The number of active sessions
+     * @return True if the current sessions card should be shown under these conditions.
+     */
+    public boolean shouldShowCurrentSessions(int sessionCount){
+        return doShowCurrentSessions() && (sessionCount > 0 || doAlwaysShowCurrentSessions());
+    }
+
     public boolean doHideCurrentSessionCard() {
         return preferences.getBoolean(
                 mContext.getString(R.string.pref_hide_current_sessions_card_on_scroll), false

@@ -1,6 +1,7 @@
 package com.example.brandon.habitlogger.HabitSessions;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import com.example.brandon.habitlogger.common.MyColorUtils;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.databinding.ActivitySessionBinding;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -377,5 +379,11 @@ public class SessionActivity extends AppCompatActivity implements
     //endregion -- end --
 
     //endregion [ ---------------- end ---------------- ]
+
+    public static void startActivity(AppCompatActivity activity, Habit habit) {
+        Intent intent = new Intent(activity, SessionActivity.class);
+        intent.putExtra(SessionActivity.BundleKeys.SERIALIZED_HABIT, (Serializable) habit);
+        activity.startActivity(intent);
+    }
 
 }
