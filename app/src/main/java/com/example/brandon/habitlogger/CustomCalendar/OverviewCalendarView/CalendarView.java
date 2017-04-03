@@ -24,7 +24,7 @@ public class CalendarView extends View {
 
     // This data contains the content of the rootView (Text elements, etc.)
     private CalendarViewData mCalendarData;
-    CalendarViewMonthModel model;
+    CalendarViewMonthModel mModel;
     public static final int NUMBER_OF_CELLS = 42;
 
     //region (Measurement Member Variables)
@@ -314,12 +314,12 @@ public class CalendarView extends View {
         float totalCalendarElementsHeight = (dateElements[0].getDiameter()) * 6;
         float elementSpace = (calendarHeight - totalCalendarElementsHeight) / 6f;
 
-        int firstDay = model.getFirstWeekDay();
-        int totalDays = model.getCalendarMonth().getActualMaximum(Calendar.DAY_OF_MONTH);
+        int firstDay = mModel.getFirstWeekDay();
+        int totalDays = mModel.getCalendarMonth().getActualMaximum(Calendar.DAY_OF_MONTH);
         int maxCell = totalDays + firstDay;
 
-        int modelMonth = model.getCalendarMonth().get(Calendar.MONTH);
-        int modelYear = model.getCalendarMonth().get(Calendar.YEAR);
+        int modelMonth = mModel.getCalendarMonth().get(Calendar.MONTH);
+        int modelYear = mModel.getCalendarMonth().get(Calendar.YEAR);
 
         Calendar c = Calendar.getInstance();
         int currentDate = c.get(Calendar.DAY_OF_MONTH);
@@ -354,7 +354,7 @@ public class CalendarView extends View {
                 TextElement text = new TextElement(String.valueOf(thisDay), mDateElementPaint);
                 text.makeMeasurements();
                 currentElement.setDateText(text);
-                currentElement.setPieData(model.getPieDataSetForDate(thisDay));
+                currentElement.setPieData(mModel.getPieDataSetForDate(thisDay));
             }
 
             currentElement.draw(canvas, x, y);
@@ -376,7 +376,7 @@ public class CalendarView extends View {
                     TextElement text = new TextElement(String.valueOf(thisDay), mDateElementPaint);
                     text.makeMeasurements();
                     currentElement.setDateText(text);
-                    currentElement.setPieData(model.getPieDataSetForDate(thisDay));
+                    currentElement.setPieData(mModel.getPieDataSetForDate(thisDay));
 
                     if (!pastCurrentDate && isCurrentMonth && thisDay == currentDate) {
                         pastCurrentDate = true;
@@ -390,8 +390,7 @@ public class CalendarView extends View {
         }
     }
 
-    //region // Getters
-
+    //region Getters {}
     /**
      * @return The color used for text.
      */
@@ -407,14 +406,6 @@ public class CalendarView extends View {
     }
 
     /**
-     * @param color The color to be used for text.
-     */
-    public void setTextColor(int color) {
-        mTextColor = color;
-        invalidateTextPaintAndMeasurements();
-    }
-
-    /**
      * @return The background drawable.
      */
     public Drawable getExampleDrawable() {
@@ -424,24 +415,15 @@ public class CalendarView extends View {
     public int getBackgroundColor() {
         return mBackgroundColor;
     }
+    //endregion -- end --
 
-    //endregion // Getters
-
-    //region // Setters
-
+    //region Setters {}
     /**
-     * @param textSize The size to be used for text.
+     * @param color The color to be used for text.
      */
-    public void setExampleDimension(float textSize) {
-        mTextSize = textSize;
+    public void setTextColor(int color) {
+        mTextColor = color;
         invalidateTextPaintAndMeasurements();
-    }
-
-    /**
-     * @param backgroundDrawable The background drawable to drawn above the background color.
-     */
-    public void setExampleDrawable(Drawable backgroundDrawable) {
-        mBackgroundDrawable = backgroundDrawable;
     }
 
     /**
@@ -452,8 +434,8 @@ public class CalendarView extends View {
         invalidateTextPaintAndMeasurements();
     }
 
-    public void bindModel(CalendarViewMonthModel model) {
-        this.model = model;
+    public void setModel(CalendarViewMonthModel model) {
+        mModel = model;
         if (mCalendarData != null) {
             mCalendarData.getTitle().setText(model.getMonthTitle());
             invalidateTextPaintAndMeasurements();
@@ -461,5 +443,5 @@ public class CalendarView extends View {
             invalidate();
         }
     }
-    //endregion // Setters
+    //endregion -- end --
 }

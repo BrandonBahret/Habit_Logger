@@ -59,7 +59,7 @@ public class CalendarViewAdapter extends CalendarViewAdapterBase<CalendarViewAda
 
     @Override
     protected void bindModel(ViewHolder holder, CalendarViewModelBase model) {
-        holder.calendarView.bindModel(model);
+        holder.calendarView.setModel(model);
     }
     //endregion -- end --
 

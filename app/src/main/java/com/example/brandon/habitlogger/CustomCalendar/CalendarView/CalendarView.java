@@ -22,12 +22,11 @@ import java.util.Calendar;
 
 public class CalendarView extends View {
 
-    // This data contains the content of the rootView (Text elements, etc.)
+    //region ( ---- Member attributes ---- )
     private CalendarViewData mCalendarData;
-    CalendarViewModelBase model;
-    public static final int NUMBER_OF_CELLS = 42;
+    private CalendarViewModelBase mModel;
 
-    //region (Measurement Member Variables)
+    //region (Measurements)
     private int mPaddingLeft;
     private int mPaddingRight;
     private int mPaddingTop;
@@ -35,7 +34,13 @@ public class CalendarView extends View {
 
     private int mContentWidth;
     private int mContentHeight;
-    //endregion
+    //endregion -- end --
+
+    //region (Dimensions)
+    private float mTextSize = getResources().getDimension(R.dimen.labels_text_size);
+    private float mDateTextSize = getResources().getDimension(R.dimen.labels_text_size);
+    private float mDateRadius = 48;
+    //endregion -- end --
 
     //region (Colors and Paints)
     private int mStreakColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
@@ -53,17 +58,13 @@ public class CalendarView extends View {
     private TextPaint mDateTextPaint;
     private TextPaint mStreakPaint;
     private TextPaint mDateElementPaint;
-    //endregion
+    //endregion -- end --
 
     //region (Drawables)
     private Drawable mBackgroundDrawable = ContextCompat.getDrawable(getContext(), R.drawable.background_simple_rectangle);
-    //endregion
+    //endregion -- end --
 
-    //region (Dimensions)
-    private float mTextSize = getResources().getDimension(R.dimen.labels_text_size);
-    private float mDateTextSize = getResources().getDimension(R.dimen.labels_text_size);
-    private float mDateRadius = 48;
-    //endregion
+    //endregion ( ---- end ---- )
 
     //region Constructors {}
     public CalendarView(Context context) {
@@ -80,7 +81,6 @@ public class CalendarView extends View {
         super(context, attrs, defStyle);
         init(attrs, defStyle);
     }
-    //endregion
 
     private void init(AttributeSet attrs, int defStyle) {
 
@@ -193,8 +193,9 @@ public class CalendarView extends View {
         invalidatePaddingAndContentMeasurements();
         invalidateTextPaintAndMeasurements();
     }
+    //endregion -- end --
 
-    //region Make measurements {}
+    //region Methods responsible for making measurements
     private void invalidatePaddingAndContentMeasurements() {
         mPaddingLeft = getPaddingLeft();
         mPaddingTop = getPaddingTop();
@@ -237,8 +238,9 @@ public class CalendarView extends View {
 
         mCalendarData.makeMeasurements();
     }
-    //endregion // Make measurements
+    //endregion -- end --
 
+    //region Methods responsible for drawing the view
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -318,12 +320,12 @@ public class CalendarView extends View {
         float totalCalendarElementsHeight = dateElements[0].getDiameter() * 6;
         float elementSpace = (calendarHeight - totalCalendarElementsHeight) / 6f;
 
-        int firstDay = model.getFirstWeekDay();
-        int totalDays = model.getCalendarMonth().getActualMaximum(Calendar.DAY_OF_MONTH);
+        int firstDay = mModel.getFirstWeekDay();
+        int totalDays = mModel.getCalendarMonth().getActualMaximum(Calendar.DAY_OF_MONTH);
         int maxCell = totalDays + firstDay;
 
-        int modelMonth = model.getCalendarMonth().get(Calendar.MONTH);
-        int modelYear = model.getCalendarMonth().get(Calendar.YEAR);
+        int modelMonth = mModel.getCalendarMonth().get(Calendar.MONTH);
+        int modelYear = mModel.getCalendarMonth().get(Calendar.YEAR);
 
         Calendar c = Calendar.getInstance();
         int currentDate = c.get(Calendar.DAY_OF_MONTH);
@@ -348,11 +350,11 @@ public class CalendarView extends View {
             else {
                 int thisDay = day - (firstDay - 2);
 
-                if (model.getDatesWithEntries().contains(thisDay)) {
+                if (mModel.getDatesWithEntries().contains(thisDay)) {
                     currentElement.setTextPaint(mStreakPaint);
 
-                    boolean isAStreak = (day == 0 && model.getDatesWithEntries().contains(thisDay - 1)) ||
-                            model.getDatesWithEntries().contains(thisDay + 1);
+                    boolean isAStreak = (day == 0 && mModel.getDatesWithEntries().contains(thisDay - 1)) ||
+                            mModel.getDatesWithEntries().contains(thisDay + 1);
 
                     currentElement.setIsAStreak(isAStreak);
                 }
@@ -373,7 +375,7 @@ public class CalendarView extends View {
 
             }
 
-//            else if (model.getDatesWithEntries().contains(day))
+//            else if (mModel.getDatesWithEntries().contains(day))
 //                currentElement.setTextPaint(mStreakPaint);
 
             if (currentElement.getIsAStreak()) {
@@ -385,9 +387,9 @@ public class CalendarView extends View {
                     x2 = element.getLastXValue();
                 }
                 int thisDay = day - (firstDay - 2);
-                if (day == 0 && model.getDatesWithEntries().contains(thisDay - 1)) {
+                if (day == 0 && mModel.getDatesWithEntries().contains(thisDay - 1)) {
                     x1 = 0;
-                    x2 = model.getDatesWithEntries().contains(thisDay + 1) ? x2 : x;
+                    x2 = mModel.getDatesWithEntries().contains(thisDay + 1) ? x2 : x;
                 }
 
                 currentElement.drawStreakLine(canvas, y, x1, x2);
@@ -405,11 +407,11 @@ public class CalendarView extends View {
                     currentElement.setTextPaint(mDateTextPaint);
                 else {
                     int thisDay = dayIndex - (firstDay - 2);
-                    if (model.getDatesWithEntries().contains(thisDay)) {
+                    if (mModel.getDatesWithEntries().contains(thisDay)) {
                         currentElement.setTextPaint(mStreakPaint);
 
-                        boolean isAStreak = (day == 0 && model.getDatesWithEntries().contains(thisDay - 1)) ||
-                                model.getDatesWithEntries().contains(thisDay + 1);
+                        boolean isAStreak = (day == 0 && mModel.getDatesWithEntries().contains(thisDay - 1)) ||
+                                mModel.getDatesWithEntries().contains(thisDay + 1);
 
                         currentElement.setIsAStreak(isAStreak);
                     }
@@ -428,7 +430,7 @@ public class CalendarView extends View {
                     }
                 }
 
-//                else if (model.getDatesWithEntries().contains(day))
+//                else if (mModel.getDatesWithEntries().contains(day))
 //                    currentElement.setTextPaint(mStreakPaint);
 
                 if (currentElement.getIsAStreak()) {
@@ -440,9 +442,9 @@ public class CalendarView extends View {
                         x2 = element.getLastXValue();
                     }
                     int thisDay = dayIndex - (firstDay - 2);
-                    if (day == 0 && model.getDatesWithEntries().contains(thisDay - 1)) {
+                    if (day == 0 && mModel.getDatesWithEntries().contains(thisDay - 1)) {
                         x1 = 0;
-                        x2 = model.getDatesWithEntries().contains(thisDay + 1) ? x2 : x;
+                        x2 = mModel.getDatesWithEntries().contains(thisDay + 1) ? x2 : x;
                     }
 
                     currentElement.drawStreakLine(canvas, y, x1, x2);
@@ -452,9 +454,9 @@ public class CalendarView extends View {
 
         }
     }
+    //endregion -- end --
 
-    //region // Getters
-
+    //region Getters {}
     /**
      * @return The color used for text.
      */
@@ -477,36 +479,12 @@ public class CalendarView extends View {
         invalidateTextPaintAndMeasurements();
     }
 
-    /**
-     * @return The background drawable.
-     */
-    public Drawable getExampleDrawable() {
-        return mBackgroundDrawable;
-    }
-
     public int getBackgroundColor() {
         return mBackgroundColor;
     }
+    //endregion -- end --
 
-    //endregion // Getters
-
-    //region // Setters
-
-    /**
-     * @param textSize The size to be used for text.
-     */
-    public void setExampleDimension(float textSize) {
-        mTextSize = textSize;
-        invalidateTextPaintAndMeasurements();
-    }
-
-    /**
-     * @param backgroundDrawable The background drawable to drawn above the background color.
-     */
-    public void setExampleDrawable(Drawable backgroundDrawable) {
-        mBackgroundDrawable = backgroundDrawable;
-    }
-
+    //region Setters {}
     /**
      * @param color The color to be drawn under the background drawable.
      */
@@ -521,8 +499,8 @@ public class CalendarView extends View {
             mStreakPaint.setColor(streakColor);
     }
 
-    public void bindModel(CalendarViewModelBase model) {
-        this.model = model;
+    public void setModel(CalendarViewModelBase model) {
+        this.mModel = model;
         if (mCalendarData != null) {
             mCalendarData.getTitle().setText(model.getMonthTitle());
             invalidateTextPaintAndMeasurements();
@@ -530,5 +508,6 @@ public class CalendarView extends View {
             invalidate();
         }
     }
-    //endregion // Setters
+    //endregion -- end --
+
 }
