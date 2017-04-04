@@ -2,7 +2,7 @@ package com.example.brandon.habitlogger.data;
 
 import android.text.format.DateUtils;
 
-import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 
 import java.util.Collections;

@@ -14,7 +14,7 @@
 
         <!--Broadcast receiver to detect when session notifications are paused/resumed by the user-->
         <receiver
-            android:name=".HabitSessions.SessionNotificationManager$SessionToggle"
+            android:name=".data.HabitSessions.SessionNotificationManager$SessionToggle"
             android:exported="false">
 
             <intent-filter>
@@ -25,7 +25,7 @@
 
         <!--Export Data Local activity (for providing the option to save locally in chooser)-->
         <activity
-            android:name=".DataExportHelpers.LocalExportActivity"
+            android:name=".data.DataExportHelpers.LocalExportActivity"
             android:exported="false"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
 
@@ -41,7 +41,7 @@
 
         <!--Main Activity-->
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.Activities.MainActivity.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
@@ -55,23 +55,23 @@
 
         <!--Session Activity-->
         <activity
-            android:name=".HabitSessions.SessionActivity"
+            android:name=".ui.Activities.SessionActivity"
             android:label="@string/habit_session_activity_label"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme"/>
 
         <!--Active Session Activity-->
         <activity
-            android:name=".HabitSessions.ActiveSessionsActivity"
+            android:name=".ui.Activities.ActiveSessionsActivity.ActiveSessionsActivity"
             android:label="@string/active_habits_activity_label"
-            android:parentActivityName=".ui.MainActivity"
+            android:parentActivityName=".ui.Activities.MainActivity.MainActivity"
             android:theme="@style/AppTheme"/>
 
         <!--About Activity-->
         <activity
-            android:name=".ui.AboutActivity"
+            android:name=".ui.Activities.AboutActivity"
             android:label="@string/about_activity_label"
-            android:parentActivityName=".ui.MainActivity"
+            android:parentActivityName=".ui.Activities.MainActivity.MainActivity"
             android:theme="@style/AppTheme">
 
             <intent-filter>
@@ -83,8 +83,8 @@
 
         <!--Settings Activity-->
         <activity
-            android:name=".Preferences.SettingsActivity"
-            android:parentActivityName=".ui.MainActivity">
+            android:name=".ui.Activities.PreferencesActivity.SettingsActivity"
+            android:parentActivityName=".ui.Activities.MainActivity.MainActivity">
 
             <intent-filter>
                 <action android:name=".Preferences.SettingsActivity"/>
@@ -96,28 +96,28 @@
 
         <!--Habit Activity-->
         <activity
-            android:name=".HabitActivity.HabitActivity"
+            android:name=".ui.Activities.HabitActivity.HabitActivity"
             android:label="@string/title_activity_habit"
             android:launchMode="singleTop"
-            android:parentActivityName=".ui.MainActivity"
+            android:parentActivityName=".ui.Activities.MainActivity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.MainActivity"/>
+                android:value=".ui.Activities.MainActivity.MainActivity"/>
 
         </activity>
 
         <!--Data Overview Activity-->
         <activity
-            android:name=".OverviewActivity.DataOverviewActivity"
+            android:name=".ui.Activities.OverviewActivity.DataOverviewActivity"
             android:label="@string/title_activity_overall_statistics"
-            android:parentActivityName=".ui.MainActivity"
+            android:parentActivityName=".ui.Activities.MainActivity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.brandon.habitlogger.ui.MainActivity"/>
+                android:value=".ui.Activities.MainActivity.MainActivity"/>
 
         </activity>
 

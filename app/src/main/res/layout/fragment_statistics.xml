@@ -4,7 +4,7 @@
     android:id="@+id/statistics_fragment_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.brandon.habitlogger.HabitActivity.StatisticsFragment">
+    tools:context=".ui.Activities.HabitActivity.Fragments.StatisticsFragment">
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/statistics_container"
@@ -22,42 +22,42 @@
 
             <fragment
                 android:id="@+id/pie_graph_completion"
-                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.PieGraphCompletion"
+                android:name="com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.StatisticsFragments.PieGraphCompletion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:layout="@layout/fragment_pie_graph_completion"/>
 
             <fragment
                 android:id="@+id/line_graph_completion"
-                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.LineGraphCompletion"
+                android:name="com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.StatisticsFragments.LineGraphCompletion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:layout="@layout/fragment_line_graph_completion"/>
 
             <fragment
                 android:id="@+id/time_averages"
-                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.TimeAverages"
+                android:name="com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.StatisticsFragments.TimeAverages"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:layout="@layout/fragment_time_averages"/>
 
             <fragment
                 android:id="@+id/streaks"
-                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.StreaksFragment"
+                android:name="com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.StatisticsFragments.StreaksFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:layout="@layout/fragment_streaks"/>
 
             <fragment
                 android:id="@+id/distribution_starting_time"
-                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.DistributionStartingTime"
+                android:name="com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.StatisticsFragments.DistributionStartingTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:layout="@layout/fragment_distribution_starting_time"/>
 
             <fragment
                 android:id="@+id/pie_graph_duration"
-                android:name="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.PieGraphDuration"
+                android:name="com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.StatisticsFragments.PieGraphDuration"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:layout="@layout/fragment_pie_graph_duration"/>

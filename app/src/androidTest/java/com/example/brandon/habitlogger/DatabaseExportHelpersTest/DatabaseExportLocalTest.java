@@ -3,11 +3,11 @@ package com.example.brandon.habitlogger.DatabaseExportHelpersTest;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 
-import com.example.brandon.habitlogger.DataExportHelpers.LocalDataExportManager;
-import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
-import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.HabitDatabase.HabitDatabase;
+import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 
 import java.util.ArrayList;
 import java.util.List;

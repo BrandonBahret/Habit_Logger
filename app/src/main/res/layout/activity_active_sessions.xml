@@ -8,7 +8,7 @@
         android:id="@+id/activity_active_sessions"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.example.brandon.habitlogger.HabitSessions.ActiveSessionsActivity">
+        tools:context=".ui.Activities.ActiveSessionsActivity.ActiveSessionsActivity">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/session_view_container"

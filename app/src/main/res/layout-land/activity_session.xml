@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:descendantFocusability="beforeDescendants"
         android:focusableInTouchMode="true"
-        tools:context="com.example.brandon.habitlogger.HabitSessions.SessionActivity">
+        tools:context=".ui.Activities.SessionActivity">
 
         <LinearLayout
             android:id="@+id/entire_session_time_display_layout"

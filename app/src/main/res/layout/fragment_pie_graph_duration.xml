@@ -1,7 +1,7 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.brandon.habitlogger.HabitActivity.StatisticsFragments.TimeAverages">
+    tools:context=".ui.Activities.HabitActivity.Fragments.StatisticsFragments.TimeAverages">
 
     <FrameLayout
         android:layout_width="match_parent"

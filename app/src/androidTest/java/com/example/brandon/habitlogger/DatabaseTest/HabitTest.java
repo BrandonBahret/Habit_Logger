@@ -3,9 +3,9 @@ package com.example.brandon.habitlogger.DatabaseTest;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
-import com.example.brandon.habitlogger.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.HabitDatabase.DataModels.HabitCategory;
-import com.example.brandon.habitlogger.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
