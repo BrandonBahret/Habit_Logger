@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.ui.Dialogs.AttributionsDialog;
 
 public class AboutActivity extends AppCompatActivity {
 
@@ -55,6 +56,10 @@ public class AboutActivity extends AppCompatActivity {
         switch (id) {
             case R.id.share:
                 share();
+                break;
+
+            case R.id.attributions:
+                AttributionsDialog.showLicensesDialog(AboutActivity.this);
                 break;
 
             case android.R.id.home:

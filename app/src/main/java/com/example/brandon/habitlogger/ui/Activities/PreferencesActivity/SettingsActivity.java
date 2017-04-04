@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionNotificationManager;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.RequestCodes;
+import com.example.brandon.habitlogger.ui.Dialogs.AttributionsDialog;
 
 public class SettingsActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -93,8 +94,11 @@ public class SettingsActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
         if (key.equals(getString(R.string.pref_do_show_notifications))) {
 
             if (mPreferenceChecker.doShowNotifications())

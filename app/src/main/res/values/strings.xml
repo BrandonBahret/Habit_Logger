@@ -128,5 +128,7 @@
     <string name="pref_do_show_notifications">preference_do_show_notifications</string>
     <string name="pref_do_show_notifications_auto">preference_do_automatically_show_notifications</string>
     <string name="pref_date_format">preference_date_format</string>
+    <string name="licenses_and_attributions"><![CDATA[Licenses & Attributions]]></string>
+    <string name="title_activity_licenses">LicensesActivity</string>
 
 </resources>

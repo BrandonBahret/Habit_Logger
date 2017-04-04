@@ -19,6 +19,7 @@
     <color name="shadow_black">#1e000000</color>
     <color name="background">#eaeaea</color>
     <color name="darker_background">#e1e1e1</color>
+    <color name="transparent">#00ffffff</color>
 
     <color name="headerTextColor">#797979</color>
     <color name="navigation_drawer_item_color">#89000000</color>

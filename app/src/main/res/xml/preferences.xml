@@ -99,7 +99,9 @@
     <PreferenceScreen
         android:icon="@drawable/ic_info_outline_black_24dp"
         android:title="About">
+
         <intent android:action=".ui.AboutActivity"/>
+
     </PreferenceScreen>
 
 </PreferenceScreen>

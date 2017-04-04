@@ -12,113 +12,103 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!--Broadcast receiver to detect when session notifications are paused/resumed by the user-->
+        <!-- Broadcast receiver to detect when session notifications are paused/resumed by the user -->
         <receiver
             android:name=".data.HabitSessions.SessionNotificationManager$SessionToggle"
             android:exported="false">
-
             <intent-filter>
                 <action android:name="session_toggle_pressed"/>
             </intent-filter>
-
         </receiver>
 
-        <!--Export Data Local activity (for providing the option to save locally in chooser)-->
+        <!-- Export Data Local activity (for providing the option to save locally in chooser) -->
         <activity
             android:name=".data.DataExportHelpers.LocalExportActivity"
             android:exported="false"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
-
             <intent-filter
                 android:icon="@drawable/ic_save_black_24dp"
                 android:label="Save Locally">
                 <action android:name="android.intent.action.SEND"/>
+
                 <category android:name="android.intent.category.DEFAULT"/>
+
                 <data android:mimeType="text/csv"/>
             </intent-filter>
-
         </activity>
 
-        <!--Main Activity-->
+        <!-- Main Activity -->
         <activity
             android:name=".ui.Activities.MainActivity.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-
         </activity>
 
-        <!--Session Activity-->
+        <!-- Session Activity -->
         <activity
             android:name=".ui.Activities.SessionActivity"
             android:label="@string/habit_session_activity_label"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme"/>
 
-        <!--Active Session Activity-->
+        <!-- Active Session Activity -->
         <activity
             android:name=".ui.Activities.ActiveSessionsActivity.ActiveSessionsActivity"
             android:label="@string/active_habits_activity_label"
             android:parentActivityName=".ui.Activities.MainActivity.MainActivity"
             android:theme="@style/AppTheme"/>
 
-        <!--About Activity-->
+        <!-- Settings Activity -->
+        <activity
+            android:name=".ui.Activities.PreferencesActivity.SettingsActivity"
+            android:parentActivityName=".ui.Activities.MainActivity.MainActivity">
+            <intent-filter>
+                <action android:name=".Preferences.SettingsActivity"/>
+
+                <data android:mimeType="text/*"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <!-- About Activity -->
         <activity
             android:name=".ui.Activities.AboutActivity"
             android:label="@string/about_activity_label"
-            android:parentActivityName=".ui.Activities.MainActivity.MainActivity"
             android:theme="@style/AppTheme">
-
             <intent-filter>
                 <action android:name=".ui.AboutActivity"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
-
         </activity>
 
-        <!--Settings Activity-->
-        <activity
-            android:name=".ui.Activities.PreferencesActivity.SettingsActivity"
-            android:parentActivityName=".ui.Activities.MainActivity.MainActivity">
-
-            <intent-filter>
-                <action android:name=".Preferences.SettingsActivity"/>
-                <data android:mimeType="text/*"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-
-        </activity>
-
-        <!--Habit Activity-->
+        <!-- Habit Activity -->
         <activity
             android:name=".ui.Activities.HabitActivity.HabitActivity"
             android:label="@string/title_activity_habit"
             android:launchMode="singleTop"
             android:parentActivityName=".ui.Activities.MainActivity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.Activities.MainActivity.MainActivity"/>
-
         </activity>
 
-        <!--Data Overview Activity-->
+        <!-- Data Overview Activity -->
         <activity
             android:name=".ui.Activities.OverviewActivity.DataOverviewActivity"
             android:label="@string/title_activity_overall_statistics"
             android:parentActivityName=".ui.Activities.MainActivity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.Activities.MainActivity.MainActivity"/>
-
         </activity>
 
     </application>
