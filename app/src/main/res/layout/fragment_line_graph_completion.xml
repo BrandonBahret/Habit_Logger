@@ -12,7 +12,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            app:cardBackgroundColor="@color/habitCard"
+            app:cardBackgroundColor="@color/defaultCardViewBackground"
             app:contentPadding="8dp">
 
             <LinearLayout
@@ -23,7 +23,7 @@
 
                 <TextView
                     android:id="@+id/title"
-                    style="@style/card_title"
+                    style="@style/statisticsTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="8dp"

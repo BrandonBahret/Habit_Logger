@@ -34,7 +34,7 @@ import com.example.brandon.habitlogger.common.MyColorUtils;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.databinding.ActivityHabitBinding;
-import com.example.brandon.habitlogger.ui.Widgets.ViewGroupManagers.FloatingDateRangeWidgetManager;
+import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
 
 import java.io.Serializable;

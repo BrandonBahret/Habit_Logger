@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ui.Activities.RecyclerViewDecorations;
+package com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -65,8 +65,8 @@ public class GroupDecoration extends RecyclerView.ItemDecoration {
     }
 
     private void fetchColors(Context context) {
-        mBackdropColor = getColor(context, R.color.darker_background);
-        mTextColor = getColor(context, R.color.headerTextColor);
+        mBackdropColor = getColor(context, R.color.itemDecorationBackground);
+        mTextColor = getColor(context, R.color.itemDecorationText);
     }
 
     private void createPaints() {

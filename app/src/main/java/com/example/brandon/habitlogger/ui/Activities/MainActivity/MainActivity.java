@@ -40,8 +40,8 @@ import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.DataOvervi
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.SettingsActivity;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.ui.Activities.RecyclerViewDecorations.GroupDecoration;
-import com.example.brandon.habitlogger.ui.Activities.RecyclerViewDecorations.SpaceOffsetDecoration;
+import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.GroupDecoration;
+import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.RequestCodes;
@@ -49,7 +49,7 @@ import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.databinding.ActivityMainBinding;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.RecyclerViewScrollObserver;
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity;
-import com.example.brandon.habitlogger.ui.Widgets.ViewGroupManagers.CurrentSessionCardManager;
+import com.example.brandon.habitlogger.ui.Widgets.CurrentSessionCardManager;
 import com.github.clans.fab.FloatingActionButton;
 
 import java.util.ArrayList;

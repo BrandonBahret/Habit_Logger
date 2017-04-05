@@ -10,7 +10,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/habitCard"
+        android:background="@color/defaultCardViewBackground"
         android:clickable="false"
         android:focusable="false">
 
@@ -33,7 +33,7 @@
             android:padding="3dp"
             android:scaleType="fitXY"
             android:src="@drawable/ic_play_black_24dp"
-            android:tint="@color/habitCardButtonColor"/>
+            android:tint="@color/defaultDarkIconTint"/>
 
         <TextView
             android:id="@+id/active_habit_time"

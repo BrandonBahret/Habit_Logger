@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ui.Activities.RecyclerViewDecorations;
+package com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations;
 
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;

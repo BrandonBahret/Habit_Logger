@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ui.Widgets.ViewGroupManagers;
+package com.example.brandon.habitlogger.ui.Widgets;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -48,11 +48,11 @@ public class CurrentSessionCardManager {
         Context context = view.getContext();
         mViewHolder = new ViewHolder(view);
 
-        mBackgroundColor = ContextCompat.getColor(context, R.color.cardBackgroundColor);
-        mAccentColor = ContextCompat.getColor(context, R.color.colorAccent);
+        mBackgroundColor = ContextCompat.getColor(context, R.color.currentSessionsBackground);
+        mAccentColor = ContextCompat.getColor(context, R.color.currentSessionsAccent);
 
-        mDisabledBackgroundColor = ContextCompat.getColor(context, R.color.cardBackgroundDisabledColor);
-        mDisabledAccentColor = ContextCompat.getColor(context, R.color.colorAccentDisabled);
+        mDisabledBackgroundColor = ContextCompat.getColor(context, R.color.currentSessionsBackgroundDisabled);
+        mDisabledAccentColor = ContextCompat.getColor(context, R.color.currentSessionsAccentDisabled);
     }
 
     //region Methods responsible for hiding/showing the current sessions card

@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ui.Widgets.ViewGroupManagers;
+package com.example.brandon.habitlogger.ui.Widgets;
 
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;

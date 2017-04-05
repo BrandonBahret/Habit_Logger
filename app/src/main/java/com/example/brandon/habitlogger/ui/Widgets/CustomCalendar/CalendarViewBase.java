@@ -46,7 +46,7 @@ public abstract class CalendarViewBase extends View {
     private int mTitleColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
     protected int mDateTextColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
     private int mBackgroundColor = ContextCompat.getColor(getContext(), R.color.background);
-    private int mCalendarBackgroundColor = ContextCompat.getColor(getContext(), R.color.habitCard);
+    private int mCalendarBackgroundColor = ContextCompat.getColor(getContext(), R.color.defaultCardViewBackground);
     private int mDateElementColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
 
     private TextPaint mBackgroundPaint;

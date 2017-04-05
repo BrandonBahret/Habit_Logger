@@ -5,7 +5,7 @@
     android:id="@+id/category_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardBackgroundColor="@color/cardBackgroundColor"
+    app:cardBackgroundColor="@color/currentSessionsBackground"
     app:cardCornerRadius="4dp">
 
     <LinearLayout

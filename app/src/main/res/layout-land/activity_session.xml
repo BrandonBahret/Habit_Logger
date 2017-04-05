@@ -36,7 +36,7 @@
                 android:contentDescription="@string/session_pause_play_content_description"
                 android:scaleType="fitXY"
                 android:src="@drawable/ic_play_black_24dp"
-                android:tint="@color/habitCardButtonColor"/>
+                android:tint="@color/defaultDarkIconTint"/>
 
             <LinearLayout
                 android:id="@+id/session_time_display_layout"

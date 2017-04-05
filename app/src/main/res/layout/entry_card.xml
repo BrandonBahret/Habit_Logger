@@ -8,7 +8,7 @@
     android:layout_height="wrap_content"
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
-    card_view:cardBackgroundColor="@color/habitCard"
+    card_view:cardBackgroundColor="@color/defaultCardViewBackground"
 
     card_view:cardCornerRadius="4dp"
     card_view:cardElevation="4dp">

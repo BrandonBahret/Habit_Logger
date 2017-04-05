@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
-    card_view:cardBackgroundColor="@color/habitCard"
+    card_view:cardBackgroundColor="@color/defaultCardViewBackground"
     card_view:cardCornerRadius="4dp"
     card_view:cardElevation="4dp">
 
@@ -26,7 +26,7 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/habitCard">
+            android:background="@color/defaultCardViewBackground">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -48,7 +48,7 @@
                     android:scaleType="fitXY"
 
                     android:src="@drawable/ic_play_black_24dp"
-                    android:tint="@color/habitCardButtonColor"/>
+                    android:tint="@color/defaultDarkIconTint"/>
 
                 <TextView
                     android:id="@+id/habit_card_time_display"
@@ -65,13 +65,13 @@
                 android:id="@+id/card_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
-                android:background="@color/habitCard"
+                android:background="@color/defaultCardViewBackground"
                 card_view:contentInsetEnd="0dp"
                 card_view:contentInsetLeft="8dp"
                 card_view:contentInsetRight="0dp"
                 card_view:contentInsetStart="8dp"
                 card_view:title="@string/habit_name"
-                card_view:titleTextAppearance="@style/card_title"/>
+                card_view:titleTextAppearance="@style/statisticsTitle"/>
 
         </RelativeLayout>
 

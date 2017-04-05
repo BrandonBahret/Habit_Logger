@@ -17,7 +17,7 @@
 
     <!-- Item decorators -->
     <dimen name="indent_pad_top">16dp</dimen>
-    <dimen name="indent_pad_bottom_of_group">16dp</dimen>
+    <dimen name="indent_pad_bottom_of_group">32dp</dimen>
     <dimen name="entries_section_text_size">14sp</dimen>
     <dimen name="category_section_text_size">15sp</dimen>
     <dimen name="line_width">3dp</dimen>

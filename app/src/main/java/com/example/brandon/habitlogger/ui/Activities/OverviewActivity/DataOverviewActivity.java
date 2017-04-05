@@ -24,7 +24,7 @@ import com.example.brandon.habitlogger.databinding.ActivityDataOverviewBinding;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.Fragments.OverviewCalendarFragment;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.Fragments.OverviewEntriesFragment;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.Fragments.OverviewStatisticsFragment;
-import com.example.brandon.habitlogger.ui.Widgets.ViewGroupManagers.FloatingDateRangeWidgetManager;
+import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
 
 import java.util.ArrayList;

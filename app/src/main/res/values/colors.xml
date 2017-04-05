@@ -1,31 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimaryLight">#98e7d1</color>
-    <color name="colorPrimary">#46dfb6</color>
-    <color name="colorPrimaryDark">#37b493</color>
-    <color name="colorAccent">#4cefc3</color>
-    <color name="colorAccentDisabled">#90E1CB</color>
 
-    <color name="tab_color">#c8eeeeee</color>
-    <color name="selected_tab_color">#ffffff</color>
+    <!-- Primary Colors -->
+    <color name="colorPrimaryVeryLight">#dae0e6</color>
+    <color name="colorPrimaryVeryLightDisabled">#ced3d9</color>
+    <color name="colorPrimaryLight">#365492</color>
+    <color name="colorPrimary">#304e8a</color>
+    <color name="colorPrimaryDark">#163067</color>
 
-    <color name="habitCard">#fdfdfd</color>
-    <color name="habitCardButtonColor">#4e4d4d</color>
+    <!-- Fab Colors -->
+    <color name="fabNormal">@color/colorAccent</color>
+    <color name="fabPressed">@color/colorAccentDark</color>
 
-    <color name="cardBackgroundColor">#ecfffa</color>
-    <color name="cardBackgroundDisabledColor">#DFE9E6</color>
+    <!-- Accent Colors -->
+    <color name="colorAccent">#738cbf</color>
+    <color name="colorAccentDark">#637aa6</color>
+    <color name="colorAccentDisabled">#8695b3</color>
 
-    <color name="black_semi_transparent">#b2000000</color>
-    <color name="shadow_black">#1e000000</color>
-    <color name="background">#eaeaea</color>
-    <color name="darker_background">#e1e1e1</color>
+    <!-- Background Color -->
+    <color name="lightBackground">#f2f2f2</color>
+    <color name="background">#e1e1e1</color>
+    <color name="background2">#d9d9d9</color>
+    <color name="darkBackground">#919eba</color>
+
+    <!-- Icon Colors -->
+    <color name="defaultDarkIconTint">#4e4d4d</color>
+    <color name="defaultIconTint">#ffffff</color>
+
+    <!-- Text Colors -->
+    <color name="defaultTextColor">#797979</color>
+    <color name="lightTextColor">#bfbfbf</color>
+    <color name="veryLightTextColor">#ededed</color>
+
+    <!-- Item Decoration Background -->
+    <color name="itemDecorationText">@color/defaultTextColor</color>
+    <color name="itemDecorationBackground">@color/background2</color>
+
+    <!-- CardView Colors -->
+    <color name="defaultCardViewBackground">@color/lightBackground</color>
+
+    <!--Calendar View Colors -->
+    <color name="calendar_view_title">@color/defaultTextColor</color>
+    <color name="calendar_view_date_label">@color/lightTextColor</color>
+
+    <!-- TabLayout Colors -->
+    <color name="normalTabColor">#c8eeeeee</color>
+    <color name="selectedTabColor">#ffffff</color>
+
+    <!-- CurrentSessionsCard Layout Colors -->
+    <color name="currentSessionsAccent">@color/colorAccent</color>
+    <color name="currentSessionsAccentDisabled">@color/colorAccentDisabled</color>
+    <color name="currentSessionsBackground">@color/colorPrimaryVeryLight</color>
+    <color name="currentSessionsBackgroundDisabled">@color/colorPrimaryVeryLightDisabled</color>
+
+    <!-- General Colors -->
+    <color name="shadowBlack">#1e000000</color>
+    <color name="semiTransparentBlack">#b2000000</color>
     <color name="transparent">#00ffffff</color>
 
-    <color name="headerTextColor">#797979</color>
-    <color name="navigation_drawer_item_color">#89000000</color>
-
-    <!--Calendar View colors-->
-    <color name="calendar_view_title">#616161</color>
-    <color name="calendar_view_date_label">#9e9e9e</color>
 
 </resources>

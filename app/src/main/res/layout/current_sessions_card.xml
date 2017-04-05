@@ -18,7 +18,7 @@
             android:layout_marginTop="6dp"
             android:clipToPadding="false"
             android:foreground="?android:attr/selectableItemBackground"
-            app:cardBackgroundColor="@color/cardBackgroundColor"
+            app:cardBackgroundColor="@color/currentSessionsBackground"
             app:cardElevation="16dp">
 
             <RelativeLayout
@@ -30,7 +30,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
-                    android:background="@color/colorAccent"
+                    android:background="@color/currentSessionsAccent"
                     android:contentDescription="@string/card_view_accent_description"
                     android:elevation="4dp"
                     android:padding="5dp"
