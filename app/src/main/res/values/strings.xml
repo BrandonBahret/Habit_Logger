@@ -130,5 +130,9 @@
     <string name="pref_date_format">preference_date_format</string>
     <string name="licenses_and_attributions"><![CDATA[Licenses & Attributions]]></string>
     <string name="title_activity_licenses">LicensesActivity</string>
+    <string name="navigate_up">Navigate Up</string>
+    <string name="app_settings">Settings</string>
+    <string name="ui_settings">User Interface Settings</string>
+    <string name="notifications_settings">Notification Settings</string>
 
 </resources>

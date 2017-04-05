@@ -66,13 +66,26 @@
 
         <!-- Settings Activity -->
         <activity
+            android:label="@string/app_settings"
             android:name=".ui.Activities.PreferencesActivity.SettingsActivity"
-            android:parentActivityName=".ui.Activities.MainActivity.MainActivity">
+            android:parentActivityName=".ui.Activities.MainActivity.MainActivity"/>
+
+        <activity
+            android:label="@string/ui_settings"
+            android:name=".ui.Activities.PreferencesActivity.UserInterfaceSettingsActivity"
+            android:parentActivityName=".ui.Activities.PreferencesActivity.SettingsActivity">
             <intent-filter>
-                <action android:name=".Preferences.SettingsActivity"/>
+                <action android:name=".ui.Activities.PreferencesActivity.UserInterfaceSettingsActivity"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
 
-                <data android:mimeType="text/*"/>
-
+        <activity
+            android:label="@string/notifications_settings"
+            android:name=".ui.Activities.PreferencesActivity.NotificationsSettingsActivity"
+            android:parentActivityName=".ui.Activities.PreferencesActivity.SettingsActivity">
+            <intent-filter>
+                <action android:name=".ui.Activities.PreferencesActivity.NotificationsSettingsActivity"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>

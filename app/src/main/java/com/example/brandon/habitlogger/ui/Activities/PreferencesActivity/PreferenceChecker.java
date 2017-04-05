@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.ui.Activities.PreferencesActivity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatDelegate;
 
 import com.example.brandon.habitlogger.R;
 
@@ -97,11 +98,15 @@ public class PreferenceChecker {
     }
     //endregion -- end --
 
-    //region Methds related to appearance settings
+    //region Methods related to appearance settings
     public boolean isNightMode(){
         return preferences.getBoolean(
                 mContext.getString(R.string.pref_is_night_mode), false
         );
+    }
+
+    public int getThemeMode(){
+        return isNightMode() ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO;
     }
 
     public String stringGetDateFormat(){
