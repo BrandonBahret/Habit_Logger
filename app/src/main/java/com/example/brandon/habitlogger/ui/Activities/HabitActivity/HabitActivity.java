@@ -16,26 +16,26 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.MyColorUtils;
+import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.NewEntryForm;
-import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;
-import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.NewHabitDialog;
+import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
+import com.example.brandon.habitlogger.data.SessionEntriesSample;
+import com.example.brandon.habitlogger.databinding.ActivityHabitBinding;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.CalendarFragment;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.EntriesFragment;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.StatisticsFragment;
-import com.example.brandon.habitlogger.ui.Activities.SessionActivity;
-import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
-import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
-import com.example.brandon.habitlogger.common.MyColorUtils;
-import com.example.brandon.habitlogger.data.CategoryDataSample;
-import com.example.brandon.habitlogger.data.SessionEntriesSample;
-import com.example.brandon.habitlogger.databinding.ActivityHabitBinding;
-import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
+import com.example.brandon.habitlogger.ui.Activities.SessionActivity;
+import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
+import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.NewEntryForm;
+import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;
+import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.NewHabitDialog;
+import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -216,6 +216,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
 
         ui.createEntryFab.setColorNormal(color);
         ui.createEntryFab.setColorPressed(darkerColor);
+
     }
     //endregion
 

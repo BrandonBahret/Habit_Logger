@@ -11,19 +11,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
-import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EditEntryForm;
+import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.EntryViewAdapter;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
-import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.GroupDecoration;
-import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
-import com.example.brandon.habitlogger.common.MyCollectionUtils;
-import com.example.brandon.habitlogger.data.SessionEntriesSample;
+import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.RecyclerViewScrollObserver;
+import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EditEntryForm;
+import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.GroupDecoration;
+import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 
 import java.util.List;
 

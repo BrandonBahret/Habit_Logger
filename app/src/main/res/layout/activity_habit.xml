@@ -77,7 +77,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_timer_white_24dp"
-                fab:fab_label="Enter Session"
+                fab:fab_label="@string/enter_session"
                 fab:fab_size="mini"/>
 
             <com.github.clans.fab.FloatingActionButton
@@ -85,7 +85,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_manually_create_entry_white_24dp"
-                fab:fab_label="Manually Create Entry"
+                fab:fab_label="@string/manually_create_entry"
                 fab:fab_size="mini"/>
 
         </com.github.clans.fab.FloatingActionMenu>

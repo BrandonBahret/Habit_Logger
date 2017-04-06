@@ -76,7 +76,7 @@ public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpd
         yAxis.setEnabled(false);
 
         XAxis xAxis = ui.chart.getXAxis();
-        ui.chart.setVisibleXRangeMaximum(5);
+        xAxis.setLabelCount(5);
         xAxis.setGranularity(1f);
         xAxis.setGranularityEnabled(true);
         xAxis.setGridColor(ColorUtils.setAlphaComponent(xAxis.getGridColor(), 50));

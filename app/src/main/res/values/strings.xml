@@ -134,5 +134,7 @@
     <string name="app_settings">Settings</string>
     <string name="ui_settings">User Interface Settings</string>
     <string name="notifications_settings">Notification Settings</string>
+    <string name="manually_create_entry">Manually Create Entry</string>
+    <string name="enter_session">Enter Session</string>
 
 </resources>
