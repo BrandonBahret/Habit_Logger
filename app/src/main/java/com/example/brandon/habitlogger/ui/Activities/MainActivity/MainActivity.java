@@ -243,8 +243,10 @@ public class MainActivity extends AppCompatActivity
 
     //region Methods responsible for applying item decorations to the recycler view
     private GroupDecoration getGroupDecoration() {
+        boolean shouldUseStickyHeaders = mPreferenceChecker.makeCategoryHeadersSticky();
+
         return new GroupDecoration
-                (MainActivity.this, R.dimen.category_section_text_size, new GroupDecoration.Callback() {
+                (MainActivity.this, R.dimen.category_section_text_size, shouldUseStickyHeaders, new GroupDecoration.Callback() {
                     @Override
                     public long getGroupId(int position) {
                         if (position >= 0 && position < mHabitList.size())
@@ -286,7 +288,7 @@ public class MainActivity extends AppCompatActivity
         boolean useLargeTopOffset = mPreferenceChecker.shouldShowCurrentSessions(sessionCount);
         int topOffset = useLargeTopOffset ? (int) getResources().getDimension(R.dimen.large_top_offset_dp) : (int) getResources().getDimension(R.dimen.top_offset_dp);
 
-        if (useLargeTopOffset && mPreferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_SECTIONS)
+        if (mPreferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_SECTIONS)
             topOffset += (int) getResources().getDimension(R.dimen.sections_top_offset_dp);
 
         int bottomOffset = (int) getResources().getDimension(R.dimen.bottom_offset_dp);

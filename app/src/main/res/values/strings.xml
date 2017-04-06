@@ -113,6 +113,14 @@
     <string name="hours_per_day">Hours Per Day</string>
     <string name="days_per_week">days per week</string>
     <string name="share">share</string>
+    <string name="licenses_and_attributions"><![CDATA[Licenses & Attributions]]></string>
+    <string name="title_activity_licenses">LicensesActivity</string>
+    <string name="navigate_up">Navigate Up</string>
+    <string name="app_settings">Settings</string>
+    <string name="ui_settings">User Interface Settings</string>
+    <string name="notifications_settings">Notification Settings</string>
+    <string name="manually_create_entry">Manually Create Entry</string>
+    <string name="enter_session">Enter Session</string>
 
     <array name="tab_titles">
         <item>Entries</item>
@@ -128,13 +136,7 @@
     <string name="pref_do_show_notifications">preference_do_show_notifications</string>
     <string name="pref_do_show_notifications_auto">preference_do_automatically_show_notifications</string>
     <string name="pref_date_format">preference_date_format</string>
-    <string name="licenses_and_attributions"><![CDATA[Licenses & Attributions]]></string>
-    <string name="title_activity_licenses">LicensesActivity</string>
-    <string name="navigate_up">Navigate Up</string>
-    <string name="app_settings">Settings</string>
-    <string name="ui_settings">User Interface Settings</string>
-    <string name="notifications_settings">Notification Settings</string>
-    <string name="manually_create_entry">Manually Create Entry</string>
-    <string name="enter_session">Enter Session</string>
+    <string name="pref_category_sticky">preference_make_categories_sticky</string>
+    <string name="pref_date_header_sticky">preference_date_headers_sticky</string>
 
 </resources>

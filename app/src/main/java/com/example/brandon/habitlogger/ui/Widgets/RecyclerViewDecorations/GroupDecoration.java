@@ -23,6 +23,7 @@ public class GroupDecoration extends RecyclerView.ItemDecoration {
     private int mBottomGap;
     private int mTextVerticalOffset;
     private int mTextSize;
+    private boolean mShouldMakeLabelsSticky = false;
 
     private int mTextColor;
     private int mBackdropColor;
@@ -45,6 +46,21 @@ public class GroupDecoration extends RecyclerView.ItemDecoration {
 
     //region Constructor {}
     public GroupDecoration(Context context, @DimenRes int textSizeRes, Callback callback) {
+        mCallback = callback;
+
+        fetchDimensions(context, textSizeRes);
+
+        fetchColors(context);
+
+        createPaints();
+
+        makeMeasurements();
+    }
+
+    public GroupDecoration(Context context, @DimenRes int textSizeRes, boolean stickyLabels, Callback callback) {
+
+        mShouldMakeLabelsSticky = stickyLabels;
+
         mCallback = callback;
 
         fetchDimensions(context, textSizeRes);
@@ -102,8 +118,8 @@ public class GroupDecoration extends RecyclerView.ItemDecoration {
     }
 
     @Override
-    public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
-        super.onDraw(c, parent, state);
+    public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
+        super.onDrawOver(c, parent, state);
 
         final int finalIndex = state.getItemCount() - 1;
         final int childCount = parent.getChildCount();
@@ -125,7 +141,23 @@ public class GroupDecoration extends RecyclerView.ItemDecoration {
             final String textLine = mCallback.getGroupFirstLine(childPosition);
             if (textLine == null || textLine.isEmpty()) continue;
 
-            float textY = view.getTop() + view.getPaddingTop() - mTextVerticalOffset;
+            float textY;
+
+            if(mShouldMakeLabelsSticky) {
+                // Find appropriate y position for text; on screen unless pushed off by bottom of group
+                textY = Math.max(mTopGap, view.getTop() + view.getPaddingTop() - mTextVerticalOffset);
+                final float viewBottom = view.getBottom() + view.getPaddingBottom() + mBottomGap + mTextVerticalOffset - (mBackdropHeight / 3);
+                if (childPosition < finalIndex) {
+                    long nextGroupId = mCallback.getGroupId(childPosition + 1);
+                    if (nextGroupId != groupId && viewBottom < textY + mBackdropHeight) {
+                        // Next item is different group, align Y with bottom of current group
+                        textY = viewBottom - mBackdropHeight;
+                    }
+                }
+            }
+            else {
+                textY = view.getTop() + view.getPaddingTop() - mTextVerticalOffset;
+            }
 
             // Draw the backdrop
             c.drawRect(0, textY - mBackdropHeight, width, textY + (mBackdropHeight / 3), mBackdropPaint);

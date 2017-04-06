@@ -35,6 +35,7 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
     private IScrollEvents mListener;
 
     private String mDateFormat;
+    private boolean mMakeHeadersSticky;
     private HabitDatabase mHabitDatabase;
     private List<SessionEntry> mSessionEntries;
 
@@ -77,7 +78,9 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
         View v = inflater.inflate(R.layout.fragment_entries, container, false);
 
         Context context = getContext();
-        mDateFormat = new PreferenceChecker(context).stringGetDateFormat();
+        PreferenceChecker preferenceChecker = new PreferenceChecker(context);
+        mDateFormat = preferenceChecker.stringGetDateFormat();
+        mMakeHeadersSticky = preferenceChecker.makeDateHeadersSticky();
         mHabitDatabase = new HabitDatabase(context);
         mSessionEntries = mCallbackInterface.getSessionEntries().getSessionEntries();
         mEntryAdapter = new EntryViewAdapter(mSessionEntries, context, this);
@@ -85,7 +88,7 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
         mEntriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
 
         //region Add item decorations
-        mEntriesContainer.addItemDecoration(new GroupDecoration(getContext(), R.dimen.entries_section_text_size, new GroupDecoration.Callback() {
+        mEntriesContainer.addItemDecoration(new GroupDecoration(getContext(), R.dimen.entries_section_text_size, mMakeHeadersSticky, new GroupDecoration.Callback() {
             @Override
             public long getGroupId(int position) {
                 if (position >= 0 && position < mSessionEntries.size()) {

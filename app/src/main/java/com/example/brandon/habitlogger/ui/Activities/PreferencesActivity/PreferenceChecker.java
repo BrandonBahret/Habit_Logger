@@ -37,6 +37,14 @@ public class PreferenceChecker {
         return parseInt(displayCategories);
     }
 
+    public boolean makeCategoryHeadersSticky(){
+        boolean wouldBeSticky = preferences.getBoolean(
+                mContext.getString(R.string.pref_category_sticky), false
+        );
+
+        return howToDisplayCategories() == AS_SECTIONS && wouldBeSticky;
+    }
+
     public boolean doShowCurrentSessions(){
         return preferences.getBoolean(
                 mContext.getString(R.string.pref_display_current_sessions_card), true
@@ -69,6 +77,14 @@ public class PreferenceChecker {
         );
     }
     //endregion -- end --
+
+    //region Methods related to entries settings
+    public boolean makeDateHeadersSticky(){
+        return preferences.getBoolean(
+                mContext.getString(R.string.pref_date_header_sticky), true
+        );
+    }
+    //endregion
 
     //region Methods related to session activity settings
     public boolean doAskBeforeCancel(){

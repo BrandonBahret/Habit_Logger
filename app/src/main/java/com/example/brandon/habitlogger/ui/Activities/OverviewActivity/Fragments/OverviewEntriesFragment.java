@@ -40,6 +40,7 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
     private RecyclerView mEntriesContainer;
     private EntryViewAdapter mEntryAdapter;
     private String mDateFormat;
+    private boolean mMakeDateHeadersSticky;
     //endregion
 
     public OverviewEntriesFragment() {
@@ -80,7 +81,7 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
     }
 
     private GroupDecoration getGroupDecoration() {
-        return new GroupDecoration(getContext(), R.dimen.entries_section_text_size, new GroupDecoration.Callback() {
+        return new GroupDecoration(getContext(), R.dimen.entries_section_text_size, mMakeDateHeadersSticky, new GroupDecoration.Callback() {
             @Override
             public long getGroupId(int position) {
                 if (position >= 0 && position < mSessionEntries.size())
@@ -104,7 +105,9 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDateFormat = new PreferenceChecker(getContext()).stringGetDateFormat();
+        PreferenceChecker preferenceChecker = new PreferenceChecker(getContext());
+        mDateFormat = preferenceChecker.stringGetDateFormat();
+        mMakeDateHeadersSticky = preferenceChecker.makeDateHeadersSticky();
         mHabitDatabase = new HabitDatabase(getContext());
         mSessionEntries = mHabitDatabase.getEntries();
     }

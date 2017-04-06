@@ -12,6 +12,12 @@
             android:title="Category mode"/>
 
         <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_category_sticky"
+            android:summary="When using categories as sections, make the headers sticky."
+            android:title="Make headers sticky"/>
+
+        <CheckBoxPreference
             android:defaultValue="true"
             android:key="@string/pref_hide_fab_on_scroll"
             android:summary="Scroll the list to move the floating action button out of the way."
@@ -36,6 +42,14 @@
             android:summary="Scroll the list to move the active sessions card out of the way."
             android:title="Hide on scroll"/>
 
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Entries">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_date_header_sticky"
+            android:summary="Make the date headers sticky."
+            android:title="Make headers sticky"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Session Activity">
