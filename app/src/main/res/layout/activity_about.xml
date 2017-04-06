@@ -10,19 +10,49 @@
     android:paddingRight="16dp"
     tools:context=".ui.Activities.AboutActivity">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="148dp"
-        android:layout_height="148dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:contentDescription="@string/app_icon_about_content_description"
-        android:scaleType="fitXY"
-        app:srcCompat="@mipmap/ic_launcher"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_above="@+id/whereToFindMeText">
+
+        <ImageView
+            android:id="@+id/appIcon"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:contentDescription="@string/app_icon_about_content_description"
+            app:srcCompat="@mipmap/ic_launcher"/>
+
+        <TextView
+            android:id="@+id/appNameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textSize="18sp"/>
+
+        <TextView
+            android:id="@+id/versionNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/value_placeholder"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
+
+        <TextView
+            android:id="@+id/appDescription"
+            android:layout_width="270dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="33dp"
+            android:text="@string/description_on_about_activity"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textSize="16sp"/>
+
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/whereToFindMeText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/link_layout"
@@ -100,36 +130,5 @@
             android:layout_height="wrap_content"
             android:layout_weight="5"/>
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/versionNumber"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView2"
-        android:layout_centerHorizontal="true"
-        android:text="@string/value_placeholder"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/imageView"
-        android:layout_centerHorizontal="true"
-        android:text="@string/app_name"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        android:textSize="18sp"/>
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="270dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/versionNumber"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="33dp"
-        android:text="@string/description_on_about_activity"
-        android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="16sp"/>
 
 </RelativeLayout>

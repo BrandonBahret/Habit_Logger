@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="Main Activity">
+    <PreferenceCategory android:title="Home Screen">
         <ListPreference
             android:defaultValue="0"
             android:dialogTitle="Display categories as..."
             android:entries="@array/category_options"
             android:entryValues="@array/category_options_values"
             android:key="@string/pref_show_categories"
-            android:summary="Set how the app displays habit categories."
-            android:title="Categories"/>
+            android:summary="Change how the app uses habit categories."
+            android:title="Category mode"/>
 
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="@string/pref_hide_fab_on_scroll"
             android:summary="Scroll the list to move the floating action button out of the way."
-            android:title="Hide new habit button on scroll"/>
+            android:title="Hide action button on scroll"/>
 
         <SwitchPreference
             android:defaultValue="true"
             android:key="@string/pref_display_current_sessions_card"
-            android:summary="Display the 'Current Sessions' card."
-            android:title="Show Current Sessions"/>
+            android:title="Show active sessions card"/>
 
         <CheckBoxPreference
             android:defaultValue="true"
             android:dependency="@string/pref_display_current_sessions_card"
             android:key="@string/pref_display_current_sessions_card_at_zero"
-            android:summary="Display the 'Current Sessions' card even when zero sessions are active."
-            android:title="Show at zero active sessions"/>
+            android:summary="Display the active sessions card even if zero sessions are active."
+            android:title="Show with zero active sessions"/>
 
         <CheckBoxPreference
             android:defaultValue="false"
             android:dependency="@string/pref_display_current_sessions_card"
             android:key="@string/pref_hide_current_sessions_card_on_scroll"
-            android:summary="Scroll the list to move the 'current sessions' card out of the way."
-            android:title="Hide card on scroll"/>
+            android:summary="Scroll the list to move the active sessions card out of the way."
+            android:title="Hide on scroll"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Session Activity">

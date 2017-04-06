@@ -5,13 +5,13 @@
         android:defaultValue="true"
         android:key="@string/pref_do_show_notifications"
         android:summary="Show notifications for active sessions."
-        android:title="Show Notifications"/>
+        android:title="Show notifications"/>
 
     <CheckBoxPreference
         android:defaultValue="true"
         android:dependency="@string/pref_do_show_notifications"
         android:key="@string/pref_do_show_notifications_auto"
-        android:summary="Have the app automatically display notifications."
-        android:title="Automatically Show Notifications"/>
+        android:summary="Automatically display notifications."
+        android:title="Show automatically"/>
 
 </PreferenceScreen>
