@@ -100,7 +100,7 @@
     <string name="time_of_day_placeholder">12:00 PM</string>
     <string name="toggle_note_content_description">expand, collapse note</string>
     <string name="starting_time_distribution">Starting Time Distribution</string>
-    <string name="habit_score_over_time">Habit score over time</string>
+    <string name="habit_score_over_time">Habit Score Over Time</string>
     <string name="time_breakdown_of_all_categories">Time breakdown of all categories</string>
     <string name="habit_score">Habit Score</string>
     <string name="days_completed">Days Completed</string>

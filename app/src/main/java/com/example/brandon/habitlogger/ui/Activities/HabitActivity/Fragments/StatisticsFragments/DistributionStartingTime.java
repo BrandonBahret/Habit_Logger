@@ -37,10 +37,9 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
     FragmentDistributionStartingTimeBinding ui;
     private int mColor;
 
-    //region // Methods responsible for handling the fragment lifecycle
+    //region [ ---- Methods responsible for handling the fragment lifecycle ---- ]
 
-    //region // Methods (onCreateView - onDestroyView)
-
+    //region Methods (onCreateView - onDestroyView)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -48,10 +47,9 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
         ui = DataBindingUtil.inflate(inflater, R.layout.fragment_distribution_starting_time, container, false);
         return ui.getRoot();
     }
+    //endregion -- end --
 
-    //endregion // Methods (onCreateView - onDestroyView)
-
-    //region // Methods (onAttach - onDetach)
+    //region Methods (onAttach - onDetach)
 
     @Override
     public void onAttach(Context context) {
@@ -67,9 +65,9 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
         callbackInterface.removeUpdateEntriesCallback(this);
     }
 
-    //endregion // Methods (onAttach - onDetach)
+    //endregion -- end --
 
-    //region // Methods (onStart - onStop)
+    //region Methods (onStart - onStop)
 
     @Override
     public void onStart() {
@@ -77,9 +75,9 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
         updateEntries(callbackInterface.getSessionEntries());
     }
 
-    //endregion // Methods (onStart - onStop)
+    //endregion -- end --
 
-    //endregion // Methods responsible for handling the fragment lifecycle
+    //endregion [ ---------------- end ---------------- ]
 
     @Override
     public void updateEntries(SessionEntriesSample dataSample) {
@@ -125,7 +123,8 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
 
         //region // X-Axis
 
-//        ui.chart.getXAxis().setLabelRotationAngle(-45);
+        ui.chart.getXAxis().setLabelRotationAngle(90);
+        ui.chart.getXAxis().setLabelCount(24);
         ui.chart.getXAxis().setDrawGridLines(false);
         ui.chart.getXAxis().setValueFormatter(new IAxisValueFormatter() {
             @Override
@@ -175,7 +174,7 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
     }
 
     class TimeIntervalEntryCounter {
-        private final int DAY_IN_MINUTES = 1439;
+        private final int DAY_IN_MINUTES = 1440;
         private final int COUNTERS_LENGTH;
         private int[] counters;
         private int timeIntervalInMinutes;

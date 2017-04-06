@@ -19,13 +19,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.databinding.FragmentLineGraphCompletionBinding;
+import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -37,7 +37,6 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpdateEntries {
 
@@ -67,17 +66,17 @@ public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpd
         ui.chart.getViewPortHandler().setMaximumScaleX(8.5f);
         ui.chart.getViewPortHandler().setMaximumScaleY(8.5f);
 
-        //region Stylize the axi
+        //region Stylize the axes
         YAxis yAxis = ui.chart.getAxisLeft();
         yAxis.setAxisMinimum(0f);
         yAxis.setGridColor(ColorUtils.setAlphaComponent(yAxis.getGridColor(), 50));
         yAxis.setValueFormatter(new PercentFormatter());
 
         yAxis = ui.chart.getAxisRight();
-        yAxis.setMinWidth(0f);
         yAxis.setEnabled(false);
 
         XAxis xAxis = ui.chart.getXAxis();
+        ui.chart.setVisibleXRangeMaximum(5);
         xAxis.setGranularity(1f);
         xAxis.setGranularityEnabled(true);
         xAxis.setGridColor(ColorUtils.setAlphaComponent(xAxis.getGridColor(), 50));

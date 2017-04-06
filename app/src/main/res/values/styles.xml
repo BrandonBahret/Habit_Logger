@@ -11,6 +11,7 @@
     <style name="AppTheme.AppBarOverlay" parent="@android:style/Widget.PopupMenu">
         <item name="colorControlNormal">@color/android:white</item>
         <item name="titleTextColor">@color/android:white</item>
+        <item name="android:editTextColor">@android:color/white</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

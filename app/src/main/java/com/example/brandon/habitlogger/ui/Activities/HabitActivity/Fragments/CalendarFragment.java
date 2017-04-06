@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
@@ -64,7 +65,6 @@ public class CalendarFragment extends Fragment implements IHabitCallback.IUpdate
         mCalendarViewContainer.setLayoutManager(layoutManager);
         mCalendarViewContainer.setItemAnimator(new DefaultItemAnimator());
         mCalendarViewContainer.addItemDecoration(getSpaceDecoration());
-        updateEntries(callbackInterface.getSessionEntries());
 
         return v;
     }
@@ -79,7 +79,7 @@ public class CalendarFragment extends Fragment implements IHabitCallback.IUpdate
     @Override
     public void updateEntries(SessionEntriesSample dataSample) {
         if (!dataSample.isEmpty()) {
-            mAdapter = new CalendarViewAdapter(callbackInterface.getSessionEntries(), mDefaultColor, getContext());
+            mAdapter = new CalendarViewAdapter(dataSample, mDefaultColor, getContext());
             mCalendarViewContainer.setAdapter(mAdapter);
         }
     }

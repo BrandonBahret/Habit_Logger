@@ -29,7 +29,7 @@
     <dimen name="fab_elevation">4dp</dimen>
     <dimen name="slide_elevation">8dp</dimen>
     <dimen name="large_top_offset_dp">58dp</dimen>
-    <dimen name="sections_top_offset_dp">24dp</dimen>
+    <dimen name="sections_top_offset_dp">18dp</dimen>
     <dimen name="extra_large_top_offset_dp">110dp</dimen>
 
 </resources>
