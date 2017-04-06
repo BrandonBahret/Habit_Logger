@@ -48,6 +48,7 @@ public class PieChartCategoriesDuration extends Fragment implements IDataOvervie
 
         ui.chart.setCenterText("All Categories");
         ui.chart.setEntryLabelColor(Color.TRANSPARENT);
+        ui.chart.setExtraOffsets(4, 8, 0, 3);
         ui.chart.getDescription().setEnabled(false);
         ui.chart.getLegend().setWordWrapEnabled(true);
 

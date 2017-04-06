@@ -75,7 +75,7 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
     //region Methods responsible constructing item decorations
     private SpaceOffsetDecoration getSpaceOffsetDecoration() {
         int bottomOffset = (int) getResources().getDimension(R.dimen.bottom_offset_dp);
-        int topOffset = (int) getResources().getDimension(R.dimen.extra_large_top_offset_dp);
+        int topOffset = (int) getResources().getDimension(R.dimen.extra_large_top_offset_dp) + (int) (getResources().getDimension(R.dimen.sections_top_offset_dp));
         return new SpaceOffsetDecoration(bottomOffset, topOffset);
     }
 

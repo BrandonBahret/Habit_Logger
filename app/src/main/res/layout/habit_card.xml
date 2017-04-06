@@ -8,8 +8,8 @@
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
     card_view:cardBackgroundColor="@color/defaultCardViewBackground"
-    card_view:cardCornerRadius="4dp"
-    card_view:cardElevation="4dp">
+    card_view:cardCornerRadius="2dp"
+    card_view:cardElevation="@dimen/default_elevation">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -21,7 +21,7 @@
             android:layout_width="@dimen/accent_strip_width"
             android:layout_height="match_parent"
             android:background="@color/colorAccent"
-            android:elevation="4dp"/>
+            android:elevation="3dp"/>
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -71,7 +71,7 @@
                 card_view:contentInsetRight="0dp"
                 card_view:contentInsetStart="8dp"
                 card_view:title="@string/habit_name"
-                card_view:titleTextAppearance="@style/statisticsTitle"/>
+                card_view:titleTextAppearance="@style/cardTitle"/>
 
         </RelativeLayout>
 

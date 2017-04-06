@@ -14,6 +14,7 @@ import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarView.CalendarViewAdapter;
+import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 
 public class CalendarFragment extends Fragment implements IHabitCallback.IUpdateEntries {
 
@@ -39,7 +40,7 @@ public class CalendarFragment extends Fragment implements IHabitCallback.IUpdate
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        callbackInterface = (IHabitCallback)context;
+        callbackInterface = (IHabitCallback) context;
         callbackInterface.addUpdateEntriesCallback(this);
     }
 
@@ -62,9 +63,16 @@ public class CalendarFragment extends Fragment implements IHabitCallback.IUpdate
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mCalendarViewContainer.setLayoutManager(layoutManager);
         mCalendarViewContainer.setItemAnimator(new DefaultItemAnimator());
+        mCalendarViewContainer.addItemDecoration(getSpaceDecoration());
         updateEntries(callbackInterface.getSessionEntries());
 
         return v;
+    }
+
+    private SpaceOffsetDecoration getSpaceDecoration() {
+        float top = getContext().getResources().getDimension(R.dimen.small_top_offset_dp);
+        float bottom = getContext().getResources().getDimension(R.dimen.bottom_offset_dp);
+        return new SpaceOffsetDecoration((int) bottom, (int) top);
     }
     //endregion
 

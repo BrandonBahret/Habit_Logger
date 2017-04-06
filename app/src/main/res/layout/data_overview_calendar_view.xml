@@ -5,12 +5,11 @@
     android:id="@+id/calendar_view"
     android:layout_width="match_parent"
     android:layout_height="390dp"
-    android:layout_margin="4dp"
 
-    android:layout_marginBottom="3dp"
-    android:layout_marginLeft="6dp"
-    android:layout_marginRight="6dp"
-    android:layout_marginTop="3dp"
+    android:layout_marginBottom="2dp"
+    android:layout_marginLeft="4dp"
+    android:layout_marginRight="4dp"
+    android:layout_marginTop="2dp"
 
     android:background="@drawable/background_simple_rectangle"
     android:textSize="20sp"
