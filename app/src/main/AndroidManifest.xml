@@ -62,7 +62,7 @@
             android:name=".ui.Activities.ActiveSessionsActivity.ActiveSessionsActivity"
             android:label="@string/active_habits_activity_label"
             android:parentActivityName=".ui.Activities.MainActivity.MainActivity"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <!-- Settings Activity -->
         <activity

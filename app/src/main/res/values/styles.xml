@@ -12,6 +12,7 @@
         <item name="colorControlNormal">@color/android:white</item>
         <item name="titleTextColor">@color/android:white</item>
         <item name="android:editTextColor">@android:color/white</item>
+        <item name="android:textColorHint">@color/searchHint</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

@@ -210,10 +210,20 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
 
-        SearchView search = (SearchView) menu.findItem(R.id.search).getActionView();
-        search.setOnQueryTextListener(getSearchListener());
-
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        MenuItem search = menu.findItem(R.id.search);
+        if (search != null) {
+            SearchView searchView = (SearchView) search.getActionView();
+            searchView.setQueryHint(getString(R.string.filter_main_activity));
+            searchView.setOnQueryTextListener(getSearchListener());
+        }
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
     //endregion [ ---------------- end ---------------- ]
@@ -346,7 +356,6 @@ public class MainActivity extends AppCompatActivity
         return new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                runDatabaseQuery(query);
                 return true;
             }
 

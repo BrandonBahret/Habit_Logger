@@ -56,7 +56,7 @@ public class PieGraphCompletion extends Fragment implements IHabitCallback.IUpda
         ui.chart.setRotationEnabled(false);
         ui.chart.setExtraOffsets(4, 3, 0, 3);
         ui.chart.setCenterTextSize(25);
-        ui.chart.setRotationAngle(-195f);
+        ui.chart.setRotationAngle(-180f);
         ui.chart.setHoleRadius(75f);
         ui.chart.getLegend().setEnabled(false);
 

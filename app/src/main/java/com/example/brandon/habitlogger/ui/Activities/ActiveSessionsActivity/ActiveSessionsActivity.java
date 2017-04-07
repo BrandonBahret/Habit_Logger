@@ -61,6 +61,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         ui = DataBindingUtil.setContentView(this, R.layout.activity_active_sessions);
 
+        setSupportActionBar(ui.toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -85,11 +86,19 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.active_sessions_menu, menu);
-
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setOnQueryTextListener(this);
-
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem search = menu.findItem(R.id.search);
+        if (search != null) {
+            SearchView searchView = (SearchView) search.getActionView();
+            searchView.setQueryHint(getString(R.string.search));
+            searchView.setOnQueryTextListener(this);
+        }
+
+        return super.onPrepareOptionsMenu(menu);
     }
     //endregion -- end --
 

@@ -31,6 +31,7 @@
     <color name="defaultTextColor">#797979</color>
     <color name="lightTextColor">#bfbfbf</color>
     <color name="veryLightTextColor">#ededed</color>
+    <color name="searchHint">#c8ffffff</color>
 
     <!-- Item Decoration Background -->
     <color name="itemDecorationText">@color/defaultTextColor</color>
@@ -44,7 +45,7 @@
     <color name="calendar_view_date_label">@color/lightTextColor</color>
 
     <!-- TabLayout Colors -->
-    <color name="normalTabColor">#c8eeeeee</color>
+    <color name="normalTabColor">#beffffff</color>
     <color name="selectedTabColor">#ffffff</color>
 
     <!-- CurrentSessionsCard Layout Colors -->

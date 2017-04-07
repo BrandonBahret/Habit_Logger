@@ -10,17 +10,40 @@
         android:layout_height="match_parent"
         tools:context=".ui.Activities.ActiveSessionsActivity.ActiveSessionsActivity">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/session_view_container"
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:clipToPadding="false"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:scrollbars="none"
-            app:layoutManager="LinearLayoutManager"/>
+            android:layout_height="wrap_content"
+            android:elevation="4dp"
+            android:theme="@style/AppTheme.AppBarOverlay">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorPrimary"
+                android:theme="@style/AppTheme.AppBarOverlay"/>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <FrameLayout
+            android:id="@+id/content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/session_view_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:scrollbars="none"
+                app:layoutManager="LinearLayoutManager"/>
+
+        </FrameLayout>
 
     </android.support.design.widget.CoordinatorLayout>
+
 </layout>

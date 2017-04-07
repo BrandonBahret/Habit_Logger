@@ -114,14 +114,19 @@ public class DataOverviewActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_overall_statistcs, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem search = menu.findItem(R.id.search);
         if (search != null) {
             SearchView searchView = (SearchView) search.getActionView();
+            searchView.setQueryHint(getString(R.string.filter_entries));
             searchView.setOnQueryTextListener(getSearchViewListener());
         }
 
-        return true;
+        return super.onPrepareOptionsMenu(menu);
     }
     //endregion --- end ---
 
