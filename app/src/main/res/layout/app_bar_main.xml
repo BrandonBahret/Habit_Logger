@@ -31,7 +31,7 @@
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
             android:elevation="@dimen/fab_elevation"
-            android:src="@drawable/ic_add_white_24dp"
+            android:src="@drawable/ic_add_24dp"
             app:fab_colorNormal="@color/fabNormal"
             app:fab_colorPressed="@color/fabPressed"
             app:fab_hideAnimation="@anim/hide_fab"

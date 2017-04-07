@@ -125,8 +125,8 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
                 boolean expand = holder.noteText.getMaxLines() == maxLines;
                 holder.noteText.setMaxLines(expand ? 100 : maxLines);
 
-                holder.expandNote.setImageResource(expand ? R.drawable.ic_arrow_drop_up_black_24dp :
-                        R.drawable.ic_arrow_drop_down_black_24dp);
+                holder.expandNote.setImageResource(expand ? R.drawable.ic_arrow_drop_up_24dp :
+                        R.drawable.ic_arrow_drop_down_24dp);
             }
         });
     }

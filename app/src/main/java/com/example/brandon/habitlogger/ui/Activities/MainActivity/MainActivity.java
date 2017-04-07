@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity
 
     ActivityMainBinding ui;
     private RecyclerView mHabitCardContainer;
+    private SearchView mSearchView;
 
     private Handler mUpdateHandler = new Handler();
     private SpaceOffsetDecoration mSpaceDecoration;
@@ -218,9 +219,9 @@ public class MainActivity extends AppCompatActivity
 
         MenuItem search = menu.findItem(R.id.search);
         if (search != null) {
-            SearchView searchView = (SearchView) search.getActionView();
-            searchView.setQueryHint(getString(R.string.filter_main_activity));
-            searchView.setOnQueryTextListener(getSearchListener());
+            mSearchView = (SearchView) search.getActionView();
+            mSearchView.setQueryHint(getString(R.string.filter_main_activity));
+            mSearchView.setOnQueryTextListener(getSearchListener());
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -582,7 +583,7 @@ public class MainActivity extends AppCompatActivity
                             timeTextView.setText(getString(R.string.time_display_placeholder));
 
                             ImageButton pauseButton = (ImageButton) item.findViewById(R.id.session_control_button);
-                            pauseButton.setImageResource(R.drawable.ic_play_black_24dp);
+                            pauseButton.setImageResource(R.drawable.ic_play_24dp);
                         }
                         break;
                     }
@@ -614,6 +615,12 @@ public class MainActivity extends AppCompatActivity
                     public void onFinishedWithResult(Habit habit) {
                         mHabitDatabase.addHabit(habit);
                         showDatabase();
+                        if (mSearchView != null){
+                            mSearchView.setQuery("", false);
+                            mSearchView.clearFocus();
+                            mSearchView.onActionViewCollapsed();
+                        }
+                        findViewById(R.id.no_habits_available_layout).setVisibility(View.GONE);
                     }
                 });
 
@@ -706,7 +713,8 @@ public class MainActivity extends AppCompatActivity
             case (R.id.overall_stats_nav):
                 if (mHabitDatabase.getNumberOfEntries() > 0)
                     DataOverviewActivity.startActivity(this);
-                else Toast.makeText(this, R.string.no_data_available_lower, Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(this, R.string.no_data_available_lower, Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.settings_nav:

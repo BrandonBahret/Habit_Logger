@@ -8,9 +8,10 @@
     <color name="colorPrimary">#304e8a</color>
     <color name="colorPrimaryDark">#163067</color>
 
-    <!-- Fab Colors -->
-    <color name="fabNormal">@color/colorAccent</color>
-    <color name="fabPressed">@color/colorAccentDark</color>
+    <!-- General Colors -->
+    <color name="shadowBlack">#1e000000</color>
+    <color name="semiTransparentBlack">#b2000000</color>
+    <color name="transparent">#00ffffff</color>
 
     <!-- Accent Colors -->
     <color name="colorAccent">#738cbf</color>
@@ -18,46 +19,50 @@
     <color name="colorAccentDisabled">#8695b3</color>
 
     <!-- Background Color -->
-    <color name="lightBackground">#f2f2f2</color>
-    <color name="background">#e1e1e1</color>
-    <color name="background2">#d9d9d9</color>
-    <color name="darkBackground">#919eba</color>
+    <color name="background1">#e1e1e1</color>
+    <color name="background2">#f2f2f2</color>
+    <color name="background3">#cccccc</color>
+    <color name="background4">#d9d9d9</color>
+    <color name="background5">#999999</color>
 
     <!-- Icon Colors -->
-    <color name="defaultDarkIconTint">#4e4d4d</color>
-    <color name="defaultIconTint">#ffffff</color>
+    <color name="iconTint1">#4e4d4d</color>
+    <color name="iconTint2">#ffffff</color>
 
     <!-- Text Colors -->
-    <color name="defaultTextColor">#797979</color>
-    <color name="lightTextColor">#bfbfbf</color>
-    <color name="veryLightTextColor">#ededed</color>
-    <color name="searchHint">#c8ffffff</color>
+    <color name="textColor1">#797979</color>
+    <color name="textColor2">#bfbfbf</color>
+    <color name="textColor3">#505050</color>
+    <color name="textColorContrast">#ffffffff</color>
+    <color name="textColorTransparent">#c8ffffff</color>
+
+    <!-- Fab Colors -->
+    <color name="fabNormal">@color/colorAccent</color>
+    <color name="fabPressed">@color/colorAccentDark</color>
+
+    <!-- SearchView colors -->
+    <color name="searchHint">@color/textColorTransparent</color>
 
     <!-- Item Decoration Background -->
-    <color name="itemDecorationText">@color/defaultTextColor</color>
-    <color name="itemDecorationBackground">@color/background2</color>
+    <color name="itemDecorationText">@color/textColor1</color>
+    <color name="itemDecorationBackground">@color/background4</color>
 
     <!-- CardView Colors -->
-    <color name="defaultCardViewBackground">@color/lightBackground</color>
+    <color name="defaultCardViewBackground">@color/background2</color>
 
     <!--Calendar View Colors -->
-    <color name="calendar_view_title">@color/defaultTextColor</color>
-    <color name="calendar_view_date_label">@color/lightTextColor</color>
+    <color name="calendarViewTitle">@color/textColor1</color>
+    <color name="calendarViewEmpty">@color/background5</color>
+    <color name="calendarViewDateLabel">@color/textColor2</color>
 
     <!-- TabLayout Colors -->
-    <color name="normalTabColor">#beffffff</color>
-    <color name="selectedTabColor">#ffffff</color>
+    <color name="normalTabColor">@color/textColorTransparent</color>
+    <color name="selectedTabColor">@color/textColorContrast</color>
 
     <!-- CurrentSessionsCard Layout Colors -->
     <color name="currentSessionsAccent">@color/colorAccent</color>
     <color name="currentSessionsAccentDisabled">@color/colorAccentDisabled</color>
     <color name="currentSessionsBackground">@color/colorPrimaryVeryLight</color>
     <color name="currentSessionsBackgroundDisabled">@color/colorPrimaryVeryLightDisabled</color>
-
-    <!-- General Colors -->
-    <color name="shadowBlack">#1e000000</color>
-    <color name="semiTransparentBlack">#b2000000</color>
-    <color name="transparent">#00ffffff</color>
-
 
 </resources>

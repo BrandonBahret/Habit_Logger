@@ -45,9 +45,10 @@ public abstract class CalendarViewBase extends View {
     private int mTextColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
     private int mTitleColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
     protected int mDateTextColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
-    private int mBackgroundColor = ContextCompat.getColor(getContext(), R.color.background);
+    private int mBackgroundColor = ContextCompat.getColor(getContext(), R.color.background1);
     private int mCalendarBackgroundColor = ContextCompat.getColor(getContext(), R.color.defaultCardViewBackground);
     private int mDateElementColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
+    protected int mEmptyDateColor = ContextCompat.getColor(getContext(), R.color.colorPrimary);
 
     private TextPaint mBackgroundPaint;
     protected TextPaint mCalendarBackgroundPaint;
@@ -55,6 +56,7 @@ public abstract class CalendarViewBase extends View {
     protected TextPaint mTitlePaint;
     protected TextPaint mDateTextPaint;
     protected TextPaint mDateElementPaint;
+    protected TextPaint mEmptyDatePaint;
     //endregion -- end --
 
     //region (Drawables)
@@ -130,6 +132,10 @@ public abstract class CalendarViewBase extends View {
         mDateElementPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         mDateElementPaint.setTextAlign(Paint.Align.LEFT);
 
+        mEmptyDatePaint = new TextPaint();
+        mEmptyDatePaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        mEmptyDatePaint.setTextAlign(Paint.Align.LEFT);
+
         mCalendarBackgroundPaint = new TextPaint();
 
         mTextPaint = new TextPaint();
@@ -165,6 +171,10 @@ public abstract class CalendarViewBase extends View {
         mDateElementColor = attributes.getColor(
                 R.styleable.CalendarView_date_element_color,
                 mDateElementColor);
+
+        mEmptyDateColor = attributes.getColor(
+                R.styleable.CalendarView_empty_date_color,
+                mEmptyDateColor);
     }
 
     private void gatherDimensionAttributes(TypedArray attributes) {
@@ -212,7 +222,7 @@ public abstract class CalendarViewBase extends View {
 
     //endregion
 
-    //region Methods responsible for making measurements
+    //region Methods responsible for handling invalidation and measurements
     protected void invalidatePaddingAndContentMeasurements() {
         mPaddingLeft = getPaddingLeft();
         mPaddingTop = getPaddingTop();
@@ -243,6 +253,8 @@ public abstract class CalendarViewBase extends View {
 
         mDateElementPaint.setTextSize(mDateTextSize);
         mDateElementPaint.setColor(mDateElementColor);
+
+        mEmptyDatePaint.setColor(mEmptyDateColor);
 
         mCalendarBackgroundPaint.setColor(mCalendarBackgroundColor);
 

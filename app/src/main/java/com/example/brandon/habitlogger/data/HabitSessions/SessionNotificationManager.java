@@ -71,7 +71,7 @@ public class SessionNotificationManager {
 
     private Notification createNotification(Habit habit) {
         return new NotificationCompat.Builder(mContext)
-                .setSmallIcon(R.drawable.ic_notification_icon_white_24dp)
+                .setSmallIcon(R.drawable.ic_notification_icon_24dp)
                 .setContentText("")
                 .setContentTitle("")
                 .setVisibility(Notification.VISIBILITY_PUBLIC)

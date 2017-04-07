@@ -244,8 +244,7 @@ public class SessionActivity extends AppCompatActivity implements
 
         if (shouldAsk) {
             boolean nightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
-            int iconRes = nightMode ? R.drawable.ic_check_white_24dp :
-                    R.drawable.ic_check_black_24dp;
+            int iconRes = R.drawable.ic_check_24dp;
 
             askForConfirmation("Finish session", "Finish this session?", true, iconRes,
                     new DialogInterface.OnClickListener() {
@@ -265,8 +264,7 @@ public class SessionActivity extends AppCompatActivity implements
 
         if (shouldAsk) {
             boolean nightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
-            int iconRes = nightMode ? R.drawable.ic_close_white_24dp :
-                    R.drawable.ic_close_black_24dp;
+            int iconRes = R.drawable.ic_close_24dp;
 
             askForConfirmation("Cancel session", "Cancel this session?", false, iconRes,
                     new DialogInterface.OnClickListener() {

@@ -6,10 +6,10 @@ import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.text.TextPaint;
 
+import com.example.brandon.habitlogger.common.MyColorUtils;
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.DateElementBase;
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.TextElement;
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.ViewElement;
-import com.example.brandon.habitlogger.common.MyColorUtils;
 
 /**
  * Created by Brandon on 3/16/2017.
@@ -37,7 +37,7 @@ public class DateElement extends DateElementBase {
             TextPaint paint = new TextPaint(mDateText.getPaint());
 
             int backgroundColor = mTextPaint.getColor();
-            if(!MyColorUtils.isColorBright(backgroundColor, 0.6f))
+            if(!MyColorUtils.isColorBright(backgroundColor, 0.5f))
                 paint.setColor(Color.WHITE);
             else if(mHasEntries)
                 paint.setColor(Color.BLACK);

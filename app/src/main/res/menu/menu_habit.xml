@@ -6,7 +6,7 @@
 
     <item
         android:id="@+id/search"
-        android:icon="@drawable/ic_search_white_24dp"
+        android:icon="@drawable/ic_search_24dp"
         android:title="@string/filter_entries"
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="always"/>

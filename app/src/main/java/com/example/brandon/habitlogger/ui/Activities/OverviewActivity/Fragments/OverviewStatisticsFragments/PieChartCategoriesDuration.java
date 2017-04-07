@@ -6,6 +6,7 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ public class PieChartCategoriesDuration extends Fragment implements IDataOvervie
     //region (Member attributes)
     FragmentPieChartCategoriesDurationBinding ui;
     IDataOverviewCallback ICallback;
+    private int mTextColor;
     //endregion
 
     public PieChartCategoriesDuration() {
@@ -46,11 +48,17 @@ public class PieChartCategoriesDuration extends Fragment implements IDataOvervie
         // Inflate the layout for this fragment
         ui = DataBindingUtil.inflate(inflater, R.layout.fragment_pie_chart_categories_duration, container, false);
 
+        mTextColor = ContextCompat.getColor(getContext(), R.color.textColor3);
         ui.chart.setCenterText("All Categories");
+        ui.chart.setCenterTextColor(mTextColor);
+        ui.chart.setCenterTextSize(16);
+        ui.chart.setHoleRadius(55f);
         ui.chart.setEntryLabelColor(Color.TRANSPARENT);
+        ui.chart.setHoleColor(Color.TRANSPARENT);
         ui.chart.setExtraOffsets(4, 8, 0, 3);
         ui.chart.getDescription().setEnabled(false);
         ui.chart.getLegend().setWordWrapEnabled(true);
+        ui.chart.getLegend().setTextColor(mTextColor);
 
         return ui.getRoot();
     }
@@ -110,7 +118,8 @@ public class PieChartCategoriesDuration extends Fragment implements IDataOvervie
         PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setSliceSpace(0f);
         dataSet.setSelectionShift(0f);
-        dataSet.setValueTextColor(Color.BLACK);
+        dataSet.setValueTextColor(mTextColor);
+        dataSet.setValueLineColor(mTextColor);
         dataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
         dataSet.setValueLineVariableLength(true);
         dataSet.setColors(collectColorsFromEntries(entries));

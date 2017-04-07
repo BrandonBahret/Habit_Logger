@@ -113,7 +113,7 @@ public class CalendarView extends CalendarViewBase {
             DateElement currentElement = dateElements[day];
 
             if (day < firstDay - 1)
-                currentElement.setTextPaint(mDateTextPaint);
+                currentElement.setTextPaint(mEmptyDatePaint);
             else {
                 int thisDay = day - (firstDay - 2);
 
@@ -166,7 +166,7 @@ public class CalendarView extends CalendarViewBase {
                 currentElement = dateElements[dayIndex];
 
                 if (dayIndex >= maxCell - 1)
-                    currentElement.setTextPaint(mDateTextPaint);
+                    currentElement.setTextPaint(mEmptyDatePaint);
                 else {
                     int thisDay = dayIndex - (firstDay - 2);
                     if (mModel.getDatesWithEntries().contains(thisDay)) {

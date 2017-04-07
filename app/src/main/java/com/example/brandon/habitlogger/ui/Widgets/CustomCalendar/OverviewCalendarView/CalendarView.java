@@ -58,7 +58,10 @@ public class CalendarView extends CalendarViewBase {
 
     @Override
     protected void onInvalidateTextPaintAndMeasurements() {
-        mEmptyDateElementPaint.setColor(MyColorUtils.setLightness(mDateTextColor, 0.9f));
+        float emptyColorLight = MyColorUtils.getLightness(mEmptyDateColor);
+        emptyColorLight = Math.max(emptyColorLight, emptyColorLight + 0.15f);
+        int emptyColor = MyColorUtils.setLightness(mEmptyDateColor, emptyColorLight);
+        mEmptyDateElementPaint.setColor(emptyColor);
     }
     //endregion -- end --
 
@@ -106,7 +109,7 @@ public class CalendarView extends CalendarViewBase {
             DateElement currentElement = dateElements[day];
 
             if (day < firstDay - 1)
-                currentElement.setTextPaint(mDateTextPaint);
+                currentElement.setTextPaint(mEmptyDatePaint);
 
             else {
                 int thisDay = day - (firstDay - 2);
@@ -134,7 +137,7 @@ public class CalendarView extends CalendarViewBase {
                 currentElement = dateElements[dayIndex];
 
                 if (dayIndex >= maxCell - 1)
-                    currentElement.setTextPaint(mDateTextPaint);
+                    currentElement.setTextPaint(mEmptyDatePaint);
 
                 else {
                     int thisDay = dayIndex - (firstDay - 2);

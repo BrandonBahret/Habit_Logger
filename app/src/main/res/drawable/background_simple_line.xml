@@ -13,7 +13,7 @@
 
             <stroke
                 android:width="1dp"
-                android:color="@color/defaultDarkIconTint" />
+                android:color="@color/iconTint1" />
         </shape>
     </item>
 

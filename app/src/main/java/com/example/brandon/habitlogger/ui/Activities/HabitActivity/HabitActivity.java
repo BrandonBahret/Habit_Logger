@@ -200,7 +200,9 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
 
         if (!mHabit.getIsArchived()) {
             color = mHabit.getCategory().getColorAsInt();
-            darkerColor = MyColorUtils.setLightness(color, 0.35f);
+
+            float darkness = MyColorUtils.getLightness(color) - 0.08f;
+            darkerColor = MyColorUtils.setLightness(color, darkness);
         }
 
         getWindow().setStatusBarColor(darkerColor);

@@ -138,8 +138,8 @@ public class HabitViewHolder extends ChildViewHolder {
     }
 
     public static int getResourceIdForPauseButton(boolean isPaused) {
-        return isPaused ? R.drawable.ic_play_black_24dp :
-                R.drawable.ic_pause_black_24dp;
+        return isPaused ? R.drawable.ic_play_24dp :
+                R.drawable.ic_pause_24dp;
     }
     //endregion
 

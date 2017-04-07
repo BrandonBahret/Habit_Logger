@@ -5,6 +5,7 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -101,6 +102,7 @@ public class PieGraphCompletion extends Fragment implements IHabitCallback.IUpda
         ui.completedDaysText.setText(String.valueOf(totalDaysWithEntries));
         ui.totalDaysText.setText(String.valueOf(totalDays));
         ui.chart.setCenterText(String.format(Locale.US, "%.2f%%", ratio));
+        ui.chart.setCenterTextColor(ContextCompat.getColor(getContext(), R.color.textColor3));
 
         List<PieEntry> entries = new ArrayList<>();
         entries.add(new PieEntry(ratio));

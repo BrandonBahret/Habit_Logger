@@ -40,7 +40,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_toEndOf="@+id/entry_start_time"
                 android:drawablePadding="3dp"
-                android:drawableStart="@drawable/ic_timer_black_24dp"
+                android:drawableStart="@drawable/ic_timer_24dp"
                 android:gravity="center"
                 android:text="@string/time_display_placeholder"/>
 
@@ -51,7 +51,7 @@
                 android:layout_above="@+id/entry_note"
                 android:layout_alignStart="@+id/entry_note"
                 android:drawablePadding="3dp"
-                android:drawableStart="@drawable/ic_clock_black_24dp"
+                android:drawableStart="@drawable/ic_clock_24dp"
                 android:gravity="center"
                 android:text="@string/time_of_day_placeholder"/>
 
@@ -63,7 +63,7 @@
                 android:layout_below="@+id/entry_note"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/toggle_note_content_description"
-                android:src="@drawable/ic_arrow_drop_down_black_24dp"
+                android:src="@drawable/ic_arrow_drop_down_24dp"
                 android:visibility="gone"/>
 
             <com.example.brandon.habitlogger.ui.Widgets.LayoutCheckableTextView

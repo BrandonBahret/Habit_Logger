@@ -4,17 +4,18 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.databinding.FragmentDistributionStartingTimeBinding;
+import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
@@ -28,14 +29,17 @@ import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class DistributionStartingTime extends Fragment implements IHabitCallback.IUpdateEntries {
+    //region (Member attributes)
     IHabitCallback callbackInterface;
     FragmentDistributionStartingTimeBinding ui;
     private int mColor;
+    private int mTextColor;
+    //endregion
 
     //region [ ---- Methods responsible for handling the fragment lifecycle ---- ]
 
@@ -45,6 +49,8 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
                              Bundle savedInstanceState) {
 
         ui = DataBindingUtil.inflate(inflater, R.layout.fragment_distribution_starting_time, container, false);
+        ui.chart.setScaleEnabled(false);
+        mTextColor = ContextCompat.getColor(getContext(), R.color.textColor3);
         return ui.getRoot();
     }
     //endregion -- end --
@@ -111,19 +117,16 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
 
         //endregion // Disable features
 
-        //region // Set Axis settings
-
-        //region // Y-Axis
-
+        //region Y-Axis
         ui.chart.getAxisLeft().setValueFormatter(new PercentFormatter());
+        ui.chart.getAxisLeft().setTextColor(mTextColor);
         ui.chart.getAxisLeft().setAxisMinimum(0.0f);
         ui.chart.getAxisRight().setEnabled(false);
+        //endregion -- end --
 
-        //endregion // Y-Axis
-
-        //region // X-Axis
-
-        ui.chart.getXAxis().setLabelRotationAngle(90);
+        //region X-Axis
+        ui.chart.getXAxis().setLabelRotationAngle(-90);
+        ui.chart.getXAxis().setTextColor(mTextColor);
         ui.chart.getXAxis().setLabelCount(24);
         ui.chart.getXAxis().setDrawGridLines(false);
         ui.chart.getXAxis().setValueFormatter(new IAxisValueFormatter() {
@@ -133,15 +136,10 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
                 return MyTimeUtils.stringifyTimePortion(time, "h a");
             }
         });
-
-//        ui.chart.getXAxis().setSpaceMax(1f);
         ui.chart.getXAxis().setGranularity(1f);
         ui.chart.getXAxis().setGranularityEnabled(true);
         ui.chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-
-        //endregion // X-Axis
-
-        //endregion // Set Axis settings
+        //endregion -- end --
 
         ui.chart.setDrawOrder(new CombinedChart.DrawOrder[]{
                 CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.LINE
@@ -152,15 +150,15 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
         //region // Add data to CombinedData
         BarDataSet dataSet = new BarDataSet(entries, "label");
         dataSet.setColor(mColor);
+        dataSet.setValueTextColor(mTextColor);
         dataSet.setHighlightEnabled(false);
         BarData barData = new BarData(dataSet);
         barData.setValueFormatter(new IValueFormatter() {
             @Override
             public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
                 if (value > 0)
-                    return new DecimalFormat("0.0").format(value);
-                else
-                    return "";
+                    return String.format(Locale.getDefault(), "%d%%", (int) value);
+                else return "";
             }
         });
 

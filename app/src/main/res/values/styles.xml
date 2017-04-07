@@ -5,7 +5,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@color/background</item>
+        <item name="android:windowBackground">@color/background1</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="@android:style/Widget.PopupMenu">
@@ -25,13 +25,13 @@
     <!-- Fab Styles -->
     <style name="fabMenuLabelStyle">
         <item name="android:background">@drawable/background_fab_label</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/textColor1</item>
     </style>
 
     <style name="fabMenuButtonsStyle">
         <item name="fab_size">mini</item>
         <item name="fab_shadowColor">@color/shadowBlack</item>
-        <item name="elevation">4dp</item>
+        <item name="elevation">@dimen/fab_elevation</item>
         <item name="fab_colorNormal">?attr/colorAccent</item>
         <item name="fab_colorPressed">?attr/colorPrimaryDark</item>
     </style>
@@ -50,7 +50,7 @@
     <style name="cardTitle">
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/defaultDarkIconTint</item>
+        <item name="android:textColor">@color/textColor1</item>
         <item name="android:textAlignment">center</item>
     </style>
 

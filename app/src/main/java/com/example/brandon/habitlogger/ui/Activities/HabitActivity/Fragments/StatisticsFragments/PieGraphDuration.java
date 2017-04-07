@@ -6,15 +6,16 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.databinding.FragmentPieGraphDurationBinding;
+import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
@@ -28,6 +29,7 @@ import java.util.List;
 public class PieGraphDuration extends Fragment implements IHabitCallback.IUpdateCategorySample {
 
     private FragmentPieGraphDurationBinding ui;
+    private int mTextColor;
     IHabitCallback callbackInterface;
 
     public PieGraphDuration() {
@@ -46,14 +48,17 @@ public class PieGraphDuration extends Fragment implements IHabitCallback.IUpdate
         // Inflate the layout for this fragment
         ui = DataBindingUtil.inflate(inflater, R.layout.fragment_pie_graph_duration, container, false);
 
+        mTextColor = ContextCompat.getColor(getContext(), R.color.textColor3);
         ui.chart.setUsePercentValues(true);
         ui.chart.setExtraOffsets(4, 8, 0, 3);
         ui.chart.getDescription().setEnabled(false);
-        ui.chart.setCenterTextSize(15);
-        ui.chart.setHoleRadius(65f);
+        ui.chart.setCenterTextSize(16);
+        ui.chart.setCenterTextColor(mTextColor);
+        ui.chart.setHoleRadius(55f);
         ui.chart.setHoleColor(Color.TRANSPARENT);
         ui.chart.setHighlightPerTapEnabled(true);
         ui.chart.getLegend().setWordWrapEnabled(true);
+        ui.chart.getLegend().setTextColor(mTextColor);
         ui.chart.setDrawEntryLabels(false);
 
         return ui.getRoot();
@@ -108,9 +113,10 @@ public class PieGraphDuration extends Fragment implements IHabitCallback.IUpdate
         PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setSliceSpace(0f);
         dataSet.setSelectionShift(0f);
-        dataSet.setValueTextColor(Color.BLACK);
+        dataSet.setValueTextColor(mTextColor);
         dataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
         dataSet.setValueLineVariableLength(true);
+        dataSet.setValueLineColor(mTextColor);
         dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
 
         PieData data = new PieData(dataSet);

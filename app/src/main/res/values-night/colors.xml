@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Primary Colors -->
+    <color name="colorPrimaryVeryLight">#424242</color>
+    <color name="colorPrimaryVeryLightDisabled">#5c5c5c</color>
+    <color name="colorPrimaryLight">#303030</color>
+    <color name="colorPrimary">#212121</color>
+    <color name="colorPrimaryDark">#000000</color>
+
+    <!-- Accent Colors -->
+    <color name="colorAccent">#738cbf</color>
+    <color name="colorAccentDark">#637aa6</color>
+    <color name="colorAccentDisabled">#8695b3</color>
+
+    <!-- Background Color -->
+    <color name="background1">#303030</color>
+    <color name="background2">#424242</color>
+    <color name="background3">#4d4d4d</color>
+    <color name="background4">#5c5c5c</color>
+
+    <!-- Icon Colors -->
+    <color name="iconTint1">#90ffffff</color>
+    <color name="iconTint2">#f2f2f2</color>
+
+    <!-- Text Colors -->
+    <color name="textColor1">#ffffff</color>
+    <color name="textColor2">#cccccc</color>
+    <color name="textColor3">#cccccc</color>
+    <color name="textColorContrast">#ffffffff</color>
+    <color name="textColorTransparent">#c8ffffff</color>
+
+    <!-- Item Decoration Background -->
+    <color name="itemDecorationText">@color/textColor2</color>
+    <color name="itemDecorationBackground">@color/background3</color>
+
+    <!--Calendar View Colors -->
+    <color name="calendarViewTitle">@color/textColor1</color>
+    <color name="calendarViewEmpty">@color/background4</color>
+    <color name="calendarViewDateLabel">@color/textColor2</color>
+
+
+</resources>

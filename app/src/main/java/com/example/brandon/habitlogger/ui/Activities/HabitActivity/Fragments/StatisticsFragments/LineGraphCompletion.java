@@ -13,6 +13,7 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -40,9 +41,12 @@ import java.util.List;
 
 public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpdateEntries {
 
+    //region (Member attributes)
     private FragmentLineGraphCompletionBinding ui;
     IHabitCallback callbackInterface;
     private int mColor;
+    private int mTextColor;
+    //endregion
 
     public LineGraphCompletion() {
         // Required empty public constructor
@@ -60,6 +64,7 @@ public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpd
         // Inflate the layout for this fragment
         ui = DataBindingUtil.inflate(inflater, R.layout.fragment_line_graph_completion, container, false);
 
+        mTextColor = ContextCompat.getColor(getContext(), R.color.textColor3);
         ui.chart.getLegend().setEnabled(false);
         ui.chart.getDescription().setEnabled(false);
         ui.chart.setPinchZoom(true);
@@ -69,6 +74,7 @@ public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpd
         //region Stylize the axes
         YAxis yAxis = ui.chart.getAxisLeft();
         yAxis.setAxisMinimum(0f);
+        yAxis.setTextColor(mTextColor);
         yAxis.setGridColor(ColorUtils.setAlphaComponent(yAxis.getGridColor(), 50));
         yAxis.setValueFormatter(new PercentFormatter());
 
@@ -76,6 +82,7 @@ public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpd
         yAxis.setEnabled(false);
 
         XAxis xAxis = ui.chart.getXAxis();
+        xAxis.setTextColor(mTextColor);
         xAxis.setLabelCount(5);
         xAxis.setGranularity(1f);
         xAxis.setGranularityEnabled(true);

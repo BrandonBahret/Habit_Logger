@@ -34,7 +34,7 @@
                     android:contentDescription="@string/card_view_accent_description"
                     android:elevation="4dp"
                     android:padding="5dp"
-                    android:src="@drawable/ic_timer_black_24dp"
+                    android:src="@drawable/ic_timer_24dp"
                     android:tint="@android:color/white"/>
 
                 <TextView
