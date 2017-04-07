@@ -29,7 +29,7 @@ public class NotificationsSettingsActivity extends SettingsActivityBase {
 
         if (key.equals(getString(R.string.pref_do_show_notifications))) {
 
-            if (getPreferenceChecker().doShowNotifications())
+            if (getPreferenceChecker().doShowNotifications() && getPreferenceChecker().doShowNotificationsAutomatically())
                 mSessionNotificationManager.launchNotificationsForAllActiveSessions();
 
             else

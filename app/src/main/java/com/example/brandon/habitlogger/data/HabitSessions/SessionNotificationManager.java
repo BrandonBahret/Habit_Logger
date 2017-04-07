@@ -14,6 +14,7 @@ import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.ui.Activities.MainActivity.HabitViewHolder;
+import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity;
 
 import java.io.Serializable;
@@ -30,11 +31,13 @@ public class SessionNotificationManager {
     private Context mContext;
     private SessionManager mSessionManager;
     private NotificationManager mNotificationManager;
+    private PreferenceChecker mPreferenceChecker;
     //endregion
 
     public SessionNotificationManager(Context context) {
         mContext = context;
         mSessionManager = new SessionManager(context);
+        mPreferenceChecker = new PreferenceChecker(context);
         mNotificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
     }
@@ -99,7 +102,7 @@ public class SessionNotificationManager {
                     public void run() {
                         final int habitId = (int) habit.getDatabaseId();
 
-                        if (mSessionManager.getIsSessionActive(habitId)) {
+                        if (mSessionManager.getIsSessionActive(habitId) && mPreferenceChecker.doShowNotifications()) {
                             mNotificationManager.notify(habitId, createNotification(habit));
 
                             try {

@@ -168,8 +168,8 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
     }
 
     private int getSessionEntryIndex(long entryId) {
-        for(int index = 0; index < mSessionEntries.size(); index++){
-            if(mSessionEntries.get(index).getDatabaseId() == entryId)
+        for (int index = 0; index < mSessionEntries.size(); index++) {
+            if (mSessionEntries.get(index).getDatabaseId() == entryId)
                 return index;
         }
 
@@ -178,7 +178,7 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
 
     private int getPositionForEntry(SessionEntry newEntry) {
         int foundPosition = MyCollectionUtils.binarySearch(mSessionEntries, newEntry.getStartingTime(), SessionEntry.IKeyCompareStartingTime);
-        return foundPosition < 0 ?  (-foundPosition) - 1 : foundPosition;
+        return foundPosition < 0 ? (-foundPosition) - 1 : foundPosition;
     }
     //endregion
 
@@ -214,6 +214,12 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
             mSessionEntries = dataSample.getSessionEntries();
             mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), this);
             mEntriesContainer.setAdapter(mEntryAdapter);
+
+            int visibilityMode = mSessionEntries.isEmpty() ? View.VISIBLE : View.GONE;
+            View noResultsLayout = getView().findViewById(R.id.no_results_layout);
+            if (noResultsLayout.getVisibility() != visibilityMode) {
+                noResultsLayout.setVisibility(visibilityMode);
+            }
         }
     }
 }

@@ -292,6 +292,12 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
         mActiveSessions.addAll(entries);
 
         mSessionViewAdapter.notifyDataSetChanged();
+
+        int visibilityMode = mActiveSessions.isEmpty() ? View.VISIBLE : View.GONE;
+        View noResultsLayout = findViewById(R.id.no_results_layout);
+        if (visibilityMode != noResultsLayout.getVisibility())
+            noResultsLayout.setVisibility(visibilityMode);
+
         return true;
     }
     //endregion
