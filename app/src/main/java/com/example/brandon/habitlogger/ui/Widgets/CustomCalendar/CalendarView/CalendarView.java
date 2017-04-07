@@ -118,6 +118,7 @@ public class CalendarView extends CalendarViewBase {
                 int thisDay = day - (firstDay - 2);
 
                 if (mModel.getDatesWithEntries().contains(thisDay)) {
+                    currentElement.setHasEntries(true);
                     currentElement.setTextPaint(mStreakPaint);
 
                     boolean isAStreak = (day == 0 && mModel.getDatesWithEntries().contains(thisDay - 1)) ||
@@ -169,6 +170,7 @@ public class CalendarView extends CalendarViewBase {
                 else {
                     int thisDay = dayIndex - (firstDay - 2);
                     if (mModel.getDatesWithEntries().contains(thisDay)) {
+                        currentElement.setHasEntries(true);
                         currentElement.setTextPaint(mStreakPaint);
 
                         boolean isAStreak = (day == 0 && mModel.getDatesWithEntries().contains(thisDay - 1)) ||

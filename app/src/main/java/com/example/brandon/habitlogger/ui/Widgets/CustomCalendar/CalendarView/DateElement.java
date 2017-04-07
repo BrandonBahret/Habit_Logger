@@ -20,6 +20,7 @@ public class DateElement extends DateElementBase {
 
     //region (Member attributes)
     private boolean mIsAStreak = false;
+    private boolean mHasEntries = false;
     protected Paint mStreakLinePaint;
     //endregion
 
@@ -38,6 +39,8 @@ public class DateElement extends DateElementBase {
             int backgroundColor = mTextPaint.getColor();
             if(!MyColorUtils.isColorBright(backgroundColor, 0.6f))
                 paint.setColor(Color.WHITE);
+            else if(mHasEntries)
+                paint.setColor(Color.BLACK);
 
             mDateText.draw(canvas, paint, x - mDateText.getWidth() / 2f, y + mDateText.getHeight() / 2f);
         }
@@ -50,6 +53,10 @@ public class DateElement extends DateElementBase {
     //region Setters {}
     public void setIsAStreak(boolean isAStreak) {
         mIsAStreak = isAStreak;
+    }
+
+    public void setHasEntries(boolean hasEntries){
+        mHasEntries = hasEntries;
     }
 
     @Override
