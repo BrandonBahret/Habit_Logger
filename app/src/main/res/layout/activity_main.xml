@@ -33,6 +33,16 @@
             tools:openDrawer="start">
 
             <include
+                android:id="@+id/no_habits_available_layout"
+                layout="@layout/no_habits_available"
+                android:visibility="gone"/>
+
+            <include
+                android:id="@+id/no_results_layout"
+                layout="@layout/no_results_found"
+                android:visibility="gone"/>
+
+            <include
                 android:id="@+id/main_include"
                 layout="@layout/app_bar_main"
                 android:layout_width="match_parent"

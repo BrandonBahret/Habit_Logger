@@ -129,11 +129,22 @@ public class HabitDatabase {
 
     //region Methods responsible for counting the number of rows in tables
     public int getNumberOfHabits(long categoryId) {
+        return (int) MyDatabaseUtils.getNumberOfRows(
+                mReadableDatabase, HabitsTableSchema.TABLE_NAME,
+                HabitsTableSchema.HABIT_CATEGORY_ID, categoryId
+        );
+    }
+
+    public int getNumberOfHabits() {
         return (int) MyDatabaseUtils.getNumberOfRows(mReadableDatabase, HabitsTableSchema.TABLE_NAME);
     }
 
     public int getNumberOfCategories() {
         return (int) MyDatabaseUtils.getNumberOfRows(mReadableDatabase, CategoriesTableSchema.TABLE_NAME);
+    }
+
+    public int getNumberOfEntries() {
+        return (int) MyDatabaseUtils.getNumberOfRows(mReadableDatabase, EntriesTableSchema.TABLE_NAME);
     }
 
     public int getNumberOfEntries(long habitId) {
@@ -143,6 +154,7 @@ public class HabitDatabase {
     //endregion
 
     //region Methods responsible for fetching record ids
+
     /**
      * @param index         The index of the record to be looked up.
      * @param tableName     The table name of the table to search.
@@ -194,6 +206,7 @@ public class HabitDatabase {
     //region [ ---- Methods for manipulating the habits table ---- ]
 
     //region Methods responsible for finding record ids
+
     /**
      * @param index The habit index to look up.
      * @return The unique habit id of the row.

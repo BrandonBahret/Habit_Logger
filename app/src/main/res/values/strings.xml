@@ -139,5 +139,8 @@
     <string name="pref_category_sticky">preference_make_categories_sticky</string>
     <string name="pref_date_header_sticky">preference_date_headers_sticky</string>
     <string name="filter_main_activity">Search…</string>
+    <string name="no_results">No Results</string>
+    <string name="no_habits_available">No Habits Available</string>
+    <string name="no_data_available_lower">No data available</string>
 
 </resources>

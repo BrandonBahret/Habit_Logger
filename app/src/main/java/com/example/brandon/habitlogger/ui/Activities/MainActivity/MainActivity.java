@@ -24,32 +24,32 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.internal.util.Predicate;
-import com.example.brandon.habitlogger.data.DataExportHelpers.GoogleDriveDataExportManager;
-import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
-import com.example.brandon.habitlogger.ui.Activities.AboutActivity;
-import com.example.brandon.habitlogger.ui.Activities.ActiveSessionsActivity.ActiveSessionsActivity;
-import com.example.brandon.habitlogger.ui.Activities.HabitActivity.HabitActivity;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;
-import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.NewHabitDialog;
-import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
-import com.example.brandon.habitlogger.data.HabitSessions.SessionNotificationManager;
-import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.DataOverviewActivity;
-import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
-import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.SettingsActivity;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.GroupDecoration;
-import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
-import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.RequestCodes;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
+import com.example.brandon.habitlogger.data.DataExportHelpers.GoogleDriveDataExportManager;
+import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
+import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
+import com.example.brandon.habitlogger.data.HabitSessions.SessionNotificationManager;
 import com.example.brandon.habitlogger.databinding.ActivityMainBinding;
+import com.example.brandon.habitlogger.ui.Activities.AboutActivity;
+import com.example.brandon.habitlogger.ui.Activities.ActiveSessionsActivity.ActiveSessionsActivity;
+import com.example.brandon.habitlogger.ui.Activities.HabitActivity.HabitActivity;
+import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.DataOverviewActivity;
+import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
+import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.SettingsActivity;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.RecyclerViewScrollObserver;
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity;
+import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
+import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;
+import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.NewHabitDialog;
 import com.example.brandon.habitlogger.ui.Widgets.CurrentSessionCardManager;
+import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.GroupDecoration;
+import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 import com.github.clans.fab.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -325,6 +325,28 @@ public class MainActivity extends AppCompatActivity
             Collections.sort(mHabitList, Habit.ICompareCategoryName);
             mHabitCardContainer.setAdapter(mHabitAdapter);
         }
+
+        checkIfHabitsAreAvailable();
+    }
+
+    public void checkIfHabitsAreAvailable() {
+        boolean habitsAvailable = mHabitDatabase.getNumberOfHabits() != 0;
+
+        mCurrentSessionCard.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
+        ui.mainInclude.habitRecyclerView.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
+        findViewById(R.id.no_habits_available_layout).setVisibility(habitsAvailable ? View.GONE : View.VISIBLE);
+    }
+
+    public void updateUiForSearchResult(boolean isEmpty) {
+        boolean habitsAvailable = mHabitDatabase.getNumberOfHabits() != 0;
+        int visibility = isEmpty && habitsAvailable ? View.VISIBLE : View.GONE;
+        View emptyResultsLayout = findViewById(R.id.no_results_layout);
+        if (emptyResultsLayout.getVisibility() != visibility) {
+
+            mCurrentSessionCard.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
+            ui.mainInclude.habitRecyclerView.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
+            emptyResultsLayout.setVisibility(visibility);
+        }
     }
 
     private void showArchiveDatabase() {
@@ -384,8 +406,13 @@ public class MainActivity extends AppCompatActivity
             mHabitList.clear();
             mHabitList.addAll(allHabits);
             mHabitAdapter.notifyDataSetChanged();
+
+            updateUiForSearchResult(mHabitList.isEmpty());
         }
-        else showDatabase();
+        else {
+            showDatabase();
+            updateUiForSearchResult(false);
+        }
     }
     //endregion -- end --
 
@@ -486,6 +513,7 @@ public class MainActivity extends AppCompatActivity
                                 int position = mHabitAdapter.getAdapterItemPosition(habitId);
                                 mHabitList.remove(position);
                                 mHabitAdapter.notifyItemRemoved(position);
+                                checkIfHabitsAreAvailable();
                             }
                         })
                         .show();
@@ -676,7 +704,9 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case (R.id.overall_stats_nav):
-                DataOverviewActivity.startActivity(this);
+                if (mHabitDatabase.getNumberOfEntries() > 0)
+                    DataOverviewActivity.startActivity(this);
+                else Toast.makeText(this, R.string.no_data_available_lower, Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.settings_nav:
