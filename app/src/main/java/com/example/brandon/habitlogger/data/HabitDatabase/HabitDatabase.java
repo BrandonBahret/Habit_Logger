@@ -8,6 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.android.internal.util.Predicate;
+import com.example.brandon.habitlogger.common.MyCollectionUtils;
+import com.example.brandon.habitlogger.common.MyDatabaseUtils;
+import com.example.brandon.habitlogger.data.CategoryDataSample;
+import com.example.brandon.habitlogger.data.HabitDataSample;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
@@ -15,9 +20,6 @@ import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.Categor
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.DatabaseSchema;
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.EntriesTableSchema;
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.HabitsTableSchema;
-import com.example.brandon.habitlogger.common.MyDatabaseUtils;
-import com.example.brandon.habitlogger.data.CategoryDataSample;
-import com.example.brandon.habitlogger.data.HabitDataSample;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 
 import java.util.ArrayList;
@@ -40,6 +42,7 @@ public class HabitDatabase {
     public DatabaseSchema databaseHelper;
     private SQLiteDatabase mWritableDatabase;
     private SQLiteDatabase mReadableDatabase;
+
     //endregion
 
     //region Code responsible for providing an interface to the database
@@ -104,6 +107,49 @@ public class HabitDatabase {
             data.add(getCategoryDataSample(category, dateFrom, dateTo));
 
         return new HabitDataSample(data, dateFrom, dateTo);
+    }
+
+    public HabitDataSample getHabitDataSample(SessionEntriesSample entriesSample) {
+
+        List<Long> habitIdsList = MyCollectionUtils.collect(entriesSample.getSessionEntries(), new MyCollectionUtils.IGetKey<SessionEntry, Long>() {
+            @Override
+            public Long get(SessionEntry entry) {
+                return entry.getHabitId();
+            }
+        });
+
+        Set<Long> habitIdsSet = new HashSet<>(habitIdsList);
+
+        Set<Long> categoryIdSet = new HashSet<>();
+
+        for (long habitId : habitIdsSet) {
+            categoryIdSet.add(getHabitCategoryId(habitId));
+        }
+
+        long dateFrom = entriesSample.getDateFromTime();
+        long dateTo = entriesSample.getDateToTime();
+
+        List<CategoryDataSample> categoryDataSamples = new ArrayList<>();
+
+        for (long categoryId : categoryIdSet) {
+            List<Habit> habits = getHabits(categoryId);
+
+            for (Habit habit : habits) {
+                final long habitId = habit.getDatabaseId();
+                List<SessionEntry> entries = new ArrayList<>(entriesSample.getSessionEntries());
+                MyCollectionUtils.filter(entries, new Predicate<SessionEntry>() {
+                    @Override
+                    public boolean apply(SessionEntry sessionEntry) {
+                        return sessionEntry.getHabitId() != habitId;
+                    }
+                });
+                habit.setEntries(entries);
+            }
+
+            categoryDataSamples.add(new CategoryDataSample(getCategory(categoryId), habits, dateFrom, dateTo));
+        }
+
+        return new HabitDataSample(categoryDataSamples, dateFrom, dateTo);
     }
 
     public CategoryDataSample getCategoryDataSample(HabitCategory category, long dateFrom, long dateTo) {

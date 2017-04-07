@@ -211,8 +211,8 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
     @Override
     public void updateEntries(SessionEntriesSample dataSample) {
         if (mEntryAdapter != null) {
-            this.mSessionEntries = dataSample.getSessionEntries();
-            mEntryAdapter = new EntryViewAdapter(this.mSessionEntries, getContext(), this);
+            mSessionEntries = dataSample.getSessionEntries();
+            mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), this);
             mEntriesContainer.setAdapter(mEntryAdapter);
         }
     }

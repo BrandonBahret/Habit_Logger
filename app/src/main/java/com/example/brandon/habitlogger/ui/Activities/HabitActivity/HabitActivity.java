@@ -407,6 +407,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
         );
 
         dateRangeManager.updateSessionEntries(entries);
+        updateEntries(entries);
     }
 
     private SearchView.OnQueryTextListener getOnSearchQueryListener() {
@@ -450,7 +451,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                 Set<Long> ids = mHabitDatabase.findEntriesWithinTimeRange(mHabitId, dateFrom, dateTo);
                 HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
                 dateRangeManager.updateSessionEntries(HabitActivity.this.mSessionEntries);
-                updateEntries(HabitActivity.this.mSessionEntries);
+                updateEntries(mSessionEntries);
             }
         };
     }
@@ -494,15 +495,28 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
         startActivity(startSession);
     }
 
-    public void updateEntries(List<SessionEntry> sessionEntries) {
+    public void updateEntries() {
 
-        dateRangeManager.updateSessionEntries(sessionEntries);
         SessionEntriesSample entriesDataSample = getSessionEntries();
-        CategoryDataSample categoryDataSample = getCategoryDataSample();
+        dateRangeManager.updateSessionEntries(entriesDataSample.getSessionEntries());
 
         for (IUpdateEntries callback : mSessionEntriesCallbacks)
             callback.updateEntries(entriesDataSample);
 
+        CategoryDataSample categoryDataSample = getCategoryDataSample();
+        for (IUpdateCategorySample callback : mCategoryDataSampleCallbacks)
+            callback.updateCategoryDataSample(categoryDataSample);
+    }
+
+    public void updateEntries(List<SessionEntry> entries){
+
+        dateRangeManager.updateSessionEntries(entries);
+
+        SessionEntriesSample entriesDataSample = new SessionEntriesSample(entries);
+        for (IUpdateEntries callback : mSessionEntriesCallbacks)
+            callback.updateEntries(entriesDataSample);
+
+        CategoryDataSample categoryDataSample = getCategoryDataSample();
         for (IUpdateCategorySample callback : mCategoryDataSampleCallbacks)
             callback.updateCategoryDataSample(categoryDataSample);
     }

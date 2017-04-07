@@ -30,8 +30,13 @@ public class SessionEntriesSample {
 
     public SessionEntriesSample(List<SessionEntry> sessionEntries) {
         mSessionEntries = sessionEntries;
-        mDateFromTime = Collections.min(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
-        mDateToTime = Collections.max(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
+        if (!mSessionEntries.isEmpty()) {
+            mDateFromTime = Collections.min(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
+            mDateToTime = Collections.max(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
+        }else{
+            mDateFromTime = -1;
+            mDateToTime = -1;
+        }
     }
 
     //region Methods With One Time Calculations {}

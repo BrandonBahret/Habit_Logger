@@ -20,6 +20,7 @@ import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntr
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.HabitDataSample;
+import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.databinding.ActivityDataOverviewBinding;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.Fragments.OverviewCalendarFragment;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.Fragments.OverviewEntriesFragment;
@@ -47,6 +48,16 @@ public class DataOverviewActivity extends AppCompatActivity implements
         HabitDataSample dataSample = getDataSample();
         List<SessionEntry> sessionEntries = dataSample.buildSessionEntriesList().getSessionEntries();
         mDateRangeManager.updateSessionEntries(sessionEntries);
+
+        for (IUpdateHabitSample callback : callbacks)
+            callback.updateHabitDataSample(dataSample);
+    }
+
+    private void updateEntries(List<SessionEntry> entries) {
+        mDateRangeManager.updateSessionEntries(entries);
+
+        SessionEntriesSample entriesSample = new SessionEntriesSample(entries);
+        HabitDataSample dataSample = mHabitDatabase.getHabitDataSample(entriesSample);
 
         for (IUpdateHabitSample callback : callbacks)
             callback.updateHabitDataSample(dataSample);
@@ -160,7 +171,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
                 );
 
                 mDateRangeManager.updateSessionEntries(entries);
-                updateEntries();
+                updateEntries(entries);
                 return true;
             }
         };
