@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/no_result_image"
+        android:id="@+id/no_result_icon"
         android:layout_width="180dp"
         android:layout_height="180dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_search_24dp"
         android:scaleType="fitXY"
-        app:layout_constraintVertical_bias="0.25"/>
+        app:layout_constraintVertical_bias="0.35000002"/>
 
     <TextView
         android:id="@+id/no_result_text"
@@ -31,7 +31,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/no_result_image"
+        app:layout_constraintTop_toBottomOf="@+id/no_result_icon"
         app:layout_constraintVertical_bias="0.0"
         app:layout_constraintHorizontal_bias="0.502"/>
 

@@ -2,6 +2,7 @@ package com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarView;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,10 +66,14 @@ public class CalendarViewAdapter extends CalendarViewAdapterBase<CalendarViewAda
 
     private void generateMonthDataFromEntries(SessionEntriesSample entriesSample) {
         Calendar startCalendar = Calendar.getInstance();
-        startCalendar.setTimeInMillis(entriesSample.getDateFromTime());
+        long minimumTime = entriesSample.getMinimumTime();
+        minimumTime = minimumTime == -1 ? System.currentTimeMillis() : minimumTime;
+        startCalendar.setTimeInMillis(minimumTime);
+//        startCalendar.setTimeInMillis(entriesSample.getDateFromTime());
 
         Calendar endCalendar = Calendar.getInstance();
-        endCalendar.setTimeInMillis(entriesSample.getDateToTime());
+        endCalendar.setTimeInMillis(DateUtils.YEAR_IN_MILLIS * 200);
+//        endCalendar.setTimeInMillis(entriesSample.getDateToTime());
 
         int diffYear = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
         int diffMonth = diffYear * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH) + 1;

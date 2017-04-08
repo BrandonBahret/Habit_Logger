@@ -402,7 +402,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void runDatabaseQuery(String query) {
-        if (query.length() != 0) {
+        if (mHabitAdapter != null && query.length() != 0) {
             final Set<Long> databaseIds = mHabitDatabase.searchHabitDatabase(query);
             List<Habit> allHabits = mHabitDatabase.getHabits();
 

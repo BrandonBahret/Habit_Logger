@@ -30,7 +30,6 @@ import com.example.brandon.habitlogger.databinding.ActivityHabitBinding;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.CalendarFragment;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.EntriesFragment;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.StatisticsFragment;
-import com.example.brandon.habitlogger.ui.Activities.MainActivity.MainActivity;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
@@ -58,6 +57,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
     private long mHabitId;
 
     FloatingDateRangeWidgetManager dateRangeManager;
+    private SearchView mSearchView;
     ActivityHabitBinding ui;
 
     private List<IUpdateEntries> mSessionEntriesCallbacks = new ArrayList<>();
@@ -103,6 +103,11 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
     @Override
     public int getDefaultColor() {
         return mHabit.getColor();
+    }
+
+    @Override
+    public Habit getHabit(){
+        return mHabit;
     }
 
     //endregion [ ---------------- end ---------------- ]
@@ -173,16 +178,16 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
 
         MenuItem search = menu.findItem(R.id.search);
         if (search != null) {
-            SearchView searchView = (SearchView) search.getActionView();
-            searchView.setQueryHint(getString(R.string.filter_entries));
-            searchView.setOnQueryTextListener(getOnSearchQueryListener());
+            mSearchView = (SearchView) search.getActionView();
+            mSearchView.setQueryHint(getString(R.string.filter_entries));
+            mSearchView.setOnQueryTextListener(getOnSearchQueryListener());
         }
 
         return super.onPrepareOptionsMenu(menu);
     }
     //endregion -- end --
 
-    //region Methods responsible for changing the appearance of the activity
+    //region Methods responsible for updating the Ui
     private void updateActivity() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(mHabit.getName());
@@ -239,6 +244,11 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                             mHabitDatabase.addEntry(mHabitId, entry);
                             mSessionEntries.add(entry);
                             updateEntries(mSessionEntries);
+                            if (mSearchView != null) {
+                                mSearchView.setQuery("", false);
+                                mSearchView.clearFocus();
+                                mSearchView.onActionViewCollapsed();
+                            }
                         }
                     }
 
@@ -501,7 +511,6 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
     }
 
     public void updateEntries() {
-
         SessionEntriesSample entriesDataSample = getSessionEntries();
         dateRangeManager.updateSessionEntries(entriesDataSample.getSessionEntries());
 
@@ -518,6 +527,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
         dateRangeManager.updateSessionEntries(entries);
 
         SessionEntriesSample entriesDataSample = new SessionEntriesSample(entries);
+
         for (IUpdateEntries callback : mSessionEntriesCallbacks)
             callback.updateEntries(entriesDataSample);
 

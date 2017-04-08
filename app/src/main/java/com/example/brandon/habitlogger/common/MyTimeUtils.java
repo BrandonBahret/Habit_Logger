@@ -75,6 +75,16 @@ public class MyTimeUtils {
     }
     //endregion
 
+    public static boolean isSameMonthOfYear(Calendar monthOne, Calendar monthTwo) {
+        int month1 = monthOne.get(Calendar.MONTH);
+        int month2 = monthTwo.get(Calendar.MONTH);
+
+        int year1 = monthOne.get(Calendar.YEAR);
+        int year2 = monthTwo.get(Calendar.YEAR);
+
+        return (month1 == month2) && (year1 == year2);
+    }
+
     public static int getTimestampField(long timestamp, int field){
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(timestamp);
@@ -100,4 +110,5 @@ public class MyTimeUtils {
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.getDefault());
         return formatter.format(new Date(timestamp));
     }
+
 }

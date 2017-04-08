@@ -82,6 +82,23 @@ public class HabitDataSample {
     public long getDateTo(){
         return mDateTo;
     }
+
+    public long getMinimumTime(){
+        List<SessionEntry> sessionEntries = buildSessionEntriesList().getSessionEntries();
+
+        if (!sessionEntries.isEmpty())
+            return Collections.min(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
+        else return -1;
+    }
+
+    public long getMaximumTime(){
+        List<SessionEntry> sessionEntries = buildSessionEntriesList().getSessionEntries();
+
+        if (!sessionEntries.isEmpty())
+            return Collections.max(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
+        else return -1;
+    }
+
     //endregion
 
 }

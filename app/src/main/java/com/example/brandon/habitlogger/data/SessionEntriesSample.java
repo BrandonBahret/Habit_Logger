@@ -2,8 +2,8 @@ package com.example.brandon.habitlogger.data;
 
 import android.text.format.DateUtils;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 
 import java.util.Collections;
 import java.util.List;
@@ -72,6 +72,18 @@ public class SessionEntriesSample {
 
     public long getDateToTime() {
         return mDateToTime;
+    }
+
+    public long getMinimumTime(){
+        if (!mSessionEntries.isEmpty())
+            return Collections.min(mSessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
+        else return -1;
+    }
+
+    public long getMaximumTime(){
+        if (!mSessionEntries.isEmpty())
+            return Collections.max(mSessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
+        else return -1;
     }
     //endregion
 }

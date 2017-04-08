@@ -1,6 +1,7 @@
 package com.example.brandon.habitlogger.ui.Activities.HabitActivity;
 
 import com.example.brandon.habitlogger.data.CategoryDataSample;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 
 /**
@@ -19,6 +20,7 @@ public interface IHabitCallback {
     }
 
     int getDefaultColor();
+    Habit getHabit();
 
     SessionEntriesSample getSessionEntries();
     void addUpdateEntriesCallback(IUpdateEntries callback);

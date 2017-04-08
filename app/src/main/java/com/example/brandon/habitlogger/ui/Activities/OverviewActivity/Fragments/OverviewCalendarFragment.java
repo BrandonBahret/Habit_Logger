@@ -79,6 +79,7 @@ public class OverviewCalendarFragment extends Fragment implements IDataOverviewC
         if (mCalendarViewContainer != null) {
             CalendarViewAdapter adapter = new CalendarViewAdapter(dataSample, getContext());
             mCalendarViewContainer.setAdapter(adapter);
+            mCalendarViewContainer.scrollToPosition(adapter.getAdapterPositionForCurrentMonth());
         }
     }
 

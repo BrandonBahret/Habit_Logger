@@ -2,17 +2,18 @@ package com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.OverviewCalend
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarViewAdapterBase;
-import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarViewModelBase;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.HabitDataSample;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarViewAdapterBase;
+import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarViewModelBase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,11 +60,16 @@ public class CalendarViewAdapter extends CalendarViewAdapterBase<CalendarViewAda
     }
 
     private void generateMonthDataFromEntries(HabitDataSample dataSample) {
+
         Calendar startCalendar = Calendar.getInstance();
-        startCalendar.setTimeInMillis(dataSample.getDateFrom());
+        long minimumTime = dataSample.getMinimumTime();
+        minimumTime = minimumTime == -1 ? System.currentTimeMillis() : minimumTime;
+        startCalendar.setTimeInMillis(minimumTime);
+//        startCalendar.setTimeInMillis(dataSample.getDateFrom());
 
         Calendar endCalendar = Calendar.getInstance();
-        endCalendar.setTimeInMillis(dataSample.getDateTo());
+        endCalendar.setTimeInMillis(DateUtils.YEAR_IN_MILLIS * 200);
+//        endCalendar.setTimeInMillis(dataSample.getDateTo());
 
         int diffYear = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
         int diffMonth = (diffYear * 12) + (endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH)) + 1;

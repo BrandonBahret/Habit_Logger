@@ -10,20 +10,21 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
-import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.IDataOverviewCallback;
-import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EditEntryForm;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.ui.Activities.HabitActivity.EntryViewAdapter;
-import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.GroupDecoration;
-import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.data.HabitDataSample;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
+import com.example.brandon.habitlogger.ui.Activities.HabitActivity.EntryViewAdapter;
+import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.IDataOverviewCallback;
+import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.RecyclerViewScrollObserver;
+import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EditEntryForm;
+import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.GroupDecoration;
+import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 
 import java.util.List;
 
@@ -38,6 +39,7 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
     private IDataOverviewCallback mCallback;
 
     private RecyclerView mEntriesContainer;
+    private View mView;
     private EntryViewAdapter mEntryAdapter;
     private String mDateFormat;
     private boolean mMakeDateHeadersSticky;
@@ -116,8 +118,8 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_entries, container, false);
-        mEntriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
+        mView = inflater.inflate(R.layout.fragment_entries, container, false);
+        mEntriesContainer = (RecyclerView) mView.findViewById(R.id.entries_holder);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mEntriesContainer.setLayoutManager(layoutManager);
@@ -129,7 +131,7 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
         mEntriesContainer.addItemDecoration(getSpaceOffsetDecoration());
         mEntriesContainer.addItemDecoration(getGroupDecoration());
 
-        return v;
+        return mView;
     }
 
     //endregion [ -- end -- ]
@@ -143,6 +145,8 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
             mSessionEntries.remove(index);
             mEntryAdapter.notifyItemRemoved(index);
         }
+
+        showNoDataLayout(mSessionEntries.isEmpty());
     }
 
     public void updateSessionEntryById(long databaseId, SessionEntry oldEntry, SessionEntry newEntry) {
@@ -174,6 +178,24 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
         }
 
         return -1;
+    }
+
+    private void showNoDataLayout(boolean showNoDataLayout) {
+        if (mView != null) {
+            boolean hasEntries = mHabitDatabase.getNumberOfEntries() > 0;
+            int noEntriesVisibilityMode = showNoDataLayout && !hasEntries ? View.VISIBLE : View.GONE;
+            int noResultsVisibilityMode = showNoDataLayout && hasEntries ? View.VISIBLE : View.GONE;
+
+            ImageView icon;
+            View noDataLayout = mView.findViewById(R.id.no_data_layout);
+            noDataLayout.setVisibility(noEntriesVisibilityMode);
+
+            View noResultsLayout = mView.findViewById(R.id.no_results_layout);
+            noResultsLayout.setVisibility(noResultsVisibilityMode);
+
+            int entryContainerVisibilityMode = showNoDataLayout ? View.GONE : View.VISIBLE;
+            mEntriesContainer.setVisibility(entryContainerVisibilityMode);
+        }
     }
     //endregion -- end --
 
@@ -230,6 +252,9 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
             mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), mEntryAdapter.getListener());
             mEntriesContainer.setAdapter(mEntryAdapter);
         }
+
+        boolean showNoDataLayout = mSessionEntries == null || mSessionEntries.isEmpty();
+        showNoDataLayout(showNoDataLayout);
     }
 
 }

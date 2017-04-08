@@ -10,9 +10,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
+import com.example.brandon.habitlogger.common.MyColorUtils;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
@@ -27,15 +30,22 @@ import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceO
 
 import java.util.List;
 
+import static com.example.brandon.habitlogger.R.id.no_entries_available_icon;
+import static com.example.brandon.habitlogger.R.id.no_result_icon;
+
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateEntries, EntryViewAdapter.OnClickListeners {
 
     //region (Member attributes)
+    private View mView;
+
     private IHabitCallback mCallbackInterface;
     private IScrollEvents mListener;
 
     private String mDateFormat;
     private boolean mMakeHeadersSticky;
+    private int mColor;
+    private Habit mHabit;
     private HabitDatabase mHabitDatabase;
     private List<SessionEntry> mSessionEntries;
 
@@ -75,7 +85,10 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.fragment_entries, container, false);
+        mView = inflater.inflate(R.layout.fragment_entries, container, false);
+
+        mColor = mCallbackInterface.getDefaultColor();
+        mHabit = mCallbackInterface.getHabit();
 
         Context context = getContext();
         PreferenceChecker preferenceChecker = new PreferenceChecker(context);
@@ -85,7 +98,7 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
         mSessionEntries = mCallbackInterface.getSessionEntries().getSessionEntries();
         mEntryAdapter = new EntryViewAdapter(mSessionEntries, context, this);
 
-        mEntriesContainer = (RecyclerView) v.findViewById(R.id.entries_holder);
+        mEntriesContainer = (RecyclerView) mView.findViewById(R.id.entries_holder);
 
         //region Add item decorations
         mEntriesContainer.addItemDecoration(new GroupDecoration(getContext(), R.dimen.entries_section_text_size, mMakeHeadersSticky, new GroupDecoration.Callback() {
@@ -136,7 +149,9 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
             }
         });
 
-        return v;
+        updateEntries(mCallbackInterface.getSessionEntries());
+
+        return mView;
     }
 
     //endregion
@@ -148,6 +163,8 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
             mSessionEntries.remove(index);
             mEntryAdapter.notifyItemRemoved(index);
         }
+
+        showNoDataLayout(mSessionEntries.isEmpty());
     }
 
     public void updateSessionEntryById(long databaseId, SessionEntry oldEntry, SessionEntry newEntry) {
@@ -182,6 +199,33 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
     }
     //endregion
 
+    //region Methods responsible for updating the ui
+    private void showNoDataLayout(boolean showNoDataLayout) {
+        if (mView != null) {
+            float lightness = MyColorUtils.getLightness(mColor) - 0.15f;
+            int color = MyColorUtils.setLightness(mColor, lightness);
+
+            boolean hasEntries = mHabitDatabase.getNumberOfEntries(mHabit.getDatabaseId()) > 0;
+            int noEntriesVisibilityMode = showNoDataLayout && !hasEntries ? View.VISIBLE : View.GONE;
+            int noResultsVisibilityMode = showNoDataLayout && hasEntries ? View.VISIBLE : View.GONE;
+
+            ImageView icon;
+            View noDataLayout = mView.findViewById(R.id.no_data_layout);
+            icon = (ImageView) mView.findViewById(no_entries_available_icon);
+            icon.setColorFilter(color);
+            noDataLayout.setVisibility(noEntriesVisibilityMode);
+
+            View noResultsLayout = mView.findViewById(R.id.no_results_layout);
+            icon = (ImageView) mView.findViewById(no_result_icon);
+            icon.setColorFilter(color);
+            noResultsLayout.setVisibility(noResultsVisibilityMode);
+
+            int entryContainerVisibilityMode = showNoDataLayout ? View.GONE : View.VISIBLE;
+            mEntriesContainer.setVisibility(entryContainerVisibilityMode);
+        }
+    }
+    //endregion
+
     @Override
     public void onEntryViewClick(long habitId, long entryId) {
         SessionEntry oldEntry = mHabitDatabase.getEntry(entryId);
@@ -212,14 +256,12 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
     public void updateEntries(SessionEntriesSample dataSample) {
         if (mEntryAdapter != null) {
             mSessionEntries = dataSample.getSessionEntries();
-            mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), this);
+            mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), mEntryAdapter.getListener());
             mEntriesContainer.setAdapter(mEntryAdapter);
-
-            int visibilityMode = mSessionEntries.isEmpty() ? View.VISIBLE : View.GONE;
-            View noResultsLayout = getView().findViewById(R.id.no_results_layout);
-            if (noResultsLayout.getVisibility() != visibilityMode) {
-                noResultsLayout.setVisibility(visibilityMode);
-            }
         }
+
+        boolean showNoDataLayout = mSessionEntries == null || mSessionEntries.isEmpty();
+        showNoDataLayout(showNoDataLayout);
     }
+
 }
