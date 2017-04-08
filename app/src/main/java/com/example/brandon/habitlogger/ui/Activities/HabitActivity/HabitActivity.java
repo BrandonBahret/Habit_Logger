@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyColorUtils;
@@ -29,6 +30,7 @@ import com.example.brandon.habitlogger.databinding.ActivityHabitBinding;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.CalendarFragment;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.EntriesFragment;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.StatisticsFragment;
+import com.example.brandon.habitlogger.ui.Activities.MainActivity.MainActivity;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
@@ -363,6 +365,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mHabitDatabase.deleteEntriesForHabit(mHabitId);
+                        Toast.makeText(HabitActivity.this, R.string.entries_deleted_message, Toast.LENGTH_SHORT).show();
                     }
                 })
                 .show();

@@ -83,7 +83,7 @@
     <string name="navigation_extras_group_title">App Tools</string>
     <string name="pause_play_content_description">Toggle the state of the session</string>
     <string name="hash_tag">#</string>
-    <string name="category_card_habits">Habit(s)</string>
+    <string name="category_card_habits">Habits: </string>
     <string name="date_range_entries_label">Entries:</string>
     <string name="date_range_total_time_label">Total Time:</string>
     <string name="date_range_from_label">From</string>
@@ -148,5 +148,9 @@
     <string name="confirm_data_restore">Confirm Data Restore</string>
     <string name="confirm_data_restore_message">This will overwrite the database.</string>
     <string name="data_restored">Database restored</string>
+    <string name="entries_deleted_message">Entries deleted</string>
+    <string name="confirm_habit_data_reset_title">Confirm Data Reset</string>
+    <string name="confirm_habit_data_reset_message_format">Do you really want to delete all entries for \'%s\'?</string>
+    <string name="database_export_format">Database exported to: %s</string>
 
 </resources>

@@ -33,6 +33,7 @@
     <color name="textColor1">#797979</color>
     <color name="textColor2">#bfbfbf</color>
     <color name="textColor3">#505050</color>
+    <color name="textColorSubTitle">#505050</color>
     <color name="textColorContrast">#ffffffff</color>
     <color name="textColorTransparent">#c8ffffff</color>
 

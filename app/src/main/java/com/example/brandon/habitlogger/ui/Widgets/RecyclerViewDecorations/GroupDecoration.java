@@ -159,6 +159,8 @@ public class GroupDecoration extends RecyclerView.ItemDecoration {
                 textY = view.getTop() + view.getPaddingTop() - mTextVerticalOffset;
             }
 
+            textY += view.getTranslationY();
+
             // Draw the backdrop
             c.drawRect(0, textY - mBackdropHeight, width, textY + (mBackdropHeight / 3), mBackdropPaint);
 

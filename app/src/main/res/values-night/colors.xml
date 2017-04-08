@@ -13,7 +13,7 @@
     <color name="colorAccentDark">#637aa6</color>
     <color name="colorAccentDisabled">#8695b3</color>
 
-    <!-- Background Color -->
+    <!-- Background Colors -->
     <color name="background1">#303030</color>
     <color name="background2">#424242</color>
     <color name="background3">#4d4d4d</color>
@@ -27,6 +27,7 @@
     <color name="textColor1">#ffffff</color>
     <color name="textColor2">#cccccc</color>
     <color name="textColor3">#cccccc</color>
+    <color name="textColorSubTitle">#cccccc</color>
     <color name="textColorContrast">#ffffffff</color>
     <color name="textColorTransparent">#c8ffffff</color>
 

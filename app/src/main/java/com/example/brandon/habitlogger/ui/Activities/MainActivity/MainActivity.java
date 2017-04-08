@@ -55,7 +55,10 @@ import com.github.clans.fab.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+
+import static android.widget.Toast.makeText;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -249,6 +252,14 @@ public class MainActivity extends AppCompatActivity
 
     void stopRepeatingTask() {
         mUpdateHandler.removeCallbacks(updateCards);
+    }
+
+    private void removeHabitView(int position) {
+        mHabitList.remove(position);
+        mHabitAdapter.notifyItemRemoved(position);
+        applySpaceDecoration();
+        ui.mainInclude.habitRecyclerView.invalidateItemDecorations();
+        checkIfHabitsAreAvailable();
     }
     //endregion -- end --
 
@@ -483,13 +494,16 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onHabitResetClick(final long habitId) {
                 String habitName = mHabitDatabase.getHabitName(habitId);
+                String messageFormat = getString(R.string.confirm_habit_data_reset_message_format);
+                String message = String.format(Locale.getDefault(), messageFormat, habitName);
                 new ConfirmationDialog(MainActivity.this)
-                        .setTitle("Confirm Data Reset")
-                        .setMessage("Do you really want to delete all entries for '" + habitName + "'?")
+                        .setTitle(getString(R.string.confirm_habit_data_reset_title))
+                        .setMessage(message)
                         .setOnYesClickListener(new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 mHabitDatabase.deleteEntriesForHabit(habitId);
+                                makeText(MainActivity.this, R.string.entries_deleted_message, Toast.LENGTH_SHORT).show();
                             }
                         })
                         .show();
@@ -512,9 +526,7 @@ public class MainActivity extends AppCompatActivity
                                 mHabitDatabase.deleteHabit(habitId);
 
                                 int position = mHabitAdapter.getAdapterItemPosition(habitId);
-                                mHabitList.remove(position);
-                                mHabitAdapter.notifyItemRemoved(position);
-                                checkIfHabitsAreAvailable();
+                                removeHabitView(position);
                             }
                         })
                         .show();
@@ -542,8 +554,7 @@ public class MainActivity extends AppCompatActivity
                                 mHabitDatabase.updateHabitIsArchived(habitId, !archivedState);
 
                                 int position = mHabitAdapter.getAdapterItemPosition(habitId);
-                                mHabitList.remove(position);
-                                mHabitAdapter.notifyItemRemoved(position);
+                                removeHabitView(position);
                             }
                         })
                         .show();
@@ -674,8 +685,7 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case R.id.menu_export_database_as_csv:
-                String filepath = mLocalExportManager.exportDatabaseAsCsv();
-                Toast.makeText(this, "Database exported to: " + filepath, Toast.LENGTH_LONG).show();
+                handleOnExportDatabaseCsv();
                 break;
 
             case R.id.menu_settings:
@@ -688,6 +698,13 @@ public class MainActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void handleOnExportDatabaseCsv() {
+        String filepath = mLocalExportManager.exportDatabaseAsCsv();
+        String messageFormat = getString(R.string.database_export_format);
+        String message = String.format(Locale.getDefault(), messageFormat, filepath);
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
     private void handleOnExportDatabase() {
@@ -715,7 +732,7 @@ public class MainActivity extends AppCompatActivity
                     public void onClick(DialogInterface dialog, int which) {
                         mLocalExportManager.importDatabase(true);
                         showDatabase();
-                        Toast.makeText(MainActivity.this, R.string.data_restored, Toast.LENGTH_SHORT).show();
+                        makeText(MainActivity.this, R.string.data_restored, Toast.LENGTH_SHORT).show();
                     }
                 })
                 .show();
@@ -742,7 +759,7 @@ public class MainActivity extends AppCompatActivity
                 if (mHabitDatabase.getNumberOfEntries() > 0)
                     DataOverviewActivity.startActivity(this);
                 else
-                    Toast.makeText(this, R.string.no_data_available_lower, Toast.LENGTH_SHORT).show();
+                    makeText(this, R.string.no_data_available_lower, Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.settings_nav:

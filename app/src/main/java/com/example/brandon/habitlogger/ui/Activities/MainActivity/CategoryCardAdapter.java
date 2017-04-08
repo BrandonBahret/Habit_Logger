@@ -38,7 +38,7 @@ public class CategoryCardAdapter extends ExpandableRecyclerViewAdapter<CategoryV
     public CategoryViewHolder onCreateGroupViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.category_card, parent, false);
-        setMargins(view, 0, 20, 0, 26);
+        setMargins(view, 0, 16, 0, 16);
 
         return new CategoryViewHolder(view, new CategoryViewHolder.Callback() {
             @Override
@@ -55,7 +55,7 @@ public class CategoryCardAdapter extends ExpandableRecyclerViewAdapter<CategoryV
     public HabitViewHolder onCreateChildViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.habit_card, parent, false);
-        setMargins(itemView, 26, 8, 26, 16);
+        setMargins(itemView, 16, 8, 16, 8);
 
         return new HabitViewHolder(itemView);
     }

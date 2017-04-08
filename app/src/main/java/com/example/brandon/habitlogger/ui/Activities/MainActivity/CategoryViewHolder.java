@@ -2,6 +2,7 @@ package com.example.brandon.habitlogger.ui.Activities.MainActivity;
 
 import android.support.v7.widget.CardView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.brandon.habitlogger.R;
@@ -17,21 +18,23 @@ public class CategoryViewHolder extends GroupViewHolder {
 
     //region (Member attributes)
     private CardView mRootView;
+    private ImageView mAccent;
     private TextView mTitle, mNumberOfHabits;
     //endregion
 
     //region Code responsible for providing an interface
     private Callback mOnBeforeGroupExpands;
 
-    public interface Callback{
+    public interface Callback {
         void beforeExpand(String title);
     }
     //endregion -- end --
 
     public CategoryViewHolder(View view, Callback onBeforeGroupExpands) {
         super(view);
-        mRootView = (CardView)view;
+        mRootView = (CardView) view;
         mTitle = (TextView) view.findViewById(R.id.category_title);
+        mAccent = (ImageView) view.findViewById(R.id.category_accent);
         mNumberOfHabits = (TextView) view.findViewById(R.id.number_of_habits);
         mOnBeforeGroupExpands = onBeforeGroupExpands;
     }
@@ -48,7 +51,8 @@ public class CategoryViewHolder extends GroupViewHolder {
     }
 
     public void setColor(int color) {
-        mRootView.setCardBackgroundColor(color);
+        mAccent.setBackgroundColor(color);
+//        mRootView.setCardBackgroundColor(color);
     }
 
     public void setNumberOfEntries(int itemCount) {

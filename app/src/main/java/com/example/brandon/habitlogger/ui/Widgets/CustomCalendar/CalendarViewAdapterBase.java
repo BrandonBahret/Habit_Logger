@@ -40,4 +40,5 @@ public abstract class CalendarViewAdapterBase <ViewHolder extends RecyclerView.V
     public int getItemCount() {
         return mCalendarData.size();
     }
+
 }
