@@ -13,20 +13,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
+import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
+import com.example.brandon.habitlogger.data.HabitDataSample;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.data.HabitDataSample;
 import com.example.brandon.habitlogger.data.SessionEntriesSample;
 import com.example.brandon.habitlogger.databinding.ActivityDataOverviewBinding;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.Fragments.OverviewCalendarFragment;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.Fragments.OverviewEntriesFragment;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.Fragments.OverviewStatisticsFragment;
-import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
+import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -175,34 +174,6 @@ public class DataOverviewActivity extends AppCompatActivity implements
                 return true;
             }
         };
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch (id) {
-            case R.id.menu_backup_database: {
-                Toast.makeText(this, "Backup Created", Toast.LENGTH_SHORT).show();
-                mExportManager.exportDatabase(true);
-            }
-            break;
-
-            case R.id.menu_restore_database: {
-                Toast.makeText(this, "Data Restored", Toast.LENGTH_SHORT).show();
-                mExportManager.importDatabase(true);
-            }
-            break;
-
-            case R.id.menu_export_database_as_csv: {
-                String filepath = mExportManager.exportDatabaseAsCsv();
-                Toast.makeText(this, "Database exported to: " + filepath, Toast.LENGTH_LONG).show();
-            }
-            break;
-
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private FloatingDateRangeWidgetManager.DateRangeChangeListener getDateRangeListener() {

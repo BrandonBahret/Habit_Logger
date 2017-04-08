@@ -9,16 +9,6 @@
         android:icon="@drawable/ic_search_24dp"
         android:title="@string/search"
         app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="ifRoom"/>
-
-    <item
-        android:id="@+id/menu_backup_database"
-        android:title="@string/export_database"/>
-    <item
-        android:id="@+id/menu_restore_database"
-        android:title="@string/restore_database"/>
-    <item
-        android:id="@+id/menu_export_database_as_csv"
-        android:title="@string/action_export"/>
+        app:showAsAction="always"/>
 
 </menu>

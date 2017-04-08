@@ -615,7 +615,7 @@ public class MainActivity extends AppCompatActivity
                     public void onFinishedWithResult(Habit habit) {
                         mHabitDatabase.addHabit(habit);
                         showDatabase();
-                        if (mSearchView != null){
+                        if (mSearchView != null) {
                             mSearchView.setQuery("", false);
                             mSearchView.clearFocus();
                             mSearchView.onActionViewCollapsed();
@@ -666,14 +666,11 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.menu_database_export:
-                mLocalExportManager.exportDatabase(true);
-                if (mGoogleDriveExportManager.isConnected())
-                    mGoogleDriveExportManager.backupDatabase();
+                handleOnExportDatabase();
                 break;
 
             case R.id.menu_database_restore:
-                mLocalExportManager.importDatabase(true);
-                showDatabase();
+                handleOnDatabaseRestore();
                 break;
 
             case R.id.menu_export_database_as_csv:
@@ -691,6 +688,37 @@ public class MainActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void handleOnExportDatabase() {
+        new ConfirmationDialog(this)
+                .setTitle(getString(R.string.confirm_data_export))
+                .setMessage(getString(R.string.confirm_data_export_message))
+                .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mLocalExportManager.exportDatabase(true);
+                        if (mGoogleDriveExportManager.isConnected())
+                            mGoogleDriveExportManager.backupDatabase();
+                        Toast.makeText(MainActivity.this, R.string.backup_created, Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .show();
+    }
+
+    private void handleOnDatabaseRestore() {
+        new ConfirmationDialog(this)
+                .setTitle(getString(R.string.confirm_data_restore))
+                .setMessage(getString(R.string.confirm_data_restore_message))
+                .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mLocalExportManager.importDatabase(true);
+                        showDatabase();
+                        Toast.makeText(MainActivity.this, R.string.data_restored, Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .show();
     }
 
     @Override

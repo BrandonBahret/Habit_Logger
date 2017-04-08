@@ -142,5 +142,11 @@
     <string name="no_results">No Results</string>
     <string name="no_habits_available">No Habits Available</string>
     <string name="no_data_available_lower">No data available</string>
+    <string name="confirm_data_export">Confirm Data Export</string>
+    <string name="confirm_data_export_message">This will overwrite any pre-existing backup file.</string>
+    <string name="backup_created">Backup created</string>
+    <string name="confirm_data_restore">Confirm Data Restore</string>
+    <string name="confirm_data_restore_message">This will overwrite the database.</string>
+    <string name="data_restored">Database restored</string>
 
 </resources>
