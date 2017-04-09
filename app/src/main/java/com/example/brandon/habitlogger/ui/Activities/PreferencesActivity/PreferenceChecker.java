@@ -125,6 +125,13 @@ public class PreferenceChecker {
         return isNightMode() ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO;
     }
 
+    public void toggleNightMode() {
+        boolean themeMode = !isNightMode();
+        preferences.edit()
+                .putBoolean(mContext.getString(R.string.pref_is_night_mode), themeMode)
+                .apply();
+    }
+
     public String stringGetDateFormat(){
         String[] dateOptions = mContext.getResources().getStringArray(R.array.date_format_options);
         int optionIndex = Integer.parseInt(

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/home_nav"
@@ -32,6 +33,13 @@
                 android:id="@+id/about_nav"
                 android:icon="@drawable/ic_info_outline_24dp"
                 android:title="@string/about_nav_string"/>
+
+            <item
+                android:icon="@drawable/ic_day_mode_24dp"
+                android:id="@+id/night_mode"
+                android:title="@string/toggle_theme"
+                app:actionLayout="@layout/switch_layout"/>
+
         </menu>
     </item>
 

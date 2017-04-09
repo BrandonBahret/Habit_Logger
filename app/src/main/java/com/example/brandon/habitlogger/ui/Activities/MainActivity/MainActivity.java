@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -143,6 +144,18 @@ public class MainActivity extends AppCompatActivity
 
         if (mPreferenceChecker.doShowNotificationsAutomatically())
             mSessionNotificationManager.launchNotificationsForAllActiveSessions();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        Menu menu = navigationView.getMenu();
+        MenuItem navNightModeSwitch = menu.findItem(R.id.night_mode);
+
+        boolean isNightMode = mPreferenceChecker.isNightMode();
+        Switch nightModeSwitch = (Switch) navNightModeSwitch.getActionView().findViewById(R.id.menu_switch);
+        nightModeSwitch.setChecked(isNightMode);
+
+        int nightModeIcon = isNightMode ? R.drawable.ic_night_mode_24dp : R.drawable.ic_day_mode_24dp;
+        navNightModeSwitch.setIcon(nightModeIcon);
+
     }
 
     private void setListeners() {
@@ -768,6 +781,12 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.about_nav:
                 AboutActivity.startActivity(this);
+                break;
+
+            case R.id.night_mode:
+                ((Switch)item.getActionView().findViewById(R.id.menu_switch)).toggle();
+                mPreferenceChecker.toggleNightMode();
+                recreate();
                 break;
         }
 

@@ -11,8 +11,8 @@
 
     <string-array name="category_options">
         <item>Cards</item>
-        <item>Sections</item>
-        <item>None</item>
+        <item>Headers</item>
+        <item>Without</item>
     </string-array>
     <string-array name="category_options_values">
         <item>0</item>

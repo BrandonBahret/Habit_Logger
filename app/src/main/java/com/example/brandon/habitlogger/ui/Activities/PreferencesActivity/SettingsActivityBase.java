@@ -2,6 +2,7 @@ package com.example.brandon.habitlogger.ui.Activities.PreferencesActivity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
@@ -19,6 +20,7 @@ public abstract class SettingsActivityBase extends AppCompatActivity
 
     //region (Member attributes)
     private PreferenceChecker mPreferenceChecker;
+    private SettingsFragment mSettingsFragment;
     //endregion
 
     public static class SettingsFragment extends PreferenceFragment {
@@ -42,8 +44,8 @@ public abstract class SettingsActivityBase extends AppCompatActivity
             int resId = getArguments().getInt(RESOURCE_ID, -1);
 
             addPreferencesFromResource(resId);
-        }
 
+        }
     }
 
     protected abstract int getPreferenceResource();
@@ -65,9 +67,9 @@ public abstract class SettingsActivityBase extends AppCompatActivity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Display the fragment as the main content.
-        SettingsFragment settingsFragment = SettingsFragment.newInstance(getPreferenceResource());
+        mSettingsFragment = SettingsFragment.newInstance(getPreferenceResource());
         getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, settingsFragment)
+                .replace(android.R.id.content, mSettingsFragment)
                 .commit();
 
     }
@@ -117,6 +119,10 @@ public abstract class SettingsActivityBase extends AppCompatActivity
     //endregion -- end --
 
     //region Getters {}
+    public Preference findPreference(String key){
+        return mSettingsFragment.findPreference(key);
+    }
+
     protected PreferenceChecker getPreferenceChecker() {return mPreferenceChecker;}
     //endregion
 

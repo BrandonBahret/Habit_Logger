@@ -1,27 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="Home Screen">
-        <ListPreference
-            android:defaultValue="0"
+    <PreferenceCategory android:title="Habits">
+
+        <com.example.brandon.habitlogger.ui.Widgets.DependentListPreference
+            android:defaultValue="2"
             android:dialogTitle="Display categories as..."
             android:entries="@array/category_options"
             android:entryValues="@array/category_options_values"
             android:key="@string/pref_show_categories"
             android:summary="Change how the app uses habit categories."
-            android:title="Category mode"/>
+            android:title="Category mode"
+            app:dependentValue="1"/>
 
         <CheckBoxPreference
             android:defaultValue="false"
+            android:dependency="@string/pref_show_categories"
             android:key="@string/pref_category_sticky"
-            android:summary="When using categories as sections, make the headers sticky."
-            android:title="Make headers sticky"/>
+            android:summary="When using categories as headers, make them sticky."
+            android:title="Sticky category headers"/>
 
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="@string/pref_hide_fab_on_scroll"
-            android:summary="Scroll the list to move the floating action button out of the way."
-            android:title="Hide action button on scroll"/>
+            android:summary="Scrolling the list will hide the new habit button."
+            android:title="Hide new habit button on scroll"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Active sessions card">
 
         <SwitchPreference
             android:defaultValue="true"
@@ -39,20 +47,12 @@
             android:defaultValue="false"
             android:dependency="@string/pref_display_current_sessions_card"
             android:key="@string/pref_hide_current_sessions_card_on_scroll"
-            android:summary="Scroll the list to move the active sessions card out of the way."
+            android:summary="Scrolling the list will hide the active sessions card."
             android:title="Hide on scroll"/>
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Entries">
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="@string/pref_date_header_sticky"
-            android:summary="Make the date headers sticky."
-            android:title="Make headers sticky"/>
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="Session Activity">
+    <PreferenceCategory android:title="Sessions">
 
         <CheckBoxPreference
             android:defaultValue="true"
@@ -68,12 +68,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Misc.">
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="@string/pref_is_night_mode"
-            android:title="Night Mode"/>
+    <PreferenceCategory android:title="Dates">
 
         <ListPreference
             android:defaultValue="0"
@@ -82,7 +77,23 @@
             android:entryValues="@array/date_format_options_values"
             android:key="@string/pref_date_format"
             android:summary="Set the format used to display dates."
-            android:title="Date Format"/>
+            android:title="Date format"/>
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_date_header_sticky"
+            android:summary="Make date headers sticky."
+            android:title="Sticky date headers"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Theme">
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/pref_is_night_mode"
+            android:title="Night mode"/>
+
     </PreferenceCategory>
 
 </PreferenceScreen>

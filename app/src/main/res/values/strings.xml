@@ -154,5 +154,6 @@
     <string name="database_export_format">Database exported to: %s</string>
     <string name="no_entries_available">No Entries Available</string>
     <string name="no_stats_available">No Statistics Available</string>
+    <string name="toggle_theme">Toggle Theme</string>
 
 </resources>
