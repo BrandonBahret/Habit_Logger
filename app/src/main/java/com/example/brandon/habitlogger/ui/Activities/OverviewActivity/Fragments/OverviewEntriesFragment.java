@@ -131,6 +131,8 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
         mEntriesContainer.addItemDecoration(getSpaceOffsetDecoration());
         mEntriesContainer.addItemDecoration(getGroupDecoration());
 
+        updateHabitDataSample(mCallback.getDataSample());
+
         return mView;
     }
 

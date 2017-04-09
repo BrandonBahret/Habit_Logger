@@ -9,8 +9,13 @@ import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.MyColorUtils;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
+import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.NestedScrollObserver;
 
@@ -21,6 +26,9 @@ public class StatisticsFragment extends Fragment {
 
     private static View mFragmentView;
     private IScrollEvents mListener;
+    private IHabitCallback mCallbackInterface;
+    private Habit mHabit;
+    private int mColor;
 
     public StatisticsFragment() {
         // Required empty public constructor
@@ -34,13 +42,21 @@ public class StatisticsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        if (context instanceof IHabitCallback)
+            mCallbackInterface = (IHabitCallback) context;
+
         if (context instanceof IScrollEvents)
-            this.mListener = (IScrollEvents) context;
+            mListener = (IScrollEvents) context;
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        mHabit = mCallbackInterface.getHabit();
+        mColor = mCallbackInterface.getDefaultColor();
+
         if (mFragmentView != null) {
             ViewGroup parent = (ViewGroup) mFragmentView.getParent();
             if (parent != null)
@@ -54,6 +70,9 @@ public class StatisticsFragment extends Fragment {
         } catch (InflateException e) {
             // empty stub
         }
+
+        boolean hasEntries = new HabitDatabase(getContext()).getNumberOfEntries(mHabit.getDatabaseId()) > 0;
+        showNoDataScreen(hasEntries);
 
         return mFragmentView;
     }
@@ -76,5 +95,21 @@ public class StatisticsFragment extends Fragment {
         };
     }
     //endregion
+
+    private void showNoDataScreen(boolean hasEntries) {
+        float lightness = MyColorUtils.getLightness(mColor) - 0.15f;
+        int color = MyColorUtils.setLightness(mColor, lightness);
+
+        int mainLayoutVisibilityMode = hasEntries ? View.VISIBLE : View.GONE;
+        mFragmentView.findViewById(R.id.statistics_container)
+                .setVisibility(mainLayoutVisibilityMode);
+
+        int noStatsLayoutVisibilityMode = hasEntries ? View.GONE : View.VISIBLE;
+        View noStatisticsLayout = mFragmentView.findViewById(R.id.no_stats_layout);
+        ((ImageView)noStatisticsLayout.findViewById(R.id.no_stats_available_icon))
+                .setColorFilter(color);
+
+        noStatisticsLayout.setVisibility(noStatsLayoutVisibilityMode);
+    }
 
 }

@@ -153,5 +153,6 @@
     <string name="confirm_habit_data_reset_message_format">Do you really want to delete all entries for \'%s\'?</string>
     <string name="database_export_format">Database exported to: %s</string>
     <string name="no_entries_available">No Entries Available</string>
+    <string name="no_stats_available">No Statistics Available</string>
 
 </resources>

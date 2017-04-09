@@ -4,10 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background1">
 
     <ImageView
-        android:id="@+id/no_entries_available_icon"
+        android:id="@+id/no_stats_available_icon"
         android:layout_width="180dp"
         android:layout_height="180dp"
         android:elevation="2dp"
@@ -18,22 +19,22 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.35000002"
-        app:srcCompat="@drawable/ic_manually_create_entry_24dp"/>
+        app:srcCompat="@drawable/ic_timeline_tint_2_24dp"/>
 
     <TextView
-        android:id="@+id/no_entries_available_text"
+        android:id="@+id/no_stats_available_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="9dp"
         android:layout_marginTop="8dp"
         android:fontFamily="sans-serif-smallcaps"
-        android:text="@string/no_entries_available"
+        android:text="@string/no_stats_available"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/no_entries_available_icon"
+        app:layout_constraintTop_toBottomOf="@+id/no_stats_available_icon"
         app:layout_constraintVertical_bias="0.050000012"/>
 
 </android.support.constraint.ConstraintLayout>

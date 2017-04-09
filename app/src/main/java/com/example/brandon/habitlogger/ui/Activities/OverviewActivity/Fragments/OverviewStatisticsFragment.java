@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.NestedScrollObserver;
 
@@ -53,6 +54,9 @@ public class OverviewStatisticsFragment extends Fragment {
             // empty stub
         }
 
+        boolean hasEntries = new HabitDatabase(getContext()).getNumberOfEntries() > 0;
+        showNoDataScreen(hasEntries);
+
         return mContentView;
     }
     //endregion -- end --
@@ -74,5 +78,15 @@ public class OverviewStatisticsFragment extends Fragment {
         };
     }
     //endregion -- end --
+
+    private void showNoDataScreen(boolean hasEntries) {
+        int mainLayoutVisibilityMode = hasEntries ? View.VISIBLE : View.GONE;
+        mContentView.findViewById(R.id.statistics_container)
+                .setVisibility(mainLayoutVisibilityMode);
+
+        int noStatsLayoutVisibilityMode = hasEntries ? View.GONE : View.VISIBLE;
+        View noStatisticsLayout = mContentView.findViewById(R.id.no_stats_layout);
+        noStatisticsLayout.setVisibility(noStatsLayoutVisibilityMode);
+    }
 
 }

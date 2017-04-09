@@ -756,10 +756,7 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case (R.id.overall_stats_nav):
-                if (mHabitDatabase.getNumberOfEntries() > 0)
-                    DataOverviewActivity.startActivity(this);
-                else
-                    makeText(this, R.string.no_data_available_lower, Toast.LENGTH_SHORT).show();
+                DataOverviewActivity.startActivity(this);
                 break;
 
             case R.id.settings_nav:
