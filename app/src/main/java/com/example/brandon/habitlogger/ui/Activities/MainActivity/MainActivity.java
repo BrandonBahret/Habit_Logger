@@ -344,7 +344,10 @@ public class MainActivity extends AppCompatActivity
     public void checkIfHabitsAreAvailable() {
         boolean habitsAvailable = mHabitDatabase.getNumberOfHabits() != 0;
 
-        mCurrentSessionCard.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
+        boolean shouldShowCurrentSessions = mPreferenceChecker.shouldShowCurrentSessions
+                (mSessionManager.getActiveSessionList().size());
+
+        mCurrentSessionCard.setVisibility(habitsAvailable && shouldShowCurrentSessions ? View.VISIBLE : View.GONE);
         ui.mainInclude.habitRecyclerView.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
         findViewById(R.id.no_habits_available_layout).setVisibility(habitsAvailable ? View.GONE : View.VISIBLE);
     }
