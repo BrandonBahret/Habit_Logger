@@ -11,11 +11,12 @@
     android:background="@drawable/background_simple_rectangle"
     android:textSize="20sp"
     calendar_view:content_margin_top="8dp"
+    calendar_view:current_day_highlight_color="@color/currentDateHighlight"
     calendar_view:date_circle_radius="14dp"
     calendar_view:date_circle_streak_color="@color/colorAccent"
     calendar_view:date_element_color="@color/calendarViewTitle"
-    calendar_view:empty_date_color="@color/calendarViewEmpty"
     calendar_view:date_label_color="@color/calendarViewDateLabel"
     calendar_view:date_label_size="14sp"
+    calendar_view:empty_date_color="@color/calendarViewEmpty"
     calendar_view:title_color="@color/calendarViewTitle"
     calendar_view:title_margin_top="6dp"/>

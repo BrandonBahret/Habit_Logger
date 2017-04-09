@@ -1,12 +1,9 @@
 package com.example.brandon.habitlogger.ui.Widgets.CustomCalendar;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.text.TextPaint;
-
-import com.example.brandon.habitlogger.common.MyColorUtils;
 
 /**
  * Created by Brandon on 4/3/2017.
@@ -32,9 +29,9 @@ public abstract class DateElementBase extends ViewElement {
         mCurrentDatePaint = new Paint(paint);
         mCurrentDatePaint.setFlags(Paint.ANTI_ALIAS_FLAG);
 
-        boolean isBright = MyColorUtils.isColorBright(paint.getColor(), 0.65f);
-        int currentDateColor = isBright ? Color.BLACK : Color.WHITE;
-        mCurrentDatePaint.setColor(currentDateColor);
+//        boolean isBright = MyColorUtils.isColorBright(paint.getColor(), 0.65f);
+//        int currentDateColor = isBright ? Color.BLACK : Color.WHITE;
+//        mCurrentDatePaint.setColor(currentDateColor);
     }
 
     @Override
@@ -91,6 +88,10 @@ public abstract class DateElementBase extends ViewElement {
 
     public void setIsCurrentDay(boolean isCurrentDay) {
         this.mIsCurrentDay = isCurrentDay;
+    }
+
+    public void setCurrentDatePaint(Paint paint){
+        mCurrentDatePaint = paint;
     }
     //endregion
 

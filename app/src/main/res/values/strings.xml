@@ -5,8 +5,8 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_settings">Settings</string>
     <string name="home_nav_string">Home</string>
-    <string name="running_habits_nav_string">Running Habits</string>
-    <string name="statistics_overview_nav_title">Data Overview</string>
+    <string name="running_habits_nav_string">Running habits</string>
+    <string name="statistics_overview_nav_title">Data overview</string>
     <string name="settings_nav_string">Settings</string>
     <string name="about_nav_string">About</string>
     <string name="value_placeholder">\'value\'</string>
@@ -80,7 +80,7 @@
     <string name="habit_session_activity_label">Habit Session</string>
     <string name="active_habits_activity_label">Active Habits</string>
     <string name="about_activity_label">About</string>
-    <string name="navigation_extras_group_title">App Tools</string>
+    <string name="navigation_extras_group_title">App tools</string>
     <string name="pause_play_content_description">Toggle the state of the session</string>
     <string name="hash_tag">#</string>
     <string name="category_card_habits">Habits: </string>
@@ -154,6 +154,6 @@
     <string name="database_export_format">Database exported to: %s</string>
     <string name="no_entries_available">No Entries Available</string>
     <string name="no_stats_available">No Statistics Available</string>
-    <string name="toggle_theme">Toggle Theme</string>
+    <string name="toggle_theme">Night mode</string>
 
 </resources>

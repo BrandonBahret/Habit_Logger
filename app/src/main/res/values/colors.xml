@@ -55,6 +55,7 @@
     <color name="calendarViewTitle">@color/textColor1</color>
     <color name="calendarViewEmpty">@color/background5</color>
     <color name="calendarViewDateLabel">@color/textColor2</color>
+    <color name="currentDateHighlight">@color/iconTint1</color>
 
     <!-- TabLayout Colors -->
     <color name="normalTabColor">@color/textColorTransparent</color>

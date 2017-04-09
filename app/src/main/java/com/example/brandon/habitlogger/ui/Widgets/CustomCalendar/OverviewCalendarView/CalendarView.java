@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.OverviewCalend
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
@@ -54,6 +55,7 @@ public class CalendarView extends CalendarViewBase {
     @Override
     protected void onCreatePaintObjects() {
         mEmptyDateElementPaint = new TextPaint();
+        mEmptyDateElementPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
     }
 
     @Override
@@ -97,6 +99,7 @@ public class CalendarView extends CalendarViewBase {
         int currentYear = c.get(Calendar.YEAR);
 
         boolean isCurrentMonth = (modelMonth == currentMonth) && (modelYear == currentYear);
+        boolean isPastCurrentMonth = (modelMonth > currentMonth && modelYear == currentYear) || (modelYear > currentYear);
 
         boolean pastCurrentDate = false;
 
@@ -118,10 +121,11 @@ public class CalendarView extends CalendarViewBase {
 
                 if (!pastCurrentDate && isCurrentMonth && thisDay == currentDate) {
                     pastCurrentDate = true;
+                    currentElement.setCurrentDatePaint(mCurrentDayPaint);
                     currentElement.setIsCurrentDay(true);
                 }
 
-                mDateElementPaint.setAlpha(thisDay > currentDate && isCurrentMonth ? 77 : 255);
+                mDateElementPaint.setAlpha((thisDay > currentDate && isCurrentMonth) || isPastCurrentMonth ? 77 : 255);
                 TextElement text = new TextElement(String.valueOf(thisDay), mDateElementPaint);
                 text.makeMeasurements();
                 currentElement.setDateText(text);
@@ -144,7 +148,7 @@ public class CalendarView extends CalendarViewBase {
 
                     currentElement.setTextPaint(mEmptyDateElementPaint);
 
-                    mDateElementPaint.setAlpha(thisDay > currentDate && isCurrentMonth ? 77 : 255);
+                    mDateElementPaint.setAlpha((thisDay > currentDate && isCurrentMonth) || isPastCurrentMonth  ? 77 : 255);
                     TextElement text = new TextElement(String.valueOf(thisDay), mDateElementPaint);
                     text.makeMeasurements();
                     currentElement.setDateText(text);
@@ -152,6 +156,7 @@ public class CalendarView extends CalendarViewBase {
 
                     if (!pastCurrentDate && isCurrentMonth && thisDay == currentDate) {
                         pastCurrentDate = true;
+                        currentElement.setCurrentDatePaint(mCurrentDayPaint);
                         currentElement.setIsCurrentDay(true);
                     }
                 }

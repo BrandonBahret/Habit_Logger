@@ -145,6 +145,11 @@ public class MainActivity extends AppCompatActivity
         if (mPreferenceChecker.doShowNotificationsAutomatically())
             mSessionNotificationManager.launchNotificationsForAllActiveSessions();
 
+        prepareNavigationDrawer();
+
+    }
+
+    private void prepareNavigationDrawer() {
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
         MenuItem navNightModeSwitch = menu.findItem(R.id.night_mode);
@@ -152,10 +157,6 @@ public class MainActivity extends AppCompatActivity
         boolean isNightMode = mPreferenceChecker.isNightMode();
         Switch nightModeSwitch = (Switch) navNightModeSwitch.getActionView().findViewById(R.id.menu_switch);
         nightModeSwitch.setChecked(isNightMode);
-
-        int nightModeIcon = isNightMode ? R.drawable.ic_night_mode_24dp : R.drawable.ic_day_mode_24dp;
-        navNightModeSwitch.setIcon(nightModeIcon);
-
     }
 
     private void setListeners() {
@@ -187,6 +188,7 @@ public class MainActivity extends AppCompatActivity
             rv.getLayoutManager().onRestoreInstanceState(getIntent().getExtras().getParcelable(RECYCLER_STATE));
         }
 
+        prepareNavigationDrawer();
         mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
         showDatabase();
         startRepeatingTask();
@@ -784,7 +786,7 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case R.id.night_mode:
-                ((Switch)item.getActionView().findViewById(R.id.menu_switch)).toggle();
+                ((Switch) item.getActionView().findViewById(R.id.menu_switch)).toggle();
                 mPreferenceChecker.toggleNightMode();
                 recreate();
                 break;

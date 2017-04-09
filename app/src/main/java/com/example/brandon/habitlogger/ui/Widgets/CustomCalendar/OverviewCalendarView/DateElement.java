@@ -32,7 +32,7 @@ public class DateElement extends DateElementBase {
 
         // Draw the date text
         if (mDateText != null)
-            mDateText.draw(canvas, x - mDateText.getWidth() / 2f, y - mDateText.getHeight() / 3f - mRadius);
+            mDateText.draw(canvas, x, y - mDateText.getHeight() / 3f - mRadius);
 
     }
 

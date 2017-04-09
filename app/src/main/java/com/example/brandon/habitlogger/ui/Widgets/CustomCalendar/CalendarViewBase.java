@@ -49,6 +49,7 @@ public abstract class CalendarViewBase extends View {
     private int mCalendarBackgroundColor = ContextCompat.getColor(getContext(), R.color.defaultCardViewBackground);
     private int mDateElementColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
     protected int mEmptyDateColor = ContextCompat.getColor(getContext(), R.color.colorPrimary);
+    protected int mCurrentDayColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryVeryLight);
 
     private TextPaint mBackgroundPaint;
     protected TextPaint mCalendarBackgroundPaint;
@@ -57,6 +58,7 @@ public abstract class CalendarViewBase extends View {
     protected TextPaint mDateTextPaint;
     protected TextPaint mDateElementPaint;
     protected TextPaint mEmptyDatePaint;
+    protected TextPaint mCurrentDayPaint;
     //endregion -- end --
 
     //region (Drawables)
@@ -130,13 +132,14 @@ public abstract class CalendarViewBase extends View {
 
         mDateElementPaint = new TextPaint();
         mDateElementPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-        mDateElementPaint.setTextAlign(Paint.Align.LEFT);
+        mDateElementPaint.setTextAlign(Paint.Align.CENTER);
 
         mEmptyDatePaint = new TextPaint();
         mEmptyDatePaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         mEmptyDatePaint.setTextAlign(Paint.Align.LEFT);
 
         mCalendarBackgroundPaint = new TextPaint();
+        mCalendarBackgroundPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
 
         mTextPaint = new TextPaint();
         mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
@@ -149,6 +152,9 @@ public abstract class CalendarViewBase extends View {
         mDateTextPaint = new TextPaint();
         mDateTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         mDateTextPaint.setTextAlign(Paint.Align.LEFT);
+
+        mCurrentDayPaint = new TextPaint();
+        mCurrentDayPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
     }
 
     private void gatherColorAttributes(TypedArray attributes) {
@@ -175,6 +181,10 @@ public abstract class CalendarViewBase extends View {
         mEmptyDateColor = attributes.getColor(
                 R.styleable.CalendarView_empty_date_color,
                 mEmptyDateColor);
+
+        mCurrentDayColor = attributes.getColor(
+                R.styleable.CalendarView_current_day_highlight_color,
+                mCurrentDayColor);
     }
 
     private void gatherDimensionAttributes(TypedArray attributes) {
@@ -255,6 +265,8 @@ public abstract class CalendarViewBase extends View {
         mDateElementPaint.setColor(mDateElementColor);
 
         mEmptyDatePaint.setColor(mEmptyDateColor);
+
+        mCurrentDayPaint.setColor(mCurrentDayColor);
 
         mCalendarBackgroundPaint.setColor(mCalendarBackgroundColor);
 

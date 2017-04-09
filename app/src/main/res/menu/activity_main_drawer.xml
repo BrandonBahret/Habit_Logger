@@ -35,7 +35,7 @@
                 android:title="@string/about_nav_string"/>
 
             <item
-                android:icon="@drawable/ic_day_mode_24dp"
+                android:icon="@drawable/ic_night_mode_24dp"
                 android:id="@+id/night_mode"
                 android:title="@string/toggle_theme"
                 app:actionLayout="@layout/switch_layout"/>

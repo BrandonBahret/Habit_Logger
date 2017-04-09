@@ -32,8 +32,8 @@
     <string-array name="date_format_options">
         <item>dd/MM/yyyy</item>
         <item>MM/dd/yyyy</item>
+        <item>dd/MMMM/yyyy</item>
         <item>MMMM/dd/yyyy</item>
-        <item>MMMM/yyyy</item>
     </string-array>
     <string-array name="date_format_options_values">
         <item>0</item>

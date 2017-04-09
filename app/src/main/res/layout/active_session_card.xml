@@ -41,7 +41,8 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toStartOf="@+id/session_pause_play"
-            android:text="@string/time_display_placeholder"/>
+            android:text="@string/time_display_placeholder"
+            android:textSize="15sp"/>
 
         <TextView
             android:id="@+id/active_session_habit_name"

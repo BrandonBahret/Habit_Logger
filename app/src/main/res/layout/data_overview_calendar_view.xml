@@ -15,6 +15,7 @@
     android:textSize="20sp"
 
     calendar_view:content_margin_top="12dp"
+    calendar_view:current_day_highlight_color="@color/currentDateHighlight"
     calendar_view:date_circle_radius="19dp"
     calendar_view:date_circle_streak_color="@color/colorAccent"
     calendar_view:date_element_color="@color/calendarViewTitle"

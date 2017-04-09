@@ -40,9 +40,9 @@ public class DateElement extends DateElementBase {
             if(!MyColorUtils.isColorBright(backgroundColor, 0.5f))
                 paint.setColor(Color.WHITE);
             else if(mHasEntries)
-                paint.setColor(Color.BLACK);
+                paint.setColor(Color.DKGRAY);
 
-            mDateText.draw(canvas, paint, x - mDateText.getWidth() / 2f, y + mDateText.getHeight() / 2f);
+            mDateText.draw(canvas, paint, x, y + mDateText.getHeight() / 2f);
         }
     }
 

@@ -39,6 +39,7 @@
     <color name="calendarViewTitle">@color/textColor1</color>
     <color name="calendarViewEmpty">@color/background4</color>
     <color name="calendarViewDateLabel">@color/textColor2</color>
+    <color name="currentDateHighlight">@color/iconTint2</color>
 
 
 </resources>

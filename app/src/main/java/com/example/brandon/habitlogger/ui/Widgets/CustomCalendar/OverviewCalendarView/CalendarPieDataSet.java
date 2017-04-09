@@ -22,15 +22,16 @@ public class CalendarPieDataSet {
     public CalendarPieDataSet(List<CalendarPieEntry> entries, int date) {
         mCalendarPieEntries = entries;
         mCurrentPaint = new Paint();
+        mCurrentPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         mDate = date;
     }
 
-    public void draw(Canvas canvas, float x, float y, float radius){
+    public void draw(Canvas canvas, float x, float y, float radius) {
         RectF oval = new RectF(x - radius, y - radius, x + radius, y + radius);
 
         float startAngle = 0;
-        for(CalendarPieEntry entry : mCalendarPieEntries){
-            int arc = (int)(entry.getValue() * 360);
+        for (CalendarPieEntry entry : mCalendarPieEntries) {
+            int arc = (int) (entry.getValue() * 360);
 
             mCurrentPaint.setColor(entry.getColor());
             canvas.drawArc(oval, startAngle, arc, true, mCurrentPaint);
@@ -48,7 +49,7 @@ public class CalendarPieDataSet {
         private float mValue;
         private int mColor;
 
-        public CalendarPieEntry(float value, int color){
+        public CalendarPieEntry(float value, int color) {
             mValue = value;
             mColor = color;
         }

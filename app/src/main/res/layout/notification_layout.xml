@@ -53,7 +53,8 @@
         android:layout_centerVertical="true"
         android:layout_toStartOf="@+id/session_pause_play"
         android:text="@string/time_display_placeholder"
-        android:textColor="@android:color/black"/>
+        android:textColor="@android:color/black"
+        android:textSize="15sp"/>
 
     <TextView
         android:id="@+id/time_started"

@@ -71,7 +71,7 @@
     <PreferenceCategory android:title="Dates">
 
         <ListPreference
-            android:defaultValue="0"
+            android:defaultValue="2"
             android:dialogTitle="Select a format"
             android:entries="@array/date_format_options"
             android:entryValues="@array/date_format_options_values"
@@ -92,7 +92,7 @@
         <SwitchPreference
             android:defaultValue="false"
             android:key="@string/pref_is_night_mode"
-            android:title="Night mode"/>
+            android:title="@string/toggle_theme"/>
 
     </PreferenceCategory>
 
