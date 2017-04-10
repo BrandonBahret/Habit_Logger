@@ -33,26 +33,26 @@
 
             <TextView
                 android:id="@+id/entry_duration"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_marginStart="10dp"
                 android:layout_marginTop="4dp"
                 android:layout_toEndOf="@+id/entry_start_time"
                 android:drawablePadding="3dp"
                 android:drawableStart="@drawable/ic_timer_24dp"
-                android:gravity="center"
+                android:gravity="left|center_vertical"
                 android:text="@string/time_display_placeholder"/>
 
             <TextView
                 android:id="@+id/entry_start_time"
-                android:layout_width="wrap_content"
+                android:layout_width="94dp"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/entry_note"
                 android:layout_alignStart="@+id/entry_note"
+                android:layout_marginTop="4dp"
                 android:drawablePadding="3dp"
                 android:drawableStart="@drawable/ic_clock_24dp"
-                android:gravity="center"
+                android:gravity="left|center_vertical"
                 android:text="@string/time_of_day_placeholder"/>
 
             <ImageButton

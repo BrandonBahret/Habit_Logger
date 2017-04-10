@@ -125,14 +125,16 @@ public class HabitViewHolder extends ChildViewHolder {
     public void bindSessionEntry(SessionEntry entry) {
         if (entry != null) {
             time.setText(entry.stringifyDuration());
+            time.setAlpha(1f);
             playButton.setImageResource(
                     getResourceIdForPauseButton(entry.getIsPaused())
             );
         }
         else {
             time.setText("00:00:00");
+            time.setAlpha(0.5f);
             playButton.setImageResource(
-                    getResourceIdForPauseButton(true)
+                    R.drawable.ic_add_timer_24dp
             );
         }
     }

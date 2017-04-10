@@ -201,8 +201,22 @@ public class SessionActivity extends AppCompatActivity implements
     //endregion -- end --
 
     public void applyHabitColorToTheme() {
+
         int color = mHabit.getColor();
-        int darkerColor = MyColorUtils.setLightness(color, 0.35f);
+        int darkerColor = MyColorUtils.darkenColorBy(color, 0.08f);
+
+        boolean isNightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
+        if (isNightMode) {
+            if (MyColorUtils.getLightness(color) > 0.40) { // Clip lightness to 40% max
+                darkerColor = MyColorUtils.setLightness(darkerColor, 0.40f);
+                color = MyColorUtils.setLightness(color, 0.45f);
+            }
+
+            if (MyColorUtils.getSaturation(color) > 0.45) { // Clip saturation to 45% max
+                darkerColor = MyColorUtils.setSaturation(darkerColor, 0.45f);
+                color = MyColorUtils.setSaturation(color, 0.45f);
+            }
+        }
 
         getWindow().setStatusBarColor(darkerColor);
 

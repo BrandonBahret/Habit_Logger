@@ -90,7 +90,7 @@
     <string name="date_range_to_label">To</string>
     <string name="date_range_type_label">Date Range Type</string>
     <string name="modify_category_name_hint">Category Name</string>
-    <string name="modify_category_color_text">#3ad6b6</string>
+    <string name="modify_category_color_text">#637aa6</string>
     <string name="modify_category_color_hint">Color</string>
     <string name="modify_entry_duration_title">Duration (Hour, Minute, Second)</string>
     <string name="colon">:</string>
