@@ -34,6 +34,7 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
 
     //region Code responsible for providing an interface
     OnClickListeners mListener;
+    private int mColor = -1;
 
     public interface OnClickListeners {
         void onEntryViewClick(long habitId, long entryId);
@@ -72,6 +73,14 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         mListener = listener;
     }
 
+    public EntryViewAdapter(List<SessionEntry> sessionEntries, Context context, int color, OnClickListeners listener) {
+        mContext = context;
+        mSessionEntries = sessionEntries;
+        mHabitDatabase = new HabitDatabase(context);
+        mListener = listener;
+        mColor = color;
+    }
+
     //region Methods responsible for creating and binding rootView holders
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -91,7 +100,11 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         holder.startTimeText.setText(item.stringifyStartingTime("h:mm a"));
         holder.durationText.setText(item.stringifyDuration());
 
-        holder.accent.setBackgroundColor(mHabitDatabase.getHabitColor(holder.habitId));
+        if (mColor == -1)
+            holder.accent.setBackgroundColor(mHabitDatabase.getHabitColor(item.getHabitId()));
+        else
+            holder.accent.setBackgroundColor(mColor);
+
 
         if (!item.getNote().equals("")) {
             holder.noteText.setText(item.getNote());

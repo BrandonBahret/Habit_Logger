@@ -77,12 +77,12 @@ public class StatisticsFragment extends Fragment implements IHabitCallback.IOnTa
             NestedScrollView scrollView = (NestedScrollView) mFragmentView.findViewById(R.id.statistics_container);
             scrollView.setOnScrollChangeListener(getOnScrollChangeListener());
 
+            boolean hasEntries = new HabitDatabase(getContext()).getNumberOfEntries(mHabit.getDatabaseId()) > 0;
+            showNoDataScreen(hasEntries);
+
         } catch (InflateException e) {
             // empty stub
         }
-
-        boolean hasEntries = new HabitDatabase(getContext()).getNumberOfEntries(mHabit.getDatabaseId()) > 0;
-        showNoDataScreen(hasEntries);
 
         return mFragmentView;
     }

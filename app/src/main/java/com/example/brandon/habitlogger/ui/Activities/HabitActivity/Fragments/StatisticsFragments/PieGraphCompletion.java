@@ -27,7 +27,7 @@ import java.util.Locale;
 import java.util.Set;
 
 
-public class PieGraphCompletion extends Fragment implements IHabitCallback.IUpdateEntries {
+public class PieGraphCompletion extends Fragment implements IHabitCallback.IUpdateEntries, IHabitCallback.IUpdateColor {
 
     private FragmentPieGraphCompletionBinding ui;
     IHabitCallback callbackInterface;
@@ -35,6 +35,7 @@ public class PieGraphCompletion extends Fragment implements IHabitCallback.IUpda
     private int mChartHoleColor;
     private int mCompletedColor;
     private int mSkippedColor;
+    private StatisticData mStatisticData;
 
     public PieGraphCompletion() {
         // Required empty public constructor
@@ -70,10 +71,16 @@ public class PieGraphCompletion extends Fragment implements IHabitCallback.IUpda
 
         callbackInterface = (IHabitCallback) context;
         callbackInterface.addUpdateEntriesCallback(this);
+        callbackInterface.addUpdateColorCallback(this);
 
-        mCompletedColor = callbackInterface.getDefaultColor();
-        mSkippedColor = ColorUtils.setAlphaComponent(mCompletedColor, 85);
-        mChartHoleColor = ColorUtils.setAlphaComponent(mCompletedColor, 10);
+        updateColor(callbackInterface.getDefaultColor());
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callbackInterface.removeUpdateEntriesCallback(this);
+        callbackInterface.removeUpdateColorCallback(this);
     }
 
     @Override
@@ -94,19 +101,20 @@ public class PieGraphCompletion extends Fragment implements IHabitCallback.IUpda
             int totalDays = dataSample.calculateTotalDaysLength() + 1;
             float ratio = totalDaysWithEntries / (float) totalDays * 100;
 
-            setPieData(totalDaysWithEntries, totalDays, ratio);
+            mStatisticData = new StatisticData(totalDaysWithEntries, totalDays, ratio);
+            setPieData(mStatisticData);
         }
     }
 
-    public void setPieData(int totalDaysWithEntries, int totalDays, float ratio) {
-        ui.completedDaysText.setText(String.valueOf(totalDaysWithEntries));
-        ui.totalDaysText.setText(String.valueOf(totalDays));
-        ui.chart.setCenterText(String.format(Locale.US, "%.2f%%", ratio));
+    public void setPieData(StatisticData data) {
+        ui.completedDaysText.setText(String.valueOf(data.mTotalDaysWithEntries));
+        ui.totalDaysText.setText(String.valueOf(data.mTotalDays));
+        ui.chart.setCenterText(String.format(Locale.US, "%.2f%%", data.mRatio));
         ui.chart.setCenterTextColor(ContextCompat.getColor(getContext(), R.color.textColor3));
 
         List<PieEntry> entries = new ArrayList<>();
-        entries.add(new PieEntry(ratio));
-        entries.add(new PieEntry(100 - ratio));
+        entries.add(new PieEntry(data.mRatio));
+        entries.add(new PieEntry(100 - data.mRatio));
 
         PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setSliceSpace(0f);
@@ -115,9 +123,32 @@ public class PieGraphCompletion extends Fragment implements IHabitCallback.IUpda
         ui.chart.setHoleColor(mChartHoleColor);
         dataSet.setColors(mCompletedColor, mSkippedColor);
 
-        PieData data = new PieData(dataSet);
-        data.setDrawValues(false);
+        PieData pieData = new PieData(dataSet);
+        pieData.setDrawValues(false);
 
-        ui.chart.setData(data);
+        ui.chart.setData(pieData);
+        ui.chart.invalidate();
+    }
+
+    @Override
+    public void updateColor(int color) {
+        mCompletedColor = color;
+        mSkippedColor = ColorUtils.setAlphaComponent(mCompletedColor, 85);
+        mChartHoleColor = ColorUtils.setAlphaComponent(mCompletedColor, 10);
+
+        if (mStatisticData != null)
+            setPieData(mStatisticData);
+    }
+
+    private class StatisticData {
+        int mTotalDaysWithEntries;
+        int mTotalDays;
+        float mRatio;
+
+        StatisticData(int totalDaysWithEntries, int totalDays, float ratio) {
+            mTotalDaysWithEntries = totalDaysWithEntries;
+            mTotalDays = totalDays;
+            mRatio = ratio;
+        }
     }
 }

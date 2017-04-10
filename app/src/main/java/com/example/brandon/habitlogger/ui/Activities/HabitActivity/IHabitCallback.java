@@ -19,23 +19,44 @@ public interface IHabitCallback {
         void updateCategoryDataSample(CategoryDataSample dataSample);
     }
 
-    interface IOnTabReselected{
+    interface IUpdateColor {
+        void updateColor(int color);
+    }
+
+    interface IOnTabReselected {
         void onTabReselected(int position);
     }
 
-    int getDefaultColor();
     Habit getHabit();
 
+    //region Color callbacks
+    int getDefaultColor();
+
+    void addUpdateColorCallback(IUpdateColor callback);
+
+    void removeUpdateColorCallback(IUpdateColor callback);
+    //endregion
+
+    //region Session entries callbacks
     SessionEntriesSample getSessionEntries();
+
     void addUpdateEntriesCallback(IUpdateEntries callback);
+
     void removeUpdateEntriesCallback(IUpdateEntries callback);
+    //endregion
 
+    //region Category data callbacks
     CategoryDataSample getCategoryDataSample();
-    void addUpdateCategoryDataSampleCallback(IUpdateCategorySample callback);
-    void removeUpdateCategoryDataSampleCallback(IUpdateCategorySample callback);
 
+    void addUpdateCategoryDataSampleCallback(IUpdateCategorySample callback);
+
+    void removeUpdateCategoryDataSampleCallback(IUpdateCategorySample callback);
+    //endregion
+
+    //region Event callbacks
     void addOnTabReselectedCallback(IOnTabReselected callback);
 
     void removeOnTabReselectedCallback(IOnTabReselected callback);
+    //endregion
 
 }

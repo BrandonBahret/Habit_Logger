@@ -39,13 +39,14 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpdateEntries {
+public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpdateEntries, IHabitCallback.IUpdateColor {
 
     //region (Member attributes)
     private FragmentLineGraphCompletionBinding ui;
     IHabitCallback callbackInterface;
     private int mColor;
     private int mTextColor;
+    private List<Entry> mValues;
     //endregion
 
     public LineGraphCompletion() {
@@ -99,15 +100,25 @@ public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpd
         return ui.getRoot();
     }
 
+    //region methods to handle (onAttach - onDetach)
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
         callbackInterface = (IHabitCallback) context;
         callbackInterface.addUpdateEntriesCallback(this);
+        callbackInterface.addUpdateColorCallback(this);
 
         mColor = callbackInterface.getDefaultColor();
     }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callbackInterface.removeUpdateEntriesCallback(this);
+        callbackInterface.removeUpdateColorCallback(this);
+    }
+    //endregion
 
     @Override
     public void onStart() {
@@ -156,6 +167,7 @@ public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpd
     }
 
     private void setLineChartData(List<Entry> values) {
+        mValues = values;
         LineDataSet dataSet = new LineDataSet(values, "");
         //region Stylize the data set
         dataSet.setDrawFilled(true);
@@ -171,6 +183,13 @@ public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpd
         data.setHighlightEnabled(false);
 
         ui.chart.setData(data);
+        ui.chart.invalidate();
+    }
+
+    @Override
+    public void updateColor(int color) {
+        mColor = color;
+        setLineChartData(mValues);
     }
 
 }

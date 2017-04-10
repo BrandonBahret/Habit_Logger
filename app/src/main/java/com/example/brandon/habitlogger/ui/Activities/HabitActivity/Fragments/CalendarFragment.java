@@ -17,7 +17,8 @@ import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarView.Ca
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 
 public class CalendarFragment extends Fragment implements
-        IHabitCallback.IOnTabReselected, IHabitCallback.IUpdateEntries {
+        IHabitCallback.IOnTabReselected, IHabitCallback.IUpdateEntries,
+        IHabitCallback.IUpdateColor {
 
     //region (Member attributes)
     IHabitCallback callbackInterface;
@@ -44,6 +45,7 @@ public class CalendarFragment extends Fragment implements
         callbackInterface = (IHabitCallback) context;
         callbackInterface.addUpdateEntriesCallback(this);
         callbackInterface.addOnTabReselectedCallback(this);
+        callbackInterface.addUpdateColorCallback(this);
     }
 
     @Override
@@ -51,6 +53,7 @@ public class CalendarFragment extends Fragment implements
         super.onDetach();
         callbackInterface.removeUpdateEntriesCallback(this);
         callbackInterface.removeOnTabReselectedCallback(this);
+        callbackInterface.removeUpdateColorCallback(this);
     }
     //endregion
 
@@ -88,8 +91,18 @@ public class CalendarFragment extends Fragment implements
     }
 
     @Override
+    public void updateColor(int color) {
+        mDefaultColor = color;
+        if(mAdapter != null) {
+            mAdapter.setColor(mDefaultColor);
+            mCalendarViewContainer.setAdapter(mAdapter);
+        }
+    }
+
+    @Override
     public void onTabReselected(int position) {
         if (position == 1)
             mCalendarViewContainer.smoothScrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
     }
+
 }

@@ -65,6 +65,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
     private List<IUpdateEntries> mSessionEntriesCallbacks = new ArrayList<>();
     private List<IUpdateCategorySample> mCategoryDataSampleCallbacks = new ArrayList<>();
     private List<IOnTabReselected> mOnTabReselectedCallbacks = new ArrayList<>();
+    private List<IUpdateColor> mUpdateColorCallbacks = new ArrayList<>();
     //endregion
 
     //region [ ---- Code responsible for providing an interface to this activity ---- ]
@@ -98,6 +99,16 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
     @Override
     public void removeOnTabReselectedCallback(IOnTabReselected callback) {
         mOnTabReselectedCallbacks.remove(callback);
+    }
+
+    @Override
+    public void addUpdateColorCallback(IUpdateColor callback) {
+        mUpdateColorCallbacks.add(callback);
+    }
+
+    @Override
+    public void removeUpdateColorCallback(IUpdateColor callback) {
+        mUpdateColorCallbacks.remove(callback);
     }
     //endregion -- end --
 
@@ -228,17 +239,25 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
             accentDarkerColor = darkerColor;
         }
 
+        for (IUpdateColor callback : mUpdateColorCallbacks) {
+            callback.updateColor(color);
+        }
+
         boolean isNightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
         if (isNightMode) {
-            darkerColor = MyColorUtils.setLightness(darkerColor, 0.40f);
-            accentDarkerColor = MyColorUtils.setLightness(accentDarkerColor, 0.45f);
-            color = MyColorUtils.setLightness(color, 0.45f);
-            accentColor = MyColorUtils.setLightness(accentColor, 0.50f);
+            if (MyColorUtils.getLightness(color) > 0.40) {
+                darkerColor = MyColorUtils.setLightness(darkerColor, 0.40f);
+                accentDarkerColor = MyColorUtils.setLightness(accentDarkerColor, 0.45f);
+                color = MyColorUtils.setLightness(color, 0.45f);
+                accentColor = MyColorUtils.setLightness(accentColor, 0.50f);
+            }
 
-            darkerColor = MyColorUtils.setSaturation(darkerColor, 0.45f);
-            accentDarkerColor = MyColorUtils.setSaturation(accentDarkerColor, 0.45f);
-            color = MyColorUtils.setSaturation(color, 0.45f);
-            accentColor = MyColorUtils.setSaturation(accentColor, 0.45f);
+            if (MyColorUtils.getSaturation(color) > 0.45) {
+                darkerColor = MyColorUtils.setSaturation(darkerColor, 0.45f);
+                accentDarkerColor = MyColorUtils.setSaturation(accentDarkerColor, 0.45f);
+                color = MyColorUtils.setSaturation(color, 0.45f);
+                accentColor = MyColorUtils.setSaturation(accentColor, 0.45f);
+            }
         }
 
         getWindow().setStatusBarColor(darkerColor);

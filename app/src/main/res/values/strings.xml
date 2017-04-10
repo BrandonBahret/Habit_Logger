@@ -159,4 +159,7 @@
     <string name="no_active_sessions">No Active Sessions</string>
     <string name="pref_allow_upon_no_active_sessions">preference_close_upon_no_active_sessions</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

@@ -33,12 +33,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class DistributionStartingTime extends Fragment implements IHabitCallback.IUpdateEntries {
+public class DistributionStartingTime extends Fragment implements IHabitCallback.IUpdateEntries, IHabitCallback.IUpdateColor {
     //region (Member attributes)
     IHabitCallback callbackInterface;
     FragmentDistributionStartingTimeBinding ui;
     private int mColor;
     private int mTextColor;
+    private List<BarEntry> mEntries;
+    private final int INTERVAL = 60;
     //endregion
 
     //region [ ---- Methods responsible for handling the fragment lifecycle ---- ]
@@ -62,6 +64,7 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
         super.onAttach(context);
         callbackInterface = (IHabitCallback) context;
         callbackInterface.addUpdateEntriesCallback(this);
+        callbackInterface.addUpdateColorCallback(this);
         mColor = callbackInterface.getDefaultColor();
     }
 
@@ -69,6 +72,7 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
     public void onDetach() {
         super.onDetach();
         callbackInterface.removeUpdateEntriesCallback(this);
+        callbackInterface.removeUpdateColorCallback(this);
     }
 
     //endregion -- end --
@@ -89,8 +93,7 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
     public void updateEntries(SessionEntriesSample dataSample) {
 
         if (!dataSample.isEmpty()) {
-            int interval = 60;
-            TimeIntervalEntryCounter entryCounter = new TimeIntervalEntryCounter(interval);
+            TimeIntervalEntryCounter entryCounter = new TimeIntervalEntryCounter(INTERVAL);
 
             for (SessionEntry entry : dataSample.getSessionEntries())
                 entryCounter.incrementCounter(entry.getStartingTimePortion());
@@ -103,11 +106,11 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
                 entries.add(new BarEntry(counterIndex, ratio));
             }
 
-            setDistributionData(entries, interval);
+            setDistributionData(entries);
         }
     }
 
-    private void setDistributionData(List<BarEntry> entries, final int interval) {
+    private void setDistributionData(List<BarEntry> entries) {
 
         //region // Disable features
 
@@ -132,7 +135,7 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
         ui.chart.getXAxis().setValueFormatter(new IAxisValueFormatter() {
             @Override
             public String getFormattedValue(float counterIndex, AxisBase axis) {
-                long time = (long) counterIndex * interval * DateUtils.MINUTE_IN_MILLIS;
+                long time = (long) counterIndex * INTERVAL * DateUtils.MINUTE_IN_MILLIS;
                 return MyTimeUtils.stringifyTimePortion(time, "h a");
             }
         });
@@ -148,6 +151,7 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
         CombinedData data = new CombinedData();
 
         //region // Add data to CombinedData
+        mEntries = entries;
         BarDataSet dataSet = new BarDataSet(entries, "label");
         dataSet.setColor(mColor);
         dataSet.setValueTextColor(mTextColor);
@@ -164,11 +168,17 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
 
         data.setData(barData);
 
-//        data.setData(generateBellCurveData(entries, interval));
+//        data.setData(generateBellCurveData(entries, INTERVAL));
         //endregion
 
         ui.chart.setData(data);
         ui.chart.invalidate();
+    }
+
+    @Override
+    public void updateColor(int color) {
+        mColor = color;
+        setDistributionData(mEntries);
     }
 
     class TimeIntervalEntryCounter {

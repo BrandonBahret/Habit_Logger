@@ -35,7 +35,7 @@ import static com.example.brandon.habitlogger.R.id.no_result_icon;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateEntries,
-        IHabitCallback.IOnTabReselected, EntryViewAdapter.OnClickListeners {
+        IHabitCallback.IOnTabReselected, IHabitCallback.IUpdateColor, EntryViewAdapter.OnClickListeners {
 
     //region (Member attributes)
     private View mView;
@@ -72,6 +72,7 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
         mCallbackInterface = (IHabitCallback) context;
         mCallbackInterface.addUpdateEntriesCallback(this);
         mCallbackInterface.addOnTabReselectedCallback(this);
+        mCallbackInterface.addUpdateColorCallback(this);
 
         if (context instanceof IScrollEvents)
             this.mListener = (IScrollEvents) context;
@@ -82,6 +83,7 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
         super.onDetach();
         mCallbackInterface.removeUpdateEntriesCallback(this);
         mCallbackInterface.removeOnTabReselectedCallback(this);
+        mCallbackInterface.removeUpdateColorCallback(this);
     }
     //endregion
 
@@ -99,7 +101,7 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
         mMakeHeadersSticky = preferenceChecker.makeDateHeadersSticky();
         mHabitDatabase = new HabitDatabase(context);
         mSessionEntries = mCallbackInterface.getSessionEntries().getSessionEntries();
-        mEntryAdapter = new EntryViewAdapter(mSessionEntries, context, this);
+        mEntryAdapter = new EntryViewAdapter(mSessionEntries, context, mColor, this);
 
         mEntriesContainer = (RecyclerView) mView.findViewById(R.id.entries_holder);
 
@@ -259,7 +261,7 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
     public void updateEntries(SessionEntriesSample dataSample) {
         if (mEntryAdapter != null) {
             mSessionEntries = dataSample.getSessionEntries();
-            mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), mEntryAdapter.getListener());
+            mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), mColor, mEntryAdapter.getListener());
             mEntriesContainer.setAdapter(mEntryAdapter);
         }
 
@@ -268,8 +270,18 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
     }
 
     @Override
+    public void updateColor(int color) {
+        if (mEntryAdapter != null) {
+            mColor = color;
+            mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), mColor, mEntryAdapter.getListener());
+            mEntriesContainer.setAdapter(mEntryAdapter);
+        }
+    }
+
+    @Override
     public void onTabReselected(int position) {
         if (position == 0)
             mEntriesContainer.smoothScrollToPosition(0);
     }
+
 }
