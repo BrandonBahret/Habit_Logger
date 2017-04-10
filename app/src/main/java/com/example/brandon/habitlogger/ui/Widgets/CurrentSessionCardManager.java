@@ -74,8 +74,8 @@ public class CurrentSessionCardManager {
     //endregion -- end --
 
     //region Methods responsible for updating the ui
-    public void updateColor(int sessionCount) {
-        if (sessionCount == 0) {
+    public void updateColor(int sessionCount, PreferenceChecker preferenceChecker) {
+        if (!preferenceChecker.allowActiveSessionsActivity(sessionCount > 0)) {
             mViewHolder.itemView.setCardBackgroundColor(mDisabledBackgroundColor);
             mViewHolder.accent.setBackgroundColor(mDisabledAccentColor);
             mViewHolder.title.setAlpha(0.5f);
@@ -93,7 +93,7 @@ public class CurrentSessionCardManager {
 
     public void updateCard(SessionManager sessionManager, PreferenceChecker preferenceChecker) {
         int sessionCount = (int) sessionManager.getNumberOfActiveSessions();
-        updateColor(sessionCount);
+        updateColor(sessionCount, preferenceChecker);
 
         if(preferenceChecker.shouldShowCurrentSessions(sessionCount))
             setVisibility(View.VISIBLE);

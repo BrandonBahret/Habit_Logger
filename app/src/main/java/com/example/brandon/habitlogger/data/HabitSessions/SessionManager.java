@@ -159,6 +159,10 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         return DatabaseUtils.queryNumEntries(mReadableDatabase, SessionsTableSchema.TABLE_NAME);
     }
 
+    public boolean hasActiveSessions() {
+        return getNumberOfActiveSessions() != 0;
+    }
+
     public List<SessionEntry> queryActiveSessionList(String query) {
         List<SessionEntry> sessions = new ArrayList<>();
 

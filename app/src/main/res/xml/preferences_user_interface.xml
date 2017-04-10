@@ -29,7 +29,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Active sessions card">
+    <PreferenceCategory android:title="Active sessions">
 
         <SwitchPreference
             android:defaultValue="true"
@@ -49,6 +49,12 @@
             android:key="@string/pref_hide_current_sessions_card_on_scroll"
             android:summary="Scrolling the list will hide the active sessions card."
             android:title="Hide on scroll"/>
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_allow_upon_no_active_sessions"
+            android:summary="Don't allow the active sessions activity to open with zero active sessions."
+            android:title="Allow activity at zero sessions"/>
 
     </PreferenceCategory>
 

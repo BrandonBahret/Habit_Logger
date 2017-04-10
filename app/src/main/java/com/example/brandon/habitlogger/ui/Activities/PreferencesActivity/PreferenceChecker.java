@@ -45,6 +45,14 @@ public class PreferenceChecker {
         return howToDisplayCategories() == AS_SECTIONS && wouldBeSticky;
     }
 
+    public boolean hideFabOnScroll() {
+        return preferences.getBoolean(
+                mContext.getString(R.string.pref_hide_fab_on_scroll), true
+        );
+    }
+    //endregion -- end --
+
+    //region Methods related to active sessions activity
     public boolean doShowCurrentSessions(){
         return preferences.getBoolean(
                 mContext.getString(R.string.pref_display_current_sessions_card), true
@@ -71,12 +79,12 @@ public class PreferenceChecker {
         );
     }
 
-    public boolean hideFabOnScroll() {
-        return preferences.getBoolean(
-                mContext.getString(R.string.pref_hide_fab_on_scroll), true
+    public boolean allowActiveSessionsActivity(boolean hasActiveSessions) {
+        return hasActiveSessions || preferences.getBoolean(
+                mContext.getString(R.string.pref_allow_upon_no_active_sessions), false
         );
     }
-    //endregion -- end --
+    //endregion
 
     //region Methods related to entries settings
     public boolean makeDateHeadersSticky(){

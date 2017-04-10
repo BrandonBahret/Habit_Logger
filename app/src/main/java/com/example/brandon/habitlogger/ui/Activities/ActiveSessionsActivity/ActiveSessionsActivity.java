@@ -23,12 +23,13 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.databinding.ActivityActiveSessionsBinding;
+import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity;
 
 import java.io.Serializable;
@@ -47,6 +48,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     private List<Pair<SessionEntry, Integer>> mUndoStack = new ArrayList<>();
     private List<SessionEntry> mActiveSessions;
     private SessionManager mSessionManager;
+    private PreferenceChecker mPreferenceChecker;
 
     private Handler mUpdateHandler = new Handler();
     private ActiveSessionViewAdapter mSessionViewAdapter;
@@ -66,7 +68,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mSessionManager = new SessionManager(this);
-
+        mPreferenceChecker = new PreferenceChecker(this);
         mActiveSessions = mSessionManager.getActiveSessionList();
 
         Collections.sort(mActiveSessions, SessionEntry.ICompareHabitNames);
@@ -81,6 +83,8 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
 
         ItemTouchHelper touchHelper = new ItemTouchHelper(createItemTouchCallback());
         touchHelper.attachToRecyclerView(ui.sessionViewContainer);
+
+        showNoActiveSessionsLayout(mActiveSessions.isEmpty());
     }
 
     @Override
@@ -121,7 +125,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
 
-        if (mSessionManager.getNumberOfActiveSessions() == 0)
+        if (!mPreferenceChecker.allowActiveSessionsActivity(mSessionManager.hasActiveSessions()))
             finish();
 
         startRepeatingTask();
@@ -176,6 +180,13 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
         }
     };
 
+    public void showNoActiveSessionsLayout(boolean noActiveSessions){
+        int visibilityMode = noActiveSessions ? View.VISIBLE : View.GONE;
+        View noActiveSessionsLayout = findViewById(R.id.no_active_sessions_layout);
+        if (visibilityMode != noActiveSessionsLayout.getVisibility())
+            noActiveSessionsLayout.setVisibility(visibilityMode);
+    }
+
     //endregion
 
     //region [ ---- Methods for handling events ---- ]
@@ -184,9 +195,8 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == android.R.id.home) {
+        if (id == android.R.id.home)
             finish();
-        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -234,6 +244,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
 
                 mSessionManager.cancelSession(habitId);
                 mActiveSessions.remove(position);
+                showNoActiveSessionsLayout(mActiveSessions.isEmpty());
                 mSessionViewAdapter.notifyItemRemoved(position);
 
                 Snackbar.make(findViewById(R.id.activity_active_sessions), "Session canceled", Snackbar.LENGTH_LONG)
@@ -242,7 +253,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
                             public void onDismissed(Snackbar transientBottomBar, int event) {
                                 super.onDismissed(transientBottomBar, event);
 
-                                if (mSessionManager.getNumberOfActiveSessions() == 0)
+                                if (!mPreferenceChecker.allowActiveSessionsActivity(mSessionManager.hasActiveSessions()))
                                     finish();
 
                                 if (event != DISMISS_EVENT_CONSECUTIVE)
@@ -261,11 +272,8 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
                                     mSessionViewAdapter.notifyItemInserted((Integer) entryPair.second);
                                 }
 
+                                showNoActiveSessionsLayout(mActiveSessions.isEmpty());
                                 mUndoStack.clear();
-
-//                                Collections.sort(mActiveSessions, SessionEntry.ICompareHabitNames);
-//                                Collections.sort(mActiveSessions, SessionEntry.ICompareCategoryNames);
-//                                mSessionViewAdapter.notifyDataSetChanged();
                             }
                         })
                         .setActionTextColor(ContextCompat.getColor(ActiveSessionsActivity.this, R.color.colorAccent))
@@ -293,7 +301,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
 
         mSessionViewAdapter.notifyDataSetChanged();
 
-        int visibilityMode = mActiveSessions.isEmpty() ? View.VISIBLE : View.GONE;
+        int visibilityMode = entries.isEmpty() && mSessionManager.hasActiveSessions() ? View.VISIBLE : View.GONE;
         View noResultsLayout = findViewById(R.id.no_results_layout);
         if (visibilityMode != noResultsLayout.getVisibility())
             noResultsLayout.setVisibility(visibilityMode);
@@ -345,8 +353,10 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     //endregion [ ---------------- end ---------------- ]
 
     public static void startActivity(Context context) {
-        long count = new SessionManager(context).getNumberOfActiveSessions();
-        if (count != 0) {
+        boolean hasActiveSessions = new SessionManager(context).hasActiveSessions();
+        PreferenceChecker preferenceChecker = new PreferenceChecker(context);
+
+        if (preferenceChecker.allowActiveSessionsActivity(hasActiveSessions)) {
             Intent intent = new Intent(context, ActiveSessionsActivity.class);
             context.startActivity(intent);
         }

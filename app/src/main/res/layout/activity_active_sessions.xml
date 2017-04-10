@@ -26,16 +26,21 @@
 
         </android.support.design.widget.AppBarLayout>
 
+        <include
+            android:id="@+id/no_active_sessions_layout"
+            layout="@layout/no_active_sessions"
+            android:visibility="gone"/>
+
+        <include
+            android:id="@+id/no_results_layout"
+            layout="@layout/no_results_found"
+            android:visibility="gone"/>
+
         <FrameLayout
             android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            <include
-                android:id="@+id/no_results_layout"
-                layout="@layout/no_results_found"
-                android:visibility="gone"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/session_view_container"
