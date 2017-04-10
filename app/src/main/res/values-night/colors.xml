@@ -4,9 +4,9 @@
     <!-- Primary Colors -->
     <color name="colorPrimaryVeryLight">#424242</color>
     <color name="colorPrimaryVeryLightDisabled">#5c5c5c</color>
-    <color name="colorPrimaryLight">#303030</color>
-    <color name="colorPrimary">#262626</color>
-    <color name="colorPrimaryDark">#1a1a1a</color>
+    <color name="colorPrimaryLight">#313f59</color>
+    <color name="colorPrimary">#2a354d</color>
+    <color name="colorPrimaryDark">#1c2333</color>
 
     <!-- Accent Colors -->
     <color name="colorAccent">#738cbf</color>
