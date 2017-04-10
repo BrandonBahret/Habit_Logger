@@ -849,16 +849,12 @@ public class HabitDatabase {
     }
 
     public List<SessionEntry> getEntries(long habitId) {
-        int size = (int) DatabaseUtils.queryNumEntries(mReadableDatabase, EntriesTableSchema.TABLE_NAME, EntriesTableSchema.ENTRY_HABIT_ID + "=?",
-                new String[]{String.valueOf(habitId)});
+        Cursor c = MyDatabaseUtils.queryTable(
+                mReadableDatabase, EntriesTableSchema.TABLE_NAME,
+                EntriesTableSchema.ENTRY_HABIT_ID, habitId
+        );
 
-        List<SessionEntry> entries = new ArrayList<>(size);
-        for (int i = 0; i < size; i++)
-            entries.add(i, getEntry(getEntryId(habitId, i)));
-
-        Collections.sort(entries, SessionEntry.ICompareStartingTimes);
-
-        return entries;
+        return fetchEntriesAtCursor(c);
     }
 
     private List<SessionEntry> fetchEntriesAtCursor(Cursor cursor) {

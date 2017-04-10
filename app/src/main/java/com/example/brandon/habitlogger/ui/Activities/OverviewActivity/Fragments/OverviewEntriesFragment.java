@@ -29,14 +29,15 @@ import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceO
 import java.util.List;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class OverviewEntriesFragment extends Fragment implements IDataOverviewCallback.IUpdateHabitSample {
+public class OverviewEntriesFragment extends Fragment implements
+        IDataOverviewCallback.IUpdateHabitSample, IDataOverviewCallback.IOnTabReselected {
 
     //region (Member attributes)
     private HabitDatabase mHabitDatabase;
     private List<SessionEntry> mSessionEntries;
 
     private IScrollEvents mListener;
-    private IDataOverviewCallback mCallback;
+    private IDataOverviewCallback mCallbackInterface;
 
     private RecyclerView mEntriesContainer;
     private View mView;
@@ -59,8 +60,9 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mCallback = (IDataOverviewCallback) context;
-        mCallback.addCallback(this);
+        mCallbackInterface = (IDataOverviewCallback) context;
+        mCallbackInterface.addCallback(this);
+        mCallbackInterface.addOnTabReselectedCallback(this);
 
         if (context instanceof IScrollEvents)
             mListener = (IScrollEvents) context;
@@ -69,7 +71,8 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
     @Override
     public void onDetach() {
         super.onDetach();
-        mCallback.removeCallback(this);
+        mCallbackInterface.removeCallback(this);
+        mCallbackInterface.removeOnTabReselectedCallback(this);
     }
     //endregion -- end --
 
@@ -131,7 +134,7 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
         mEntriesContainer.addItemDecoration(getSpaceOffsetDecoration());
         mEntriesContainer.addItemDecoration(getGroupDecoration());
 
-        updateHabitDataSample(mCallback.getDataSample());
+        updateHabitDataSample(mCallbackInterface.getDataSample());
 
         return mView;
     }
@@ -257,6 +260,12 @@ public class OverviewEntriesFragment extends Fragment implements IDataOverviewCa
 
         boolean showNoDataLayout = mSessionEntries == null || mSessionEntries.isEmpty();
         showNoDataLayout(showNoDataLayout);
+    }
+
+    @Override
+    public void onTabReselected(int position) {
+        if (position == 0)
+            mEntriesContainer.smoothScrollToPosition(0);
     }
 
 }

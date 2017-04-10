@@ -13,10 +13,20 @@ public interface IDataOverviewCallback {
         void updateHabitDataSample(HabitDataSample dataSample);
     }
 
+    interface IOnTabReselected {
+        void onTabReselected(int position);
+    }
+
+
     HabitDataSample getDataSample();
 
     void addCallback(IUpdateHabitSample callback);
 
     void removeCallback(IUpdateHabitSample callback);
+
+    void addOnTabReselectedCallback(IOnTabReselected callback);
+
+    void removeOnTabReselectedCallback(IOnTabReselected callback);
+
 
 }

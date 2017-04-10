@@ -4,12 +4,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -62,6 +64,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
 
     private List<IUpdateEntries> mSessionEntriesCallbacks = new ArrayList<>();
     private List<IUpdateCategorySample> mCategoryDataSampleCallbacks = new ArrayList<>();
+    private List<IOnTabReselected> mOnTabReselectedCallbacks = new ArrayList<>();
     //endregion
 
     //region [ ---- Code responsible for providing an interface to this activity ---- ]
@@ -86,6 +89,16 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
     public void removeUpdateCategoryDataSampleCallback(IUpdateCategorySample callback) {
         mCategoryDataSampleCallbacks.remove(callback);
     }
+
+    @Override
+    public void addOnTabReselectedCallback(IOnTabReselected callback) {
+        mOnTabReselectedCallbacks.add(callback);
+    }
+
+    @Override
+    public void removeOnTabReselectedCallback(IOnTabReselected callback) {
+        mOnTabReselectedCallbacks.remove(callback);
+    }
     //endregion -- end --
 
     @Override
@@ -106,7 +119,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
     }
 
     @Override
-    public Habit getHabit(){
+    public Habit getHabit() {
         return mHabit;
     }
 
@@ -136,6 +149,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
         ui.container.addOnPageChangeListener(getOnPageChangedListener());
 
         ui.tabs.setupWithViewPager(ui.container);
+        ui.tabs.addOnTabSelectedListener(getTabSelectedListener());
 
         ui.menuFab.hideMenu(false);
         ui.menuFab.setClosedOnTouchOutside(true);
@@ -203,13 +217,28 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
 
     private void updateColorTheme() {
         int color = 0xFFCCCCCC;
+        int accentColor = 0xFFCCCCCC;
         int darkerColor = 0xFFBBBBBB;
+        int accentDarkerColor = 0xFFBBBBBB;
 
         if (!mHabit.getIsArchived()) {
             color = mHabit.getCategory().getColorAsInt();
+            accentColor = color;
+            darkerColor = MyColorUtils.darkenColorBy(color, 0.08f);
+            accentDarkerColor = darkerColor;
+        }
 
-            float darkness = MyColorUtils.getLightness(color) - 0.08f;
-            darkerColor = MyColorUtils.setLightness(color, darkness);
+        boolean isNightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
+        if (isNightMode) {
+            darkerColor = MyColorUtils.setLightness(darkerColor, 0.40f);
+            accentDarkerColor = MyColorUtils.setLightness(accentDarkerColor, 0.45f);
+            color = MyColorUtils.setLightness(color, 0.45f);
+            accentColor = MyColorUtils.setLightness(accentColor, 0.50f);
+
+            darkerColor = MyColorUtils.setSaturation(darkerColor, 0.45f);
+            accentDarkerColor = MyColorUtils.setSaturation(accentDarkerColor, 0.45f);
+            color = MyColorUtils.setSaturation(color, 0.45f);
+            accentColor = MyColorUtils.setSaturation(accentColor, 0.45f);
         }
 
         getWindow().setStatusBarColor(darkerColor);
@@ -217,14 +246,14 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
 
         ui.toolbar.setBackgroundColor(color);
 
-        ui.menuFab.setMenuButtonColorNormal(color);
-        ui.menuFab.setMenuButtonColorPressed(darkerColor);
+        ui.menuFab.setMenuButtonColorNormal(accentColor);
+        ui.menuFab.setMenuButtonColorPressed(accentDarkerColor);
 
-        ui.enterSessionFab.setColorNormal(color);
-        ui.enterSessionFab.setColorPressed(darkerColor);
+        ui.enterSessionFab.setColorNormal(accentColor);
+        ui.enterSessionFab.setColorPressed(accentDarkerColor);
 
-        ui.createEntryFab.setColorNormal(color);
-        ui.createEntryFab.setColorPressed(darkerColor);
+        ui.createEntryFab.setColorNormal(accentColor);
+        ui.createEntryFab.setColorPressed(accentDarkerColor);
 
     }
     //endregion
@@ -302,6 +331,23 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                     }
                     break;
                 }
+            }
+        };
+    }
+
+    private TabLayout.OnTabSelectedListener getTabSelectedListener() {
+        return new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                for (IOnTabReselected callback : mOnTabReselectedCallbacks)
+                    callback.onTabReselected(position);
             }
         };
     }
@@ -522,7 +568,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
             callback.updateCategoryDataSample(categoryDataSample);
     }
 
-    public void updateEntries(List<SessionEntry> entries){
+    public void updateEntries(List<SessionEntry> entries) {
 
         dateRangeManager.updateSessionEntries(entries);
 

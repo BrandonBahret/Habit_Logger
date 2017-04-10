@@ -35,6 +35,7 @@ public class FloatingDateRangeWidgetManager {
 
     private long mDateFromTime, mDateToTime, mMinimumTime, mMaximumTime;
     public boolean mIsShown = true;
+    private int mLastPosition = -1;
     //endregion
 
     //region Code responsible for providing an interface
@@ -130,7 +131,9 @@ public class FloatingDateRangeWidgetManager {
         return new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                onItemSelectedMethod(position, true);
+                boolean lastPositionSet = mLastPosition != -1;
+                onItemSelectedMethod(position, lastPositionSet);
+                mLastPosition = position;
             }
 
             @Override
@@ -164,6 +167,7 @@ public class FloatingDateRangeWidgetManager {
             }
         }
         else updateDateRangeLabels(false);
+
     }
     //endregion -- end --
 

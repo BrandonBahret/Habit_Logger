@@ -88,5 +88,12 @@ public class MyColorUtils {
         hsl[2] = lightness;
         return ColorUtils.HSLToColor(hsl);
     }
+
+    public static int darkenColorBy(int color, float amount) {
+        float[] hsl = getHSLComponents(color);
+        float lightness = hsl[2];
+        hsl[2] = Math.max(0, lightness - amount);
+        return ColorUtils.HSLToColor(hsl);
+    }
     //endregion
 }

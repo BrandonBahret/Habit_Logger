@@ -22,13 +22,15 @@ import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.NestedScrol
 /**
  * A simple {@link Fragment} subclass.
  */
-public class StatisticsFragment extends Fragment {
+public class StatisticsFragment extends Fragment implements IHabitCallback.IOnTabReselected {
 
+    //region (Member attributes)
     private static View mFragmentView;
     private IScrollEvents mListener;
     private IHabitCallback mCallbackInterface;
     private Habit mHabit;
     private int mColor;
+    //endregion
 
     public StatisticsFragment() {
         // Required empty public constructor
@@ -43,12 +45,20 @@ public class StatisticsFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if (context instanceof IHabitCallback)
+        if (context instanceof IHabitCallback) {
             mCallbackInterface = (IHabitCallback) context;
+            mCallbackInterface.addOnTabReselectedCallback(this);
+        }
 
         if (context instanceof IScrollEvents)
             mListener = (IScrollEvents) context;
 
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbackInterface.removeOnTabReselectedCallback(this);
     }
 
     @Override
@@ -78,6 +88,22 @@ public class StatisticsFragment extends Fragment {
     }
     //endregion
 
+    private void showNoDataScreen(boolean hasEntries) {
+        float lightness = MyColorUtils.getLightness(mColor) - 0.15f;
+        int color = MyColorUtils.setLightness(mColor, lightness);
+
+        int mainLayoutVisibilityMode = hasEntries ? View.VISIBLE : View.GONE;
+        mFragmentView.findViewById(R.id.statistics_container)
+                .setVisibility(mainLayoutVisibilityMode);
+
+        int noStatsLayoutVisibilityMode = hasEntries ? View.GONE : View.VISIBLE;
+        View noStatisticsLayout = mFragmentView.findViewById(R.id.no_stats_layout);
+        ((ImageView) noStatisticsLayout.findViewById(R.id.no_stats_available_icon))
+                .setColorFilter(color);
+
+        noStatisticsLayout.setVisibility(noStatsLayoutVisibilityMode);
+    }
+
     //region Methods responsible for handling events
     private NestedScrollObserver getOnScrollChangeListener() {
         return new NestedScrollObserver() {
@@ -94,22 +120,14 @@ public class StatisticsFragment extends Fragment {
             }
         };
     }
-    //endregion
 
-    private void showNoDataScreen(boolean hasEntries) {
-        float lightness = MyColorUtils.getLightness(mColor) - 0.15f;
-        int color = MyColorUtils.setLightness(mColor, lightness);
-
-        int mainLayoutVisibilityMode = hasEntries ? View.VISIBLE : View.GONE;
-        mFragmentView.findViewById(R.id.statistics_container)
-                .setVisibility(mainLayoutVisibilityMode);
-
-        int noStatsLayoutVisibilityMode = hasEntries ? View.GONE : View.VISIBLE;
-        View noStatisticsLayout = mFragmentView.findViewById(R.id.no_stats_layout);
-        ((ImageView)noStatisticsLayout.findViewById(R.id.no_stats_available_icon))
-                .setColorFilter(color);
-
-        noStatisticsLayout.setVisibility(noStatsLayoutVisibilityMode);
+    @Override
+    public void onTabReselected(int position) {
+        if (mFragmentView != null && position == 2) {
+            NestedScrollView scrollView = (NestedScrollView) mFragmentView.findViewById(R.id.statistics_container);
+            scrollView.smoothScrollTo(0, 0);
+        }
     }
+    //endregion
 
 }

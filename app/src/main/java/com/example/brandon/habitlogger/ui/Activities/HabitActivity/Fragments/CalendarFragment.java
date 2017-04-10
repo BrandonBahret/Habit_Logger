@@ -16,7 +16,8 @@ import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallbac
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarView.CalendarViewAdapter;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 
-public class CalendarFragment extends Fragment implements IHabitCallback.IUpdateEntries {
+public class CalendarFragment extends Fragment implements
+        IHabitCallback.IOnTabReselected, IHabitCallback.IUpdateEntries {
 
     //region (Member attributes)
     IHabitCallback callbackInterface;
@@ -42,12 +43,14 @@ public class CalendarFragment extends Fragment implements IHabitCallback.IUpdate
 
         callbackInterface = (IHabitCallback) context;
         callbackInterface.addUpdateEntriesCallback(this);
+        callbackInterface.addOnTabReselectedCallback(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         callbackInterface.removeUpdateEntriesCallback(this);
+        callbackInterface.removeOnTabReselectedCallback(this);
     }
     //endregion
 
@@ -66,6 +69,8 @@ public class CalendarFragment extends Fragment implements IHabitCallback.IUpdate
         mCalendarViewContainer.addItemDecoration(getSpaceDecoration());
 
         updateEntries(callbackInterface.getSessionEntries());
+        mCalendarViewContainer.scrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
+
         return v;
     }
 
@@ -80,6 +85,11 @@ public class CalendarFragment extends Fragment implements IHabitCallback.IUpdate
     public void updateEntries(SessionEntriesSample dataSample) {
         mAdapter = new CalendarViewAdapter(dataSample, mDefaultColor, getContext());
         mCalendarViewContainer.setAdapter(mAdapter);
-        mCalendarViewContainer.scrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
+    }
+
+    @Override
+    public void onTabReselected(int position) {
+        if (position == 1)
+            mCalendarViewContainer.smoothScrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
     }
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -41,14 +42,38 @@ public class DataOverviewActivity extends AppCompatActivity implements
     //endregion
 
     //region Code responsible for providing an interface to this activity
-    List<IUpdateHabitSample> callbacks = new ArrayList<>();
+
+    List<IUpdateHabitSample> mUpdateDataCallbacks = new ArrayList<>();
+    List<IOnTabReselected> mOnTabReselectedCallbacks = new ArrayList<>();
+
+    //region Methods to add and remove callbacks
+    @Override
+    public void addCallback(IUpdateHabitSample callback) {
+        mUpdateDataCallbacks.add(callback);
+    }
+
+    @Override
+    public void removeCallback(IUpdateHabitSample callback) {
+        mUpdateDataCallbacks.remove(callback);
+    }
+
+    @Override
+    public void addOnTabReselectedCallback(IOnTabReselected callback) {
+        mOnTabReselectedCallbacks.add(callback);
+    }
+
+    @Override
+    public void removeOnTabReselectedCallback(IOnTabReselected callback) {
+        mOnTabReselectedCallbacks.remove(callback);
+    }
+    //endregion
 
     public void updateEntries() {
         HabitDataSample dataSample = getDataSample();
         List<SessionEntry> sessionEntries = dataSample.buildSessionEntriesList().getSessionEntries();
         mDateRangeManager.updateSessionEntries(sessionEntries);
 
-        for (IUpdateHabitSample callback : callbacks)
+        for (IUpdateHabitSample callback : mUpdateDataCallbacks)
             callback.updateHabitDataSample(dataSample);
     }
 
@@ -58,18 +83,8 @@ public class DataOverviewActivity extends AppCompatActivity implements
         SessionEntriesSample entriesSample = new SessionEntriesSample(entries);
         HabitDataSample dataSample = mHabitDatabase.getHabitDataSample(entriesSample);
 
-        for (IUpdateHabitSample callback : callbacks)
+        for (IUpdateHabitSample callback : mUpdateDataCallbacks)
             callback.updateHabitDataSample(dataSample);
-    }
-
-    @Override
-    public void addCallback(IUpdateHabitSample callback) {
-        callbacks.add(callback);
-    }
-
-    @Override
-    public void removeCallback(IUpdateHabitSample callback) {
-        callbacks.remove(callback);
     }
 
     @Override
@@ -113,6 +128,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ui.tabs.setupWithViewPager(ui.container);
+        ui.tabs.addOnTabSelectedListener(getTabSelectedListener());
 
         mDateRangeManager.setDateRangeChangeListener(getDateRangeListener());
 
@@ -155,6 +171,23 @@ public class DataOverviewActivity extends AppCompatActivity implements
         mDateRangeManager.hideView(true);
     }
     //endregion -- end --
+
+    private TabLayout.OnTabSelectedListener getTabSelectedListener() {
+        return new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                for (IOnTabReselected callback : mOnTabReselectedCallbacks)
+                    callback.onTabReselected(position);
+            }
+        };
+    }
 
     private SearchView.OnQueryTextListener getSearchViewListener() {
         return new SearchView.OnQueryTextListener() {

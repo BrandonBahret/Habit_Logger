@@ -5,8 +5,8 @@
     <color name="colorPrimaryVeryLight">#424242</color>
     <color name="colorPrimaryVeryLightDisabled">#5c5c5c</color>
     <color name="colorPrimaryLight">#303030</color>
-    <color name="colorPrimary">#212121</color>
-    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorPrimary">#262626</color>
+    <color name="colorPrimaryDark">#1a1a1a</color>
 
     <!-- Accent Colors -->
     <color name="colorAccent">#738cbf</color>

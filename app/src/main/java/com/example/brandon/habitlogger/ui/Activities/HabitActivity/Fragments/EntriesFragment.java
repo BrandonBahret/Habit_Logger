@@ -34,7 +34,8 @@ import static com.example.brandon.habitlogger.R.id.no_entries_available_icon;
 import static com.example.brandon.habitlogger.R.id.no_result_icon;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateEntries, EntryViewAdapter.OnClickListeners {
+public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateEntries,
+        IHabitCallback.IOnTabReselected, EntryViewAdapter.OnClickListeners {
 
     //region (Member attributes)
     private View mView;
@@ -70,6 +71,7 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
 
         mCallbackInterface = (IHabitCallback) context;
         mCallbackInterface.addUpdateEntriesCallback(this);
+        mCallbackInterface.addOnTabReselectedCallback(this);
 
         if (context instanceof IScrollEvents)
             this.mListener = (IScrollEvents) context;
@@ -79,6 +81,7 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
     public void onDetach() {
         super.onDetach();
         mCallbackInterface.removeUpdateEntriesCallback(this);
+        mCallbackInterface.removeOnTabReselectedCallback(this);
     }
     //endregion
 
@@ -264,4 +267,9 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
         showNoDataLayout(showNoDataLayout);
     }
 
+    @Override
+    public void onTabReselected(int position) {
+        if (position == 0)
+            mEntriesContainer.smoothScrollToPosition(0);
+    }
 }

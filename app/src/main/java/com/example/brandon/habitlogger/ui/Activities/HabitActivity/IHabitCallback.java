@@ -19,6 +19,10 @@ public interface IHabitCallback {
         void updateCategoryDataSample(CategoryDataSample dataSample);
     }
 
+    interface IOnTabReselected{
+        void onTabReselected(int position);
+    }
+
     int getDefaultColor();
     Habit getHabit();
 
@@ -29,5 +33,9 @@ public interface IHabitCallback {
     CategoryDataSample getCategoryDataSample();
     void addUpdateCategoryDataSampleCallback(IUpdateCategorySample callback);
     void removeUpdateCategoryDataSampleCallback(IUpdateCategorySample callback);
+
+    void addOnTabReselectedCallback(IOnTabReselected callback);
+
+    void removeOnTabReselectedCallback(IOnTabReselected callback);
 
 }

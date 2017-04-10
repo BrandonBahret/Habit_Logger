@@ -36,11 +36,13 @@ public class DateElement extends DateElementBase {
         if (mDateText != null) { // Draw the date text
             TextPaint paint = new TextPaint(mDateText.getPaint());
 
-            int backgroundColor = mTextPaint.getColor();
-            if(!MyColorUtils.isColorBright(backgroundColor, 0.5f))
-                paint.setColor(Color.WHITE);
-            else if(mHasEntries)
-                paint.setColor(Color.DKGRAY);
+            if (mHasEntries) {
+                int backgroundColor = mTextPaint.getColor();
+                if (MyColorUtils.isColorBright(backgroundColor, 0.50f))
+                    paint.setColor(Color.DKGRAY);
+                else
+                    paint.setColor(Color.WHITE);
+            }
 
             mDateText.draw(canvas, paint, x, y + mDateText.getHeight() / 2f);
         }
@@ -55,7 +57,7 @@ public class DateElement extends DateElementBase {
         mIsAStreak = isAStreak;
     }
 
-    public void setHasEntries(boolean hasEntries){
+    public void setHasEntries(boolean hasEntries) {
         mHasEntries = hasEntries;
     }
 

@@ -23,6 +23,7 @@ public class UserInterfaceSettingsActivity extends SettingsActivityBase {
         }
         dateFormat.setEntries(entries);
         dateFormat.setSummary(dateFormat.getEntry());
+
     }
     //endregion -- end --
 

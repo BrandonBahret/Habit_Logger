@@ -37,6 +37,22 @@ public class MyDatabaseUtils {
     }
     //endregion
 
+    /**
+     * @param readableDatabase Sqlite database object to query.
+     * @param tableName        The name of the table to query.
+     * @param recordKey        The name of the column that holds your record ids.
+     * @param recordId         The id of the record to select.
+     * @return A cursor pointing to the results
+     */
+    public static Cursor queryTable(SQLiteDatabase readableDatabase, String tableName,
+                                    String recordKey, long recordId){
+        return readableDatabase.query(
+                tableName, null, recordKey + "=?",
+                new String[]{String.valueOf(recordId)},
+                null, null, null
+        );
+    }
+
     //region Methods to manipulate records
     /**
      * @param readableDatabase Sqlite database object to query.
@@ -50,11 +66,7 @@ public class MyDatabaseUtils {
                                       String recordKey, long recordId,
                                       GetRecordFromContentValues<Out> recordGetter) {
 
-        Cursor c = readableDatabase.query(
-                tableName, null, recordKey + "=?",
-                new String[]{String.valueOf(recordId)},
-                null, null, null
-        );
+        Cursor c = MyDatabaseUtils.queryTable(readableDatabase, tableName, recordKey, recordId);
 
         if (c != null && c.moveToFirst()) {
             ContentValues contentValues = new ContentValues(c.getColumnCount());

@@ -11,13 +11,15 @@ import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
+import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.IDataOverviewCallback;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.NestedScrollObserver;
 
-public class OverviewStatisticsFragment extends Fragment {
+public class OverviewStatisticsFragment extends Fragment implements IDataOverviewCallback.IOnTabReselected {
 
     //region (Member attributes)
-    private static View mContentView;
+    private static View mFragmentView;
+    private IDataOverviewCallback mCallbackInterface;
     private IScrollEvents mListener;
     //endregion
 
@@ -33,20 +35,32 @@ public class OverviewStatisticsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        if (context instanceof IDataOverviewCallback) {
+            mCallbackInterface = (IDataOverviewCallback) context;
+            mCallbackInterface.addOnTabReselectedCallback(this);
+        }
+
         if (context instanceof IScrollEvents)
             mListener = (IScrollEvents) context;
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        if (mCallbackInterface != null) mCallbackInterface.removeOnTabReselectedCallback(this);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (mContentView != null) {
-            ViewGroup parent = (ViewGroup) mContentView.getParent();
+        if (mFragmentView != null) {
+            ViewGroup parent = (ViewGroup) mFragmentView.getParent();
             if (parent != null)
-                parent.removeView(mContentView);
+                parent.removeView(mFragmentView);
         }
         try {
-            mContentView = inflater.inflate(R.layout.fragment_overall_statistics, container, false);
-            NestedScrollView scrollView = (NestedScrollView) mContentView.findViewById(R.id.statistics_container);
+            mFragmentView = inflater.inflate(R.layout.fragment_overall_statistics, container, false);
+            NestedScrollView scrollView = (NestedScrollView) mFragmentView.findViewById(R.id.statistics_container);
 
             scrollView.setOnScrollChangeListener(getScrollEventListener());
 
@@ -57,7 +71,7 @@ public class OverviewStatisticsFragment extends Fragment {
         boolean hasEntries = new HabitDatabase(getContext()).getNumberOfEntries() > 0;
         showNoDataScreen(hasEntries);
 
-        return mContentView;
+        return mFragmentView;
     }
     //endregion -- end --
 
@@ -81,12 +95,19 @@ public class OverviewStatisticsFragment extends Fragment {
 
     private void showNoDataScreen(boolean hasEntries) {
         int mainLayoutVisibilityMode = hasEntries ? View.VISIBLE : View.GONE;
-        mContentView.findViewById(R.id.statistics_container)
+        mFragmentView.findViewById(R.id.statistics_container)
                 .setVisibility(mainLayoutVisibilityMode);
 
         int noStatsLayoutVisibilityMode = hasEntries ? View.GONE : View.VISIBLE;
-        View noStatisticsLayout = mContentView.findViewById(R.id.no_stats_layout);
+        View noStatisticsLayout = mFragmentView.findViewById(R.id.no_stats_layout);
         noStatisticsLayout.setVisibility(noStatsLayoutVisibilityMode);
     }
 
+    @Override
+    public void onTabReselected(int position) {
+        if (mFragmentView != null && position == 2) {
+            NestedScrollView scrollView = (NestedScrollView) mFragmentView.findViewById(R.id.statistics_container);
+            scrollView.smoothScrollTo(0, 0);
+        }
+    }
 }
