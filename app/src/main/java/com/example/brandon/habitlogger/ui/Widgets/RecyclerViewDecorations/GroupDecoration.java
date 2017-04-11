@@ -141,28 +141,32 @@ public class GroupDecoration extends RecyclerView.ItemDecoration {
             final String textLine = mCallback.getGroupFirstLine(childPosition);
             if (textLine == null || textLine.isEmpty()) continue;
 
-            float textY;
+            Rect mTextRect = new Rect();
+            mTextPaint.getTextBounds(textLine, 0, textLine.length(), mTextRect);
 
-            if(mShouldMakeLabelsSticky) {
+            float textY = view.getTop() + view.getPaddingTop() - mTextVerticalOffset;
+
+            if (mShouldMakeLabelsSticky) {
                 // Find appropriate y position for text; on screen unless pushed off by bottom of group
-                textY = Math.max(mTopGap, view.getTop() + view.getPaddingTop() - mTextVerticalOffset);
+                textY = Math.max(mBackdropHeight, textY);
                 final float viewBottom = view.getBottom() + view.getPaddingBottom() + mBottomGap + mTextVerticalOffset - (mBackdropHeight / 3);
+
                 if (childPosition < finalIndex) {
-                    long nextGroupId = mCallback.getGroupId(childPosition + 1);
-                    if (nextGroupId != groupId && viewBottom < textY + mBackdropHeight) {
+                    boolean nextViewStartsANewGroup = mCallback.getGroupId(childPosition + 1) != groupId;
+                    if (nextViewStartsANewGroup && viewBottom < textY + mBackdropHeight) {
                         // Next item is different group, align Y with bottom of current group
                         textY = viewBottom - mBackdropHeight;
                     }
                 }
-            }
-            else {
-                textY = view.getTop() + view.getPaddingTop() - mTextVerticalOffset;
+
             }
 
             textY += view.getTranslationY();
 
             // Draw the backdrop
-            c.drawRect(0, textY - mBackdropHeight, width, textY + (mBackdropHeight / 3), mBackdropPaint);
+            float backdropTop = textY - mBackdropHeight;
+            float backdropBottom = textY + (mBackdropHeight / 3);
+            c.drawRect(0, backdropTop, width, backdropBottom, mBackdropPaint);
 
             // Draw the section text
             c.drawText(textLine, textX, textY, mTextPaint);

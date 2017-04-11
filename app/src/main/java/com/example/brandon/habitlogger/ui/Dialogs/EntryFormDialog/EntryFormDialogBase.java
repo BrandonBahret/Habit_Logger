@@ -6,16 +6,17 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.databinding.DialogNewEntryBinding;
+import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Dialogs.MyDatePickerDialog;
 import com.example.brandon.habitlogger.ui.Dialogs.MyTimePickerDialog;
 
@@ -88,7 +89,18 @@ public abstract class EntryFormDialogBase extends DialogFragment {
         if (getNegativeButtonText() != null)
             builder.setNegativeButton(getNegativeButtonText(), getOnNegativeButtonClickListener());
 
-        return builder.create();
+        final AlertDialog entryDialog = builder.create();
+
+        entryDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                int color = ContextCompat.getColor(getContext(), R.color.textColorContrastBackground);
+                entryDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(color);
+                entryDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(color);
+            }
+        });
+
+        return entryDialog;
     }
 
     //region Methods responsible for filling in the entry form initially

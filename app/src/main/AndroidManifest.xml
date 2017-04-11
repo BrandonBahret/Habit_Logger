@@ -66,13 +66,13 @@
 
         <!-- Settings Activity -->
         <activity
-            android:label="@string/app_settings"
             android:name=".ui.Activities.PreferencesActivity.SettingsActivity"
+            android:label="@string/app_settings"
             android:parentActivityName=".ui.Activities.MainActivity.MainActivity"/>
 
         <activity
-            android:label="@string/ui_settings"
             android:name=".ui.Activities.PreferencesActivity.UserInterfaceSettingsActivity"
+            android:label="@string/ui_settings"
             android:parentActivityName=".ui.Activities.PreferencesActivity.SettingsActivity">
             <intent-filter>
                 <action android:name=".ui.Activities.PreferencesActivity.UserInterfaceSettingsActivity"/>
@@ -81,8 +81,8 @@
         </activity>
 
         <activity
-            android:label="@string/notifications_settings"
             android:name=".ui.Activities.PreferencesActivity.NotificationsSettingsActivity"
+            android:label="@string/notifications_settings"
             android:parentActivityName=".ui.Activities.PreferencesActivity.SettingsActivity">
             <intent-filter>
                 <action android:name=".ui.Activities.PreferencesActivity.NotificationsSettingsActivity"/>

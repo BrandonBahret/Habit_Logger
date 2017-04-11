@@ -51,7 +51,9 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
                              Bundle savedInstanceState) {
 
         ui = DataBindingUtil.inflate(inflater, R.layout.fragment_distribution_starting_time, container, false);
-        ui.chart.setScaleEnabled(false);
+        ui.chart.setScaleEnabled(true);
+        ui.chart.setScaleYEnabled(false);
+        ui.chart.getViewPortHandler().setMaximumScaleX(4f);
         mTextColor = ContextCompat.getColor(getContext(), R.color.textColor3);
         return ui.getRoot();
     }
@@ -128,9 +130,9 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
         //endregion -- end --
 
         //region X-Axis
-        ui.chart.getXAxis().setLabelRotationAngle(-90);
+        ui.chart.getXAxis().setLabelRotationAngle(-45);
         ui.chart.getXAxis().setTextColor(mTextColor);
-        ui.chart.getXAxis().setLabelCount(24);
+        ui.chart.getXAxis().setLabelCount(8, false);
         ui.chart.getXAxis().setDrawGridLines(false);
         ui.chart.getXAxis().setValueFormatter(new IAxisValueFormatter() {
             @Override

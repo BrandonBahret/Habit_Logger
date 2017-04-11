@@ -66,7 +66,7 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.habit_card, parent, false);
 
-        setMargins(itemView, 0, 16, 0, 16);
+        setMargins(itemView, 0, 12, 0, 12);
 
         return new HabitViewHolder(itemView);
     }

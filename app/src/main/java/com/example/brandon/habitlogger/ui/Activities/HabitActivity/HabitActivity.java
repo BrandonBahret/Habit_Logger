@@ -427,6 +427,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                         finish();
                     }
                 })
+                .setUsesAppAccentColor(false)
                 .show();
     }
 
@@ -443,6 +444,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                         Toast.makeText(HabitActivity.this, R.string.entries_deleted_message, Toast.LENGTH_SHORT).show();
                     }
                 })
+                .setUsesAppAccentColor(false)
                 .show();
     }
 
@@ -463,6 +465,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                         updateColorTheme();
                     }
                 })
+                .setUsesAppAccentColor(false)
                 .show();
     }
 
@@ -475,7 +478,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                 updateActivity();
             }
         }, mHabit);
-
+        dialog.setUsesAppAccentColor(false);
         dialog.show(getSupportFragmentManager(), "edit-mHabit");
     }
     //endregion

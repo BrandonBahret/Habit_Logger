@@ -6,15 +6,16 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 
+import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.CategoryDialog.CategorySpinnerAdapter;
-import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.databinding.DialogHabitFormBinding;
+import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.CategoryDialog.CategorySpinnerAdapter;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public abstract class HabitDialogBase extends DialogFragment {
 
     //region (Member attributes)
     protected Habit mHabit;
-
+    boolean mUsesAppAccentColor = true;
     DialogHabitFormBinding ui;
     protected CategorySpinnerAdapter mAdapter;
     //endregion
@@ -58,6 +59,7 @@ public abstract class HabitDialogBase extends DialogFragment {
         mHabit = getInitialHabit();
 
         LayoutInflater layoutInflater = LayoutInflater.from(getContext());
+
         ui = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_habit_form, null, false);
 
         List<HabitCategory> categories = new HabitDatabase(getContext()).getCategories();
@@ -77,7 +79,20 @@ public abstract class HabitDialogBase extends DialogFragment {
 
         builder.setView(ui.getRoot());
 
-        return builder.create();
+        final AlertDialog habitDialog = builder.create();
+
+        if (!mUsesAppAccentColor) {
+            habitDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                @Override
+                public void onShow(DialogInterface dialog) {
+                    int color = ContextCompat.getColor(getContext(), R.color.textColorContrastBackground);
+                    habitDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(color);
+                    habitDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(color);
+                }
+            });
+        }
+
+        return habitDialog;
     }
 
     protected DialogInterface.OnClickListener getOnPositiveButtonClickListener() {
@@ -90,6 +105,10 @@ public abstract class HabitDialogBase extends DialogFragment {
         };
     }
     //endregion
+
+    public void setUsesAppAccentColor(boolean state) {
+        mUsesAppAccentColor = state;
+    }
 
     public Habit getHabitFromDialog() {
         String name = ui.habitName.getText().toString();

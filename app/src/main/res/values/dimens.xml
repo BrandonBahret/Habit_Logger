@@ -19,7 +19,7 @@
     <!-- Item decorators -->
     <dimen name="indent_pad_top">16dp</dimen>
     <dimen name="indent_pad_bottom_of_group">28dp</dimen>
-    <dimen name="entries_section_text_size">14sp</dimen>
+    <dimen name="entries_section_text_size">15sp</dimen>
     <dimen name="category_section_text_size">15sp</dimen>
     <dimen name="line_vertical_offset">14dp</dimen>
 

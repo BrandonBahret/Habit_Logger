@@ -86,7 +86,7 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.entry_card, parent, false);
-        setMargins(itemView, 0, 8, 0, 8);
+        setMargins(itemView, 0, 12, 0, 12);
 
         return new ViewHolder(itemView);
     }

@@ -109,23 +109,19 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
         mEntriesContainer.addItemDecoration(new GroupDecoration(getContext(), R.dimen.entries_section_text_size, mMakeHeadersSticky, new GroupDecoration.Callback() {
             @Override
             public long getGroupId(int position) {
-                if (position >= 0 && position < mSessionEntries.size()) {
+                if (position >= 0 && position < mSessionEntries.size())
                     return mSessionEntries.get(position).getStartingTimeIgnoreTimeOfDay();
-                }
-                else {
-                    return -1;
-                }
+
+                else return -1;
             }
 
             @Override
             @NonNull
             public String getGroupFirstLine(int position) {
-                if (position >= 0 && position < mSessionEntries.size()) {
+                if (position >= 0 && position < mSessionEntries.size())
                     return mSessionEntries.get(position).stringifyStartingTime(mDateFormat);
-                }
-                else {
-                    return "";
-                }
+
+                else return "";
             }
         }));
 
@@ -236,7 +232,6 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
         SessionEntry oldEntry = mHabitDatabase.getEntry(entryId);
 
         EditEntryForm dialog = EditEntryForm.newInstance(oldEntry);
-
         dialog.setOnFinishedListener(new EditEntryForm.OnFinishedListener() {
             @Override
             public void onPositiveClicked(SessionEntry entry) {

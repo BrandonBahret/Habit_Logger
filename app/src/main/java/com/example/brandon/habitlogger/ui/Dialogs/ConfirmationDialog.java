@@ -3,7 +3,10 @@ package com.example.brandon.habitlogger.ui.Dialogs;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.DrawableRes;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+
+import com.example.brandon.habitlogger.R;
 
 /**
  * Created by Brandon on 3/13/2017.
@@ -13,8 +16,10 @@ import android.support.v7.app.AlertDialog;
 public class ConfirmationDialog {
 
     private AlertDialog.Builder mDialogBuilder;
+    private Context mContext;
     private String mTitle, mMessage;
     private int mIconRes = -1;
+    private boolean mUseAppAccentColor = true;
 
     DialogInterface.OnClickListener onYesListener;
     DialogInterface.OnClickListener onNoListener;
@@ -23,6 +28,7 @@ public class ConfirmationDialog {
 
     public ConfirmationDialog(Context context) {
         mDialogBuilder = new AlertDialog.Builder(context);
+        mContext = context;
     }
 
     public ConfirmationDialog show() {
@@ -34,10 +40,25 @@ public class ConfirmationDialog {
                 .setOnCancelListener(this.onCancelListener)
                 .setOnDismissListener(this.onDismissListener);
 
-        if(mIconRes != -1)
+        if (mIconRes != -1)
             mDialogBuilder.setIcon(mIconRes);
 
-        mDialogBuilder.show();
+        final AlertDialog confirmDialog = mDialogBuilder.create();
+
+        if (!mUseAppAccentColor) {
+            confirmDialog.setOnShowListener(
+                    new DialogInterface.OnShowListener() {
+                        @Override
+                        public void onShow(DialogInterface dialog) {
+                            int color = ContextCompat.getColor(mContext, R.color.textColorContrastBackground);
+                            confirmDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(color);
+                            confirmDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(color);
+                        }
+                    }
+            );
+        }
+
+        confirmDialog.show();
 
         return this;
     }
@@ -59,6 +80,11 @@ public class ConfirmationDialog {
 
     public ConfirmationDialog setIcon(@DrawableRes int iconRes) {
         this.mIconRes = iconRes;
+        return this;
+    }
+
+    public ConfirmationDialog setUsesAppAccentColor(boolean state) {
+        mUseAppAccentColor = state;
         return this;
     }
     //endregion

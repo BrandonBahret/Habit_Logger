@@ -29,6 +29,7 @@
     <color name="textColor3">#cccccc</color>
     <color name="textColorSubTitle">#cccccc</color>
     <color name="textColorContrast">#ffffffff</color>
+    <color name="textColorContrastBackground">@color/textColor2</color>
     <color name="textColorTransparent">#c8ffffff</color>
 
     <!-- Item Decoration Background -->
