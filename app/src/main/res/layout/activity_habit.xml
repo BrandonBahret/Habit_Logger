@@ -10,7 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        tools:context=".ui.Activities.HabitActivity.HabitActivity">
+        tools:context=".ui.Activities.HabitActivity.HabitActivity"
+        android:theme="@style/AppTheme.ContrastText">
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar"

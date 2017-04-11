@@ -129,6 +129,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
             finish();
 
         startRepeatingTask();
+        showNoActiveSessionsLayout(!mSessionManager.hasActiveSessions());
     }
 
     @Override
@@ -180,11 +181,13 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
         }
     };
 
-    public void showNoActiveSessionsLayout(boolean noActiveSessions){
+    public void showNoActiveSessionsLayout(boolean noActiveSessions) {
         int visibilityMode = noActiveSessions ? View.VISIBLE : View.GONE;
         View noActiveSessionsLayout = findViewById(R.id.no_active_sessions_layout);
-        if (visibilityMode != noActiveSessionsLayout.getVisibility())
+        if (visibilityMode != noActiveSessionsLayout.getVisibility()) {
             noActiveSessionsLayout.setVisibility(visibilityMode);
+            findViewById(R.id.content).setVisibility(noActiveSessions ? View.GONE : View.VISIBLE);
+        }
     }
 
     //endregion

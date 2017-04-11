@@ -71,14 +71,21 @@ public class DataOverviewActivity extends AppCompatActivity implements
     public void updateEntries() {
         HabitDataSample dataSample = getDataSample();
         List<SessionEntry> sessionEntries = dataSample.buildSessionEntriesList().getSessionEntries();
-        mDateRangeManager.updateSessionEntries(sessionEntries);
+
+        updateDateRangeManagerEntries(sessionEntries);
 
         for (IUpdateHabitSample callback : mUpdateDataCallbacks)
             callback.updateHabitDataSample(dataSample);
     }
 
+    private void updateDateRangeManagerEntries(List<SessionEntry> sessionEntries) {
+        long minTime = mHabitDatabase.getMinEntry().getStartingTimeIgnoreTimeOfDay();
+        long maxTime = mHabitDatabase.getMaxEntry().getStartingTimeIgnoreTimeOfDay();
+        mDateRangeManager.updateSessionEntries(sessionEntries, minTime, maxTime);
+    }
+
     private void updateEntries(List<SessionEntry> entries) {
-        mDateRangeManager.updateSessionEntries(entries);
+        updateDateRangeManagerEntries(entries);
 
         SessionEntriesSample entriesSample = new SessionEntriesSample(entries);
         HabitDataSample dataSample = mHabitDatabase.getHabitDataSample(entriesSample);
@@ -202,7 +209,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
                         mHabitDatabase.findEntryIdsByComment(query)
                 );
 
-                mDateRangeManager.updateSessionEntries(entries);
+                updateDateRangeManagerEntries(entries);
                 updateEntries(entries);
                 return true;
             }
@@ -237,7 +244,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
                 HabitDataSample dataSample = getDataSample();
 
                 List<SessionEntry> sessionEntries = dataSample.buildSessionEntriesList().getSessionEntries();
-                mDateRangeManager.updateSessionEntries(sessionEntries);
+                updateDateRangeManagerEntries(sessionEntries);
             }
 
             @Override
@@ -251,7 +258,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
 
                 HabitDataSample dataSample = getDataSample();
                 List<SessionEntry> sessionEntries = dataSample.buildSessionEntriesList().getSessionEntries();
-                mDateRangeManager.updateSessionEntries(sessionEntries);
+                updateDateRangeManagerEntries(sessionEntries);
             }
         };
     }

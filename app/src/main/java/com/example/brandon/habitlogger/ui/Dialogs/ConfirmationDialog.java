@@ -20,6 +20,7 @@ public class ConfirmationDialog {
     private String mTitle, mMessage;
     private int mIconRes = -1;
     private boolean mUseAppAccentColor = true;
+    private static Integer mAccentColor = null;
 
     DialogInterface.OnClickListener onYesListener;
     DialogInterface.OnClickListener onNoListener;
@@ -50,7 +51,10 @@ public class ConfirmationDialog {
                     new DialogInterface.OnShowListener() {
                         @Override
                         public void onShow(DialogInterface dialog) {
-                            int color = ContextCompat.getColor(mContext, R.color.textColorContrastBackground);
+                            int color = mAccentColor == null ?
+                                    ContextCompat.getColor(mContext, R.color.textColorContrastBackground) :
+                                    mAccentColor;
+
                             confirmDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(color);
                             confirmDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(color);
                         }
@@ -107,6 +111,11 @@ public class ConfirmationDialog {
 
     public ConfirmationDialog setOnDismissListener(DialogInterface.OnDismissListener listener) {
         this.onDismissListener = listener;
+        return this;
+    }
+
+    public ConfirmationDialog setAccentColor(int color) {
+        mAccentColor = color;
         return this;
     }
     //endregion

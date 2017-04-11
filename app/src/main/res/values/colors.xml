@@ -26,7 +26,7 @@
     <color name="background5">#999999</color>
 
     <!-- Icon Colors -->
-    <color name="iconTint1">#4e4d4d</color>
+    <color name="iconTint1">#616161</color>
     <color name="iconTint2">#ffffff</color>
 
     <!-- Text Colors -->
@@ -36,6 +36,7 @@
     <color name="textColorSubTitle">#505050</color>
     <color name="textColorContrast">#ffffffff</color>
     <color name="textColorContrastBackground">@color/textColor1</color>
+    <color name="contrastBackgroundAccent">@color/textColor2</color>
     <color name="textColorTransparent">#c8ffffff</color>
 
     <!-- Fab Colors -->

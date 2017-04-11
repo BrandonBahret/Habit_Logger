@@ -21,6 +21,7 @@ public abstract class SettingsActivityBase extends AppCompatActivity
     //region (Member attributes)
     private PreferenceChecker mPreferenceChecker;
     private SettingsFragment mSettingsFragment;
+    private Integer mLastThemeMode = null;
     //endregion
 
     public static class SettingsFragment extends PreferenceFragment {
@@ -87,13 +88,14 @@ public abstract class SettingsActivityBase extends AppCompatActivity
         super.onResume();
 
         int themeMode = mPreferenceChecker.getThemeMode();
-        if (AppCompatDelegate.getDefaultNightMode() != themeMode)
+        if (mLastThemeMode != null && mLastThemeMode != themeMode)
             recreate();
-
         else
             mPreferenceChecker.preferences.registerOnSharedPreferenceChangeListener(this);
 
+        mLastThemeMode = themeMode;
     }
+
     //endregion -- end --
 
     //endregion [ ---------------- end ---------------- ]

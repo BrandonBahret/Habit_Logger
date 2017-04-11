@@ -132,7 +132,7 @@ public class HabitViewHolder extends ChildViewHolder {
         }
         else {
             time.setText("00:00:00");
-            time.setAlpha(0.5f);
+            time.setAlpha(0.60f);
             playButton.setImageResource(
                     R.drawable.ic_add_timer_24dp
             );

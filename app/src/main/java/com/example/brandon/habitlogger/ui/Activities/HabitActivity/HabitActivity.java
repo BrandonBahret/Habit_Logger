@@ -489,9 +489,10 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                 mHabitDatabase.findEntryIdsByComment(mHabitId, query)
         );
 
-        dateRangeManager.updateSessionEntries(entries);
+        updateDateRangeManagerEntries(entries);
         updateEntries(entries);
     }
+
 
     private SearchView.OnQueryTextListener getOnSearchQueryListener() {
         return new SearchView.OnQueryTextListener() {
@@ -533,7 +534,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
             public void onDateRangeChanged(long dateFrom, long dateTo) {
                 Set<Long> ids = mHabitDatabase.findEntriesWithinTimeRange(mHabitId, dateFrom, dateTo);
                 HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
-                dateRangeManager.updateSessionEntries(HabitActivity.this.mSessionEntries);
+                updateDateRangeManagerEntries(HabitActivity.this.mSessionEntries);
                 updateEntries(mSessionEntries);
             }
         };
@@ -547,7 +548,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
             public void onEntryDeleted(SessionEntry removedEntry) {
                 Set<Long> ids = mHabitDatabase.findEntriesWithinTimeRange(mHabitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
                 HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
-                dateRangeManager.updateSessionEntries(HabitActivity.this.mSessionEntries);
+                updateDateRangeManagerEntries(HabitActivity.this.mSessionEntries);
             }
 
             @Override
@@ -556,7 +557,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
 
                 Set<Long> ids = mHabitDatabase.findEntriesWithinTimeRange(mHabitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
                 HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
-                dateRangeManager.updateSessionEntries(HabitActivity.this.mSessionEntries);
+                updateDateRangeManagerEntries(HabitActivity.this.mSessionEntries);
             }
 
             @Override
@@ -578,21 +579,15 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
         startActivity(startSession);
     }
 
-    public void updateEntries() {
-        SessionEntriesSample entriesDataSample = getSessionEntries();
-        dateRangeManager.updateSessionEntries(entriesDataSample.getSessionEntries());
-
-        for (IUpdateEntries callback : mSessionEntriesCallbacks)
-            callback.updateEntries(entriesDataSample);
-
-        CategoryDataSample categoryDataSample = getCategoryDataSample();
-        for (IUpdateCategorySample callback : mCategoryDataSampleCallbacks)
-            callback.updateCategoryDataSample(categoryDataSample);
+    private void updateDateRangeManagerEntries(List<SessionEntry> entries) {
+        long minTime = mHabitDatabase.getMinEntry(mHabitId).getStartingTimeIgnoreTimeOfDay();
+        long maxTime = mHabitDatabase.getMaxEntry(mHabitId).getStartingTimeIgnoreTimeOfDay();
+        dateRangeManager.updateSessionEntries(entries, minTime, maxTime);
     }
 
     public void updateEntries(List<SessionEntry> entries) {
 
-        dateRangeManager.updateSessionEntries(entries);
+        updateDateRangeManagerEntries(entries);
 
         SessionEntriesSample entriesDataSample = new SessionEntriesSample(entries);
 

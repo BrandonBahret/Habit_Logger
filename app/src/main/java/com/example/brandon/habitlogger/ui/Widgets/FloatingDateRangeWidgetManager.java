@@ -97,7 +97,6 @@ public class FloatingDateRangeWidgetManager {
         mViewHolder.rangeType.setOnItemSelectedListener(getOnDateRangeTypeSelectedListener());
 
         updateSessionEntries(sessionEntries);
-        updateMinMaxTimestamps(sessionEntries);
         setStartRange(true);
     }
 
@@ -217,12 +216,22 @@ public class FloatingDateRangeWidgetManager {
             refreshDateRange(false);
         }
         else if (newEntry.getStartingTime() < mMinimumTime) {
-            this.mMinimumTime = MyTimeUtils.setTimePortion(newEntry.getStartingTime(), true, 0, 0, 0, 0);
+            this.mMinimumTime = newEntry.getStartingTimeIgnoreTimeOfDay();
             refreshDateRange(false);
         }
     }
 
-    public void updateSessionEntries(List<SessionEntry> sessionEntries) {
+    private void updateSessionEntries(List<SessionEntry> sessionEntries){
+        int numberOfEntries = sessionEntries.size();
+        mViewHolder.entriesCountText.setText(String.valueOf(numberOfEntries));
+
+        long totalDuration = (long) MyCollectionUtils.sum(sessionEntries, SessionEntry.IGetSessionDuration);
+        String totalTimeString = SessionEntry.stringifyDuration(totalDuration);
+        mViewHolder.totalTimeText.setText(totalTimeString);
+        updateMinMaxTimestamps(sessionEntries);
+    }
+
+    public void updateSessionEntries(List<SessionEntry> sessionEntries, long minimumTime, long maximumTime) {
         int numberOfEntries = sessionEntries.size();
         mViewHolder.entriesCountText.setText(String.valueOf(numberOfEntries));
 
@@ -230,7 +239,8 @@ public class FloatingDateRangeWidgetManager {
         String totalTimeString = SessionEntry.stringifyDuration(totalDuration);
         mViewHolder.totalTimeText.setText(totalTimeString);
 
-        updateMinMaxTimestamps(sessionEntries);
+        mMinimumTime = minimumTime;
+        mMaximumTime = maximumTime;
         refreshDateRange(false);
     }
 
@@ -287,8 +297,8 @@ public class FloatingDateRangeWidgetManager {
     public void setStartRange(boolean shouldNotifyListeners) {
         setDateRangeEnabled(false);
 
-        mDateToTime = MyTimeUtils.setTimePortion(System.currentTimeMillis(), false, 11, 59, 59, 999);
         mDateFromTime = mMinimumTime;
+        mDateToTime = MyTimeUtils.setTimePortion(System.currentTimeMillis(), false, 11, 59, 59, 999);
         updateDateRangeLabels(shouldNotifyListeners);
     }
 

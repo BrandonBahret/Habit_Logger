@@ -34,10 +34,8 @@ public class UserInterfaceSettingsActivity extends SettingsActivityBase {
 
     @Override
     protected void handleOnSharedPreferenceChanged(String key) {
-        if (key.equals(getString(R.string.pref_is_night_mode)))
-            recreate();
 
-        else if(key.equals(getString(R.string.pref_date_format))){
+        if(key.equals(getString(R.string.pref_date_format))){
             ListPreference dateFormat = (ListPreference) findPreference(getString(R.string.pref_date_format));
             dateFormat.setSummary(dateFormat.getEntry());
         }

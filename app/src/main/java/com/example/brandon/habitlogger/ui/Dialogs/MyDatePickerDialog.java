@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.text.format.DateUtils;
 import android.widget.DatePicker;
 
 import java.util.Calendar;
@@ -43,7 +44,7 @@ public class MyDatePickerDialog extends DialogFragment implements
         MyDatePickerDialog dialog = new MyDatePickerDialog();
 
         Bundle args = new Bundle();
-        args.putLong(KEY_DATE_MIN, dateMin);
+        args.putLong(KEY_DATE_MIN, Math.max(dateMin, DateUtils.DAY_IN_MILLIS));
         args.putLong(KEY_DATE_MAX, dateMax);
         args.putLong(KEY_DATE_MILLIS, dateInMillis);
         dialog.setArguments(args);

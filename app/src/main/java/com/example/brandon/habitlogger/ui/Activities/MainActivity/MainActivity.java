@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity
     private static final String RECYCLER_STATE = "RECYCLER_STATE";
     final int NO_ARCHIVED_HABITS = 0, ONLY_ARCHIVED_HABITS = 1;
     private int mHabitDisplayMode = NO_ARCHIVED_HABITS;
+    private Integer mLastThemeMode = null;
 
     private List<Habit> mHabitList = new ArrayList<>();
     private HabitDatabase mHabitDatabase;
@@ -111,9 +112,9 @@ public class MainActivity extends AppCompatActivity
 
     private void setActivityTheme() {
         mPreferenceChecker = new PreferenceChecker(this);
-        int themeMode = mPreferenceChecker.isNightMode() ?
-                AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO;
+        int themeMode = mPreferenceChecker.getThemeMode();
         AppCompatDelegate.setDefaultNightMode(themeMode);
+        mLastThemeMode = themeMode;
     }
 
     private void setUpActivityUi() {
@@ -182,6 +183,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        int themeMode = mPreferenceChecker.getThemeMode();
+        if ((mLastThemeMode != null && mLastThemeMode != themeMode) || AppCompatDelegate.getDefaultNightMode() != themeMode) {
+            recreate();
+            mHabitCardContainer.invalidate();
+        }
 
         if (getIntent().hasExtra(RECYCLER_STATE)) {
             RecyclerView rv = ui.mainInclude.habitRecyclerView;
@@ -800,9 +807,17 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == RequestCodes.SETTINGS_ACTIVITY)
-            recreate();
-        else if (resultCode == RESULT_OK) {
+//        int themeMode = mPreferenceChecker.getThemeMode();
+//        if ((mLastThemeMode != null && mLastThemeMode != themeMode) || AppCompatDelegate.getDefaultNightMode() != themeMode) {
+//            recreate();
+//            mHabitCardContainer.invalidate();
+//        }
+
+//        if (requestCode == RequestCodes.SETTINGS_ACTIVITY) {
+//            recreate();
+//            mHabitCardContainer.invalidate();
+//        }
+        if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case RequestCodes.GOOGLE_DRIVE_REQUEST_CODE:
                     mGoogleDriveExportManager.connect();

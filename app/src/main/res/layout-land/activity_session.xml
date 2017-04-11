@@ -9,6 +9,7 @@
         android:layout_height="match_parent"
         android:descendantFocusability="beforeDescendants"
         android:focusableInTouchMode="true"
+        android:theme="@style/AppTheme.ContrastText"
         tools:context=".ui.Activities.SessionActivity">
 
         <LinearLayout

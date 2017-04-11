@@ -42,7 +42,6 @@ public class HabitDatabase {
     public DatabaseSchema databaseHelper;
     private SQLiteDatabase mWritableDatabase;
     private SQLiteDatabase mReadableDatabase;
-
     //endregion
 
     //region Code responsible for providing an interface to the database
@@ -814,6 +813,53 @@ public class HabitDatabase {
     //endregion
 
     //region Read records
+    // TODO Optimize get min/max entry methods
+    public SessionEntry getMinEntry(long habitId) {
+        return Collections.min(getEntries(habitId), SessionEntry.ICompareStartingTimes);
+//        Cursor c = mReadableDatabase.query(EntriesTableSchema.TABLE_NAME,
+//                new String[] { "min(" + EntriesTableSchema.ENTRY_START_TIME + ")" },
+//                EntriesTableSchema.ENTRY_HABIT_ID + "=?", new String[]{String.valueOf(habitId)},
+//                null, null, null
+//        );
+//
+//        if(c.moveToFirst()) return getEntryFromCursor(c);
+//        else return null;
+    }
+
+    public SessionEntry getMaxEntry(long habitId) {
+        return Collections.max(getEntries(habitId), SessionEntry.ICompareStartingTimes);
+//        Cursor c = mReadableDatabase.query(EntriesTableSchema.TABLE_NAME,
+//                new String[] { "max(" + EntriesTableSchema.ENTRY_START_TIME + ")" },
+//                EntriesTableSchema.ENTRY_HABIT_ID + "=?", new String[]{String.valueOf(habitId)},
+//                null, null, null
+//        );
+//
+//        if(c.moveToFirst()) return getEntryFromCursor(c);
+//        else return null;
+    }
+
+    public SessionEntry getMinEntry() {
+        return Collections.min(getEntries(), SessionEntry.ICompareStartingTimes);
+//        Cursor c = mReadableDatabase.query(EntriesTableSchema.TABLE_NAME,
+//                new String[] { "min(" + EntriesTableSchema.ENTRY_START_TIME + ")" },
+//                null, null, null, null, null
+//        );
+//
+//        if(c.moveToFirst()) return getEntryFromCursor(c);
+//        else return null;
+    }
+
+    public SessionEntry getMaxEntry() {
+        return Collections.max(getEntries(), SessionEntry.ICompareStartingTimes);
+//        Cursor c = mReadableDatabase.query(EntriesTableSchema.TABLE_NAME,
+//                new String[] { "max(" + EntriesTableSchema.ENTRY_START_TIME + ")" },
+//                null, null, null, null, null
+//        );
+//
+//        if(c.moveToFirst()) return getEntryFromCursor(c);
+//        else return null;
+    }
+
     public List<SessionEntry> lookUpEntries(Set<Long> ids) {
         List<SessionEntry> entries = new ArrayList<>(ids.size());
 

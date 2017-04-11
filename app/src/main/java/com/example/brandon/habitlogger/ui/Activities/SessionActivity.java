@@ -7,7 +7,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.view.Menu;
@@ -46,13 +45,11 @@ public class SessionActivity extends AppCompatActivity implements
     }
 
     //region (Member attributes)
-    private AlertDialog mConfirmationDialog;
+    private ConfirmationDialog mConfirmationDialog;
     private Bundle mDialogSettings = new Bundle();
 
     private SessionManager mSessionManager;
     private Habit mHabit;
-    private int mColor;
-    private int mDarkerColor;
 
     private Handler mUpdateHandler = new Handler();
     ActivitySessionBinding ui;
@@ -133,8 +130,8 @@ public class SessionActivity extends AppCompatActivity implements
         super.onSaveInstanceState(outState);
 
         if (mDialogSettings != null) {
-            if (mConfirmationDialog != null && mConfirmationDialog.isShowing())
-                mConfirmationDialog.dismiss();
+//            if (mConfirmationDialog != null && mConfirmationDialog.isShowing())
+//                mConfirmationDialog.dismiss();
 
             outState.putBundle(DialogSettingKeys.DIALOG_SETTINGS_BUNDLE, mDialogSettings);
         }
@@ -182,6 +179,7 @@ public class SessionActivity extends AppCompatActivity implements
             ui.sessionHoursView.setText(String.format(Locale.US, "%02d", time[0]));
             ui.sessionMinutesView.setText(String.format(Locale.US, "%02d", time[1]));
             ui.sessionSecondsView.setText(String.format(Locale.US, "%02d", time[2]));
+
         }
     }
 
@@ -204,27 +202,27 @@ public class SessionActivity extends AppCompatActivity implements
 
     public void applyHabitColorToTheme() {
 
-        mColor = mHabit.getColor();
-        mDarkerColor = MyColorUtils.darkenColorBy(mColor, 0.08f);
+        int color = mHabit.getColor();
+        int darkerColor = MyColorUtils.darkenColorBy(color, 0.08f);
 
         boolean isNightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
         if (isNightMode) {
-            if (MyColorUtils.getLightness(mColor) > 0.40) { // Clip lightness to 40% max
-                mDarkerColor = MyColorUtils.setLightness(mDarkerColor, 0.40f);
-                mColor = MyColorUtils.setLightness(mColor, 0.45f);
+            if (MyColorUtils.getLightness(color) > 0.40) { // Clip lightness to 40% max
+                darkerColor = MyColorUtils.setLightness(darkerColor, 0.40f);
+                color = MyColorUtils.setLightness(color, 0.45f);
             }
 
-            if (MyColorUtils.getSaturation(mColor) > 0.45) { // Clip saturation to 45% max
-                mDarkerColor = MyColorUtils.setSaturation(mDarkerColor, 0.45f);
-                mColor = MyColorUtils.setSaturation(mColor, 0.45f);
+            if (MyColorUtils.getSaturation(color) > 0.45) { // Clip saturation to 45% max
+                darkerColor = MyColorUtils.setSaturation(darkerColor, 0.45f);
+                color = MyColorUtils.setSaturation(color, 0.45f);
             }
         }
 
-        getWindow().setStatusBarColor(mDarkerColor);
+        getWindow().setStatusBarColor(darkerColor);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
-            actionBar.setBackgroundDrawable(new ColorDrawable(mColor));
+            actionBar.setBackgroundDrawable(new ColorDrawable(color));
     }
 
     //endregion [ ---------------- end ---------------- ]
@@ -279,7 +277,6 @@ public class SessionActivity extends AppCompatActivity implements
         boolean shouldAsk = new PreferenceChecker(this).doAskBeforeCancel();
 
         if (shouldAsk) {
-            boolean nightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
             int iconRes = R.drawable.ic_close_24dp;
 
             askForConfirmation("Cancel session", "Cancel this session?", false, iconRes,
@@ -363,8 +360,8 @@ public class SessionActivity extends AppCompatActivity implements
                     }
                 })
                 .setUsesAppAccentColor(false)
-                .show()
-                .create();
+                .setAccentColor(mHabit.getColor())
+                .show();
 
         mDialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, true);
     }

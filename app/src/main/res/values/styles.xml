@@ -8,6 +8,21 @@
         <item name="android:windowBackground">@color/background1</item>
     </style>
 
+    <style name="AppTheme.ContrastText" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/iconTint2</item>
+        <item name="colorPrimaryDark">@color/iconTint2</item>
+        <item name="colorAccent">@color/contrastBackgroundAccent</item>
+        <item name="android:textColor">@color/textColorContrastBackground</item>
+        <item name="alertDialogStyle">@style/AppTheme.ContrastText.DialogTheme</item>
+    </style>
+
+    <style name="AppTheme.ContrastText.DialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+        <item name="colorPrimary">@color/iconTint2</item>
+        <item name="colorPrimaryDark">@color/iconTint2</item>
+        <item name="colorAccent">@color/iconTint2</item>
+        <item name="android:textColor">@color/textColorContrastBackground</item>
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="@android:style/Widget.PopupMenu">
         <item name="colorControlNormal">@color/android:white</item>
         <item name="titleTextColor">@color/android:white</item>
@@ -21,13 +36,6 @@
     </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat"/>
-
-    <style name="DialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">
-        <item name="colorPrimary">@color/iconTint2</item>
-        <item name="colorPrimaryDark">@color/iconTint2</item>
-        <item name="colorAccent">@color/iconTint2</item>
-        <item name="android:textColor">@color/textColorContrastBackground</item>
-    </style>
 
     <!-- Fab Styles -->
     <style name="fabMenuLabelStyle">
