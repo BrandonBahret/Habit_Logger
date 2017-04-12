@@ -1,7 +1,10 @@
 package com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.CategoryDialog;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
+import android.graphics.PorterDuff;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.util.AttributeSet;
@@ -11,8 +14,9 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.SpinnerAdapter;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.MyColorUtils;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.databinding.DialogCategorySelectorBinding;
 
 /**
@@ -25,6 +29,8 @@ public class CategorySpinner extends AppCompatSpinner {
     //region (Member attributes)
     private AlertDialog mDialog;
     Context mContext;
+
+    private Integer mAccentColor = 0;
     //endregion
 
     public CategorySpinner(Context context, AttributeSet attrs) {
@@ -36,7 +42,7 @@ public class CategorySpinner extends AppCompatSpinner {
         mContext = getContext();
 
         LayoutInflater layoutInflater = LayoutInflater.from(mContext);
-        DialogCategorySelectorBinding ui = DataBindingUtil.inflate(
+        final DialogCategorySelectorBinding ui = DataBindingUtil.inflate(
                 layoutInflater, R.layout.dialog_category_selector,
                 null, false
         );
@@ -50,6 +56,19 @@ public class CategorySpinner extends AppCompatSpinner {
                 .setCancelable(true)
                 .setView(ui.getRoot())
                 .create();
+
+        if(mAccentColor != 0) {
+            mDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                @Override
+                public void onShow(DialogInterface dialog) {
+                    int color = mAccentColor;
+                    if(MyColorUtils.getLightness(color) > 0.5){
+                        color = MyColorUtils.darkenColorBy(mAccentColor, 0.2f);
+                    }
+                    ui.newCategoryButton.getBackground().setColorFilter(color, PorterDuff.Mode.SRC);
+                }
+            });
+        }
 
         super.setAdapter(adapter);
     }
@@ -75,7 +94,15 @@ public class CategorySpinner extends AppCompatSpinner {
                 @Override
                 public void onClick(View v) {
                     NewCategoryDialog dialog = new NewCategoryDialog(mContext, OnCategoryDialogFinished);
-                    dialog.createBuilder().show();
+                    final AlertDialog categoryDialog = dialog.createBuilder().create();
+                    categoryDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                        @Override
+                        public void onShow(DialogInterface dialog) {
+                            int color = mAccentColor == 0 ? ContextCompat.getColor(getContext(), R.color.colorAccent) : mAccentColor;
+                            categoryDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(color);
+                        }
+                    });
+                    categoryDialog.show();
                 }
             };
 
@@ -86,6 +113,10 @@ public class CategorySpinner extends AppCompatSpinner {
                     ((CategorySpinnerAdapter) getAdapter()).addCategory(category);
                 }
             };
+
+    public void setAccentColor(Integer accentColor) {
+        mAccentColor = accentColor;
+    }
     //endregion -- end --
 
 }

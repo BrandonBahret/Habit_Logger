@@ -3,10 +3,7 @@ package com.example.brandon.habitlogger.ui.Dialogs;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.DrawableRes;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-
-import com.example.brandon.habitlogger.R;
 
 /**
  * Created by Brandon on 3/13/2017.
@@ -19,8 +16,7 @@ public class ConfirmationDialog {
     private Context mContext;
     private String mTitle, mMessage;
     private int mIconRes = -1;
-    private boolean mUseAppAccentColor = true;
-    private static Integer mAccentColor = null;
+    private Integer mAccentColor = 0;
 
     DialogInterface.OnClickListener onYesListener;
     DialogInterface.OnClickListener onNoListener;
@@ -46,17 +42,17 @@ public class ConfirmationDialog {
 
         final AlertDialog confirmDialog = mDialogBuilder.create();
 
-        if (!mUseAppAccentColor) {
+        if (mAccentColor != 0) {
             confirmDialog.setOnShowListener(
                     new DialogInterface.OnShowListener() {
                         @Override
                         public void onShow(DialogInterface dialog) {
-                            int color = mAccentColor == null ?
-                                    ContextCompat.getColor(mContext, R.color.textColorContrastBackground) :
-                                    mAccentColor;
+//                            int color = mAccentColor == null ?
+//                                    ContextCompat.getColor(mContext, R.color.textColorContrastBackground) :
+//                                    mAccentColor;
 
-                            confirmDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(color);
-                            confirmDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(color);
+                            confirmDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(mAccentColor);
+                            confirmDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(mAccentColor);
                         }
                     }
             );
@@ -84,11 +80,6 @@ public class ConfirmationDialog {
 
     public ConfirmationDialog setIcon(@DrawableRes int iconRes) {
         this.mIconRes = iconRes;
-        return this;
-    }
-
-    public ConfirmationDialog setUsesAppAccentColor(boolean state) {
-        mUseAppAccentColor = state;
         return this;
     }
     //endregion

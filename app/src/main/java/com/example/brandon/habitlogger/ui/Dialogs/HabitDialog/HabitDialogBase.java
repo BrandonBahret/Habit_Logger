@@ -5,8 +5,8 @@ import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 
@@ -27,8 +27,11 @@ import java.util.List;
 public abstract class HabitDialogBase extends DialogFragment {
 
     //region (Member attributes)
+    protected static final String KEY_HABIT = "KEY_HABIT";
+    protected static final String KEY_COLOR = "KEY_COLOR";
+
     protected Habit mHabit;
-    boolean mUsesAppAccentColor = true;
+    Integer mAccentColor = 0;
     DialogHabitFormBinding ui;
     protected CategorySpinnerAdapter mAdapter;
     //endregion
@@ -52,6 +55,16 @@ public abstract class HabitDialogBase extends DialogFragment {
     protected abstract String getTitle();
 
     //region Methods responsible for creating the dialog
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (getArguments() != null)
+            mAccentColor = getArguments().getInt(KEY_COLOR, 0);
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -64,6 +77,7 @@ public abstract class HabitDialogBase extends DialogFragment {
 
         List<HabitCategory> categories = new HabitDatabase(getContext()).getCategories();
         mAdapter = new CategorySpinnerAdapter(getContext(), categories);
+        ui.spinnerCategorySelector.setAccentColor(mAccentColor);
         ui.spinnerCategorySelector.setAdapter(mAdapter);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
@@ -81,13 +95,13 @@ public abstract class HabitDialogBase extends DialogFragment {
 
         final AlertDialog habitDialog = builder.create();
 
-        if (!mUsesAppAccentColor) {
+        if (mAccentColor != 0) {
             habitDialog.setOnShowListener(new DialogInterface.OnShowListener() {
                 @Override
                 public void onShow(DialogInterface dialog) {
-                    int color = ContextCompat.getColor(getContext(), R.color.textColorContrastBackground);
-                    habitDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(color);
-                    habitDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(color);
+//                    int color = ContextCompat.getColor(getContext(), R.color.textColorContrastBackground);
+                    habitDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(mAccentColor);
+                    habitDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(mAccentColor);
                 }
             });
         }
@@ -106,8 +120,8 @@ public abstract class HabitDialogBase extends DialogFragment {
     }
     //endregion
 
-    public void setUsesAppAccentColor(boolean state) {
-        mUsesAppAccentColor = state;
+    public void setAccentColor(int color) {
+        mAccentColor = color;
     }
 
     public Habit getHabitFromDialog() {

@@ -13,7 +13,6 @@ import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 public class EditHabitDialog extends HabitDialogBase {
 
     //region (Member attributes)
-    private static final String SERIALIZED_HABIT = "SERIALIZED_HABIT";
     private Habit mEditHabit;
     //endregion
 
@@ -21,7 +20,19 @@ public class EditHabitDialog extends HabitDialogBase {
         EditHabitDialog dialog = new EditHabitDialog();
 
         Bundle args = new Bundle(1);
-        args.putSerializable(SERIALIZED_HABIT, editHabit);
+        args.putSerializable(KEY_HABIT, editHabit);
+        dialog.setArguments(args);
+
+        dialog.setOnFinishedListener(listener);
+        return dialog;
+    }
+
+    public static EditHabitDialog newInstance(OnFinishedListener listener, int accentColor, Habit editHabit) {
+        EditHabitDialog dialog = new EditHabitDialog();
+
+        Bundle args = new Bundle(2);
+        args.putSerializable(KEY_HABIT, editHabit);
+        args.putInt(KEY_COLOR, accentColor);
         dialog.setArguments(args);
 
         dialog.setOnFinishedListener(listener);
@@ -31,7 +42,7 @@ public class EditHabitDialog extends HabitDialogBase {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mEditHabit = (Habit) getArguments().getSerializable(SERIALIZED_HABIT);
+        mEditHabit = (Habit) getArguments().getSerializable(KEY_HABIT);
     }
 
     @Override

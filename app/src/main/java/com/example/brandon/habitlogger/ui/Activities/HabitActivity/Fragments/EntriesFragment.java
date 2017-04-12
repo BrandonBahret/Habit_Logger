@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -231,7 +232,7 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
     public void onEntryViewClick(long habitId, long entryId) {
         SessionEntry oldEntry = mHabitDatabase.getEntry(entryId);
 
-        EditEntryForm dialog = EditEntryForm.newInstance(oldEntry);
+        EditEntryForm dialog = EditEntryForm.newInstance(oldEntry, ContextCompat.getColor(getContext(), R.color.textColorContrastBackground));
         dialog.setOnFinishedListener(new EditEntryForm.OnFinishedListener() {
             @Override
             public void onPositiveClicked(SessionEntry entry) {

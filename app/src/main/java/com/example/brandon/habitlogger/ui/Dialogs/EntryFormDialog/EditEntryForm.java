@@ -21,6 +21,17 @@ public class EditEntryForm extends EntryFormDialogBase {
         return form;
     }
 
+    public static EditEntryForm newInstance(SessionEntry entry, int accentColor) {
+        EditEntryForm form = new EditEntryForm();
+
+        Bundle args = new Bundle();
+        args.putSerializable(EntryFormDialogBase.KEY_ENTRY, entry);
+        args.putInt(EntryFormDialogBase.KEY_COLOR, accentColor);
+        form.setArguments(args);
+
+        return form;
+    }
+
     @Override
     String getTitle() {
         return "Edit Entry";

@@ -8,6 +8,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -284,7 +285,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NewEntryForm dialog = new NewEntryForm();
+                NewEntryForm dialog = NewEntryForm.newInstance(ContextCompat.getColor(HabitActivity.this, R.color.textColorContrastBackground));
                 dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
                     @Override
                     public void onPositiveClicked(SessionEntry entry) {
@@ -427,7 +428,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                         finish();
                     }
                 })
-                .setUsesAppAccentColor(false)
+                .setAccentColor(ContextCompat.getColor(this, R.color.textColorContrastBackground))
                 .show();
     }
 
@@ -444,7 +445,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                         Toast.makeText(HabitActivity.this, R.string.entries_deleted_message, Toast.LENGTH_SHORT).show();
                     }
                 })
-                .setUsesAppAccentColor(false)
+                .setAccentColor(ContextCompat.getColor(this, R.color.textColorContrastBackground))
                 .show();
     }
 
@@ -465,7 +466,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                         updateColorTheme();
                     }
                 })
-                .setUsesAppAccentColor(false)
+                .setAccentColor(ContextCompat.getColor(this, R.color.textColorContrastBackground))
                 .show();
     }
 
@@ -477,8 +478,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                 mHabitDatabase.updateHabit(habit.getDatabaseId(), habit);
                 updateActivity();
             }
-        }, mHabit);
-        dialog.setUsesAppAccentColor(false);
+        }, ContextCompat.getColor(this, R.color.textColorContrastBackground), mHabit);
         dialog.show(getSupportFragmentManager(), "edit-mHabit");
     }
     //endregion

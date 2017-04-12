@@ -14,10 +14,12 @@
     <color name="colorAccentDisabled">#8695b3</color>
 
     <!-- Background Colors -->
-    <color name="background1">#303030</color>
+    <color name="appBackground">#303030</color>
     <color name="background2">#424242</color>
     <color name="background3">#4d4d4d</color>
     <color name="background4">#5c5c5c</color>
+    <color name="background5">#424242</color>
+    <color name="dialogPickerHeaderColor">@color/contrastBackgroundAccent</color>
 
     <!-- Icon Colors -->
     <color name="iconTint1">#90ffffff</color>

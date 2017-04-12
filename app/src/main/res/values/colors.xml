@@ -19,14 +19,15 @@
     <color name="colorAccentDisabled">#8695b3</color>
 
     <!-- Background Color -->
-    <color name="background1">#e1e1e1</color>
+    <color name="appBackground">#e1e1e1</color>
     <color name="background2">#f2f2f2</color>
     <color name="background3">#cccccc</color>
     <color name="background4">#d9d9d9</color>
     <color name="background5">#999999</color>
+    <color name="dialogPickerHeaderColor">@color/contrastBackgroundAccent</color>
 
     <!-- Icon Colors -->
-    <color name="iconTint1">#616161</color>
+    <color name="iconTint1">#4e4d4d</color>
     <color name="iconTint2">#ffffff</color>
 
     <!-- Text Colors -->
@@ -36,7 +37,7 @@
     <color name="textColorSubTitle">#505050</color>
     <color name="textColorContrast">#ffffffff</color>
     <color name="textColorContrastBackground">@color/textColor1</color>
-    <color name="contrastBackgroundAccent">@color/textColor2</color>
+    <color name="contrastBackgroundAccent">#8c8c8c</color>
     <color name="textColorTransparent">#c8ffffff</color>
 
     <!-- Fab Colors -->

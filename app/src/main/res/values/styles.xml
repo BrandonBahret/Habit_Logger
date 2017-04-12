@@ -5,22 +5,12 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@color/background1</item>
+        <item name="android:windowBackground">@color/appBackground</item>
     </style>
 
-    <style name="AppTheme.ContrastText" parent="Theme.AppCompat.DayNight.DarkActionBar">
-        <item name="colorPrimary">@color/iconTint2</item>
-        <item name="colorPrimaryDark">@color/iconTint2</item>
+    <style name="AppTheme.ContrastBackground" parent="Theme.AppCompat.DayNight.Dialog.Alert">
         <item name="colorAccent">@color/contrastBackgroundAccent</item>
-        <item name="android:textColor">@color/textColorContrastBackground</item>
-        <item name="alertDialogStyle">@style/AppTheme.ContrastText.DialogTheme</item>
-    </style>
-
-    <style name="AppTheme.ContrastText.DialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">
-        <item name="colorPrimary">@color/iconTint2</item>
-        <item name="colorPrimaryDark">@color/iconTint2</item>
-        <item name="colorAccent">@color/iconTint2</item>
-        <item name="android:textColor">@color/textColorContrastBackground</item>
+        <item name="android:windowBackground">@color/appBackground</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="@android:style/Widget.PopupMenu">
@@ -36,6 +26,10 @@
     </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat"/>
+
+    <style name="DefaultTextAppearance">
+        <item name="android:textColor">@color/textColor1</item>
+    </style>
 
     <!-- Fab Styles -->
     <style name="fabMenuLabelStyle">
@@ -68,5 +62,43 @@
         <item name="android:textColor">@color/textColor1</item>
         <item name="android:textAlignment">center</item>
     </style>
+
+    <!-- Date Picker Style -->
+    <style name="MyDatePickerDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <!-- this is new -->
+        <item name="android:datePickerStyle">@style/MyDatePickerStyle</item>
+        <item name="colorAccent">@color/contrastBackgroundAccent</item>
+        <item name="android:colorAccent">@color/contrastBackgroundAccent</item>
+        <item name="android:windowBackground">@color/appBackground</item>
+        <item name="android:textColorPrimary">@color/textColor1</item>
+        <item name="editTextColor">@color/textColor1</item>
+        <item name="android:textColor">@color/textColor1</item>
+    </style>
+
+    <style name="MyDatePickerStyle" parent="@android:style/Widget.Material.Light.DatePicker">
+        <item name="android:headerBackground">@color/dialogPickerHeaderColor</item>
+        <item name="android:calendarTextColor">@color/textColor1</item>
+        <item name="android:yearListItemTextAppearance">@style/DefaultTextAppearance</item>
+        <item name="android:yearListSelectorColor">@color/contrastBackgroundAccent</item>
+        <item name="android:datePickerMode">calendar</item>
+    </style>
+
+    <!-- Time Picker Style -->
+    <style name="MyTimePickerDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <!-- this is new -->
+        <item name="android:timePickerStyle">@style/MyTimePickerStyle</item>
+        <item name="colorAccent">@color/contrastBackgroundAccent</item>
+        <item name="android:colorAccent">@color/contrastBackgroundAccent</item>
+        <item name="android:windowBackground">@color/appBackground</item>
+        <item name="android:textColorPrimary">@color/textColor1</item>
+        <item name="editTextColor">@color/textColor1</item>
+        <item name="android:textColor">@color/textColor1</item>
+    </style>
+
+    <style name="MyTimePickerStyle" parent="@android:style/Widget.Material.Light.TimePicker">
+        <item name="android:headerBackground">@color/dialogPickerHeaderColor</item>
+        <item name="android:colorAccent">@color/contrastBackgroundAccent</item>
+    </style>
+
 
 </resources>

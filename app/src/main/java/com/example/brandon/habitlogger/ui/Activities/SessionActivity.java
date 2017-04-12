@@ -6,6 +6,7 @@ import android.databinding.DataBindingUtil;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
@@ -359,8 +360,7 @@ public class SessionActivity extends AppCompatActivity implements
                             mSessionManager.setPauseState(mHabit.getDatabaseId(), initialPauseState);
                     }
                 })
-                .setUsesAppAccentColor(false)
-                .setAccentColor(mHabit.getColor())
+                .setAccentColor(ContextCompat.getColor(this, R.color.contrastBackgroundAccent))
                 .show();
 
         mDialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, true);

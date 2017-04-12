@@ -2,16 +2,18 @@ package com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog;
 
 import android.os.Bundle;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
-
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class NewEntryForm extends EntryFormDialogBase {
 
-    public static NewEntryForm newInstance(SessionEntry entry) {
+    public static NewEntryForm newInstance() {
+        return new NewEntryForm();
+    }
+
+    public static NewEntryForm newInstance(int accentColor) {
         NewEntryForm form = new NewEntryForm();
 
         Bundle args = new Bundle();
-        args.putSerializable(EntryFormDialogBase.KEY_ENTRY, entry);
+        args.putInt(EntryFormDialogBase.KEY_COLOR, accentColor);
         form.setArguments(args);
 
         return form;

@@ -6,7 +6,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -29,7 +28,9 @@ public abstract class EntryFormDialogBase extends DialogFragment {
 
     //region (Member attributes)
     protected static final String KEY_ENTRY = "KEY_ENTRY";
+    protected static final String KEY_COLOR = "KEY_COLOR";
     protected SessionEntry mEntry;
+    protected Integer mAccentColor = 0;
 
     DialogNewEntryBinding ui;
     //endregion
@@ -59,11 +60,16 @@ public abstract class EntryFormDialogBase extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null && getArguments().containsKey(KEY_ENTRY))
-            mEntry = (SessionEntry) getArguments().getSerializable(KEY_ENTRY);
+        if (getArguments() != null) {
+            if (getArguments().containsKey(KEY_ENTRY))
+                mEntry = (SessionEntry) getArguments().getSerializable(KEY_ENTRY);
+            else
+                mEntry = new SessionEntry(System.currentTimeMillis(), 0, "");
 
-        else
-            mEntry = new SessionEntry(System.currentTimeMillis(), 0, "");
+            if (getArguments().containsKey(KEY_COLOR))
+                mAccentColor = getArguments().getInt(KEY_COLOR, 0);
+        }
+
     }
 
     @NonNull
@@ -91,14 +97,15 @@ public abstract class EntryFormDialogBase extends DialogFragment {
 
         final AlertDialog entryDialog = builder.create();
 
-        entryDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialog) {
-                int color = ContextCompat.getColor(getContext(), R.color.textColorContrastBackground);
-                entryDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(color);
-                entryDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(color);
-            }
-        });
+        if (mAccentColor != 0) {
+            entryDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                @Override
+                public void onShow(DialogInterface dialog) {
+                    entryDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(mAccentColor);
+                    entryDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(mAccentColor);
+                }
+            });
+        }
 
         return entryDialog;
     }
@@ -162,7 +169,7 @@ public abstract class EntryFormDialogBase extends DialogFragment {
                 int hours = mEntry.getStartingTimeHours();
                 int minutes = mEntry.getStartingTimeMinutes();
 
-                MyTimePickerDialog dialog = MyTimePickerDialog.newInstance(hours, minutes);
+                MyTimePickerDialog dialog = MyTimePickerDialog.newInstance(hours, minutes, mAccentColor);
                 dialog.setOnFinishedListener(new MyTimePickerDialog.OnFinishedListener() {
                     @Override
                     public void onFinishedWithResult(int hours, int minutes) {
@@ -181,7 +188,7 @@ public abstract class EntryFormDialogBase extends DialogFragment {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MyDatePickerDialog dialog = MyDatePickerDialog.newInstance(-1, -1, mEntry.getStartingTime());
+                MyDatePickerDialog dialog = MyDatePickerDialog.newInstance(-1, -1, mAccentColor, mEntry.getStartingTime());
 
                 dialog.setOnFinishedListener(new MyDatePickerDialog.OnFinishedListener() {
                     @Override
@@ -191,6 +198,7 @@ public abstract class EntryFormDialogBase extends DialogFragment {
                         ui.sessionDate.setText(dateString);
                     }
                 });
+
                 dialog.show(getFragmentManager(), "get-date");
             }
         };

@@ -8,6 +8,8 @@ import android.support.v4.app.DialogFragment;
 import android.text.format.DateUtils;
 import android.widget.DatePicker;
 
+import com.example.brandon.habitlogger.R;
+
 import java.util.Calendar;
 
 /**
@@ -21,11 +23,14 @@ public class MyDatePickerDialog extends DialogFragment implements
     public static final String KEY_DATE_MIN = "date_min";
     public static final String KEY_DATE_MAX = "date_max";
     public static final String KEY_DATE_MILLIS = "date_in_milliseconds";
+    public static final String KEY_COLOR_ACCENT = "color_accent";
 
     //region (Member attributes)
     private int mHour;
     private int mMinute;
     private int mSecond;
+
+    private Integer mAccentColor = null;
     //endregion
 
     //region Code responsible for providing an interface
@@ -52,6 +57,19 @@ public class MyDatePickerDialog extends DialogFragment implements
         return dialog;
     }
 
+    public static MyDatePickerDialog newInstance(long dateMin, long dateMax, int accentColor, long dateInMillis) {
+        MyDatePickerDialog dialog = new MyDatePickerDialog();
+
+        Bundle args = new Bundle();
+        args.putLong(KEY_DATE_MIN, Math.max(dateMin, DateUtils.DAY_IN_MILLIS));
+        args.putLong(KEY_DATE_MAX, dateMax);
+        args.putLong(KEY_DATE_MILLIS, dateInMillis);
+        args.putInt(KEY_COLOR_ACCENT, accentColor);
+        dialog.setArguments(args);
+
+        return dialog;
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -61,6 +79,7 @@ public class MyDatePickerDialog extends DialogFragment implements
         long minTime = args.getLong(KEY_DATE_MIN, -1);
         long maxTime = args.getLong(KEY_DATE_MAX, -1);
         long time = args.getLong(KEY_DATE_MILLIS, minTime);
+        mAccentColor = args.getInt(KEY_COLOR_ACCENT);
 
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(time);
@@ -72,15 +91,23 @@ public class MyDatePickerDialog extends DialogFragment implements
         int mYear = c.get(Calendar.YEAR);
         int mMonth = c.get(Calendar.MONTH);
         int mDay = c.get(Calendar.DAY_OF_MONTH);
-        DatePickerDialog dialog = new DatePickerDialog(getActivity(), this, mYear, mMonth, mDay);
+        final DatePickerDialog pickerDialog = new DatePickerDialog(getActivity(), R.style.MyDatePickerDialogTheme, this, mYear, mMonth, mDay);
+
+//        pickerDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+//            @Override
+//            public void onShow(DialogInterface dialog) {
+//                pickerDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(mAccentColor);
+//                pickerDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(mAccentColor);
+//            }
+//        });
 
         if (minTime != -1)
-            dialog.getDatePicker().setMinDate(minTime);
+            pickerDialog.getDatePicker().setMinDate(minTime);
 
         if (maxTime != -1)
-            dialog.getDatePicker().setMaxDate(maxTime);
+            pickerDialog.getDatePicker().setMaxDate(maxTime);
 
-        return dialog;
+        return pickerDialog;
     }
 
     @Override
