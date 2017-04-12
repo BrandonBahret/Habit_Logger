@@ -42,6 +42,11 @@
                 layout="@layout/no_results_found"
                 android:visibility="gone"/>
 
+            <FrameLayout
+                android:id="@+id/content_frame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
             <include
                 android:id="@+id/main_include"
                 layout="@layout/app_bar_main"

@@ -10,16 +10,6 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/habit_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/current_sessions_card"
-            android:clipToPadding="false"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-            android:scrollbars="none"/>
-
         <include
             android:id="@+id/current_sessions_card"
             layout="@layout/current_sessions_card"/>

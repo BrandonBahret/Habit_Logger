@@ -4,60 +4,51 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.os.Handler;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.internal.util.Predicate;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.RequestCodes;
-import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.DataExportHelpers.GoogleDriveDataExportManager;
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionNotificationManager;
 import com.example.brandon.habitlogger.databinding.ActivityMainBinding;
 import com.example.brandon.habitlogger.ui.Activities.AboutActivity;
 import com.example.brandon.habitlogger.ui.Activities.ActiveSessionsActivity.ActiveSessionsActivity;
-import com.example.brandon.habitlogger.ui.Activities.HabitActivity.HabitActivity;
+import com.example.brandon.habitlogger.ui.Activities.MainActivity.Fragments.AllHabitsFragment;
+import com.example.brandon.habitlogger.ui.Activities.MainActivity.Fragments.ArchivedHabitsFragment;
+import com.example.brandon.habitlogger.ui.Activities.MainActivity.Fragments.CategoryCardHabitsFragment;
+import com.example.brandon.habitlogger.ui.Activities.MainActivity.Fragments.MyFragmentBase;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.DataOverviewActivity;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.SettingsActivity;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.RecyclerViewScrollObserver;
-import com.example.brandon.habitlogger.ui.Activities.SessionActivity;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
-import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.NewHabitDialog;
 import com.example.brandon.habitlogger.ui.Widgets.CurrentSessionCardManager;
-import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.GroupDecoration;
-import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 import com.github.clans.fab.FloatingActionButton;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import static android.widget.Toast.makeText;
 
@@ -65,13 +56,13 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     //region (Member attributes)
-    private static final String RECYCLER_STATE = "RECYCLER_STATE";
-    final int NO_ARCHIVED_HABITS = 0, ONLY_ARCHIVED_HABITS = 1;
-    private int mHabitDisplayMode = NO_ARCHIVED_HABITS;
+//    private static final String RECYCLER_STATE = "RECYCLER_STATE";
+//    final int NO_ARCHIVED_HABITS = 0, ONLY_ARCHIVED_HABITS = 1;
+//    private int mHabitDisplayMode = NO_ARCHIVED_HABITS;
     private Integer mLastThemeMode = null;
 
-    private List<Habit> mHabitList = new ArrayList<>();
-    private HabitDatabase mHabitDatabase;
+    //    private List<Habit> mHabitList = new ArrayList<>();
+//    private HabitDatabase mHabitDatabase;
     private SessionManager mSessionManager;
     private SessionNotificationManager mSessionNotificationManager;
     private PreferenceChecker mPreferenceChecker;
@@ -80,14 +71,15 @@ public class MainActivity extends AppCompatActivity
     private CurrentSessionCardManager mCurrentSessionCard;
 
     ActivityMainBinding ui;
-    private RecyclerView mHabitCardContainer;
+    //    private RecyclerView mHabitCardContainer;
     private SearchView mSearchView;
+    private String mTitle;
 
-    private Handler mUpdateHandler = new Handler();
-    private SpaceOffsetDecoration mSpaceDecoration;
-    private GroupDecoration mGroupDecoration;
-    private HabitViewAdapter mHabitAdapter;
-    private CategoryCardAdapter mCategoryAdapter;
+//    private Handler mUpdateHandler = new Handler();
+//    private SpaceOffsetDecoration mSpaceDecoration;
+//    private GroupDecoration mGroupDecoration;
+//    private HabitViewAdapter mHabitAdapter;
+//    private CategoryCardAdapter mCategoryAdapter;
     //endregion
 
     //region [ ---- Methods responsible for handling the lifecycle of the activity ---- ]
@@ -125,22 +117,22 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-        mHabitCardContainer.setLayoutManager(layoutManager);
-        mHabitCardContainer.setItemAnimator(new DefaultItemAnimator());
+//        mHabitCardContainer.setLayoutManager(layoutManager);
+//        mHabitCardContainer.setItemAnimator(new DefaultItemAnimator());
 
-        if (mPreferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_CARDS) {
-            List<CategoryDataSample> categoryContainers = mHabitDatabase.getAllData();
-            MyCollectionUtils.filter(categoryContainers, CategoryDataSample.IFilterEmptySamples);
-            mCategoryAdapter = new CategoryCardAdapter(categoryContainers, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
-            mHabitCardContainer.setAdapter(mCategoryAdapter);
-        }
-        else {
-            mHabitAdapter = new HabitViewAdapter(mHabitList, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
-            mHabitCardContainer.setAdapter(mHabitAdapter);
-            showDatabase();
-        }
+//        if (mPreferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_CARDS) {
+//            List<CategoryDataSample> categoryContainers = mHabitDatabase.getAllData();
+//            MyCollectionUtils.filter(categoryContainers, CategoryDataSample.IFilterEmptySamples);
+//            mCategoryAdapter = new CategoryCardAdapter(categoryContainers, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
+//            mHabitCardContainer.setAdapter(mCategoryAdapter);
+//        }
+//        else {
+//            mHabitAdapter = new HabitViewAdapter(mHabitList, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
+//            mHabitCardContainer.setAdapter(mHabitAdapter);
+//            showDatabase();
+//        }
 
-        applyGroupDecoration();
+//        applyGroupDecoration();
         mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
 
         if (mPreferenceChecker.doShowNotificationsAutomatically())
@@ -148,11 +140,13 @@ public class MainActivity extends AppCompatActivity
 
         prepareNavigationDrawer();
 
+        setFragmentForNavId(R.id.home_nav);
+
     }
 
     private void prepareNavigationDrawer() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        Menu menu = navigationView.getMenu();
+
+        Menu menu = ui.navView.getMenu();
         MenuItem navNightModeSwitch = menu.findItem(R.id.night_mode);
 
         boolean isNightMode = mPreferenceChecker.isNightMode();
@@ -164,15 +158,15 @@ public class MainActivity extends AppCompatActivity
         mSessionManager.addSessionChangedCallback(getOnSessionChangedListener());
         ui.mainInclude.fab.setOnClickListener(getOnNewHabitButtonClicked());
         ui.navView.setNavigationItemSelectedListener(this);
-        mHabitCardContainer.addOnScrollListener(getOnScrollListener());
+//        mHabitCardContainer.addOnScrollListener(getOnScrollListener());
         mCurrentSessionCard.setOnClickListener(getOnSessionsCardClickListener());
     }
 
     private void gatherDependencies() {
         mCurrentSessionCard = new CurrentSessionCardManager(ui.mainInclude.currentSessionsCard.itemRoot);
-        mHabitCardContainer = ui.mainInclude.habitRecyclerView;
+//        mHabitCardContainer = ui.mainInclude.habitRecyclerView;
         mSessionNotificationManager = new SessionNotificationManager(this);
-        mHabitDatabase = new HabitDatabase(this);
+//        mHabitDatabase = new HabitDatabase(this);
         mSessionManager = new SessionManager(this);
         mLocalExportManager = new LocalDataExportManager(this);
         mGoogleDriveExportManager = new GoogleDriveDataExportManager(this);
@@ -187,17 +181,17 @@ public class MainActivity extends AppCompatActivity
         int themeMode = mPreferenceChecker.getThemeMode();
         if ((mLastThemeMode != null && mLastThemeMode != themeMode) || AppCompatDelegate.getDefaultNightMode() != themeMode) {
             recreate();
-            mHabitCardContainer.invalidate();
+//            mHabitCardContainer.invalidate();
         }
 
-        if (getIntent().hasExtra(RECYCLER_STATE)) {
-            RecyclerView rv = ui.mainInclude.habitRecyclerView;
-            rv.getLayoutManager().onRestoreInstanceState(getIntent().getExtras().getParcelable(RECYCLER_STATE));
-        }
+//        if (getIntent().hasExtra(RECYCLER_STATE)) {
+//            RecyclerView rv = ui.mainInclude.habitRecyclerView;
+//            rv.getLayoutManager().onRestoreInstanceState(getIntent().getExtras().getParcelable(RECYCLER_STATE));
+//        }
 
         prepareNavigationDrawer();
         mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
-        showDatabase();
+//        showDatabase();
         startRepeatingTask();
     }
 
@@ -206,8 +200,8 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
 
         stopRepeatingTask();
-        RecyclerView rv = ui.mainInclude.habitRecyclerView;
-        getIntent().putExtra(RECYCLER_STATE, rv.getLayoutManager().onSaveInstanceState());
+//        RecyclerView rv = ui.mainInclude.habitRecyclerView;
+//        getIntent().putExtra(RECYCLER_STATE, rv.getLayoutManager().onSaveInstanceState());
     }
     //endregion
 
@@ -216,19 +210,19 @@ public class MainActivity extends AppCompatActivity
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if (mCategoryAdapter != null)
-            mCategoryAdapter.onSaveInstanceState(outState);
+//        if (mCategoryAdapter != null)
+//            mCategoryAdapter.onSaveInstanceState(outState);
 
-        RecyclerView rv = ui.mainInclude.habitRecyclerView;
-        outState.putParcelable(RECYCLER_STATE, rv.getLayoutManager().onSaveInstanceState());
+//        RecyclerView rv = ui.mainInclude.habitRecyclerView;
+//        outState.putParcelable(RECYCLER_STATE, rv.getLayoutManager().onSaveInstanceState());
     }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
-        if (mCategoryAdapter != null)
-            mCategoryAdapter.onRestoreInstanceState(savedInstanceState);
+//        if (mCategoryAdapter != null)
+//            mCategoryAdapter.onRestoreInstanceState(savedInstanceState);
     }
     //endregion -- end --
 
@@ -256,15 +250,55 @@ public class MainActivity extends AppCompatActivity
 
     //region [ ---- Code responsible for updating the ui ---- ]
 
+    private void setFragmentForNavId(@IdRes int menuId) {
+        // Create a new fragment and specify the planet to show based on position
+        MyFragmentBase fragment;
+
+        switch (menuId) {
+            case R.id.home_nav:
+                if (mPreferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_CARDS)
+                    fragment = AllHabitsFragment.newInstance();
+                else
+                    fragment = CategoryCardHabitsFragment.newInstance();
+
+                break;
+
+            case R.id.archived_habits:
+                fragment = ArchivedHabitsFragment.newInstance();
+                break;
+
+            default:
+                fragment = AllHabitsFragment.newInstance();
+        }
+
+        // Insert the fragment by replacing any existing fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.content_frame, fragment)
+                .commit();
+
+        // Change the title accordingly
+        setTitle(fragment.getFragmentTitle());
+        ui.drawerLayout.closeDrawer(GravityCompat.START);
+    }
+
+    @Override
+    public void setTitle(@StringRes int textId) {
+        mTitle = getString(textId);
+        ActionBar toolbar = getSupportActionBar();
+        if (toolbar != null)
+            toolbar.setTitle(mTitle);
+    }
+
     //region Code responsible to update habit card views
     private Runnable updateCards = new Runnable() {
         @Override
         public void run() {
             List<SessionEntry> entries = mSessionManager.getActiveSessionList();
-            if (mHabitAdapter != null)
-                mHabitAdapter.updateHabitViews(entries);
+//            if (mHabitAdapter != null)
+//                mHabitAdapter.updateHabitViews(entries);
 
-            mUpdateHandler.postDelayed(updateCards, 1000);
+//            mUpdateHandler.postDelayed(updateCards, 1000);
         }
     };
 
@@ -273,59 +307,59 @@ public class MainActivity extends AppCompatActivity
     }
 
     void stopRepeatingTask() {
-        mUpdateHandler.removeCallbacks(updateCards);
+//        mUpdateHandler.removeCallbacks(updateCards);
     }
 
     private void removeHabitView(int position) {
-        mHabitList.remove(position);
-        mHabitAdapter.notifyItemRemoved(position);
+//        mHabitList.remove(position);
+//        mHabitAdapter.notifyItemRemoved(position);
         applySpaceDecoration();
-        ui.mainInclude.habitRecyclerView.invalidateItemDecorations();
+//        ui.mainInclude.habitRecyclerView.invalidateItemDecorations();
         checkIfHabitsAreAvailable();
     }
+    //region Methods responsible for applying item decorations to the recycler view
+//    private GroupDecoration getGroupDecoration() {
+//        boolean shouldUseStickyHeaders = mPreferenceChecker.makeCategoryHeadersSticky();
+//
+//        return new GroupDecoration
+//                (MainActivity.this, R.dimen.category_section_text_size, shouldUseStickyHeaders, new GroupDecoration.Callback() {
+//                    @Override
+//                    public long getGroupId(int position) {
+//                        if (position >= 0 && position < mHabitList.size())
+//                            return mHabitList.get(position).getCategory().getDatabaseId();
+//                        else return -1;
+//                    }
+//
+//                    @Override
+//                    public String getGroupFirstLine(int position) {
+//                        if (position >= 0 && position < mHabitList.size())
+//                            return mHabitList.get(position).getCategory().getName();
+//                        else return null;
+//                    }
+//                });
+//    }
+
     //endregion -- end --
 
-    //region Methods responsible for applying item decorations to the recycler view
-    private GroupDecoration getGroupDecoration() {
-        boolean shouldUseStickyHeaders = mPreferenceChecker.makeCategoryHeadersSticky();
-
-        return new GroupDecoration
-                (MainActivity.this, R.dimen.category_section_text_size, shouldUseStickyHeaders, new GroupDecoration.Callback() {
-                    @Override
-                    public long getGroupId(int position) {
-                        if (position >= 0 && position < mHabitList.size())
-                            return mHabitList.get(position).getCategory().getDatabaseId();
-                        else return -1;
-                    }
-
-                    @Override
-                    public String getGroupFirstLine(int position) {
-                        if (position >= 0 && position < mHabitList.size())
-                            return mHabitList.get(position).getCategory().getName();
-                        else return null;
-                    }
-                });
-    }
-
-    private void applyGroupDecoration() {
-        switch (mPreferenceChecker.howToDisplayCategories()) {
-            case PreferenceChecker.AS_CARDS:
-                mHabitCardContainer.removeItemDecoration(mGroupDecoration);
-                break;
-
-            case PreferenceChecker.AS_SECTIONS:
-                mGroupDecoration = getGroupDecoration();
-
-                mHabitCardContainer.addItemDecoration(mGroupDecoration);
-                break;
-
-            case PreferenceChecker.WITHOUT_CATEGORIES:
-                mHabitCardContainer.removeItemDecoration(mGroupDecoration);
-                break;
-        }
-
-        applySpaceDecoration();
-    }
+//    private void applyGroupDecoration() {
+//        switch (mPreferenceChecker.howToDisplayCategories()) {
+//            case PreferenceChecker.AS_CARDS:
+//                mHabitCardContainer.removeItemDecoration(mGroupDecoration);
+//                break;
+//
+//            case PreferenceChecker.AS_SECTIONS:
+//                mGroupDecoration = getGroupDecoration();
+//
+//                mHabitCardContainer.addItemDecoration(mGroupDecoration);
+//                break;
+//
+//            case PreferenceChecker.WITHOUT_CATEGORIES:
+//                mHabitCardContainer.removeItemDecoration(mGroupDecoration);
+//                break;
+//        }
+//
+//        applySpaceDecoration();
+//    }
 
     private void applySpaceDecoration() {
         int sessionCount = (int) mSessionManager.getNumberOfActiveSessions();
@@ -337,74 +371,74 @@ public class MainActivity extends AppCompatActivity
 
         int bottomOffset = (int) getResources().getDimension(R.dimen.bottom_offset_dp);
 
-        if (mSpaceDecoration != null)
-            mHabitCardContainer.removeItemDecoration(mSpaceDecoration);
+//        if (mSpaceDecoration != null)
+//            mHabitCardContainer.removeItemDecoration(mSpaceDecoration);
 
-        mSpaceDecoration = new SpaceOffsetDecoration(bottomOffset, topOffset);
-        mHabitCardContainer.addItemDecoration(mSpaceDecoration);
+//        mSpaceDecoration = new SpaceOffsetDecoration(bottomOffset, topOffset);
+//        mHabitCardContainer.addItemDecoration(mSpaceDecoration);
     }
     //endregion -- end --
 
-    public void showDatabase() {
-        if (mPreferenceChecker.howToDisplayCategories() != PreferenceChecker.AS_CARDS) {
-            mHabitList = mHabitDatabase.getHabits();
-            mHabitAdapter = new HabitViewAdapter(mHabitList, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
-
-            if (mHabitDisplayMode == ONLY_ARCHIVED_HABITS)
-                MyCollectionUtils.filter(mHabitList, Habit.ICheckIfIsNotArchived);
-
-            else if (mHabitDisplayMode == NO_ARCHIVED_HABITS)
-                MyCollectionUtils.filter(mHabitList, Habit.ICheckIfIsArchived);
-
-            Collections.sort(mHabitList, Habit.ICompareCategoryName);
-            mHabitCardContainer.setAdapter(mHabitAdapter);
-        }
-
-        checkIfHabitsAreAvailable();
-    }
+//    public void showDatabase() {
+//        if (mPreferenceChecker.howToDisplayCategories() != PreferenceChecker.AS_CARDS) {
+//            mHabitList = mHabitDatabase.getHabits();
+//            mHabitAdapter = new HabitViewAdapter(mHabitList, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
+//
+//            if (mHabitDisplayMode == ONLY_ARCHIVED_HABITS)
+//                MyCollectionUtils.filter(mHabitList, Habit.ICheckIfIsNotArchived);
+//
+//            else if (mHabitDisplayMode == NO_ARCHIVED_HABITS)
+//                MyCollectionUtils.filter(mHabitList, Habit.ICheckIfIsArchived);
+//
+//            Collections.sort(mHabitList, Habit.ICompareCategoryName);
+//            mHabitCardContainer.setAdapter(mHabitAdapter);
+//        }
+//
+//        checkIfHabitsAreAvailable();
+//    }
 
     public void checkIfHabitsAreAvailable() {
-        boolean habitsAvailable = mHabitDatabase.getNumberOfHabits() != 0;
+//        boolean habitsAvailable = mHabitDatabase.getNumberOfHabits() != 0;
 
         boolean shouldShowCurrentSessions = mPreferenceChecker.shouldShowCurrentSessions
                 (mSessionManager.getActiveSessionList().size());
 
-        mCurrentSessionCard.setVisibility(habitsAvailable && shouldShowCurrentSessions ? View.VISIBLE : View.GONE);
-        ui.mainInclude.habitRecyclerView.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
-        findViewById(R.id.no_habits_available_layout).setVisibility(habitsAvailable ? View.GONE : View.VISIBLE);
+//        mCurrentSessionCard.setVisibility(habitsAvailable && shouldShowCurrentSessions ? View.VISIBLE : View.GONE);
+//        ui.mainInclude.habitRecyclerView.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
+//        findViewById(R.id.no_habits_available_layout).setVisibility(habitsAvailable ? View.GONE : View.VISIBLE);
     }
 
     public void updateUiForSearchResult(boolean isEmpty) {
-        boolean habitsAvailable = mHabitDatabase.getNumberOfHabits() != 0;
-        int visibility = isEmpty && habitsAvailable ? View.VISIBLE : View.GONE;
+//        boolean habitsAvailable = mHabitDatabase.getNumberOfHabits() != 0;
+//        int visibility = isEmpty && habitsAvailable ? View.VISIBLE : View.GONE;
         View emptyResultsLayout = findViewById(R.id.no_results_layout);
-        if (emptyResultsLayout.getVisibility() != visibility) {
+//        if (emptyResultsLayout.getVisibility() != visibility) {
 
-            mCurrentSessionCard.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
-            ui.mainInclude.habitRecyclerView.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
-            emptyResultsLayout.setVisibility(visibility);
-        }
+//            mCurrentSessionCard.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
+//            ui.mainInclude.habitRecyclerView.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
+//            emptyResultsLayout.setVisibility(visibility);
+//        }
     }
 
-    private void showArchiveDatabase() {
-        ActionBar toolbar = getSupportActionBar();
-        if (toolbar != null) toolbar.setTitle("Archive");
+//    private void showArchiveDatabase() {
+//        ActionBar toolbar = getSupportActionBar();
+//        if (toolbar != null) toolbar.setTitle("Archive");
+//
+//        mHabitDisplayMode = ONLY_ARCHIVED_HABITS;
+//        showDatabase();
+//    }
 
-        mHabitDisplayMode = ONLY_ARCHIVED_HABITS;
-        showDatabase();
-    }
-
-    public void setInitialFragment() {
-        mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
-        ActionBar toolbar = getSupportActionBar();
-        if (toolbar != null)
-            toolbar.setTitle(getString(R.string.app_name));
-
-        mHabitDisplayMode = NO_ARCHIVED_HABITS;
-        mHabitList.clear();
-        mHabitCardContainer.removeAllViews();
-        showDatabase();
-    }
+//    public void setInitialFragment() {
+//        mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
+//        ActionBar toolbar = getSupportActionBar();
+//        if (toolbar != null)
+//            toolbar.setTitle(getString(R.string.app_name));
+//
+//        mHabitDisplayMode = NO_ARCHIVED_HABITS;
+//        mHabitList.clear();
+//        mHabitCardContainer.removeAllViews();
+//        showDatabase();
+//    }
 
     //endregion [ ------------ end ------------ ]
 
@@ -420,177 +454,177 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                runDatabaseQuery(newText);
+//                runDatabaseQuery(newText);
                 return true;
             }
         };
     }
 
-    private void runDatabaseQuery(String query) {
-        if (mHabitAdapter != null && query.length() != 0) {
-            final Set<Long> databaseIds = mHabitDatabase.searchHabitDatabase(query);
-            List<Habit> allHabits = mHabitDatabase.getHabits();
-
-            MyCollectionUtils.filter(allHabits, new Predicate<Habit>() {
-                @Override
-                public boolean apply(Habit habit) {
-                    return !databaseIds.contains(habit.getDatabaseId()) ||
-                            mHabitDisplayMode == ONLY_ARCHIVED_HABITS && !habit.getIsArchived() ||
-                            mHabitDisplayMode == NO_ARCHIVED_HABITS && habit.getIsArchived();
-                }
-            });
-
-            mHabitList.clear();
-            mHabitList.addAll(allHabits);
-            mHabitAdapter.notifyDataSetChanged();
-
-            updateUiForSearchResult(mHabitList.isEmpty());
-        }
-        else {
-            showDatabase();
-            updateUiForSearchResult(false);
-        }
-    }
+//    private void runDatabaseQuery(String query) {
+//        if (mHabitAdapter != null && query.length() != 0) {
+//            final Set<Long> databaseIds = mHabitDatabase.searchHabitDatabase(query);
+//            List<Habit> allHabits = mHabitDatabase.getHabits();
+//
+//            MyCollectionUtils.filter(allHabits, new Predicate<Habit>() {
+//                @Override
+//                public boolean apply(Habit habit) {
+//                    return !databaseIds.contains(habit.getDatabaseId()) ||
+//                            mHabitDisplayMode == ONLY_ARCHIVED_HABITS && !habit.getIsArchived() ||
+//                            mHabitDisplayMode == NO_ARCHIVED_HABITS && habit.getIsArchived();
+//                }
+//            });
+//
+//            mHabitList.clear();
+//            mHabitList.addAll(allHabits);
+//            mHabitAdapter.notifyDataSetChanged();
+//
+//            updateUiForSearchResult(mHabitList.isEmpty());
+//        }
+//        else {
+//            showDatabase();
+//            updateUiForSearchResult(false);
+//        }
+//    }
     //endregion -- end --
 
     //region Methods responsible for handling habit card events
-    private HabitViewAdapter.ButtonClickCallback getHabitButtonClickCallback() {
-        return new HabitViewAdapter.ButtonClickCallback() {
+//    private HabitViewAdapter.ButtonClickCallback getHabitButtonClickCallback() {
+//        return new HabitViewAdapter.ButtonClickCallback() {
+//
+//            @Override
+//            public View.OnClickListener getPlayButtonClickedListener(final long habitId) {
+//                return new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        if (!mSessionManager.getIsSessionActive(habitId))
+//                            SessionActivity.startActivity(MainActivity.this, mHabitDatabase.getHabit(habitId));
+//                        else {
+//                            boolean isPaused = mSessionManager.getIsPaused(habitId);
+//                            mSessionManager.setPauseState(habitId, !isPaused);
+//                            updateCards.run();
+//                        }
+//                    }
+//                };
+//            }
+//
+//            @Override
+//            public View.OnLongClickListener getPlayButtonLongClickedListener(final long habitId) {
+//                return new View.OnLongClickListener() {
+//                    @Override
+//                    public boolean onLongClick(View v) {
+//                        SessionActivity.startActivity(MainActivity.this, mHabitDatabase.getHabit(habitId));
+//                        return true;
+//                    }
+//                };
+//            }
+//
+//            @Override
+//            public View.OnClickListener getHabitViewClickedListener(final long habitId) {
+//                return new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        HabitActivity.startActivity(MainActivity.this, habitId);
+//                    }
+//                };
+//            }
+//
+//        };
+//    }
 
-            @Override
-            public View.OnClickListener getPlayButtonClickedListener(final long habitId) {
-                return new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (!mSessionManager.getIsSessionActive(habitId))
-                            SessionActivity.startActivity(MainActivity.this, mHabitDatabase.getHabit(habitId));
-                        else {
-                            boolean isPaused = mSessionManager.getIsPaused(habitId);
-                            mSessionManager.setPauseState(habitId, !isPaused);
-                            updateCards.run();
-                        }
-                    }
-                };
-            }
-
-            @Override
-            public View.OnLongClickListener getPlayButtonLongClickedListener(final long habitId) {
-                return new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        SessionActivity.startActivity(MainActivity.this, mHabitDatabase.getHabit(habitId));
-                        return true;
-                    }
-                };
-            }
-
-            @Override
-            public View.OnClickListener getHabitViewClickedListener(final long habitId) {
-                return new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        HabitActivity.startActivity(MainActivity.this, habitId);
-                    }
-                };
-            }
-
-        };
-    }
-
-    private HabitViewAdapter.MenuItemClickListener getHabitMenuItemClickListener() {
-        return new HabitViewAdapter.MenuItemClickListener() {
-            @Override
-            public void onHabitEditClick(long habitId) {
-                Habit habit = mHabitDatabase.getHabit(habitId);
-                EditHabitDialog dialog = EditHabitDialog.newInstance(new EditHabitDialog.OnFinishedListener() {
-                    @Override
-                    public void onFinishedWithResult(Habit habit) {
-                        mHabitDatabase.updateHabit(habit.getDatabaseId(), habit);
-
-                        int position = mHabitAdapter.getAdapterItemPosition(habit.getDatabaseId());
-                        mHabitList.set(position, habit);
-                        mHabitAdapter.notifyItemChanged(position);
-                    }
-                }, habit);
-
-                dialog.show(getSupportFragmentManager(), "edit-habit");
-            }
-
-            @Override
-            public void onHabitResetClick(final long habitId) {
-                String habitName = mHabitDatabase.getHabitName(habitId);
-                String messageFormat = getString(R.string.confirm_habit_data_reset_message_format);
-                String message = String.format(Locale.getDefault(), messageFormat, habitName);
-                new ConfirmationDialog(MainActivity.this)
-                        .setTitle(getString(R.string.confirm_habit_data_reset_title))
-                        .setMessage(message)
-                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mHabitDatabase.deleteEntriesForHabit(habitId);
-                                makeText(MainActivity.this, R.string.entries_deleted_message, Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .show();
-            }
-
-            @Override
-            public void onHabitDeleteClick(final long habitId) {
-                String habitName = mHabitDatabase.getHabitName(habitId);
-                new ConfirmationDialog(MainActivity.this)
-                        .setTitle("Confirm Delete")
-                        .setMessage("Do you really want to delete '" + habitName + "'?")
-                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (mSessionManager.getIsSessionActive(habitId)) {
-                                    mSessionManager.cancelSession(habitId);
-                                    mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
-                                }
-
-                                mHabitDatabase.deleteHabit(habitId);
-
-                                int position = mHabitAdapter.getAdapterItemPosition(habitId);
-                                removeHabitView(position);
-                            }
-                        })
-                        .show();
-            }
-
-            @Override
-            public void onHabitExportClick(long habitId) {
-                Habit habit = mHabitDatabase.getHabit(habitId);
-                mLocalExportManager.shareExportHabit(habit);
-            }
-
-            @Override
-            public void onHabitArchiveClick(final long habitId) {
-                String habitName = mHabitDatabase.getHabitName(habitId);
-                final boolean archivedState = mHabitDatabase.getIsHabitArchived(habitId);
-                String actionName = archivedState ? "Unarchive" : "Archive";
-                String actionNameLower = archivedState ? "unarchive" : "archive";
-
-                new ConfirmationDialog(MainActivity.this)
-                        .setTitle("Confirm " + actionName)
-                        .setMessage("Do you really want to " + actionNameLower + " '" + habitName + "'? ")
-                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mHabitDatabase.updateHabitIsArchived(habitId, !archivedState);
-
-                                int position = mHabitAdapter.getAdapterItemPosition(habitId);
-                                removeHabitView(position);
-                            }
-                        })
-                        .show();
-            }
-
-            @Override
-            public void onHabitStartSession(long habitId) {
-                SessionActivity.startActivity(MainActivity.this, mHabitDatabase.getHabit(habitId));
-            }
-        };
-    }
+//    private HabitViewAdapter.MenuItemClickListener getHabitMenuItemClickListener() {
+//        return new HabitViewAdapter.MenuItemClickListener() {
+//            @Override
+//            public void onHabitEditClick(long habitId) {
+//                Habit habit = mHabitDatabase.getHabit(habitId);
+//                EditHabitDialog dialog = EditHabitDialog.newInstance(new EditHabitDialog.OnFinishedListener() {
+//                    @Override
+//                    public void onFinishedWithResult(Habit habit) {
+//                        mHabitDatabase.updateHabit(habit.getDatabaseId(), habit);
+//
+//                        int position = mHabitAdapter.getAdapterItemPosition(habit.getDatabaseId());
+//                        mHabitList.set(position, habit);
+//                        mHabitAdapter.notifyItemChanged(position);
+//                    }
+//                }, habit);
+//
+//                dialog.show(getSupportFragmentManager(), "edit-habit");
+//            }
+//
+//            @Override
+//            public void onHabitResetClick(final long habitId) {
+//                String habitName = mHabitDatabase.getHabitName(habitId);
+//                String messageFormat = getString(R.string.confirm_habit_data_reset_message_format);
+//                String message = String.format(Locale.getDefault(), messageFormat, habitName);
+//                new ConfirmationDialog(MainActivity.this)
+//                        .setTitle(getString(R.string.confirm_habit_data_reset_title))
+//                        .setMessage(message)
+//                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                mHabitDatabase.deleteEntriesForHabit(habitId);
+//                                makeText(MainActivity.this, R.string.entries_deleted_message, Toast.LENGTH_SHORT).show();
+//                            }
+//                        })
+//                        .show();
+//            }
+//
+//            @Override
+//            public void onHabitDeleteClick(final long habitId) {
+//                String habitName = mHabitDatabase.getHabitName(habitId);
+//                new ConfirmationDialog(MainActivity.this)
+//                        .setTitle("Confirm Delete")
+//                        .setMessage("Do you really want to delete '" + habitName + "'?")
+//                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                if (mSessionManager.getIsSessionActive(habitId)) {
+//                                    mSessionManager.cancelSession(habitId);
+//                                    mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
+//                                }
+//
+//                                mHabitDatabase.deleteHabit(habitId);
+//
+//                                int position = mHabitAdapter.getAdapterItemPosition(habitId);
+//                                removeHabitView(position);
+//                            }
+//                        })
+//                        .show();
+//            }
+//
+//            @Override
+//            public void onHabitExportClick(long habitId) {
+//                Habit habit = mHabitDatabase.getHabit(habitId);
+//                mLocalExportManager.shareExportHabit(habit);
+//            }
+//
+//            @Override
+//            public void onHabitArchiveClick(final long habitId) {
+//                String habitName = mHabitDatabase.getHabitName(habitId);
+//                final boolean archivedState = mHabitDatabase.getIsHabitArchived(habitId);
+//                String actionName = archivedState ? "Unarchive" : "Archive";
+//                String actionNameLower = archivedState ? "unarchive" : "archive";
+//
+//                new ConfirmationDialog(MainActivity.this)
+//                        .setTitle("Confirm " + actionName)
+//                        .setMessage("Do you really want to " + actionNameLower + " '" + habitName + "'? ")
+//                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                mHabitDatabase.updateHabitIsArchived(habitId, !archivedState);
+//
+//                                int position = mHabitAdapter.getAdapterItemPosition(habitId);
+//                                removeHabitView(position);
+//                            }
+//                        })
+//                        .show();
+//            }
+//
+//            @Override
+//            public void onHabitStartSession(long habitId) {
+//                SessionActivity.startActivity(MainActivity.this, mHabitDatabase.getHabit(habitId));
+//            }
+//        };
+//    }
     //endregion -- end --
 
     private View.OnClickListener getOnSessionsCardClickListener() {
@@ -611,19 +645,19 @@ public class MainActivity extends AppCompatActivity
             public void beforeSessionEnded(long habitId, boolean wasCanceled) {
                 mSessionNotificationManager.cancel((int) habitId);
 
-                for (int i = 0; i < mHabitList.size(); i++) {
-                    if (mHabitList.get(i).getDatabaseId() == habitId) {
-                        View item = mHabitCardContainer.getChildAt(i);
-                        if (item != null) {
-                            TextView timeTextView = (TextView) item.findViewById(R.id.habit_card_time_display);
-                            timeTextView.setText(getString(R.string.time_display_placeholder));
-
-                            ImageButton pauseButton = (ImageButton) item.findViewById(R.id.session_control_button);
-                            pauseButton.setImageResource(R.drawable.ic_play_24dp);
-                        }
-                        break;
-                    }
-                }
+//                for (int i = 0; i < mHabitList.size(); i++) {
+//                    if (mHabitList.get(i).getDatabaseId() == habitId) {
+//                        View item = mHabitCardContainer.getChildAt(i);
+//                        if (item != null) {
+//                            TextView timeTextView = (TextView) item.findViewById(R.id.habit_card_time_display);
+//                            timeTextView.setText(getString(R.string.time_display_placeholder));
+//
+//                            ImageButton pauseButton = (ImageButton) item.findViewById(R.id.session_control_button);
+//                            pauseButton.setImageResource(R.drawable.ic_play_24dp);
+//                        }
+//                        break;
+//                    }
+//                }
             }
 
             @Override
@@ -631,10 +665,10 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onSessionStarted(long habitId) {
-                if (mPreferenceChecker.doShowNotificationsAutomatically() && mPreferenceChecker.doShowNotifications()) {
-                    Habit habit = mHabitDatabase.getHabit(habitId);
-                    mSessionNotificationManager.updateNotification(habit);
-                }
+//                if (mPreferenceChecker.doShowNotificationsAutomatically() && mPreferenceChecker.doShowNotifications()) {
+//                    Habit habit = mHabitDatabase.getHabit(habitId);
+//                    mSessionNotificationManager.updateNotification(habit);
+//                }
 
                 mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
                 applySpaceDecoration();
@@ -649,14 +683,14 @@ public class MainActivity extends AppCompatActivity
                 NewHabitDialog dialog = NewHabitDialog.newInstance(new NewHabitDialog.OnFinishedListener() {
                     @Override
                     public void onFinishedWithResult(Habit habit) {
-                        mHabitDatabase.addHabit(habit);
-                        showDatabase();
+//                        mHabitDatabase.addHabit(habit);
+//                        showDatabase();
                         if (mSearchView != null) {
                             mSearchView.setQuery("", false);
                             mSearchView.clearFocus();
                             mSearchView.onActionViewCollapsed();
                         }
-                        findViewById(R.id.no_habits_available_layout).setVisibility(View.GONE);
+//                        findViewById(R.id.no_habits_available_layout).setVisibility(View.GONE);
                     }
                 });
 
@@ -756,7 +790,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mLocalExportManager.importDatabase(true);
-                        showDatabase();
+//                        showDatabase();
                         makeText(MainActivity.this, R.string.data_restored, Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -769,7 +803,7 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.home_nav:
-                setInitialFragment();
+                setFragmentForNavId(id);
                 break;
 
             case R.id.running_habits_nav:
@@ -777,7 +811,7 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case R.id.archived_habits:
-                showArchiveDatabase();
+                setFragmentForNavId(id);
                 break;
 
             case (R.id.overall_stats_nav):

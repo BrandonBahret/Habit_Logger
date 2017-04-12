@@ -7,23 +7,23 @@ import com.example.brandon.habitlogger.R;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ArchivedHabitsFragment#newInstance} factory method to
+ * Use the {@link CategoryCardHabitsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ArchivedHabitsFragment extends MyFragmentBase {
+public class CategoryCardHabitsFragment extends MyFragmentBase {
 
-    public ArchivedHabitsFragment() {
+    public CategoryCardHabitsFragment() {
         // Required empty public constructor
     }
 
-    public static ArchivedHabitsFragment newInstance() {
-        return new ArchivedHabitsFragment();
+    public static CategoryCardHabitsFragment newInstance(){
+        return new CategoryCardHabitsFragment();
     }
 
     @Override
     @StringRes
     public int getFragmentTitle() {
-        return R.string.menu_archive;
+        return R.string.home_nav_string;
     }
 
 }
