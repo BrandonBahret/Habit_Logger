@@ -20,6 +20,7 @@ public class ArchivedHabitsFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    public static final String FRAGMENT_NAME = "Archived";
 
     // TODO: Rename and change types of parameters
     private String mParam1;

@@ -121,7 +121,7 @@ public class OverviewEntriesFragment extends Fragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mView = inflater.inflate(R.layout.fragment_entries, container, false);
+        mView = inflater.inflate(R.layout.fragment_overview_entries, container, false);
         mEntriesContainer = (RecyclerView) mView.findViewById(R.id.entries_holder);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());

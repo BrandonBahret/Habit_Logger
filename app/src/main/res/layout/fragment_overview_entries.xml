@@ -1,0 +1,28 @@
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/entries_fragment_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/no_results_layout"
+        layout="@layout/no_results_found"
+        android:visibility="gone"/>
+
+    <include
+        android:id="@+id/no_data_layout"
+        layout="@layout/no_entries_available"
+        android:visibility="gone"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/entries_holder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:scrollbars="none"/>
+
+</android.support.design.widget.CoordinatorLayout>

@@ -56,7 +56,7 @@ public class OverviewCalendarFragment extends Fragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.fragment_calendar, container, false);
+        View v = inflater.inflate(R.layout.fragment_overview_calendar, container, false);
         mCalendarViewContainer = (RecyclerView) v.findViewById(R.id.calendar_view_container);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
