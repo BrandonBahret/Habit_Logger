@@ -18,6 +18,7 @@ import android.view.View;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyColorUtils;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
+import com.example.brandon.habitlogger.common.RequestCodes;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
@@ -234,6 +235,7 @@ public class SessionActivity extends AppCompatActivity implements
     //region [ -- Handle onClick events -- ]
 
     //region Actionbar events
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         final int id = item.getItemId();
@@ -383,13 +385,10 @@ public class SessionActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void afterSessionEnded(long habitId, boolean wasCanceled) {
-    }
+    public void afterSessionEnded(long habitId, boolean wasCanceled) {}
 
     @Override
-    public void onSessionStarted(long habitId) {
-
-    }
+    public void onSessionStarted(long habitId) {}
     //endregion -- end --
 
     //endregion [ ---------------- end ---------------- ]
@@ -397,7 +396,7 @@ public class SessionActivity extends AppCompatActivity implements
     public static void startActivity(Activity activity, Habit habit) {
         Intent intent = new Intent(activity, SessionActivity.class);
         intent.putExtra(SessionActivity.BundleKeys.SERIALIZED_HABIT, (Serializable) habit);
-        activity.startActivity(intent);
+        activity.startActivityForResult(intent, RequestCodes.SESSION_ACTIVITY);
     }
 
 }

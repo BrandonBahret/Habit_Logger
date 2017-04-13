@@ -49,6 +49,8 @@ public class HabitDatabase {
     public interface OnEntryChangedListener {
         void onEntryDeleted(SessionEntry removedEntry);
 
+        void onEntryAdded(SessionEntry newEntry);
+
         void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry);
 
         void onEntriesReset(long habitId);
@@ -59,6 +61,11 @@ public class HabitDatabase {
     private void notifyEntryDeleted(SessionEntry removedEntry) {
         for (OnEntryChangedListener listener : onEntryChangedListeners)
             listener.onEntryDeleted(removedEntry);
+    }
+
+    private void notifyEntryAdded(SessionEntry newEntry) {
+        for (OnEntryChangedListener listener : onEntryChangedListeners)
+            listener.onEntryAdded(newEntry);
     }
 
     private void notifyEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
@@ -811,6 +818,7 @@ public class HabitDatabase {
         );
         entry.setHabitId(habitId);
         entry.setDatabaseId(entryId);
+        notifyEntryAdded(entry);
 
         return entryId;
     }
@@ -820,6 +828,7 @@ public class HabitDatabase {
             long entryId = addEntry(habitId, entry);
             entry.setDatabaseId(entryId);
             entry.setHabitId(habitId);
+            notifyEntryAdded(entry);
         }
     }
     //endregion

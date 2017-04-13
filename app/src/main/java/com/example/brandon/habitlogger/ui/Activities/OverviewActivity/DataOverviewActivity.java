@@ -248,6 +248,11 @@ public class DataOverviewActivity extends AppCompatActivity implements
             }
 
             @Override
+            public void onEntryAdded(SessionEntry newEntry) {
+
+            }
+
+            @Override
             public void onEntriesReset(long habitId) {
                 updateEntries();
             }

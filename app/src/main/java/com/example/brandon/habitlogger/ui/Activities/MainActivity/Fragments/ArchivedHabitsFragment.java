@@ -114,6 +114,7 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
         MyCollectionUtils.filter(mData, Habit.ICheckIfIsNotArchived);
         mHabitAdapter = new HabitViewAdapter(mData, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
         mRecyclerView.setAdapter(mHabitAdapter);
+        mCallbackInterface.showCurrentSessionsCard(false);
     }
 
     @Override

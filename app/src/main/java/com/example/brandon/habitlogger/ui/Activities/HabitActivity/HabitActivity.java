@@ -42,7 +42,6 @@ import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.NewHabitDialog;
 import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -150,7 +149,6 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
         mSessionManager = new SessionManager(this);
         mExportManager = new LocalDataExportManager(this);
         mHabitDatabase = new HabitDatabase(this);
-        HabitDatabase.addOnEntryChangedListener(getOnEntryChangeInDatabaseListener());
 
         Intent data = getIntent();
         mHabitId = data.getLongExtra(HABIT_ID, -1);
@@ -178,11 +176,23 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
         ui.container.setCurrentItem(1);
     }
 
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        Set<Long> ids = mHabitDatabase.findEntriesWithinTimeRange(mHabitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+//        HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
+//        updateEntries(HabitActivity.this.mSessionEntries);
+//    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        HabitDatabase.addOnEntryChangedListener(getOnEntryChangeInDatabaseListener());
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
-        mSessionEntriesCallbacks.clear();
-        mCategoryDataSampleCallbacks.clear();
         HabitDatabase.removeOnEntryChangedListener(getOnEntryChangeInDatabaseListener());
     }
 
@@ -279,6 +289,33 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
         ui.createEntryFab.setColorPressed(accentDarkerColor);
 
     }
+
+    private void updateDateRangeManagerEntries(List<SessionEntry> entries) {
+        SessionEntry minEntry = mHabitDatabase.getMinEntry(mHabitId);
+        SessionEntry maxEntry = mHabitDatabase.getMaxEntry(mHabitId);
+        if (minEntry != null && maxEntry != null) {
+            long minTime = minEntry.getStartingTimeIgnoreTimeOfDay();
+            long maxTime = maxEntry.getStartingTimeIgnoreTimeOfDay();
+            dateRangeManager.updateSessionEntries(entries, minTime, maxTime);
+        }
+        else {
+            dateRangeManager.updateSessionEntries(new ArrayList<SessionEntry>(), -1, -1);
+        }
+    }
+
+    public void updateEntries(List<SessionEntry> entries) {
+
+        updateDateRangeManagerEntries(entries);
+
+        SessionEntriesSample entriesDataSample = new SessionEntriesSample(entries);
+
+        for (IUpdateEntries callback : mSessionEntriesCallbacks)
+            callback.updateEntries(entriesDataSample);
+
+        CategoryDataSample categoryDataSample = getCategoryDataSample();
+        for (IUpdateCategorySample callback : mCategoryDataSampleCallbacks)
+            callback.updateCategoryDataSample(categoryDataSample);
+    }
     //endregion
 
     //region [ ---- Methods responsible for handling events ---- ]
@@ -321,7 +358,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
             @Override
             public void onClick(View view) {
                 ui.menuFab.close(true);
-                startSession();
+                SessionActivity.startActivity(HabitActivity.this, mHabit);
             }
         };
     }
@@ -391,7 +428,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                 break;
 
             case (R.id.menu_enter_session):
-                startSession();
+                SessionActivity.startActivity(HabitActivity.this, mHabit);
                 break;
 
             case (R.id.menu_toggle_archive):
@@ -556,6 +593,9 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                 }
 
                 @Override
+                public void onEntryAdded(SessionEntry newEntry) {}
+
+                @Override
                 public void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
                     dateRangeManager.entryChanged(oldEntry, newEntry);
 
@@ -578,40 +618,16 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
     }
     //endregion
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Set<Long> ids = mHabitDatabase.findEntriesWithinTimeRange(mHabitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+        HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
+        updateEntries(HabitActivity.this.mSessionEntries);
+    }
+
+
     //endregion [ ---------------- end ---------------- ]
-
-    public void startSession() {
-        Intent startSession = new Intent(this, SessionActivity.class);
-        startSession.putExtra(SessionActivity.BundleKeys.SERIALIZED_HABIT, (Serializable) mHabit);
-        startActivity(startSession);
-    }
-
-    private void updateDateRangeManagerEntries(List<SessionEntry> entries) {
-        SessionEntry minEntry = mHabitDatabase.getMinEntry(mHabitId);
-        SessionEntry maxEntry = mHabitDatabase.getMaxEntry(mHabitId);
-        if (minEntry != null && maxEntry != null) {
-            long minTime = minEntry.getStartingTimeIgnoreTimeOfDay();
-            long maxTime = maxEntry.getStartingTimeIgnoreTimeOfDay();
-            dateRangeManager.updateSessionEntries(entries, minTime, maxTime);
-        }
-        else{
-            dateRangeManager.updateSessionEntries(new ArrayList<SessionEntry>(), -1, -1);
-        }
-    }
-
-    public void updateEntries(List<SessionEntry> entries) {
-
-        updateDateRangeManagerEntries(entries);
-
-        SessionEntriesSample entriesDataSample = new SessionEntriesSample(entries);
-
-        for (IUpdateEntries callback : mSessionEntriesCallbacks)
-            callback.updateEntries(entriesDataSample);
-
-        CategoryDataSample categoryDataSample = getCategoryDataSample();
-        for (IUpdateCategorySample callback : mCategoryDataSampleCallbacks)
-            callback.updateCategoryDataSample(categoryDataSample);
-    }
 
     public static void startActivity(Activity activity, long habitId) {
         Intent intent = new Intent(activity, HabitActivity.class);

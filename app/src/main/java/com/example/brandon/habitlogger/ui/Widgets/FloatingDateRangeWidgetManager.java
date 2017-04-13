@@ -221,6 +221,17 @@ public class FloatingDateRangeWidgetManager {
         }
     }
 
+//    public void entryAdded(SessionEntry newEntry) {
+//        if (newEntry.getStartingTime() > mMaximumTime) {
+//            this.mMaximumTime = MyTimeUtils.setTimePortion(newEntry.getStartingTime(), false, 11, 59, 59, 999);
+//            refreshDateRange(false);
+//        }
+//        else if (newEntry.getStartingTime() < mMinimumTime) {
+//            this.mMinimumTime = newEntry.getStartingTimeIgnoreTimeOfDay();
+//            refreshDateRange(false);
+//        }
+//    }
+
     private void updateSessionEntries(List<SessionEntry> sessionEntries){
         int numberOfEntries = sessionEntries.size();
         mViewHolder.entriesCountText.setText(String.valueOf(numberOfEntries));
