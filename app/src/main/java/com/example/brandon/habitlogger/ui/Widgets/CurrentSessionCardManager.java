@@ -56,12 +56,30 @@ public class CurrentSessionCardManager {
     }
 
     //region Methods responsible for hiding/showing the current sessions card
+    public void showView(boolean animate) {
+        if (animate)
+            showView();
+        else {
+            mViewHolder.itemView.setAlpha(1);
+            mViewHolder.itemView.setTranslationY(0);
+        }
+    }
+
     public void showView() {
         mViewHolder.itemView.animate()
                 .setStartDelay(0)
                 .setDuration(300)
                 .alpha(1)
                 .translationY(0);
+    }
+
+    public void hideView(boolean animate) {
+        if (animate)
+            hideView();
+        else {
+            mViewHolder.itemView.setAlpha(0);
+            mViewHolder.itemView.setTranslationY(-mViewHolder.itemView.getHeight());
+        }
     }
 
     public void hideView() {
@@ -95,7 +113,7 @@ public class CurrentSessionCardManager {
         int sessionCount = (int) sessionManager.getNumberOfActiveSessions();
         updateColor(sessionCount, preferenceChecker);
 
-        if(preferenceChecker.shouldShowCurrentSessions(sessionCount))
+        if (preferenceChecker.shouldShowCurrentSessions(sessionCount))
             setVisibility(View.VISIBLE);
         else
             setVisibility(View.GONE);

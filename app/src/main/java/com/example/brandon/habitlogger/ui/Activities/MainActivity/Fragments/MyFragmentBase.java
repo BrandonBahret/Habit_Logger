@@ -47,6 +47,14 @@ public abstract class MyFragmentBase extends Fragment {
 
     public interface IMainActivity {
         IScrollEvents getScrollEventsListener();
+
+        void hideFab(boolean animate);
+
+        void hideCurrentSessionsCard(boolean animate);
+
+        void showFab(boolean animate);
+
+        void showCurrentSessionsCard(boolean animate);
     }
     //endregion
 

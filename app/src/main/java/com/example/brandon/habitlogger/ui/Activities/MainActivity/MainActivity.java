@@ -267,6 +267,9 @@ public class MainActivity extends AppCompatActivity
 
         clearFocusFromSearchView();
 
+        if (mPreferenceChecker.doHideCurrentSessionCard())
+            mCurrentSessionCard.showView(false);
+
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
@@ -631,6 +634,26 @@ public class MainActivity extends AppCompatActivity
 //    }
     //endregion -- end --
 
+
+    @Override
+    public void hideFab(boolean animate) {
+        ui.mainInclude.fab.hide(animate);
+    }
+
+    @Override
+    public void hideCurrentSessionsCard(boolean animate) {
+        mCurrentSessionCard.hideView(animate);
+    }
+
+    @Override
+    public void showFab(boolean animate) {
+        ui.mainInclude.fab.show(animate);
+    }
+
+    @Override
+    public void showCurrentSessionsCard(boolean animate) {
+        mCurrentSessionCard.showView(animate);
+    }
 
     @Override
     public IScrollEvents getScrollEventsListener() {

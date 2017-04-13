@@ -82,6 +82,12 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        mCallbackInterface.hideFab(true);
+    }
+
+    @Override
     protected void checkIfHabitsAreAvailable() {
         boolean habitsAvailable = mHabitDatabase.getNumberOfArchivedHabits() != 0;
         mRecyclerView.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
