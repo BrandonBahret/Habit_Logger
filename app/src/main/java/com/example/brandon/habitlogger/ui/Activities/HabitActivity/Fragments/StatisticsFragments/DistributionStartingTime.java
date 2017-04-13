@@ -39,7 +39,7 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
     FragmentDistributionStartingTimeBinding ui;
     private int mColor;
     private int mTextColor;
-    private List<BarEntry> mEntries;
+    private List<BarEntry> mEntries = new ArrayList<>();
     private final int INTERVAL = 60;
     //endregion
 

@@ -38,6 +38,11 @@
                 android:visibility="gone"/>
 
             <include
+                android:id="@+id/no_archived_habits_available_layout"
+                layout="@layout/no_archived_habits_available"
+                android:visibility="gone"/>
+
+            <include
                 android:id="@+id/no_results_layout"
                 layout="@layout/no_results_found"
                 android:visibility="gone"/>

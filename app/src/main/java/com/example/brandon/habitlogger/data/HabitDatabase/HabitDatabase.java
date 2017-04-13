@@ -181,7 +181,17 @@ public class HabitDatabase {
     }
 
     public int getNumberOfHabits() {
-        return (int) MyDatabaseUtils.getNumberOfRows(mReadableDatabase, HabitsTableSchema.TABLE_NAME);
+        return (int) MyDatabaseUtils.getNumberOfRows(
+                mReadableDatabase, HabitsTableSchema.TABLE_NAME,
+                HabitsTableSchema.HABIT_IS_ARCHIVED, 0
+        );
+    }
+
+    public int getNumberOfArchivedHabits() {
+        return (int) MyDatabaseUtils.getNumberOfRows(
+                mReadableDatabase, HabitsTableSchema.TABLE_NAME,
+                HabitsTableSchema.HABIT_IS_ARCHIVED, 1
+        );
     }
 
     public int getNumberOfCategories() {
@@ -426,6 +436,8 @@ public class HabitDatabase {
             long categoryId = getCategoryIdFromIndex(i);
             habits.addAll(getHabits(categoryId));
         }
+
+        Collections.sort(habits, Habit.ICompareCategoryName);
 
         return habits;
     }
@@ -814,8 +826,12 @@ public class HabitDatabase {
 
     //region Read records
     // TODO Optimize get min/max entry methods
+    @Nullable
     public SessionEntry getMinEntry(long habitId) {
-        return Collections.min(getEntries(habitId), SessionEntry.ICompareStartingTimes);
+        List<SessionEntry> entries = getEntries(habitId);
+        if (!entries.isEmpty())
+            return Collections.min(entries, SessionEntry.ICompareStartingTimes);
+        else return null;
 //        Cursor c = mReadableDatabase.query(EntriesTableSchema.TABLE_NAME,
 //                new String[] { "min(" + EntriesTableSchema.ENTRY_START_TIME + ")" },
 //                EntriesTableSchema.ENTRY_HABIT_ID + "=?", new String[]{String.valueOf(habitId)},
@@ -826,8 +842,13 @@ public class HabitDatabase {
 //        else return null;
     }
 
+    @Nullable
     public SessionEntry getMaxEntry(long habitId) {
-        return Collections.max(getEntries(habitId), SessionEntry.ICompareStartingTimes);
+        List<SessionEntry> entries = getEntries(habitId);
+        if (!entries.isEmpty())
+            return Collections.max(entries, SessionEntry.ICompareStartingTimes);
+        else return null;
+
 //        Cursor c = mReadableDatabase.query(EntriesTableSchema.TABLE_NAME,
 //                new String[] { "max(" + EntriesTableSchema.ENTRY_START_TIME + ")" },
 //                EntriesTableSchema.ENTRY_HABIT_ID + "=?", new String[]{String.valueOf(habitId)},
@@ -838,8 +859,12 @@ public class HabitDatabase {
 //        else return null;
     }
 
+    @Nullable
     public SessionEntry getMinEntry() {
-        return Collections.min(getEntries(), SessionEntry.ICompareStartingTimes);
+        List<SessionEntry> entries = getEntries();
+        if (!entries.isEmpty())
+            return Collections.min(entries, SessionEntry.ICompareStartingTimes);
+        else return null;
 //        Cursor c = mReadableDatabase.query(EntriesTableSchema.TABLE_NAME,
 //                new String[] { "min(" + EntriesTableSchema.ENTRY_START_TIME + ")" },
 //                null, null, null, null, null
@@ -849,8 +874,12 @@ public class HabitDatabase {
 //        else return null;
     }
 
+    @Nullable
     public SessionEntry getMaxEntry() {
-        return Collections.max(getEntries(), SessionEntry.ICompareStartingTimes);
+        List<SessionEntry> entries = getEntries();
+        if (!entries.isEmpty())
+            return Collections.max(entries, SessionEntry.ICompareStartingTimes);
+        else return null;
 //        Cursor c = mReadableDatabase.query(EntriesTableSchema.TABLE_NAME,
 //                new String[] { "max(" + EntriesTableSchema.ENTRY_START_TIME + ")" },
 //                null, null, null, null, null

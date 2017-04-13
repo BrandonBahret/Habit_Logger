@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.ui.Activities;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -393,7 +394,7 @@ public class SessionActivity extends AppCompatActivity implements
 
     //endregion [ ---------------- end ---------------- ]
 
-    public static void startActivity(AppCompatActivity activity, Habit habit) {
+    public static void startActivity(Activity activity, Habit habit) {
         Intent intent = new Intent(activity, SessionActivity.class);
         intent.putExtra(SessionActivity.BundleKeys.SERIALIZED_HABIT, (Serializable) habit);
         activity.startActivity(intent);

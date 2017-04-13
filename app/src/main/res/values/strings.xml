@@ -155,7 +155,7 @@
     <string name="no_entries_available">No Entries Available</string>
     <string name="no_stats_available">No Statistics Available</string>
     <string name="toggle_theme">Night mode</string>
-    <string name="no_habits_archived">Nothing In Archive</string>
+    <string name="no_habits_archived">Archive Is Empty</string>
     <string name="no_active_sessions">No Active Sessions</string>
     <string name="pref_allow_upon_no_active_sessions">preference_close_upon_no_active_sessions</string>
 

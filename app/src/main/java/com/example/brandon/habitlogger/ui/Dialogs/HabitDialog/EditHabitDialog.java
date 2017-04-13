@@ -21,9 +21,9 @@ public class EditHabitDialog extends HabitDialogBase {
 
         Bundle args = new Bundle(1);
         args.putSerializable(KEY_HABIT, editHabit);
+        args.putSerializable(KEY_LISTENER, listener);
         dialog.setArguments(args);
 
-        dialog.setOnFinishedListener(listener);
         return dialog;
     }
 
@@ -32,10 +32,10 @@ public class EditHabitDialog extends HabitDialogBase {
 
         Bundle args = new Bundle(2);
         args.putSerializable(KEY_HABIT, editHabit);
+        args.putSerializable(KEY_LISTENER, listener);
         args.putInt(KEY_COLOR, accentColor);
         dialog.setArguments(args);
 
-        dialog.setOnFinishedListener(listener);
         return dialog;
     }
 

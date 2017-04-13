@@ -83,6 +83,10 @@ public class SessionEntry implements Serializable {
         this.mNote = note;
     }
 
+    public SessionEntry() {
+        this(-1, -1, "");
+    }
+
     public static void copy(SessionEntry dest, SessionEntry source) {
         dest.mStartTime = source.mStartTime;
         dest.mDuration = source.mDuration;

@@ -25,10 +25,10 @@ public class MyDatabaseUtils {
 
     //region Methods to count records
     public static long getNumberOfRows(SQLiteDatabase readableDatabase, String tableName,
-                                String recordKey, long recordId) {
+                                String recordKey, long recordValue) {
         return DatabaseUtils.queryNumEntries(
                 readableDatabase, tableName,
-                recordKey + "=?", new String[]{String.valueOf(recordId)}
+                recordKey + "=?", new String[]{String.valueOf(recordValue)}
         );
     }
 

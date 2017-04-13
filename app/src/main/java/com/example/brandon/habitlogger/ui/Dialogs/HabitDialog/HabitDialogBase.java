@@ -17,6 +17,7 @@ import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.databinding.DialogHabitFormBinding;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.CategoryDialog.CategorySpinnerAdapter;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -29,6 +30,7 @@ public abstract class HabitDialogBase extends DialogFragment {
     //region (Member attributes)
     protected static final String KEY_HABIT = "KEY_HABIT";
     protected static final String KEY_COLOR = "KEY_COLOR";
+    protected static final String KEY_LISTENER = "KEY_LISTENER";
 
     protected Habit mHabit;
     Integer mAccentColor = 0;
@@ -39,13 +41,11 @@ public abstract class HabitDialogBase extends DialogFragment {
     //region Code responsible for providing an interface
     private OnFinishedListener onFinishedListener;
 
-    public interface OnFinishedListener {
+    public interface OnFinishedListener extends Serializable {
         void onFinishedWithResult(Habit habit);
     }
 
-    public void setOnFinishedListener(OnFinishedListener listener) {
-        onFinishedListener = listener;
-    }
+//
     //endregion
 
     public abstract Habit getInitialHabit();
@@ -61,8 +61,10 @@ public abstract class HabitDialogBase extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null)
+        if (getArguments() != null) {
             mAccentColor = getArguments().getInt(KEY_COLOR, 0);
+            onFinishedListener = (OnFinishedListener) getArguments().getSerializable(KEY_LISTENER);
+        }
     }
 
     @NonNull

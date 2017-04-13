@@ -111,6 +111,11 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
         }
     }
 
+    public void notifySessionEnded(long habitId) {
+        int adapterPosition = getAdapterItemPosition(habitId);
+        notifyItemChanged(adapterPosition, null);
+    }
+
     public void removeAt(int position) {
         mHabitsList.remove(position);
         notifyItemRemoved(position);

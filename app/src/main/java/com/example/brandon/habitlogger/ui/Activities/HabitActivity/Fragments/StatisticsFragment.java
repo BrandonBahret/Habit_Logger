@@ -22,7 +22,7 @@ import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.NestedScrol
 /**
  * A simple {@link Fragment} subclass.
  */
-public class StatisticsFragment extends Fragment implements IHabitCallback.IOnTabReselected {
+public class StatisticsFragment extends Fragment implements IHabitCallback.IOnTabReselected, IHabitCallback.IUpdateColor {
 
     //region (Member attributes)
     private static View mFragmentView;
@@ -48,6 +48,7 @@ public class StatisticsFragment extends Fragment implements IHabitCallback.IOnTa
         if (context instanceof IHabitCallback) {
             mCallbackInterface = (IHabitCallback) context;
             mCallbackInterface.addOnTabReselectedCallback(this);
+            mCallbackInterface.addUpdateColorCallback(this);
         }
 
         if (context instanceof IScrollEvents)
@@ -59,6 +60,7 @@ public class StatisticsFragment extends Fragment implements IHabitCallback.IOnTa
     public void onDetach() {
         super.onDetach();
         mCallbackInterface.removeOnTabReselectedCallback(this);
+        mCallbackInterface.removeUpdateColorCallback(this);
     }
 
     @Override
@@ -89,14 +91,14 @@ public class StatisticsFragment extends Fragment implements IHabitCallback.IOnTa
     //endregion
 
     private void showNoDataScreen(boolean hasEntries) {
-        float lightness = MyColorUtils.getLightness(mColor) - 0.15f;
-        int color = MyColorUtils.setLightness(mColor, lightness);
+
 
         int mainLayoutVisibilityMode = hasEntries ? View.VISIBLE : View.GONE;
         mFragmentView.findViewById(R.id.statistics_container)
                 .setVisibility(mainLayoutVisibilityMode);
 
         int noStatsLayoutVisibilityMode = hasEntries ? View.GONE : View.VISIBLE;
+        int color = MyColorUtils.darkenColorBy(mColor, 0.20f);
         View noStatisticsLayout = mFragmentView.findViewById(R.id.no_stats_layout);
         ((ImageView) noStatisticsLayout.findViewById(R.id.no_stats_available_icon))
                 .setColorFilter(color);
@@ -126,6 +128,18 @@ public class StatisticsFragment extends Fragment implements IHabitCallback.IOnTa
         if (mFragmentView != null && position == 2) {
             NestedScrollView scrollView = (NestedScrollView) mFragmentView.findViewById(R.id.statistics_container);
             scrollView.smoothScrollTo(0, 0);
+        }
+    }
+
+    @Override
+    public void updateColor(int color) {
+        mColor = color;
+
+        if (mFragmentView != null) {
+            color = MyColorUtils.darkenColorBy(mColor, 0.20f);
+            View noStatisticsLayout = mFragmentView.findViewById(R.id.no_stats_layout);
+            ((ImageView) noStatisticsLayout.findViewById(R.id.no_stats_available_icon))
+                    .setColorFilter(color);
         }
     }
     //endregion

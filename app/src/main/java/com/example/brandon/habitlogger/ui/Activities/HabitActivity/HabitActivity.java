@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.ui.Activities.HabitActivity;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -67,6 +68,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
     private List<IUpdateCategorySample> mCategoryDataSampleCallbacks = new ArrayList<>();
     private List<IOnTabReselected> mOnTabReselectedCallbacks = new ArrayList<>();
     private List<IUpdateColor> mUpdateColorCallbacks = new ArrayList<>();
+    private HabitDatabase.OnEntryChangedListener mOnEntryChangeInDatabaseListener;
     //endregion
 
     //region [ ---- Code responsible for providing an interface to this activity ---- ]
@@ -181,6 +183,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
         super.onStop();
         mSessionEntriesCallbacks.clear();
         mCategoryDataSampleCallbacks.clear();
+        HabitDatabase.removeOnEntryChangedListener(getOnEntryChangeInDatabaseListener());
     }
 
     @Override
@@ -423,7 +426,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
                         if (mSessionManager.getIsSessionActive(mHabitId)) {
                             mSessionManager.cancelSession(mHabitId);
                         }
-
+                        HabitDatabase.removeOnEntryChangedListener(getOnEntryChangeInDatabaseListener());
                         mHabitDatabase.deleteHabit(mHabitId);
                         finish();
                     }
@@ -543,31 +546,35 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
 
     //region Methods to handle session entry change events
     private HabitDatabase.OnEntryChangedListener getOnEntryChangeInDatabaseListener() {
-        return new HabitDatabase.OnEntryChangedListener() {
-            @Override
-            public void onEntryDeleted(SessionEntry removedEntry) {
-                Set<Long> ids = mHabitDatabase.findEntriesWithinTimeRange(mHabitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
-                HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
-                updateDateRangeManagerEntries(HabitActivity.this.mSessionEntries);
-            }
-
-            @Override
-            public void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
-                dateRangeManager.entryChanged(oldEntry, newEntry);
-
-                Set<Long> ids = mHabitDatabase.findEntriesWithinTimeRange(mHabitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
-                HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
-                updateDateRangeManagerEntries(HabitActivity.this.mSessionEntries);
-            }
-
-            @Override
-            public void onEntriesReset(long habitId) {
-                if (habitId == HabitActivity.this.mHabitId) {
-                    mSessionEntries = new ArrayList<>();
-                    updateEntries(mSessionEntries);
+        if (mOnEntryChangeInDatabaseListener == null) {
+            mOnEntryChangeInDatabaseListener = new HabitDatabase.OnEntryChangedListener() {
+                @Override
+                public void onEntryDeleted(SessionEntry removedEntry) {
+                    Set<Long> ids = mHabitDatabase.findEntriesWithinTimeRange(mHabitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+                    HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
+                    updateDateRangeManagerEntries(HabitActivity.this.mSessionEntries);
                 }
-            }
-        };
+
+                @Override
+                public void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
+                    dateRangeManager.entryChanged(oldEntry, newEntry);
+
+                    Set<Long> ids = mHabitDatabase.findEntriesWithinTimeRange(mHabitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+                    HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
+                    updateDateRangeManagerEntries(HabitActivity.this.mSessionEntries);
+                }
+
+                @Override
+                public void onEntriesReset(long habitId) {
+                    if (habitId == HabitActivity.this.mHabitId) {
+                        mSessionEntries = new ArrayList<>();
+                        updateEntries(mSessionEntries);
+                    }
+                }
+            };
+        }
+
+        return mOnEntryChangeInDatabaseListener;
     }
     //endregion
 
@@ -580,9 +587,16 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
     }
 
     private void updateDateRangeManagerEntries(List<SessionEntry> entries) {
-        long minTime = mHabitDatabase.getMinEntry(mHabitId).getStartingTimeIgnoreTimeOfDay();
-        long maxTime = mHabitDatabase.getMaxEntry(mHabitId).getStartingTimeIgnoreTimeOfDay();
-        dateRangeManager.updateSessionEntries(entries, minTime, maxTime);
+        SessionEntry minEntry = mHabitDatabase.getMinEntry(mHabitId);
+        SessionEntry maxEntry = mHabitDatabase.getMaxEntry(mHabitId);
+        if (minEntry != null && maxEntry != null) {
+            long minTime = minEntry.getStartingTimeIgnoreTimeOfDay();
+            long maxTime = maxEntry.getStartingTimeIgnoreTimeOfDay();
+            dateRangeManager.updateSessionEntries(entries, minTime, maxTime);
+        }
+        else{
+            dateRangeManager.updateSessionEntries(new ArrayList<SessionEntry>(), -1, -1);
+        }
     }
 
     public void updateEntries(List<SessionEntry> entries) {
@@ -599,7 +613,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
             callback.updateCategoryDataSample(categoryDataSample);
     }
 
-    public static void startActivity(AppCompatActivity activity, long habitId) {
+    public static void startActivity(Activity activity, long habitId) {
         Intent intent = new Intent(activity, HabitActivity.class);
         intent.putExtra(HabitActivity.HABIT_ID, habitId);
         activity.startActivity(intent);

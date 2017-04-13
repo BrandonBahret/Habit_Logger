@@ -1,8 +1,10 @@
 package com.example.brandon.habitlogger.ui.Dialogs.HabitDialog;
 
+import android.os.Bundle;
+
+import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
-import com.example.brandon.habitlogger.R;
 
 /**
  * Created by Brandon on 3/6/2017.
@@ -13,7 +15,9 @@ public class NewHabitDialog extends HabitDialogBase {
 
     public static NewHabitDialog newInstance(OnFinishedListener listener) {
         NewHabitDialog dialog = new NewHabitDialog();
-        dialog.setOnFinishedListener(listener);
+        Bundle args = new Bundle();
+        args.putSerializable(KEY_LISTENER, listener);
+        dialog.setArguments(args);
         return dialog;
     }
 

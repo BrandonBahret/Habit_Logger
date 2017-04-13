@@ -204,13 +204,12 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
     //region Methods responsible for updating the ui
     private void showNoDataLayout(boolean showNoDataLayout) {
         if (mView != null) {
-            float lightness = MyColorUtils.getLightness(mColor) - 0.15f;
-            int color = MyColorUtils.setLightness(mColor, lightness);
 
             boolean hasEntries = mHabitDatabase.getNumberOfEntries(mHabit.getDatabaseId()) > 0;
             int noEntriesVisibilityMode = showNoDataLayout && !hasEntries ? View.VISIBLE : View.GONE;
             int noResultsVisibilityMode = showNoDataLayout && hasEntries ? View.VISIBLE : View.GONE;
 
+            int color = MyColorUtils.darkenColorBy(mColor, 0.20f);
             ImageView icon;
             View noDataLayout = mView.findViewById(R.id.no_data_layout);
             icon = (ImageView) mView.findViewById(no_entries_available_icon);
@@ -267,10 +266,18 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
 
     @Override
     public void updateColor(int color) {
+        mColor = color;
+
         if (mEntryAdapter != null) {
-            mColor = color;
             mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), mColor, mEntryAdapter.getListener());
             mEntriesContainer.setAdapter(mEntryAdapter);
+        }
+
+        if(mView != null) {
+            color = MyColorUtils.darkenColorBy(mColor, 0.15f);
+            View noDataLayout = mView.findViewById(R.id.no_data_layout);
+            ImageView icon = (ImageView) mView.findViewById(no_entries_available_icon);
+            icon.setColorFilter(color);
         }
     }
 
