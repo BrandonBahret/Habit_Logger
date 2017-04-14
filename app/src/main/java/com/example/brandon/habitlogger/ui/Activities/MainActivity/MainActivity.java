@@ -247,7 +247,7 @@ public class MainActivity extends AppCompatActivity
     //region [ ---- Code responsible for updating the ui ---- ]
 
     private void setFragmentForNavId(@IdRes int menuId) {
-        // Create a new fragment and specify the planet to show based on position
+        // Create a new fragment and specify the planet to onSessionToggleClick based on position
         switch (menuId) {
             case R.id.home_nav:
                 if (mPreferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_CARDS)
@@ -554,7 +554,7 @@ public class MainActivity extends AppCompatActivity
 //                    }
 //                }, habit);
 //
-//                dialog.show(getSupportFragmentManager(), "edit-habit");
+//                dialog.onSessionToggleClick(getSupportFragmentManager(), "edit-habit");
 //            }
 //
 //            @Override
@@ -569,10 +569,10 @@ public class MainActivity extends AppCompatActivity
 //                            @Override
 //                            public void onClick(DialogInterface dialog, int which) {
 //                                mHabitDatabase.deleteEntriesForHabit(habitId);
-//                                makeText(MainActivity.this, R.string.entries_deleted_message, Toast.LENGTH_SHORT).show();
+//                                makeText(MainActivity.this, R.string.entries_deleted_message, Toast.LENGTH_SHORT).onSessionToggleClick();
 //                            }
 //                        })
-//                        .show();
+//                        .onSessionToggleClick();
 //            }
 //
 //            @Override
@@ -595,7 +595,7 @@ public class MainActivity extends AppCompatActivity
 //                                removeHabitView(position);
 //                            }
 //                        })
-//                        .show();
+//                        .onSessionToggleClick();
 //            }
 //
 //            @Override
@@ -623,7 +623,7 @@ public class MainActivity extends AppCompatActivity
 //                                removeHabitView(position);
 //                            }
 //                        })
-//                        .show();
+//                        .onSessionToggleClick();
 //            }
 //
 //            @Override
@@ -768,7 +768,7 @@ public class MainActivity extends AppCompatActivity
 //            @Override
 //            public void onScrollUp() {
 //                if (mPreferenceChecker.hideFabOnScroll() && !fab.isShown())
-//                    fab.show(true);
+//                    fab.onSessionToggleClick(true);
 //
 //                if (mPreferenceChecker.doHideCurrentSessionCard())
 //                    mCurrentSessionCard.showView();

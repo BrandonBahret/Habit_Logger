@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ui.Activities;
+package com.example.brandon.habitlogger.ui.Activities.SessionActivity;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -6,34 +6,30 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyColorUtils;
-import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.common.RequestCodes;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.databinding.ActivitySessionBinding;
-import com.example.brandon.habitlogger.ui.Activities.MainActivity.HabitViewHolder;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
+import com.example.brandon.habitlogger.ui.Activities.SessionActivity.Fragments.TimerFragment;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
 
 import java.io.Serializable;
-import java.util.Locale;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class SessionActivity extends AppCompatActivity implements
-        SessionManager.SessionChangeListeners, View.OnClickListener {
+        SessionManager.SessionChangeListeners, TimerFragment.ITimerFragment {
 
     public static class BundleKeys {
         public static final String SERIALIZED_HABIT = "SERIALIZED_HABIT_KEY";
@@ -48,13 +44,13 @@ public class SessionActivity extends AppCompatActivity implements
     }
 
     //region (Member attributes)
-    private ConfirmationDialog mConfirmationDialog;
     private Bundle mDialogSettings = new Bundle();
+
+    private TimerFragment mTimerFragment;
 
     private SessionManager mSessionManager;
     private Habit mHabit;
 
-    private Handler mUpdateHandler = new Handler();
     ActivitySessionBinding ui;
     //endregion
 
@@ -66,6 +62,7 @@ public class SessionActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         ui = DataBindingUtil.setContentView(this, R.layout.activity_session);
         mHabit = (Habit) getIntent().getSerializableExtra(BundleKeys.SERIALIZED_HABIT);
+        mTimerFragment = (TimerFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_timer);
     }
 
     @Override
@@ -89,10 +86,7 @@ public class SessionActivity extends AppCompatActivity implements
             getSupportActionBar().setTitle(mHabit.getName());
         }
 
-        updateTimeDisplay(true);
-
         mSessionManager.addSessionChangedCallback(this);
-        ui.sessionPausePlay.setOnClickListener(this);
     }
 
     @Override
@@ -106,15 +100,12 @@ public class SessionActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        updateSessionPlayButton(mSessionManager.getIsPaused(mHabit.getDatabaseId()));
-        updateTimeDisplay(true);
 
         // Load note from database
         String note = mSessionManager.getNote(mHabit.getDatabaseId());
         if (!note.isEmpty()) ui.sessionNote.setText(note);
 
         applyHabitColorToTheme();
-        startRepeatingTask();
     }
 
     @Override
@@ -123,7 +114,6 @@ public class SessionActivity extends AppCompatActivity implements
 
         // Save note in database
         mSessionManager.setNote(mHabit.getDatabaseId(), ui.sessionNote.getText().toString());
-        stopRepeatingTask();
     }
     //endregion -- end --
 
@@ -132,12 +122,8 @@ public class SessionActivity extends AppCompatActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if (mDialogSettings != null) {
-//            if (mConfirmationDialog != null && mConfirmationDialog.isShowing())
-//                mConfirmationDialog.dismiss();
-
+        if (mDialogSettings != null)
             outState.putBundle(DialogSettingKeys.DIALOG_SETTINGS_BUNDLE, mDialogSettings);
-        }
     }
 
     @Override
@@ -160,47 +146,25 @@ public class SessionActivity extends AppCompatActivity implements
     //region [ ---- Methods responsible for updating the UI ---- ]
 
     //region Methods responsible for updating the timer
-    private void updateSessionPlayButton(boolean isPaused) {
-        ui.sessionPausePlay.setImageResource(
-                HabitViewHolder.getResourceIdForPauseButton(isPaused)
-        );
 
-        float alphaValue = isPaused ? 0.5f : 1.0f;
+    @Override
+    public Long getSessionDuration(boolean required) {
+        boolean shouldUpdate = required || (mSessionManager.getIsSessionActive(mHabit.getDatabaseId()) &&
+                !mSessionManager.getIsPaused(mHabit.getDatabaseId()));
 
-        ui.sessionTimeDisplayLayout.setAlpha(alphaValue);
-    }
-
-    public void updateTimeDisplay(boolean forceUpdate) {
-        boolean shouldUpdate = mSessionManager.getIsSessionActive(mHabit.getDatabaseId()) &&
-                !mSessionManager.getIsPaused(mHabit.getDatabaseId());
-
-        if (forceUpdate || shouldUpdate) {
+        if (shouldUpdate) {
             SessionEntry entry = mSessionManager.getSession(mHabit.getDatabaseId());
-
-            int time[] = MyTimeUtils.getTimePortion(entry.getDuration());
-
-            ui.sessionHoursView.setText(String.format(Locale.US, "%02d", time[0]));
-            ui.sessionMinutesView.setText(String.format(Locale.US, "%02d", time[1]));
-            ui.sessionSecondsView.setText(String.format(Locale.US, "%02d", time[2]));
-
+            return entry.getDuration();
         }
+
+        else return null;
     }
 
-    private Runnable updateTimeDisplayRunnable = new Runnable() {
-        @Override
-        public void run() {
-            updateTimeDisplay(false);
-            mUpdateHandler.postDelayed(updateTimeDisplayRunnable, 1000);
-        }
-    };
-
-    void startRepeatingTask() {
-        updateTimeDisplayRunnable.run();
+    @Override
+    public boolean getSessionState() {
+        return mSessionManager.getIsPaused(mHabit.getDatabaseId());
     }
 
-    void stopRepeatingTask() {
-        mUpdateHandler.removeCallbacks(updateTimeDisplayRunnable);
-    }
     //endregion -- end --
 
     public void applyHabitColorToTheme() {
@@ -235,7 +199,6 @@ public class SessionActivity extends AppCompatActivity implements
     //region [ -- Handle onClick events -- ]
 
     //region Actionbar events
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         final int id = item.getItemId();
@@ -259,7 +222,6 @@ public class SessionActivity extends AppCompatActivity implements
 
     private void onFinishSessionClicked() {
         boolean shouldAsk = new PreferenceChecker(this).doAskBeforeFinish();
-
         if (shouldAsk) {
             boolean nightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
             int iconRes = R.drawable.ic_check_24dp;
@@ -270,7 +232,8 @@ public class SessionActivity extends AppCompatActivity implements
                         public void onClick(DialogInterface dialog, int which) {
                             finishSession();
                         }
-                    });
+                    }
+            );
 
             mDialogSettings.putBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG, false);
         }
@@ -279,7 +242,6 @@ public class SessionActivity extends AppCompatActivity implements
 
     private void onCancelSessionClicked() {
         boolean shouldAsk = new PreferenceChecker(this).doAskBeforeCancel();
-
         if (shouldAsk) {
             int iconRes = R.drawable.ic_close_24dp;
 
@@ -289,13 +251,12 @@ public class SessionActivity extends AppCompatActivity implements
                         public void onClick(DialogInterface dialog, int which) {
                             mSessionManager.cancelSession(mHabit.getDatabaseId());
                         }
-                    });
+                    }
+            );
 
             mDialogSettings.putBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG, true);
         }
-        else {
-            mSessionManager.cancelSession(mHabit.getDatabaseId());
-        }
+        else mSessionManager.cancelSession(mHabit.getDatabaseId());
     }
 
     private void finishSession() {
@@ -313,18 +274,11 @@ public class SessionActivity extends AppCompatActivity implements
     //endregion
 
     @Override
-    public void onClick(View v) {
-        final int id = v.getId();
-
-        switch (id) {
-
-            case (R.id.session_pause_play): {
-                boolean isPaused = !mSessionManager.getIsPaused(mHabit.getDatabaseId());
-                mSessionManager.setPauseState(mHabit.getDatabaseId(), isPaused);
-            }
-            break;
-        }
+    public void onSessionToggleClick() {
+        boolean isPaused = !mSessionManager.getIsPaused(mHabit.getDatabaseId());
+        mSessionManager.setPauseState(mHabit.getDatabaseId(), isPaused);
     }
+
 
     private void askForConfirmation(String title, String message, final boolean shouldPause,
                                     int iconRes, DialogInterface.OnClickListener onYesMethod) {
@@ -340,7 +294,7 @@ public class SessionActivity extends AppCompatActivity implements
                 mSessionManager.setPauseState(habitId, true);
         }
 
-        mConfirmationDialog = new ConfirmationDialog(this)
+        ConfirmationDialog mConfirmationDialog = new ConfirmationDialog(this)
                 .setIcon(iconRes)
                 .setTitle(title)
                 .setMessage(message)
@@ -375,7 +329,7 @@ public class SessionActivity extends AppCompatActivity implements
     @Override
     public void onSessionPauseStateChanged(long habitId, boolean isPaused) {
         if (habitId == this.mHabit.getDatabaseId())
-            updateSessionPlayButton(isPaused);
+            mTimerFragment.updateSessionPlayButton(isPaused);
     }
 
     @Override

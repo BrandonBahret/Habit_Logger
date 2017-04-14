@@ -15,7 +15,7 @@ import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.ui.Activities.MainActivity.HabitViewHolder;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
-import com.example.brandon.habitlogger.ui.Activities.SessionActivity;
+import com.example.brandon.habitlogger.ui.Activities.SessionActivity.SessionActivity;
 
 import java.io.Serializable;
 import java.util.ArrayList;

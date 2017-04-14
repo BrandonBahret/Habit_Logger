@@ -52,7 +52,7 @@
 
         <!-- Session Activity -->
         <activity
-            android:name=".ui.Activities.SessionActivity"
+            android:name=".ui.Activities.SessionActivity.SessionActivity"
             android:label="@string/habit_session_activity_label"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme"/>

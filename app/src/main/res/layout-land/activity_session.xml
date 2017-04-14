@@ -10,114 +10,21 @@
         android:descendantFocusability="beforeDescendants"
         android:focusableInTouchMode="true"
         android:theme="@style/AppTheme.ContrastBackground"
-        tools:context=".ui.Activities.SessionActivity">
+        tools:context=".ui.Activities.SessionActivity.SessionActivity">
 
-        <LinearLayout
-            android:id="@+id/entire_session_time_display_layout"
+        <fragment
+            android:id="@+id/fragment_timer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:background="@drawable/background_simple_line"
-
-            android:gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:paddingBottom="4dp"
-            android:weightSum="1">
-
-            <ImageButton
-                android:id="@+id/session_pause_play"
-
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginTop="2dp"
-
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/session_pause_play_content_description"
-                android:scaleType="fitXY"
-                android:src="@drawable/ic_play_24dp"
-                android:tint="@color/iconTint1"/>
-
-            <LinearLayout
-                android:id="@+id/session_time_display_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/session_hours_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-condensed"
-
-                        android:text="@string/_00"
-                        android:textSize="@dimen/land_time_display"/>
-
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-condensed"
-
-                    android:text="@string/colon_to_separate_time"
-                    android:textSize="@dimen/land_time_display"/>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/session_minutes_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-condensed"
-
-                        android:text="@string/_00"
-                        android:textSize="@dimen/land_time_display"/>
-
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-condensed"
-
-                    android:text="@string/colon_to_separate_time"
-                    android:textSize="@dimen/land_time_display"/>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/session_seconds_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-condensed"
-
-                        android:text="@string/_00"
-                        android:textSize="@dimen/land_time_display"/>
-
-                </LinearLayout>
-
-            </LinearLayout>
-        </LinearLayout>
+            android:name="com.example.brandon.habitlogger.ui.Activities.SessionActivity.Fragments.TimerFragment"
+            tools:layout="@layout/fragment_timer"/>
 
         <EditText
             android:id="@+id/session_note"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_below="@+id/entire_session_time_display_layout"
+            android:layout_below="@+id/fragment_timer"
             android:layout_marginBottom="4dp"
             android:layout_marginEnd="4dp"
             android:layout_marginStart="4dp"

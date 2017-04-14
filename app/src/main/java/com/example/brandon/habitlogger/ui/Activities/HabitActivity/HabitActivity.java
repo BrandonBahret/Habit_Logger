@@ -35,7 +35,7 @@ import com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.Cal
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.EntriesFragment;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.StatisticsFragment;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
-import com.example.brandon.habitlogger.ui.Activities.SessionActivity;
+import com.example.brandon.habitlogger.ui.Activities.SessionActivity.SessionActivity;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
 import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.NewEntryForm;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;

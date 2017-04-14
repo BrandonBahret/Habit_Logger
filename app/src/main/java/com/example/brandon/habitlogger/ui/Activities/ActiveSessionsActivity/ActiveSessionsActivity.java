@@ -30,7 +30,7 @@ import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.databinding.ActivityActiveSessionsBinding;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
-import com.example.brandon.habitlogger.ui.Activities.SessionActivity;
+import com.example.brandon.habitlogger.ui.Activities.SessionActivity.SessionActivity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
