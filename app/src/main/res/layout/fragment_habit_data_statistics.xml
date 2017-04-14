@@ -1,0 +1,16 @@
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/entries_fragment_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/AppTheme.ContrastBackground">
+
+    <include
+        android:id="@+id/no_stats_layout"
+        layout="@layout/no_statistics_available"
+        android:visibility="visible"/>
+
+</android.support.design.widget.CoordinatorLayout>
+
+
