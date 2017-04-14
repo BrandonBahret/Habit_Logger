@@ -20,7 +20,7 @@ import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.Categor
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.DatabaseSchema;
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.EntriesTableSchema;
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.HabitsTableSchema;
-import com.example.brandon.habitlogger.data.SessionEntriesSample;
+import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -115,7 +115,7 @@ public class HabitDatabase {
         return new HabitDataSample(data, dateFrom, dateTo);
     }
 
-    public HabitDataSample getHabitDataSample(SessionEntriesSample entriesSample) {
+    public HabitDataSample getHabitDataSample(SessionEntriesCollection entriesSample) {
 
         List<Long> habitIdsList = MyCollectionUtils.collect(entriesSample.getSessionEntries(), new MyCollectionUtils.IGetKey<SessionEntry, Long>() {
             @Override
@@ -170,12 +170,12 @@ public class HabitDatabase {
         return new CategoryDataSample(category, habits, dateFrom, dateTo);
     }
 
-    public SessionEntriesSample getEntriesSample(long habitId, long dateFrom, long dateTo) {
+    public SessionEntriesCollection getEntriesSample(long habitId, long dateFrom, long dateTo) {
         List<SessionEntry> entries = lookUpEntries(
                 findEntriesWithinTimeRange(habitId, dateFrom, dateTo)
         );
 
-        return new SessionEntriesSample(entries, dateFrom, dateTo);
+        return new SessionEntriesCollection(entries, dateFrom, dateTo);
     }
     //endregion
 
@@ -837,7 +837,7 @@ public class HabitDatabase {
     // TODO Optimize get min/max entry methods
     @Nullable
     public SessionEntry getMinEntry(long habitId) {
-        List<SessionEntry> entries = getEntries(habitId);
+        List<SessionEntry> entries = getEntriesAsList(habitId);
         if (!entries.isEmpty())
             return Collections.min(entries, SessionEntry.ICompareStartingTimes);
         else return null;
@@ -853,7 +853,7 @@ public class HabitDatabase {
 
     @Nullable
     public SessionEntry getMaxEntry(long habitId) {
-        List<SessionEntry> entries = getEntries(habitId);
+        List<SessionEntry> entries = getEntriesAsList(habitId);
         if (!entries.isEmpty())
             return Collections.max(entries, SessionEntry.ICompareStartingTimes);
         else return null;
@@ -870,7 +870,7 @@ public class HabitDatabase {
 
     @Nullable
     public SessionEntry getMinEntry() {
-        List<SessionEntry> entries = getEntries();
+        List<SessionEntry> entries = getEntriesAsList();
         if (!entries.isEmpty())
             return Collections.min(entries, SessionEntry.ICompareStartingTimes);
         else return null;
@@ -885,7 +885,7 @@ public class HabitDatabase {
 
     @Nullable
     public SessionEntry getMaxEntry() {
-        List<SessionEntry> entries = getEntries();
+        List<SessionEntry> entries = getEntriesAsList();
         if (!entries.isEmpty())
             return Collections.max(entries, SessionEntry.ICompareStartingTimes);
         else return null;
@@ -932,13 +932,30 @@ public class HabitDatabase {
         );
     }
 
-    public List<SessionEntry> getEntries(long habitId) {
+    public List<SessionEntry> getEntriesAsList(long habitId) {
         Cursor c = MyDatabaseUtils.queryTable(
                 mReadableDatabase, EntriesTableSchema.TABLE_NAME,
                 EntriesTableSchema.ENTRY_HABIT_ID, habitId
         );
 
         return fetchEntriesAtCursor(c);
+    }
+
+    public List<SessionEntry> getEntriesAsList() {
+        Cursor c = mReadableDatabase.query(
+                EntriesTableSchema.TABLE_NAME,
+                null, null, null, null, null, null
+        );
+
+        return fetchEntriesAtCursor(c);
+    }
+
+    public SessionEntriesCollection getEntries(long habitId) {
+        return new SessionEntriesCollection(getEntriesAsList(habitId));
+    }
+
+    public SessionEntriesCollection getEntries() {
+        return new SessionEntriesCollection(getEntriesAsList());
     }
 
     private List<SessionEntry> fetchEntriesAtCursor(Cursor cursor) {
@@ -958,14 +975,6 @@ public class HabitDatabase {
         return new ArrayList<>();
     }
 
-    public List<SessionEntry> getEntries() {
-        Cursor c = mReadableDatabase.query(
-                EntriesTableSchema.TABLE_NAME,
-                null, null, null, null, null, null
-        );
-
-        return fetchEntriesAtCursor(c);
-    }
     //endregion
 
     //region Update records

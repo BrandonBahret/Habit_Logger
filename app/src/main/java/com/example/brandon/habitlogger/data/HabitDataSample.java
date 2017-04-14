@@ -27,7 +27,7 @@ public class HabitDataSample {
         mDateTo = dateTo;
     }
 
-    public SessionEntriesSample buildSessionEntriesList() {
+    public SessionEntriesCollection buildSessionEntriesList() {
         List<SessionEntry> entries = new ArrayList<>();
 
         for (CategoryDataSample categoryDataSample : mData)
@@ -35,7 +35,7 @@ public class HabitDataSample {
 
         Collections.sort(entries, SessionEntry.ICompareStartingTimes);
 
-        return new SessionEntriesSample(entries, mDateFrom, mDateTo);
+        return new SessionEntriesCollection(entries, mDateFrom, mDateTo);
     }
 
     /**

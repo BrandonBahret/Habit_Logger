@@ -29,7 +29,7 @@ import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
-import com.example.brandon.habitlogger.data.SessionEntriesSample;
+import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 import com.example.brandon.habitlogger.databinding.ActivityHabitBinding;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.CalendarFragment;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.Fragments.EntriesFragment;
@@ -115,8 +115,8 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
     //endregion -- end --
 
     @Override
-    public SessionEntriesSample getSessionEntries() {
-        return new SessionEntriesSample
+    public SessionEntriesCollection getSessionEntries() {
+        return new SessionEntriesCollection
                 (mSessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
     }
 
@@ -153,7 +153,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
         Intent data = getIntent();
         mHabitId = data.getLongExtra(HABIT_ID, -1);
         mHabit = mHabitDatabase.getHabit(mHabitId);
-        mSessionEntries = mHabitDatabase.getEntries(mHabitId);
+        mSessionEntries = mHabitDatabase.getEntriesAsList(mHabitId);
         //endregion
 
         HabitActivityPagerAdapter pagerAdapter = new HabitActivityPagerAdapter(getSupportFragmentManager());
@@ -299,7 +299,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
 
         updateDateRangeManagerEntries(entries);
 
-        SessionEntriesSample entriesDataSample = new SessionEntriesSample(entries);
+        SessionEntriesCollection entriesDataSample = new SessionEntriesCollection(entries);
 
         for (IUpdateEntries callback : mSessionEntriesCallbacks)
             callback.updateEntries(entriesDataSample);

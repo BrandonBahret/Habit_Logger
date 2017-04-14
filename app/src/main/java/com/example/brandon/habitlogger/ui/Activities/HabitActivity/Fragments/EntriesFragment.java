@@ -19,7 +19,7 @@ import com.example.brandon.habitlogger.common.MyColorUtils;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.data.SessionEntriesSample;
+import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.EntryViewAdapter;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
@@ -253,7 +253,7 @@ public class EntriesFragment extends Fragment implements IHabitCallback.IUpdateE
     }
 
     @Override
-    public void updateEntries(SessionEntriesSample dataSample) {
+    public void updateEntries(SessionEntriesCollection dataSample) {
         if (mEntryAdapter != null) {
             mSessionEntries = dataSample.getSessionEntries();
             mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), mColor, mEntryAdapter.getListener());

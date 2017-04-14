@@ -15,7 +15,7 @@ import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallbac
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
-import com.example.brandon.habitlogger.data.SessionEntriesSample;
+import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 import com.example.brandon.habitlogger.databinding.FragmentPieGraphCompletionBinding;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -91,7 +91,7 @@ public class PieGraphCompletion extends Fragment implements IHabitCallback.IUpda
     //endregion
 
     @Override
-    public void updateEntries(SessionEntriesSample dataSample) {
+    public void updateEntries(SessionEntriesCollection dataSample) {
         if (!dataSample.isEmpty()) {
             Set<Long> uniqueEntryStartDates = MyCollectionUtils.listToSet(
                     dataSample.getSessionEntries(), SessionEntry.IGetSessionStartDate

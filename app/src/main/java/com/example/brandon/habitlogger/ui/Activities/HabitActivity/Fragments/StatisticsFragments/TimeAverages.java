@@ -13,7 +13,7 @@ import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallbac
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
-import com.example.brandon.habitlogger.data.SessionEntriesSample;
+import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 
 public class TimeAverages extends Fragment implements IHabitCallback.IUpdateEntries {
 
@@ -66,7 +66,7 @@ public class TimeAverages extends Fragment implements IHabitCallback.IUpdateEntr
     //endregion
 
     @Override
-    public void updateEntries(SessionEntriesSample dataSample) {
+    public void updateEntries(SessionEntriesCollection dataSample) {
 
         if (!dataSample.isEmpty()) {
 

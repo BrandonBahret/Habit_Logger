@@ -13,18 +13,16 @@ import android.view.MenuItem;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
+import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
+import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 import com.example.brandon.habitlogger.databinding.ActivityHabitDataBinding;
 import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class HabitDataActivity extends AppCompatActivity {
+public class HabitDataActivity extends AppCompatActivity implements IHabitDataCallback {
 
     public static String HABIT_ID = "HABIT_ID";
 
@@ -38,7 +36,7 @@ public class HabitDataActivity extends AppCompatActivity {
     // Data
     private Habit mHabit;
     private long mHabitId;
-    private List<SessionEntry> mSessionEntries = new ArrayList<>();
+    private SessionEntriesCollection mSessionEntries = new SessionEntriesCollection();
 
     // View related members
     FloatingDateRangeWidgetManager dateRangeManager;
@@ -47,6 +45,36 @@ public class HabitDataActivity extends AppCompatActivity {
     private HabitDataActivityPagerAdapter mSectionsPagerAdapter;
 
     //endregion
+
+    //region Code responsible for providing communication between child fragments and this activity
+
+    // Callbacks
+    private IEntriesFragment mEntriesCallback;
+    private IStatisticsFragment mStatisticsCallback;
+    private ICalendarFragment mCalendarCallback;
+
+    @Override
+    public void setEntriesFragmentCallback(IEntriesFragment callback) {
+        mEntriesCallback = callback;
+    }
+
+    @Override
+    public void setCalendarFragmentCallback(ICalendarFragment callback) {
+        mCalendarCallback = callback;
+    }
+
+    @Override
+    public void setStatisticsFragmentCallback(IStatisticsFragment callback) {
+        mStatisticsCallback = callback;
+    }
+
+    //endregion -- end --
+
+    public static void startActivity(Activity activity, long habitId) {
+        Intent intent = new Intent(activity, HabitDataActivity.class);
+        intent.putExtra(HabitDataActivity.HABIT_ID, habitId);
+        activity.startActivity(intent);
+    }
 
     //region [ ---- Methods responsible for handling the activity lifecycle ---- ]
 
@@ -83,8 +111,8 @@ public class HabitDataActivity extends AppCompatActivity {
         ui.menuFab.setClosedOnTouchOutside(true);
         ui.menuFab.hideMenu(false);
 
-        dateRangeManager.hideView(false);
-        ui.container.setCurrentItem(1);
+//        dateRangeManager.hideView(false);
+//        ui.container.setCurrentItem(1);
         setUpActivityWithHabit(mHabit);
 
     }
@@ -100,7 +128,7 @@ public class HabitDataActivity extends AppCompatActivity {
 //        }
 
         boolean isNightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
-        ThemeColorPalette palette = ThemeColorPalette.newInstance(color, isNightMode);
+        ThemeColorPalette palette = new ThemeColorPalette(color, isNightMode);
 
         getWindow().setStatusBarColor(palette.getColorPrimaryDark());
         ui.tabs.setBackgroundColor(palette.getColorPrimary());
@@ -180,10 +208,28 @@ public class HabitDataActivity extends AppCompatActivity {
     }
     //endregion -- end --
 
-    public static void startActivity(Activity activity, long habitId) {
-        Intent intent = new Intent(activity, HabitDataActivity.class);
-        intent.putExtra(HabitDataActivity.HABIT_ID, habitId);
-        activity.startActivity(intent);
+    //region Getters {}
+    @Override
+    public Habit getHabit() {
+        return mHabit;
     }
+
+    @Override
+    public int getDefaultColor() {
+        return mHabit.getColor();
+    }
+
+    @Override
+    public SessionEntriesCollection getSessionDataSample() {
+        return new SessionEntriesCollection
+                (mSessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+    }
+
+    @Override
+    public CategoryDataSample getCategoryDataSample() {
+        return mHabitDatabase.getCategoryDataSample
+                (mHabit.getCategory(), dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+    }
+    //endregion -- end --
 
 }

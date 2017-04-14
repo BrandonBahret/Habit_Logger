@@ -20,7 +20,7 @@ import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportMan
 import com.example.brandon.habitlogger.data.HabitDataSample;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.data.SessionEntriesSample;
+import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 import com.example.brandon.habitlogger.databinding.ActivityDataOverviewBinding;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.Fragments.OverviewCalendarFragment;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.Fragments.OverviewEntriesFragment;
@@ -87,7 +87,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
     private void updateEntries(List<SessionEntry> entries) {
         updateDateRangeManagerEntries(entries);
 
-        SessionEntriesSample entriesSample = new SessionEntriesSample(entries);
+        SessionEntriesCollection entriesSample = new SessionEntriesCollection(entries);
         HabitDataSample dataSample = mHabitDatabase.getHabitDataSample(entriesSample);
 
         for (IUpdateHabitSample callback : mUpdateDataCallbacks)
@@ -121,7 +121,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
         mExportManager = new LocalDataExportManager(this);
 
         mDateRangeManager = new FloatingDateRangeWidgetManager
-                (this, findViewById(R.id.date_range), mHabitDatabase.getEntries());
+                (this, findViewById(R.id.date_range), mHabitDatabase.getEntriesAsList());
         mDateRangeManager.hideView(false);
 
     }

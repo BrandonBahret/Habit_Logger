@@ -114,7 +114,7 @@ public class OverviewEntriesFragment extends Fragment implements
         mDateFormat = preferenceChecker.stringGetDateFormat();
         mMakeDateHeadersSticky = preferenceChecker.makeDateHeadersSticky();
         mHabitDatabase = new HabitDatabase(getContext());
-        mSessionEntries = mHabitDatabase.getEntries();
+        mSessionEntries = mHabitDatabase.getEntriesAsList();
     }
 
     @Override

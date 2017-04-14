@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.data.SessionEntriesSample;
+import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarView.CalendarViewAdapter;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
@@ -85,7 +85,7 @@ public class CalendarFragment extends Fragment implements
     //endregion
 
     @Override
-    public void updateEntries(SessionEntriesSample dataSample) {
+    public void updateEntries(SessionEntriesCollection dataSample) {
         mAdapter = new CalendarViewAdapter(dataSample, mDefaultColor, getContext());
         mCalendarViewContainer.setAdapter(mAdapter);
     }

@@ -2,7 +2,7 @@ package com.example.brandon.habitlogger.ui.Activities.HabitActivity;
 
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.SessionEntriesSample;
+import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 
 /**
  * Created by Brandon on 2/9/2017.
@@ -12,7 +12,7 @@ import com.example.brandon.habitlogger.data.SessionEntriesSample;
 public interface IHabitCallback {
 
     interface IUpdateEntries {
-        void updateEntries(SessionEntriesSample dataSample);
+        void updateEntries(SessionEntriesCollection dataSample);
     }
 
     interface IUpdateCategorySample {
@@ -38,7 +38,7 @@ public interface IHabitCallback {
     //endregion
 
     //region Session entries callbacks
-    SessionEntriesSample getSessionEntries();
+    SessionEntriesCollection getSessionEntries();
 
     void addUpdateEntriesCallback(IUpdateEntries callback);
 

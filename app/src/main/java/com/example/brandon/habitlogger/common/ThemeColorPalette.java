@@ -14,11 +14,7 @@ public class ThemeColorPalette {
     private final int mColorAccentDark;
     //endregion
 
-    public static ThemeColorPalette newInstance(int baseColor, boolean isNightMode){
-        return new ThemeColorPalette(baseColor, isNightMode);
-    }
-
-    private ThemeColorPalette(int baseColor, boolean isNightMode){
+    public ThemeColorPalette(int baseColor, boolean isNightMode){
         int color = baseColor;
         int darkerColor = MyColorUtils.darkenColorBy(baseColor, 0.08f);
         int accentColor = baseColor;

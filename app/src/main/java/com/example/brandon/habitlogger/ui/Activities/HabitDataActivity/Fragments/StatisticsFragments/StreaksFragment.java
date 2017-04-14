@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.data.SessionEntriesSample;
+import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
 
 import java.util.ArrayList;
@@ -61,11 +61,11 @@ public class StreaksFragment extends Fragment implements IHabitCallback.IUpdateE
     //endregion
 
     @Override
-    public void updateEntries(SessionEntriesSample dataSample) {
+    public void updateEntries(SessionEntriesCollection dataSample) {
         value.setText(Streak.listToString(getStreaks(dataSample)));
     }
 
-    public static List<Streak> getStreaks(SessionEntriesSample dataSample) {
+    public static List<Streak> getStreaks(SessionEntriesCollection dataSample) {
         List<Streak> streaks = new ArrayList<>();
 
         if (!dataSample.isEmpty()) {

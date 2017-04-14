@@ -11,7 +11,7 @@ import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarViewAda
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarViewModelBase;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.data.SessionEntriesSample;
+import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,10 +26,10 @@ import java.util.Set;
 
 public class CalendarViewAdapter extends CalendarViewAdapterBase<CalendarViewAdapter.ViewHolder> {
 
-    SessionEntriesSample mEntriesSample;
+    SessionEntriesCollection mEntriesSample;
     private int mStreakColor = -1;
 
-    public CalendarViewAdapter(SessionEntriesSample entriesSample, int streakColor, Context context) {
+    public CalendarViewAdapter(SessionEntriesCollection entriesSample, int streakColor, Context context) {
         super(context);
         mEntriesSample = entriesSample;
         mStreakColor = streakColor;
@@ -69,7 +69,7 @@ public class CalendarViewAdapter extends CalendarViewAdapterBase<CalendarViewAda
     }
     //endregion -- end --
 
-    private void generateMonthDataFromEntries(SessionEntriesSample entriesSample) {
+    private void generateMonthDataFromEntries(SessionEntriesCollection entriesSample) {
         Calendar startCalendar = Calendar.getInstance();
         long minimumTime = entriesSample.getMinimumTime();
         minimumTime = minimumTime == -1 ? System.currentTimeMillis() : minimumTime;

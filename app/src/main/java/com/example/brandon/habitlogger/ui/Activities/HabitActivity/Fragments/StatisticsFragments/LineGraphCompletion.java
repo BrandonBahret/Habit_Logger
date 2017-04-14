@@ -24,7 +24,7 @@ import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.data.SessionEntriesSample;
+import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 import com.example.brandon.habitlogger.databinding.FragmentLineGraphCompletionBinding;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
 import com.github.mikephil.charting.components.AxisBase;
@@ -128,7 +128,7 @@ public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpd
     //endregion
 
     //region Methods responsible for generating the line chart data.
-    List<Entry> calculateDataSet(SessionEntriesSample dataSample) {
+    List<Entry> calculateDataSet(SessionEntriesCollection dataSample) {
 
         int totalDays = dataSample.calculateTotalDaysLength();
         List<Entry> values = new ArrayList<>(totalDays);
@@ -161,7 +161,7 @@ public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpd
     //endregion
 
     @Override
-    public void updateEntries(SessionEntriesSample dataSample) {
+    public void updateEntries(SessionEntriesCollection dataSample) {
         if (!dataSample.isEmpty())
             setLineChartData(calculateDataSet(dataSample));
     }

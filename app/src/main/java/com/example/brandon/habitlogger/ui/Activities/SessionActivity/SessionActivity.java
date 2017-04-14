@@ -14,8 +14,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.common.MyColorUtils;
 import com.example.brandon.habitlogger.common.RequestCodes;
+import com.example.brandon.habitlogger.common.ThemeColorPalette;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
@@ -168,28 +168,14 @@ public class SessionActivity extends AppCompatActivity implements
     //endregion -- end --
 
     public void applyHabitColorToTheme() {
-
-        int color = mHabit.getColor();
-        int darkerColor = MyColorUtils.darkenColorBy(color, 0.08f);
-
         boolean isNightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
-        if (isNightMode) {
-            if (MyColorUtils.getLightness(color) > 0.40) { // Clip lightness to 40% max
-                darkerColor = MyColorUtils.setLightness(darkerColor, 0.40f);
-                color = MyColorUtils.setLightness(color, 0.45f);
-            }
+        ThemeColorPalette palette = new ThemeColorPalette(mHabit.getColor(), isNightMode);
 
-            if (MyColorUtils.getSaturation(color) > 0.45) { // Clip saturation to 45% max
-                darkerColor = MyColorUtils.setSaturation(darkerColor, 0.45f);
-                color = MyColorUtils.setSaturation(color, 0.45f);
-            }
-        }
-
-        getWindow().setStatusBarColor(darkerColor);
+        getWindow().setStatusBarColor(palette.getColorPrimaryDark());
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
-            actionBar.setBackgroundDrawable(new ColorDrawable(color));
+            actionBar.setBackgroundDrawable(new ColorDrawable(palette.getColorPrimary()));
     }
 
     //endregion [ ---------------- end ---------------- ]
