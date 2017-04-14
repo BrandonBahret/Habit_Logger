@@ -115,6 +115,10 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
         mHabitAdapter = new HabitViewAdapter(mData, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
         mRecyclerView.setAdapter(mHabitAdapter);
         mCallbackInterface.showCurrentSessionsCard(false);
+        mRecyclerView.removeItemDecoration(mSpaceDecoration);
+        mRecyclerView.removeItemDecoration(mGroupDecoration);
+        applyGroupDecoration();
+        applySpaceDecoration();
     }
 
     @Override

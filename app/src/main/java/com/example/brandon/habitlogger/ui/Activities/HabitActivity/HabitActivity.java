@@ -669,4 +669,5 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
             return titles[position];
         }
     }
+
 }

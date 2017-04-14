@@ -116,6 +116,10 @@ public class AllHabitsFragment extends MyFragmentBase {
         mRecyclerView.setAdapter(mHabitAdapter);
         mCallbackInterface.showCurrentSessionsCard(false);
         mCallbackInterface.showFab(true);
+        mRecyclerView.removeItemDecoration(mSpaceDecoration);
+        mRecyclerView.removeItemDecoration(mGroupDecoration);
+        applyGroupDecoration();
+        applySpaceDecoration();
     }
 
     @Override

@@ -902,11 +902,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-//        if (requestCode == RequestCodes.SETTINGS_ACTIVITY) {
-//            recreate();
-////            mHabitCardContainer.invalidate();
-//        }
+        if (requestCode == RequestCodes.SETTINGS_ACTIVITY) {
+            mFragment.refreshLayout();
+        }
 
         if (resultCode == RESULT_OK) {
             switch (requestCode) {

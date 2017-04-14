@@ -10,14 +10,16 @@ import android.os.Parcelable;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
+import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.ui.Activities.MainActivity.HabitViewHolder;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Brandon on 2/18/2017.
@@ -32,6 +34,8 @@ public class SessionNotificationManager {
     private SessionManager mSessionManager;
     private NotificationManager mNotificationManager;
     private PreferenceChecker mPreferenceChecker;
+
+    static List<Long> notificationIds = new ArrayList<>();
     //endregion
 
     public SessionNotificationManager(Context context) {
@@ -126,6 +130,7 @@ public class SessionNotificationManager {
 
     //region Methods responsible for canceling notifications
     public void cancel(int habitId) {
+        removeNotificationFromList((long) habitId);
         mNotificationManager.cancel(habitId);
     }
 
@@ -134,7 +139,21 @@ public class SessionNotificationManager {
     }
     //endregion -- end --
 
+    private void storeNotificationInList(Habit habit) {
+        if (!notificationIds.contains(habit.getDatabaseId())) {
+            notificationIds.add(habit.getDatabaseId());
+            launchSessionNotification(habit);
+        }
+    }
+
+    private void removeNotificationFromList(Long habitId) {
+        if (notificationIds.contains(habitId)) {
+            notificationIds.remove(habitId);
+        }
+    }
+
     public void updateNotification(Habit habit) {
+        storeNotificationInList(habit);
         mNotificationManager.notify((int) habit.getDatabaseId(), createNotification(habit));
     }
 
