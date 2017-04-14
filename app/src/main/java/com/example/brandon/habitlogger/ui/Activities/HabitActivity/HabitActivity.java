@@ -176,14 +176,6 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
         ui.container.setCurrentItem(1);
     }
 
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        Set<Long> ids = mHabitDatabase.findEntriesWithinTimeRange(mHabitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
-//        HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntries(ids);
-//        updateEntries(HabitActivity.this.mSessionEntries);
-//    }
-
     @Override
     protected void onStart() {
         super.onStart();

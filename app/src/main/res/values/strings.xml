@@ -48,6 +48,7 @@
     <string name="edit_habit_title">Edit Habit</string>
     <string name="session_notification_ticker_format_string">Controller for \"%s\" created</string>
     <string name="menu_archive">Archive</string>
+    <string name="menu_unarchive">Unarchive</string>
     <string name="title_activity_habit">HabitActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="action_edit">Edit Habit</string>

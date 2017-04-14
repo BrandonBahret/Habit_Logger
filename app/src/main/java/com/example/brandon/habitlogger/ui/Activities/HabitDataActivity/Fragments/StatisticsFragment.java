@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
-import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,7 @@ import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.NestedScrol
 public class StatisticsFragment extends Fragment implements IHabitCallback.IOnTabReselected, IHabitCallback.IUpdateColor {
 
     //region (Member attributes)
-    private static View mFragmentView;
+    private View mFragmentView;
     private IScrollEvents mListener;
 //    private IHabitCallback mCallbackInterface;
     private Habit mHabit;
@@ -68,22 +67,12 @@ public class StatisticsFragment extends Fragment implements IHabitCallback.IOnTa
 //        mHabit = mCallbackInterface.getHabit();
 //        mColor = mCallbackInterface.getDefaultColor();
 
-        if (mFragmentView != null) {
-            ViewGroup parent = (ViewGroup) mFragmentView.getParent();
-            if (parent != null)
-                parent.removeView(mFragmentView);
-        }
-        try {
-            mFragmentView = inflater.inflate(R.layout.fragment_habit_data_statistics, container, false);
+        mFragmentView = inflater.inflate(R.layout.fragment_habit_data_statistics, container, false);
 //            NestedScrollView scrollView = (NestedScrollView) mFragmentView.findViewById(R.id.statistics_container);
 //            scrollView.setOnScrollChangeListener(getOnScrollChangeListener());
 
 //            boolean hasEntries = new HabitDatabase(getContext()).getNumberOfEntries(mHabit.getDatabaseId()) > 0;
 //            showNoDataScreen(hasEntries);
-
-        } catch (InflateException e) {
-            // empty stub
-        }
 
         return mFragmentView;
     }
