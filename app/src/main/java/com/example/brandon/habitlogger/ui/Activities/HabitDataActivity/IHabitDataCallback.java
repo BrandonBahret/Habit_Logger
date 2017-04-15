@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity;
 
+import com.example.brandon.habitlogger.common.ThemeColorPalette;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.SessionEntriesCollection;
@@ -20,7 +21,7 @@ public interface IHabitDataCallback {
 
         void onUpdateEntry();
 
-        void onUpdateColor(int color);
+        void onUpdateColorPalette(ThemeColorPalette palette);
 
         void onTabReselected();
     }
@@ -30,7 +31,7 @@ public interface IHabitDataCallback {
     interface ICalendarFragment {
         void onUpdateEntries(SessionEntriesCollection dataSample);
 
-        void onUpdateColor(int color);
+        void onUpdateColorPalette(ThemeColorPalette palette);
 
         void onTabReselected();
 
@@ -44,7 +45,7 @@ public interface IHabitDataCallback {
 
         void onUpdateCategoryDataSample(CategoryDataSample dataSample);
 
-        void onUpdateColor(int color);
+        void onUpdateColorPalette(ThemeColorPalette palette);
 
         void onTabReselected();
     }
@@ -53,9 +54,9 @@ public interface IHabitDataCallback {
 
     Habit getHabit();
 
-    int getDefaultColor();
+    ThemeColorPalette getColorPalette();
 
-    SessionEntriesCollection getSessionDataSample();
+    SessionEntriesCollection getSessionEntries();
 
     CategoryDataSample getCategoryDataSample();
 

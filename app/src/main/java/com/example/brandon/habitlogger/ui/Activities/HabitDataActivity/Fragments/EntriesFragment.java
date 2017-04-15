@@ -15,12 +15,12 @@ import android.widget.ImageView;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
-import com.example.brandon.habitlogger.common.MyColorUtils;
+import com.example.brandon.habitlogger.common.ThemeColorPalette;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.SessionEntriesCollection;
-import com.example.brandon.habitlogger.ui.Activities.HabitActivity.EntryViewAdapter;
+import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.EntryViewAdapter;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
@@ -28,8 +28,6 @@ import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.RecyclerVie
 import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EditEntryForm;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.GroupDecoration;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
-
-import java.util.List;
 
 import static com.example.brandon.habitlogger.R.id.no_entries_available_icon;
 import static com.example.brandon.habitlogger.R.id.no_result_icon;
@@ -46,10 +44,10 @@ public class EntriesFragment extends Fragment implements
 
     private String mDateFormat;
     private boolean mMakeHeadersSticky;
-    private int mColor;
+    private ThemeColorPalette mColorPalette;
     private Habit mHabit;
     private HabitDatabase mHabitDatabase;
-    private List<SessionEntry> mSessionEntries;
+    private SessionEntriesCollection mSessionEntries;
 
     private EntryViewAdapter mEntryAdapter;
     private RecyclerView mEntriesContainer;
@@ -83,7 +81,7 @@ public class EntriesFragment extends Fragment implements
 
         mView = inflater.inflate(R.layout.fragment_entries, container, false);
 
-        mColor = mCallbackInterface.getDefaultColor();
+        mColorPalette = mCallbackInterface.getColorPalette();
         mHabit = mCallbackInterface.getHabit();
 
         Context context = getContext();
@@ -92,8 +90,8 @@ public class EntriesFragment extends Fragment implements
         mMakeHeadersSticky = preferenceChecker.makeDateHeadersSticky();
         mHabitDatabase = new HabitDatabase(context);
 
-//        mSessionEntries = mCallbackInterface.getSessionEntries().getSessionEntries();
-//        mEntryAdapter = new EntryViewAdapter(mSessionEntries, context, mColor, this);
+        mSessionEntries = mCallbackInterface.getSessionEntries();
+        mEntryAdapter = new EntryViewAdapter(mSessionEntries, context, mColorPalette, this);
 
         mEntriesContainer = (RecyclerView) mView.findViewById(R.id.entries_holder);
 
@@ -144,7 +142,7 @@ public class EntriesFragment extends Fragment implements
             );
         }
 
-        onUpdateEntries(mCallbackInterface.getSessionDataSample());
+        onUpdateEntries(mCallbackInterface.getSessionEntries());
 
         return mView;
     }
@@ -164,7 +162,7 @@ public class EntriesFragment extends Fragment implements
 
     public void updateSessionEntryById(long databaseId, SessionEntry oldEntry, SessionEntry newEntry) {
         int index = getSessionEntryIndex(databaseId);
-        if (index != mSessionEntries.size()) {
+        if (index != mEntryAdapter.getItemCount()) {
             if (oldEntry.getStartingTime() == newEntry.getStartingTime()) {
                 mSessionEntries.set(index, newEntry);
                 mEntryAdapter.notifyItemChanged(index);
@@ -202,16 +200,15 @@ public class EntriesFragment extends Fragment implements
             int noEntriesVisibilityMode = showNoDataLayout && !hasEntries ? View.VISIBLE : View.GONE;
             int noResultsVisibilityMode = showNoDataLayout && hasEntries ? View.VISIBLE : View.GONE;
 
-            int color = MyColorUtils.darkenColorBy(mColor, 0.20f);
             ImageView icon;
             View noDataLayout = mView.findViewById(R.id.no_data_layout);
             icon = (ImageView) mView.findViewById(no_entries_available_icon);
-            icon.setColorFilter(color);
+            icon.setColorFilter(mColorPalette.getColorAccentDark());
             noDataLayout.setVisibility(noEntriesVisibilityMode);
 
             View noResultsLayout = mView.findViewById(R.id.no_results_layout);
             icon = (ImageView) mView.findViewById(no_result_icon);
-            icon.setColorFilter(color);
+            icon.setColorFilter(mColorPalette.getColorAccentDark());
             noResultsLayout.setVisibility(noResultsVisibilityMode);
 
             int entryContainerVisibilityMode = showNoDataLayout ? View.GONE : View.VISIBLE;
@@ -247,15 +244,13 @@ public class EntriesFragment extends Fragment implements
 
     //region IEntriesFragmentCallback
     @Override
-    public void onUpdateEntries(SessionEntriesCollection dataSample) {
+    public void onUpdateEntries(SessionEntriesCollection dataCollection) {
         if (mEntryAdapter != null) {
-            mSessionEntries = dataSample.getSessionEntries();
-            mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), mColor, mEntryAdapter.getListener());
+            mEntryAdapter = new EntryViewAdapter(dataCollection, getContext(), mColorPalette, mEntryAdapter.getListener());
             mEntriesContainer.setAdapter(mEntryAdapter);
         }
 
-        boolean showNoDataLayout = mSessionEntries == null || mSessionEntries.isEmpty();
-        showNoDataLayout(showNoDataLayout);
+        showNoDataLayout(mSessionEntries == null || mSessionEntries.isEmpty());
     }
 
     @Override
@@ -274,19 +269,20 @@ public class EntriesFragment extends Fragment implements
     }
 
     @Override
-    public void onUpdateColor(int color) {
-        mColor = color;
+    public void onUpdateColorPalette(ThemeColorPalette palette) {
+        mColorPalette = palette;
 
         if (mEntryAdapter != null) {
-            mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), mColor, mEntryAdapter.getListener());
-            mEntriesContainer.setAdapter(mEntryAdapter);
+            mEntryAdapter.setColorPalette(mColorPalette);
+            mEntriesContainer.invalidate();
+//            mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), mColorPalette, mEntryAdapter.getListener());
+//            mEntriesContainer.setAdapter(mEntryAdapter);
         }
 
         if (mView != null) {
-            color = MyColorUtils.darkenColorBy(mColor, 0.15f);
             View noDataLayout = mView.findViewById(R.id.no_data_layout);
             ImageView icon = (ImageView) mView.findViewById(no_entries_available_icon);
-            icon.setColorFilter(color);
+            icon.setColorFilter(mColorPalette.getColorAccentDark());
         }
     }
 

@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,7 +33,6 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
 
     // Data
     private Habit mHabit;
-    private long mHabitId;
     private SessionEntriesCollection mSessionEntries = new SessionEntriesCollection();
 
     // View related members
@@ -70,12 +67,6 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
 
     //endregion -- end --
 
-    public static void startActivity(Activity activity, long habitId) {
-        Intent intent = new Intent(activity, HabitDataActivity.class);
-        intent.putExtra(HabitDataActivity.HABIT_ID, habitId);
-        activity.startActivity(intent);
-    }
-
     //region [ ---- Methods responsible for handling the activity lifecycle ---- ]
 
     //region entire lifetime (onCreate - onDestroy)
@@ -85,7 +76,7 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
 
         // Gather data from intent
         Intent data = getIntent();
-        mHabitId = data.getLongExtra(HABIT_ID, -1);
+        long habitId = data.getLongExtra(HABIT_ID, -1);
 
         // Create dependencies
         mHabitDatabase = new HabitDatabase(this);
@@ -93,26 +84,25 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
         mExportManager = new LocalDataExportManager(this);
 
         // Fetch data from database
-        mHabit = mHabitDatabase.getHabit(mHabitId);
-        mSessionEntries = mHabitDatabase.getEntries(mHabitId);
+        mHabit = mHabitDatabase.getHabit(habitId);
+        mSessionEntries = mHabitDatabase.getEntries(habitId);
 
         // Set up activity
         ui = DataBindingUtil.setContentView(this, R.layout.activity_habit_data);
 
         setSupportActionBar(ui.toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mSectionsPagerAdapter = new HabitDataActivityPagerAdapter(getSupportFragmentManager(), this);
         dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), mSessionEntries);
         ui.container.setAdapter(mSectionsPagerAdapter);
         ui.tabs.setupWithViewPager(ui.container);
-
         ui.menuFab.setClosedOnTouchOutside(true);
-        ui.menuFab.hideMenu(false);
 
 //        dateRangeManager.hideView(false);
 //        ui.container.setCurrentItem(1);
+//        ui.menuFab.hideMenu(false);
+
         setUpActivityWithHabit(mHabit);
 
     }
@@ -121,14 +111,13 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
         ui.toolbar.setTitle(mHabit.getName());
         setSupportActionBar(ui.toolbar);
 
-        int color = habit.getColor();
+        ThemeColorPalette palette = new ThemeColorPalette(habit.getColor());
 
-//        for (IUpdateColor callback : mUpdateColorCallbacks) {
-//            callback.updateColor(color);
-//        }
-
-        boolean isNightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
-        ThemeColorPalette palette = new ThemeColorPalette(color, isNightMode);
+        if(mStatisticsCallback != null && mEntriesCallback != null && mCalendarCallback != null) {
+            mStatisticsCallback.onUpdateColorPalette(palette);
+            mEntriesCallback.onUpdateColorPalette(palette);
+            mCalendarCallback.onUpdateColorPalette(palette);
+        }
 
         getWindow().setStatusBarColor(palette.getColorPrimaryDark());
         ui.tabs.setBackgroundColor(palette.getColorPrimary());
@@ -214,15 +203,15 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
         return mHabit;
     }
 
+
     @Override
-    public int getDefaultColor() {
-        return mHabit.getColor();
+    public ThemeColorPalette getColorPalette() {
+        return new ThemeColorPalette(mHabit.getColor());
     }
 
     @Override
-    public SessionEntriesCollection getSessionDataSample() {
-        return new SessionEntriesCollection
-                (mSessionEntries, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+    public SessionEntriesCollection getSessionEntries() {
+        return mSessionEntries;
     }
 
     @Override
@@ -231,5 +220,11 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
                 (mHabit.getCategory(), dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
     }
     //endregion -- end --
+
+    public static void startActivity(Activity activity, long habitId) {
+        Intent intent = new Intent(activity, HabitDataActivity.class);
+        intent.putExtra(HabitDataActivity.HABIT_ID, habitId);
+        activity.startActivity(intent);
+    }
 
 }

@@ -11,23 +11,26 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.common.MyColorUtils;
+import com.example.brandon.habitlogger.common.ThemeColorPalette;
+import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
+import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
+import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.NestedScrollObserver;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class StatisticsFragment extends Fragment implements IHabitCallback.IOnTabReselected, IHabitCallback.IUpdateColor {
+public class StatisticsFragment extends Fragment implements IHabitDataCallback.IStatisticsFragment {
 
     //region (Member attributes)
     private View mFragmentView;
     private IScrollEvents mListener;
-//    private IHabitCallback mCallbackInterface;
+    private IHabitDataCallback mCallbackInterface;
     private Habit mHabit;
-    private int mColor;
+    private ThemeColorPalette mColorPalette;
     //endregion
 
     public StatisticsFragment() {
@@ -43,10 +46,9 @@ public class StatisticsFragment extends Fragment implements IHabitCallback.IOnTa
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if (context instanceof IHabitCallback) {
-//            mCallbackInterface = (IHabitCallback) context;
-//            mCallbackInterface.addOnTabReselectedCallback(this);
-//            mCallbackInterface.addUpdateColorCallback(this);
+        if (context instanceof IHabitDataCallback) {
+            mCallbackInterface = (IHabitDataCallback) context;
+            mCallbackInterface.setStatisticsFragmentCallback(this);
         }
 
         if (context instanceof IScrollEvents)
@@ -55,24 +57,17 @@ public class StatisticsFragment extends Fragment implements IHabitCallback.IOnTa
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-//        mCallbackInterface.removeOnTabReselectedCallback(this);
-//        mCallbackInterface.removeUpdateColorCallback(this);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-//        mHabit = mCallbackInterface.getHabit();
-//        mColor = mCallbackInterface.getDefaultColor();
+        mHabit = mCallbackInterface.getHabit();
+        mColorPalette = mCallbackInterface.getColorPalette();
 
         mFragmentView = inflater.inflate(R.layout.fragment_habit_data_statistics, container, false);
 //            NestedScrollView scrollView = (NestedScrollView) mFragmentView.findViewById(R.id.statistics_container);
 //            scrollView.setOnScrollChangeListener(getOnScrollChangeListener());
 
-//            boolean hasEntries = new HabitDatabase(getContext()).getNumberOfEntries(mHabit.getDatabaseId()) > 0;
-//            showNoDataScreen(hasEntries);
+        boolean hasEntries = new HabitDatabase(getContext()).getNumberOfEntries(mHabit.getDatabaseId()) > 0;
+        showNoDataScreen(hasEntries);
 
         return mFragmentView;
     }
@@ -80,16 +75,14 @@ public class StatisticsFragment extends Fragment implements IHabitCallback.IOnTa
 
     private void showNoDataScreen(boolean hasEntries) {
 
-
-        int mainLayoutVisibilityMode = hasEntries ? View.VISIBLE : View.GONE;
-        mFragmentView.findViewById(R.id.statistics_container)
-                .setVisibility(mainLayoutVisibilityMode);
+//        int mainLayoutVisibilityMode = hasEntries ? View.VISIBLE : View.GONE;
+//        mFragmentView.findViewById(R.id.statistics_container)
+//                .setVisibility(mainLayoutVisibilityMode);
 
         int noStatsLayoutVisibilityMode = hasEntries ? View.GONE : View.VISIBLE;
-        int color = MyColorUtils.darkenColorBy(mColor, 0.20f);
         View noStatisticsLayout = mFragmentView.findViewById(R.id.no_stats_layout);
         ((ImageView) noStatisticsLayout.findViewById(R.id.no_stats_available_icon))
-                .setColorFilter(color);
+                .setColorFilter(mColorPalette.getColorPrimaryDark());
 
         noStatisticsLayout.setVisibility(noStatsLayoutVisibilityMode);
     }
@@ -111,23 +104,33 @@ public class StatisticsFragment extends Fragment implements IHabitCallback.IOnTa
         };
     }
 
+
     @Override
-    public void onTabReselected(int position) {
-        if (mFragmentView != null && position == 2) {
-            NestedScrollView scrollView = (NestedScrollView) mFragmentView.findViewById(R.id.statistics_container);
-            scrollView.smoothScrollTo(0, 0);
+    public void onUpdateEntries(SessionEntriesCollection dataSample) {
+
+    }
+
+    @Override
+    public void onUpdateCategoryDataSample(CategoryDataSample dataSample) {
+
+    }
+
+    @Override
+    public void onUpdateColorPalette(ThemeColorPalette colorPalette) {
+        mColorPalette = colorPalette;
+
+        if (mFragmentView != null) {
+            View noStatisticsLayout = mFragmentView.findViewById(R.id.no_stats_layout);
+            ((ImageView) noStatisticsLayout.findViewById(R.id.no_stats_available_icon))
+                    .setColorFilter(mColorPalette.getColorAccentDark());
         }
     }
 
     @Override
-    public void updateColor(int color) {
-        mColor = color;
-
+    public void onTabReselected() {
         if (mFragmentView != null) {
-            color = MyColorUtils.darkenColorBy(mColor, 0.20f);
-            View noStatisticsLayout = mFragmentView.findViewById(R.id.no_stats_layout);
-            ((ImageView) noStatisticsLayout.findViewById(R.id.no_stats_available_icon))
-                    .setColorFilter(color);
+            NestedScrollView scrollView = (NestedScrollView) mFragmentView.findViewById(R.id.statistics_container);
+            scrollView.smoothScrollTo(0, 0);
         }
     }
     //endregion

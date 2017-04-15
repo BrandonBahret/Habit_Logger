@@ -168,8 +168,7 @@ public class SessionActivity extends AppCompatActivity implements
     //endregion -- end --
 
     public void applyHabitColorToTheme() {
-        boolean isNightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
-        ThemeColorPalette palette = new ThemeColorPalette(mHabit.getColor(), isNightMode);
+        ThemeColorPalette palette = new ThemeColorPalette(mHabit.getColor());
 
         getWindow().setStatusBarColor(palette.getColorPrimaryDark());
 

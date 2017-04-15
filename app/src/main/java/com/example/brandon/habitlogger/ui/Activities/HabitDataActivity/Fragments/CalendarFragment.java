@@ -11,17 +11,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.common.ThemeColorPalette;
 import com.example.brandon.habitlogger.data.SessionEntriesCollection;
-import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
+import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarView.CalendarViewAdapter;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 
-public class CalendarFragment extends Fragment implements
-        IHabitCallback.IOnTabReselected, IHabitCallback.IUpdateEntries,
-        IHabitCallback.IUpdateColor {
+public class CalendarFragment extends Fragment implements IHabitDataCallback.ICalendarFragment {
 
     //region (Member attributes)
-//    IHabitCallback callbackInterface;
+    IHabitDataCallback mCallbackInterface;
 
     private RecyclerView mCalendarViewContainer;
     private CalendarViewAdapter mAdapter;
@@ -42,18 +41,10 @@ public class CalendarFragment extends Fragment implements
     public void onAttach(Context context) {
         super.onAttach(context);
 
-//        callbackInterface = (IHabitCallback) context;
-//        callbackInterface.addUpdateEntriesCallback(this);
+        mCallbackInterface = (IHabitDataCallback) context;
+        mCallbackInterface.setCalendarFragmentCallback(this);
 //        callbackInterface.addOnTabReselectedCallback(this);
 //        callbackInterface.addUpdateColorCallback(this);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-//        callbackInterface.removeUpdateEntriesCallback(this);
-//        callbackInterface.removeOnTabReselectedCallback(this);
-//        callbackInterface.removeUpdateColorCallback(this);
     }
     //endregion
 
@@ -85,24 +76,22 @@ public class CalendarFragment extends Fragment implements
     //endregion
 
     @Override
-    public void updateEntries(SessionEntriesCollection dataSample) {
+    public void onUpdateEntries(SessionEntriesCollection dataSample) {
         mAdapter = new CalendarViewAdapter(dataSample, mDefaultColor, getContext());
         mCalendarViewContainer.setAdapter(mAdapter);
     }
 
     @Override
-    public void updateColor(int color) {
-        mDefaultColor = color;
-        if(mAdapter != null) {
+    public void onUpdateColorPalette(ThemeColorPalette palette) {
+        mDefaultColor = palette.getColorPrimary();
+        if (mAdapter != null) {
             mAdapter.setColor(mDefaultColor);
             mCalendarViewContainer.setAdapter(mAdapter);
         }
     }
 
     @Override
-    public void onTabReselected(int position) {
-        if (position == 1)
-            mCalendarViewContainer.smoothScrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
+    public void onTabReselected() {
+        mCalendarViewContainer.smoothScrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
     }
-
 }

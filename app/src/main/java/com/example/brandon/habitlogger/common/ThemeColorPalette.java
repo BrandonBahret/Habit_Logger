@@ -1,5 +1,7 @@
 package com.example.brandon.habitlogger.common;
 
+import android.support.v7.app.AppCompatDelegate;
+
 /**
  * Created by Brandon on 4/14/2017.
  * A class to calculate a palette used to programmatically change the app theme
@@ -14,13 +16,15 @@ public class ThemeColorPalette {
     private final int mColorAccentDark;
     //endregion
 
-    public ThemeColorPalette(int baseColor, boolean isNightMode){
+    public ThemeColorPalette(int baseColor){
         int color = baseColor;
         int darkerColor = MyColorUtils.darkenColorBy(baseColor, 0.08f);
         int accentColor = baseColor;
         int accentDarkerColor = accentColor;
 
-        if (isNightMode) {
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            // Darken colors for night mode, we don't want bright colors at night.
+
             if (MyColorUtils.getLightness(color) > 0.40) {
                 darkerColor = MyColorUtils.setLightness(darkerColor, 0.40f);
                 accentDarkerColor = MyColorUtils.setLightness(accentDarkerColor, 0.45f);
