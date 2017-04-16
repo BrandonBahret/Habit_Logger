@@ -15,6 +15,7 @@ import android.view.MenuItem;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.RequestCodes;
+import com.example.brandon.habitlogger.common.ResultCodes;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
@@ -30,6 +31,8 @@ import java.io.Serializable;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class SessionActivity extends AppCompatActivity implements
         SessionManager.SessionChangeListeners, TimerFragment.ITimerFragment {
+
+    public static String RESULT_NEW_ENTRY = "RESULT_NEW_ENTRY";
 
     public static class BundleKeys {
         public static final String SERIALIZED_HABIT = "SERIALIZED_HABIT_KEY";
@@ -253,6 +256,9 @@ public class SessionActivity extends AppCompatActivity implements
         // Add the new SessionEntry to the database
         HabitDatabase database = new HabitDatabase(SessionActivity.this);
         database.addEntry(mHabit.getDatabaseId(), entry);
+
+        Intent data = new Intent().putExtra(RESULT_NEW_ENTRY, entry);
+        setResult(ResultCodes.SESSION_FINISH, data);
 
         finish();
     }

@@ -9,11 +9,12 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Dialogs.MyDatePickerDialog;
 
 import java.util.Collections;
@@ -215,13 +216,14 @@ public class FloatingDateRangeWidgetManager {
     //endregion -- end --
 
     //region Methods responsible for updating the ui
-    public void entryChanged(SessionEntry oldEntry, SessionEntry newEntry) {
-        if (newEntry.getStartingTime() > mMaximumTime) {
-            this.mMaximumTime = MyTimeUtils.setTimePortion(newEntry.getStartingTime(), false, 11, 59, 59, 999);
+
+    public void adjustDateRangeForEntry(SessionEntry entry) {
+        if (entry.getStartingTime() > mMaximumTime) {
+            this.mMaximumTime = MyTimeUtils.setTimePortion(entry.getStartingTime(), false, 11, 59, 59, 999);
             refreshDateRange(false);
         }
-        else if (newEntry.getStartingTime() < mMinimumTime) {
-            this.mMinimumTime = newEntry.getStartingTimeIgnoreTimeOfDay();
+        else if (entry.getStartingTime() < mMinimumTime) {
+            this.mMinimumTime = entry.getStartingTimeIgnoreTimeOfDay();
             refreshDateRange(false);
         }
     }
@@ -245,6 +247,21 @@ public class FloatingDateRangeWidgetManager {
         String totalTimeString = SessionEntry.stringifyDuration(totalDuration);
         mViewHolder.totalTimeText.setText(totalTimeString);
         updateMinMaxTimestamps(sessionEntries);
+    }
+
+    public void updateSessionEntries(SessionEntriesCollection sessionEntries){
+        updateSessionEntries(sessionEntries, sessionEntries.getMinimumTime(), sessionEntries.getMaximumTime());
+    }
+
+    public void updateSessionEntries(int numberOfEntries, long entriesDuration, long minimumTime, long maximumTime) {
+        mViewHolder.entriesCountText.setText(String.valueOf(numberOfEntries));
+
+        String totalTimeString = SessionEntry.stringifyDuration(entriesDuration);
+        mViewHolder.totalTimeText.setText(totalTimeString);
+
+        mMinimumTime = minimumTime;
+        mMaximumTime = maximumTime;
+        refreshDateRange(false);
     }
 
     public void updateSessionEntries(List<SessionEntry> sessionEntries, long minimumTime, long maximumTime) {

@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
@@ -55,7 +54,13 @@ public class EntriesFragment extends Fragment implements
     private IEntriesEvents mEntryViewListener;
 
     public interface IEntriesEvents {
-        void onEntryViewClicked(SessionEntry entry);
+        void onEntryViewClicked(long entryId, SessionEntry entry);
+    }
+
+    @Override
+    public void onEntryViewClick(long habitId, long entryId) {
+        SessionEntry entry = mHabitDatabase.getEntry(entryId);
+        mEntryViewListener.onEntryViewClicked(entryId, entry);
     }
     //endregion
 
@@ -157,32 +162,6 @@ public class EntriesFragment extends Fragment implements
 
     //endregion
 
-    //region Methods responsible for manipulating entries in the fragment
-    public void removeSessionEntryById(long databaseId) {
-        int index = getSessionEntryIndex(databaseId);
-        if (index != -1) {
-            mSessionEntries.remove(index);
-            mEntryAdapter.notifyItemRemoved(index);
-        }
-
-        showNoDataLayout(mSessionEntries.isEmpty());
-    }
-
-    private int getSessionEntryIndex(long entryId) {
-        for (int index = 0; index < mSessionEntries.size(); index++) {
-            if (mSessionEntries.get(index).getDatabaseId() == entryId)
-                return index;
-        }
-
-        return -1;
-    }
-
-    private int getPositionForEntry(SessionEntry newEntry) {
-        int foundPosition = MyCollectionUtils.binarySearch(mSessionEntries, newEntry.getStartingTime(), SessionEntry.IKeyCompareStartingTime);
-        return foundPosition < 0 ? (-foundPosition) - 1 : foundPosition;
-    }
-    //endregion
-
     //region Methods responsible for updating the ui
     private void showNoDataLayout(boolean showNoDataLayout) {
         if (mView != null) {
@@ -208,41 +187,15 @@ public class EntriesFragment extends Fragment implements
     }
     //endregion
 
-    @Override
-    public void onEntryViewClick(long habitId, long entryId) {
-        SessionEntry entry = mHabitDatabase.getEntry(entryId);
+    //region Methods responsible for handling events
 
-        mEntryViewListener.onEntryViewClicked(entry);
-
-//        SessionEntry oldEntry = mHabitDatabase.getEntry(entryId);
-//
-//        EditEntryForm dialog = EditEntryForm.newInstance(oldEntry, ContextCompat.getColor(getContext(), R.color.textColorContrastBackground));
-//        dialog.setOnFinishedListener(new EditEntryForm.OnFinishedListener() {
-//            @Override
-//            public void onPositiveClicked(SessionEntry entry) {
-//                if (entry != null) {
-//                    SessionEntry oldEntry = mHabitDatabase.getEntry(entry.getDatabaseId());
-//                    mHabitDatabase.updateEntry(entry.getDatabaseId(), entry);
-//                    updateSessionEntryById(entry.getDatabaseId(), oldEntry, entry);
-//                }
-//            }
-//
-//            @Override
-//            public void onNegativeClicked(SessionEntry entry) {
-//                mHabitDatabase.deleteEntry(entry.getDatabaseId());
-//                removeSessionEntryById(entry.getDatabaseId());
-//            }
-//        });
-//
-//        dialog.show(getFragmentManager(), "edit-entry");
-    }
-
-    //region IEntriesFragmentCallback
     @Override
     public void onUpdateEntries(SessionEntriesCollection dataCollection) {
         if (mEntryAdapter != null) {
+            mSessionEntries = dataCollection;
             mEntryAdapter = new EntryViewAdapter(dataCollection, getContext(), mColorPalette, mEntryAdapter.getListener());
             mEntriesContainer.setAdapter(mEntryAdapter);
+            mEntriesContainer.invalidateItemDecorations();
         }
 
         showNoDataLayout(mSessionEntries == null || mSessionEntries.isEmpty());
@@ -250,39 +203,17 @@ public class EntriesFragment extends Fragment implements
 
     @Override
     public void onNotifyEntryRemoved(int adapterPosition) {
-//        int index = getSessionEntryIndex(removedEntry.getDatabaseId());
-//        if (index != -1) {
-//            mSessionEntries.remove(index);
-//        }
-
         mEntryAdapter.notifyItemRemoved(adapterPosition);
-        showNoDataLayout(mSessionEntries.isEmpty());
+        showNoDataLayout(mSessionEntries == null || mSessionEntries.isEmpty());
     }
 
     @Override
     public void onNotifyEntryAdded(int adapterPosition) {
         // Todo this doesn't work well with item decorations
         mEntryAdapter.notifyItemInserted(adapterPosition);
+        showNoDataLayout(mSessionEntries == null || mSessionEntries.isEmpty());
 //        mEntryAdapter.notifyDataSetChanged();
     }
-
-//    @Override
-//    public void onUpdateEntry(long databaseId, SessionEntry oldEntry, SessionEntry newEntry) {
-//        int index = getSessionEntryIndex(databaseId);
-//        if (index != mEntryAdapter.getItemCount()) {
-//            if (oldEntry.getStartingTime() == newEntry.getStartingTime()) {
-//                mSessionEntries.set(index, newEntry);
-//                mEntryAdapter.notifyItemChanged(index);
-//            }
-//            else {
-//                mSessionEntries.remove(index);
-//                int newIndex = getPositionForEntry(newEntry);
-//                mSessionEntries.add(newIndex, newEntry);
-//                mEntryAdapter.notifyItemMoved(index, newIndex);
-//                mEntryAdapter.notifyItemChanged(newIndex);
-//            }
-//        }
-//    }
 
     @Override
     public void onNotifyEntryUpdated(int oldPosition, int newPosition) {
@@ -296,7 +227,7 @@ public class EntriesFragment extends Fragment implements
 
         if (mEntryAdapter != null) {
             mEntryAdapter.setColorPalette(mColorPalette);
-            mEntriesContainer.invalidate();
+            mEntryAdapter.notifyDataSetChanged();
 //            mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), mColorPalette, mEntryAdapter.getListener());
 //            mEntriesContainer.setAdapter(mEntryAdapter);
         }
@@ -312,6 +243,6 @@ public class EntriesFragment extends Fragment implements
     public void onTabReselected() {
         mEntriesContainer.smoothScrollToPosition(0);
     }
-    //endregion
+    //endregion -- end --
 
 }

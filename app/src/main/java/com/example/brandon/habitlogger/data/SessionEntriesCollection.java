@@ -113,17 +113,20 @@ public class SessionEntriesCollection extends ArrayList<SessionEntry> {
     public int addEntry(SessionEntry entry) {
         int pos = MyCollectionUtils.binarySearchForInsertPosition(this, entry.getStartingTime(), SessionEntry.IKeyCompareStartingTime);
         this.add(pos, entry);
+        invalidate();
         return pos;
     }
 
     public int removeEntry(SessionEntry entry) {
         int pos = this.indexOf(entry);
         this.remove(pos);
+        invalidate();
         return pos;
     }
 
     public int updateEntry(SessionEntry oldEntry, SessionEntry newEntry) {
         this.removeEntry(oldEntry);
+        invalidate();
         return this.addEntry(newEntry);
     }
     //endregion

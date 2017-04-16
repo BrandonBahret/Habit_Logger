@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.ui.Dialogs;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 
 /**
@@ -70,6 +71,11 @@ public class ConfirmationDialog {
     //region Setters {}
     public ConfirmationDialog setTitle(String title) {
         this.mTitle = title;
+        return this;
+    }
+
+    public ConfirmationDialog setTitle(@StringRes int textId) {
+        this.mTitle = mContext.getString(textId);
         return this;
     }
 

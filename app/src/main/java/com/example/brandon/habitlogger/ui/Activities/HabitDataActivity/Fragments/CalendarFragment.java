@@ -92,6 +92,6 @@ public class CalendarFragment extends Fragment implements IHabitDataCallback.ICa
 
     @Override
     public void onTabReselected() {
-        mCalendarViewContainer.smoothScrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
+//        mCalendarViewContainer.smoothScrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
     }
 }

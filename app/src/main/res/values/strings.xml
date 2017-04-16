@@ -160,5 +160,6 @@
     <string name="no_active_sessions">No Active Sessions</string>
     <string name="pref_allow_upon_no_active_sessions">preference_close_upon_no_active_sessions</string>
     <string name="title_activity_habit_data">HabitDataActivity</string>
+    <string name="confirm_delete">Confirm Delete</string>
 
 </resources>

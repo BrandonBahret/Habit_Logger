@@ -259,7 +259,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
 
             @Override
             public void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
-                mDateRangeManager.entryChanged(oldEntry, newEntry);
+                mDateRangeManager.adjustDateRangeForEntry(newEntry);
 
                 HabitDataSample dataSample = getDataSample();
                 List<SessionEntry> sessionEntries = dataSample.buildSessionEntriesList().getSessionEntries();

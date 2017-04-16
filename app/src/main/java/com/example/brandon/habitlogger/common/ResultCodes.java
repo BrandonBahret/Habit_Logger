@@ -8,4 +8,5 @@ package com.example.brandon.habitlogger.common;
 public final class ResultCodes {
 
     public static final int SETTINGS_CHANGED = 100;
+    public static int SESSION_FINISH = 200;
 }

@@ -589,7 +589,7 @@ public class HabitActivity extends AppCompatActivity implements IHabitCallback, 
 
                 @Override
                 public void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
-                    dateRangeManager.entryChanged(oldEntry, newEntry);
+                    dateRangeManager.adjustDateRangeForEntry(newEntry);
 
                     Set<Long> ids = mHabitDatabase.findEntriesWithinTimeRange(mHabitId, dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
                     HabitActivity.this.mSessionEntries = mHabitDatabase.lookUpEntriesAsList(ids);
