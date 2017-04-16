@@ -27,6 +27,8 @@ import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EditEntryForm;
 import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.NewEntryForm;
 import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 
+import java.util.Set;
+
 public class HabitDataActivity extends AppCompatActivity implements IHabitDataCallback, IScrollEvents, EntriesFragment.IEntriesEvents {
 
     public static String HABIT_ID = "HABIT_ID";
@@ -106,7 +108,9 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
         ui.tabs.setupWithViewPager(ui.container);
         ui.menuFab.setClosedOnTouchOutside(true);
 
-        dateRangeManager.hideView(false);
+        mSessionEntries = fetchEntriesWithinTimeRange();
+
+//        dateRangeManager.hideView(false);
 //        ui.container.setCurrentItem(1);
 //        ui.menuFab.hideMenu(false);
 
@@ -187,7 +191,7 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
         if (search != null) {
             mSearchView = (SearchView) search.getActionView();
             mSearchView.setQueryHint(getString(R.string.filter_entries));
-//            mSearchView.setOnQueryTextListener(getOnSearchQueryListener());
+            mSearchView.setOnQueryTextListener(onSearchQueryListener);
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -201,6 +205,47 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
     public boolean onOptionsItemSelected(MenuItem item) {
 
         return super.onOptionsItemSelected(item);
+    }
+
+    SearchView.OnQueryTextListener onSearchQueryListener = new SearchView.OnQueryTextListener() {
+        @Override
+        public boolean onQueryTextSubmit(String query) {
+            return false;
+        }
+
+        @Override
+        public boolean onQueryTextChange(String newText) {
+            mSessionEntries = newText.length() > 0 ?
+                    fetchEntriesWithinConditions(newText) : fetchEntriesWithinTimeRange();
+
+            mEntriesCallback.onUpdateEntries(mSessionEntries);
+
+            return false;
+        }
+    };
+
+    private SessionEntriesCollection fetchEntriesWithinConditions(String query) {
+        Set<Long> queryIds = mHabitDatabase.findEntryIdsByComment(
+                mHabit.getDatabaseId(), query
+        );
+
+        Set<Long> dateRangeIds = mHabitDatabase.findEntriesWithinTimeRange(
+                mHabit.getDatabaseId(),
+                dateRangeManager.getDateFrom(), dateRangeManager.getDateTo()
+        );
+
+        queryIds.retainAll(dateRangeIds);
+
+        return mHabitDatabase.lookUpEntries(queryIds);
+    }
+
+    private SessionEntriesCollection fetchEntriesWithinTimeRange() {
+        Set<Long> dateRangeIds = mHabitDatabase.findEntriesWithinTimeRange(
+                mHabit.getDatabaseId(),
+                dateRangeManager.getDateFrom(), dateRangeManager.getDateTo()
+        );
+
+        return mHabitDatabase.lookUpEntries(dateRangeIds);
     }
 
     //region Scroll events
@@ -225,12 +270,22 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
         EditEntryForm dialog = EditEntryForm.newInstance(entry, ContextCompat.getColor(this, R.color.textColorContrastBackground));
         dialog.setOnFinishedListener(new EditEntryForm.OnFinishedListener() {
             @Override
-            public void onPositiveClicked(SessionEntry entry) {
-                if (entry != null) {
-                    SessionEntry oldEntry = mHabitDatabase.getEntry(entry.getDatabaseId());
-                    mHabitDatabase.updateEntry(entry.getDatabaseId(), entry);
-                    mEntriesCallback.onUpdateEntry(entry.getDatabaseId(), oldEntry, entry);
+            public void onPositiveClicked(SessionEntry newEntry) {
+                if (newEntry != null) {
+                    SessionEntry oldEntry = mHabitDatabase.getEntry(newEntry.getDatabaseId());
+                    mHabitDatabase.updateEntry(newEntry.getDatabaseId(), newEntry);
 
+                    dateRangeManager.entryChanged(oldEntry, newEntry);
+
+                    if (checkIfEntryFitsWithinConditions(newEntry)) {
+                        int oldIndex = mSessionEntries.indexOf(oldEntry);
+                        int newIndex = mSessionEntries.updateEntry(oldEntry, newEntry);
+                        mEntriesCallback.onNotifyEntryUpdated(oldIndex, newIndex);
+                    }
+                    else {
+                        int pos = mSessionEntries.removeEntry(oldEntry);
+                        mEntriesCallback.onNotifyEntryRemoved(pos);
+                    }
 //                    updateSessionEntryById(entry.getDatabaseId(), oldEntry, entry);
                 }
             }
@@ -238,7 +293,9 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
             @Override
             public void onNegativeClicked(SessionEntry entry) {
                 mHabitDatabase.deleteEntry(entry.getDatabaseId());
-                mEntriesCallback.onRemoveEntry(entry);
+
+                int pos = mSessionEntries.removeEntry(entry);
+                mEntriesCallback.onNotifyEntryRemoved(pos);
 //                removeSessionEntryById(entry.getDatabaseId());
             }
         });

@@ -188,7 +188,7 @@ public abstract class EntryFormDialogBase extends DialogFragment {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MyDatePickerDialog dialog = MyDatePickerDialog.newInstance(-1, -1, mAccentColor, mEntry.getStartingTime());
+                MyDatePickerDialog dialog = MyDatePickerDialog.newInstance(-1, mAccentColor, mEntry.getStartingTime());
 
                 dialog.setOnFinishedListener(new MyDatePickerDialog.OnFinishedListener() {
                     @Override

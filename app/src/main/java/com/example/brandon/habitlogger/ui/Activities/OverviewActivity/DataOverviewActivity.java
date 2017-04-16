@@ -205,7 +205,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
 
             @Override
             public boolean onQueryTextChange(String query) {
-                List<SessionEntry> entries = mHabitDatabase.lookUpEntries(
+                List<SessionEntry> entries = mHabitDatabase.lookUpEntriesAsList(
                         mHabitDatabase.findEntryIdsByComment(query)
                 );
 

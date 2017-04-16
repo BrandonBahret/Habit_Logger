@@ -115,6 +115,17 @@ public class SessionEntriesCollection extends ArrayList<SessionEntry> {
         this.add(pos, entry);
         return pos;
     }
+
+    public int removeEntry(SessionEntry entry) {
+        int pos = this.indexOf(entry);
+        this.remove(pos);
+        return pos;
+    }
+
+    public int updateEntry(SessionEntry oldEntry, SessionEntry newEntry) {
+        this.removeEntry(oldEntry);
+        return this.addEntry(newEntry);
+    }
     //endregion
 
 

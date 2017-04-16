@@ -2,6 +2,7 @@ package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragment
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +24,8 @@ import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDat
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.RecyclerViewScrollObserver;
+import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.GroupDecoration;
+import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 
 import static com.example.brandon.habitlogger.R.id.no_entries_available_icon;
 import static com.example.brandon.habitlogger.R.id.no_result_icon;
@@ -102,29 +105,29 @@ public class EntriesFragment extends Fragment implements
         mEntriesContainer = (RecyclerView) mView.findViewById(R.id.entries_holder);
 
         // Add item decorations
-//        mEntriesContainer.addItemDecoration(new GroupDecoration(getContext(), R.dimen.entries_section_text_size, mMakeHeadersSticky, new GroupDecoration.Callback() {
-//            @Override
-//            public long getGroupId(int position) {
-//                if (position >= 0 && position < mSessionEntries.size())
-//                    return mSessionEntries.get(position).getStartingTimeIgnoreTimeOfDay();
-//
-//                else return -1;
-//            }
-//
-//            @Override
-//            @NonNull
-//            public String getGroupFirstLine(int position) {
-//                if (position >= 0 && position < mSessionEntries.size())
-//                    return mSessionEntries.get(position).stringifyStartingTime(mDateFormat);
-//
-//                else return "";
-//            }
-//        }));
-//
-//        int bottomOffset = (int) getResources().getDimension(R.dimen.bottom_offset_dp);
-//        int topOffset = (int) (getResources().getDimension(R.dimen.extra_large_top_offset_dp)) + (int) (getResources().getDimension(R.dimen.sections_top_offset_dp));
-//        SpaceOffsetDecoration spaceOffsetDecoration = new SpaceOffsetDecoration(bottomOffset, topOffset);
-//        mEntriesContainer.addItemDecoration(spaceOffsetDecoration);
+        mEntriesContainer.addItemDecoration(new GroupDecoration(getContext(), R.dimen.entries_section_text_size, mMakeHeadersSticky, new GroupDecoration.Callback() {
+            @Override
+            public long getGroupId(int position) {
+                if (position >= 0 && position < mSessionEntries.size())
+                    return mSessionEntries.get(position).getStartingTimeIgnoreTimeOfDay();
+
+                else return -1;
+            }
+
+            @Override
+            @NonNull
+            public String getGroupFirstLine(int position) {
+                if (position >= 0 && position < mSessionEntries.size())
+                    return mSessionEntries.get(position).stringifyStartingTime(mDateFormat);
+
+                else return "";
+            }
+        }));
+
+        int bottomOffset = (int) getResources().getDimension(R.dimen.bottom_offset_dp);
+        int topOffset = (int) (getResources().getDimension(R.dimen.extra_large_top_offset_dp)) + (int) (getResources().getDimension(R.dimen.sections_top_offset_dp));
+        SpaceOffsetDecoration spaceOffsetDecoration = new SpaceOffsetDecoration(bottomOffset, topOffset);
+        mEntriesContainer.addItemDecoration(spaceOffsetDecoration);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mEntriesContainer.setLayoutManager(layoutManager);
@@ -246,13 +249,13 @@ public class EntriesFragment extends Fragment implements
     }
 
     @Override
-    public void onRemoveEntry(SessionEntry removedEntry) {
-        int index = getSessionEntryIndex(removedEntry.getDatabaseId());
-        if (index != -1) {
-            mSessionEntries.remove(index);
-            mEntryAdapter.notifyItemRemoved(index);
-        }
+    public void onNotifyEntryRemoved(int adapterPosition) {
+//        int index = getSessionEntryIndex(removedEntry.getDatabaseId());
+//        if (index != -1) {
+//            mSessionEntries.remove(index);
+//        }
 
+        mEntryAdapter.notifyItemRemoved(adapterPosition);
         showNoDataLayout(mSessionEntries.isEmpty());
     }
 
@@ -263,22 +266,28 @@ public class EntriesFragment extends Fragment implements
 //        mEntryAdapter.notifyDataSetChanged();
     }
 
+//    @Override
+//    public void onUpdateEntry(long databaseId, SessionEntry oldEntry, SessionEntry newEntry) {
+//        int index = getSessionEntryIndex(databaseId);
+//        if (index != mEntryAdapter.getItemCount()) {
+//            if (oldEntry.getStartingTime() == newEntry.getStartingTime()) {
+//                mSessionEntries.set(index, newEntry);
+//                mEntryAdapter.notifyItemChanged(index);
+//            }
+//            else {
+//                mSessionEntries.remove(index);
+//                int newIndex = getPositionForEntry(newEntry);
+//                mSessionEntries.add(newIndex, newEntry);
+//                mEntryAdapter.notifyItemMoved(index, newIndex);
+//                mEntryAdapter.notifyItemChanged(newIndex);
+//            }
+//        }
+//    }
+
     @Override
-    public void onUpdateEntry(long databaseId, SessionEntry oldEntry, SessionEntry newEntry) {
-        int index = getSessionEntryIndex(databaseId);
-        if (index != mEntryAdapter.getItemCount()) {
-            if (oldEntry.getStartingTime() == newEntry.getStartingTime()) {
-                mSessionEntries.set(index, newEntry);
-                mEntryAdapter.notifyItemChanged(index);
-            }
-            else {
-                mSessionEntries.remove(index);
-                int newIndex = getPositionForEntry(newEntry);
-                mSessionEntries.add(newIndex, newEntry);
-                mEntryAdapter.notifyItemMoved(index, newIndex);
-                mEntryAdapter.notifyItemChanged(newIndex);
-            }
-        }
+    public void onNotifyEntryUpdated(int oldPosition, int newPosition) {
+        mEntryAdapter.notifyItemMoved(oldPosition, newPosition);
+        mEntryAdapter.notifyItemChanged(newPosition);
     }
 
     @Override

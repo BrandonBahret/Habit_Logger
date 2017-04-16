@@ -45,12 +45,25 @@ public class MyDatePickerDialog extends DialogFragment implements
     }
     //endregion
 
+    //region Methods to get instances of the dialog
     public static MyDatePickerDialog newInstance(long dateMin, long dateMax, long dateInMillis) {
         MyDatePickerDialog dialog = new MyDatePickerDialog();
 
         Bundle args = new Bundle();
         args.putLong(KEY_DATE_MIN, Math.max(dateMin, DateUtils.DAY_IN_MILLIS));
         args.putLong(KEY_DATE_MAX, dateMax);
+        args.putLong(KEY_DATE_MILLIS, dateInMillis);
+        dialog.setArguments(args);
+
+        return dialog;
+    }
+
+    public static MyDatePickerDialog newInstance(long dateMin, long dateInMillis) {
+        MyDatePickerDialog dialog = new MyDatePickerDialog();
+
+        Bundle args = new Bundle();
+        args.putLong(KEY_DATE_MIN, Math.max(dateMin, DateUtils.DAY_IN_MILLIS));
+        args.putLong(KEY_DATE_MAX, System.currentTimeMillis());
         args.putLong(KEY_DATE_MILLIS, dateInMillis);
         dialog.setArguments(args);
 
@@ -69,6 +82,20 @@ public class MyDatePickerDialog extends DialogFragment implements
 
         return dialog;
     }
+
+    public static MyDatePickerDialog newInstance(long dateMin, int accentColor, long dateInMillis) {
+        MyDatePickerDialog dialog = new MyDatePickerDialog();
+
+        Bundle args = new Bundle();
+        args.putLong(KEY_DATE_MIN, Math.max(dateMin, DateUtils.DAY_IN_MILLIS));
+        args.putLong(KEY_DATE_MAX, System.currentTimeMillis());
+        args.putLong(KEY_DATE_MILLIS, dateInMillis);
+        args.putInt(KEY_COLOR_ACCENT, accentColor);
+        dialog.setArguments(args);
+
+        return dialog;
+    }
+    //endregion -- end --
 
     @NonNull
     @Override

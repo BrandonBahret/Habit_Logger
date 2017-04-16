@@ -163,7 +163,7 @@ public class HabitDatabase {
         for (Habit habit : habits) {
             long habitId = habit.getDatabaseId();
             Set<Long> ids = findEntriesWithinTimeRange(habitId, dateFrom, dateTo);
-            List<SessionEntry> entries = lookUpEntries(ids);
+            List<SessionEntry> entries = lookUpEntriesAsList(ids);
             habit.setEntries(entries);
         }
 
@@ -171,7 +171,7 @@ public class HabitDatabase {
     }
 
     public SessionEntriesCollection getEntriesSample(long habitId, long dateFrom, long dateTo) {
-        List<SessionEntry> entries = lookUpEntries(
+        List<SessionEntry> entries = lookUpEntriesAsList(
                 findEntriesWithinTimeRange(habitId, dateFrom, dateTo)
         );
 
@@ -261,7 +261,7 @@ public class HabitDatabase {
             return recordIds;
         }
 
-        return null;
+        return new HashSet<>();
     }
     //endregion
 
@@ -742,7 +742,6 @@ public class HabitDatabase {
     /**
      * @return An array of entry ids found by the search, null if results were empty.
      */
-    @Nullable
     public Set<Long> findEntryIdsByComment(long habitId, String query) {
         return searchTableForIds(
                 "SELECT " + EntriesTableSchema.ENTRY_ID + " FROM " +
@@ -770,7 +769,6 @@ public class HabitDatabase {
     /**
      * @return An array of entry ids found by the search, null if results were empty.
      */
-    @Nullable
     public Set<Long> findEntriesWithinTimeRange(long habitId, long timeFrom, long timeTo) {
         // SELECT ENTRY_ID FROM ENTRIES_TABLE WHERE HABIT_ID=habitId
         // AND START_TIME >= BEGIN AND START_TIME <= END
@@ -898,7 +896,7 @@ public class HabitDatabase {
 //        else return null;
     }
 
-    public List<SessionEntry> lookUpEntries(Set<Long> ids) {
+    public List<SessionEntry> lookUpEntriesAsList(Set<Long> ids) {
         List<SessionEntry> entries = new ArrayList<>(ids.size());
 
         for (long id : ids) entries.add(getEntry(id));
@@ -906,6 +904,10 @@ public class HabitDatabase {
         Collections.sort(entries, SessionEntry.ICompareStartingTimes);
 
         return entries;
+    }
+
+    public SessionEntriesCollection lookUpEntries(Set<Long> ids) {
+        return new SessionEntriesCollection(lookUpEntriesAsList(ids));
     }
 
     /**

@@ -104,9 +104,9 @@ public class FloatingDateRangeWidgetManager {
         MyDatePickerDialog dialog;
 
         if (shouldSetDateFrom)
-            dialog = MyDatePickerDialog.newInstance(-1, mDateToTime - DateUtils.DAY_IN_MILLIS, currentTime);
+            dialog = MyDatePickerDialog.newInstance(-1, currentTime);
         else
-            dialog = MyDatePickerDialog.newInstance(mDateFromTime + DateUtils.DAY_IN_MILLIS, -1, currentTime);
+            dialog = MyDatePickerDialog.newInstance(mDateFromTime + DateUtils.DAY_IN_MILLIS, currentTime);
 
         dialog.setOnFinishedListener(new MyDatePickerDialog.OnFinishedListener() {
             @Override
@@ -127,7 +127,7 @@ public class FloatingDateRangeWidgetManager {
 
     public boolean entryFitsRange(SessionEntry entry) {
         long startingTime = entry.getStartingTime();
-        return (getDateTo() > startingTime) && (startingTime >= getDateFrom());
+        return (getDateTo() >= startingTime) && (startingTime >= getDateFrom());
     }
 
     //region Methods responsible for handling events

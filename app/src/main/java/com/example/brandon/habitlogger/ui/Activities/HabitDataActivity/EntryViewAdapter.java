@@ -93,7 +93,7 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        final SessionEntry item = mSessionEntries.get(position);
+        SessionEntry item = mSessionEntries.get(position);
         holder.entryId = item.getDatabaseId();
         holder.habitId = item.getHabitId();
 
@@ -128,7 +128,8 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         holder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.onEntryViewClick(holder.habitId, item.getDatabaseId());
+                SessionEntry item = mSessionEntries.get(holder.getAdapterPosition());
+                mListener.onEntryViewClick(item.getHabitId(), item.getDatabaseId());
             }
         });
 
