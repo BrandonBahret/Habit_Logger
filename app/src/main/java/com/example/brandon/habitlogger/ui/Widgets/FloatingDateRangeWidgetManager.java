@@ -251,6 +251,8 @@ public class FloatingDateRangeWidgetManager {
 
     public void updateSessionEntries(SessionEntriesCollection sessionEntries){
         updateSessionEntries(sessionEntries, sessionEntries.getMinimumTime(), sessionEntries.getMaximumTime());
+        sessionEntries.setDateFrom(getDateFrom());
+        sessionEntries.setDateTo(getDateTo());
     }
 
     public void updateSessionEntries(int numberOfEntries, long entriesDuration, long minimumTime, long maximumTime) {

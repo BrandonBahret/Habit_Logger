@@ -24,7 +24,7 @@ import java.util.Set;
 public class StreaksFragment extends Fragment implements IHabitCallback.IUpdateEntries {
 
     private TextView value;
-//    IHabitCallback callbackInterface;
+//    IHabitCallback mCallbackInterface;
 
     public StreaksFragment() {
         // Required empty public constructor
@@ -49,14 +49,14 @@ public class StreaksFragment extends Fragment implements IHabitCallback.IUpdateE
     public void onAttach(Context context) {
         super.onAttach(context);
 
-//        callbackInterface = (IHabitCallback) context;
-//        callbackInterface.addUpdateEntriesCallback(this);
+//        mCallbackInterface = (IHabitCallback) context;
+//        mCallbackInterface.addUpdateEntriesCallback(this);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-//        updateEntries(callbackInterface.getSessionEntries());
+//        updateEntries(mCallbackInterface.getSessionEntries());
     }
     //endregion
 

@@ -254,6 +254,7 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
         if (checkIfEntryFitsWithinConditions(newEntry)) {
             mEntriesCallback.onNotifyEntryAdded(pos);
             mCalendarCallback.onUpdateEntries(mSessionEntries);
+            mStatisticsCallback.onUpdateEntries(mSessionEntries);
         }
         else {
             mSessionEntries.removeEntry(newEntry);
@@ -266,19 +267,22 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
         dateRangeManager.updateSessionEntries(mSessionEntries);
         mEntriesCallback.onNotifyEntryUpdated(oldIndex, newIndex);
         mCalendarCallback.onUpdateEntries(mSessionEntries);
+        mStatisticsCallback.onUpdateEntries(mSessionEntries);
     }
 
     private void removeEntry(SessionEntry oldEntry) {
         int pos = mSessionEntries.removeEntry(oldEntry);
+        dateRangeManager.updateSessionEntries(mSessionEntries);
         mEntriesCallback.onNotifyEntryRemoved(pos);
         mCalendarCallback.onUpdateEntries(mSessionEntries);
-        dateRangeManager.updateSessionEntries(mSessionEntries);
+        mStatisticsCallback.onUpdateEntries(mSessionEntries);
     }
 
     private void updateEntries(SessionEntriesCollection sessionEntries) {
         updateDateRangeManagerEntries(sessionEntries);
         mEntriesCallback.onUpdateEntries(sessionEntries);
         mCalendarCallback.onUpdateEntries(sessionEntries);
+        mStatisticsCallback.onUpdateEntries(mSessionEntries);
     }
 
     private void updateDateRangeManagerEntries(SessionEntriesCollection sessionEntries) {
@@ -288,6 +292,8 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
             long minTime = minEntry.getStartingTimeIgnoreTimeOfDay();
             long maxTime = maxEntry.getStartingTimeIgnoreTimeOfDay();
             dateRangeManager.updateSessionEntries(sessionEntries.size(), sessionEntries.calculateDuration(), minTime, maxTime);
+            sessionEntries.setDateFrom(dateRangeManager.getDateFrom());
+            sessionEntries.setDateTo(dateRangeManager.getDateTo());
         }
         else {
             dateRangeManager.updateSessionEntries(new ArrayList<SessionEntry>(), -1, -1);
@@ -299,6 +305,7 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
         dateRangeManager.updateSessionEntries(mSessionEntries);
         mEntriesCallback.onUpdateEntries(mSessionEntries);
         mCalendarCallback.onUpdateEntries(mSessionEntries);
+        mStatisticsCallback.onUpdateEntries(mSessionEntries);
     }
     //endregion -- end --
 

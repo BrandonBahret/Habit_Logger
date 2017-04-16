@@ -78,7 +78,7 @@ public class CalendarFragment extends Fragment implements IHabitDataCallback.ICa
     //region Methods responsible for handling events
     @Override
     public void onUpdateEntries(SessionEntriesCollection dataCollection) {
-        mCalendarAdapter = new CalendarViewAdapter(dataCollection, mColorPalette.getColorPrimary(), getContext());
+        mCalendarAdapter = new CalendarViewAdapter(dataCollection, mColorPalette.getBaseColor(), getContext());
         mCalendarViewContainer.setAdapter(mCalendarAdapter);
     }
 
@@ -86,7 +86,7 @@ public class CalendarFragment extends Fragment implements IHabitDataCallback.ICa
     public void onUpdateColorPalette(ThemeColorPalette palette) {
         mColorPalette = palette;
         if (mCalendarAdapter != null) {
-            mCalendarAdapter.setColor(mColorPalette.getColorPrimary());
+            mCalendarAdapter.setColor(mColorPalette.getBaseColor());
             mCalendarViewContainer.setAdapter(mCalendarAdapter);
         }
     }

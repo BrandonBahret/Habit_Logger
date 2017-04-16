@@ -2,21 +2,25 @@ package com.example.brandon.habitlogger.common;
 
 import android.support.v7.app.AppCompatDelegate;
 
+import java.io.Serializable;
+
 /**
  * Created by Brandon on 4/14/2017.
  * A class to calculate a palette used to programmatically change the app theme
  */
 
-public class ThemeColorPalette {
+public class ThemeColorPalette implements Serializable {
 
     //region (Member attributes)
+    private final int mBaseColor;
     private final int mColorPrimary;
     private final int mColorPrimaryDark;
     private final int mColorAccent;
     private final int mColorAccentDark;
     //endregion
 
-    public ThemeColorPalette(int baseColor){
+    public ThemeColorPalette(int baseColor) {
+        mBaseColor = baseColor;
         int color = baseColor;
         int darkerColor = MyColorUtils.darkenColorBy(baseColor, 0.08f);
         int accentColor = baseColor;
@@ -47,6 +51,10 @@ public class ThemeColorPalette {
     }
 
     //region Getters {}
+    public int getBaseColor() {
+        return mBaseColor;
+    }
+
     public int getColorPrimary() {
         return mColorPrimary;
     }

@@ -6,6 +6,52 @@
     android:layout_height="match_parent"
     android:theme="@style/AppTheme.ContrastBackground">
 
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/scroll_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/extra_large_top_offset_dp"/>
+
+            <FrameLayout
+                android:id="@+id/fragment_pie_completion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/fragment_line_completion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/fragment_distribution_starting_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/fragment_pie_duration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </FrameLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/bottom_offset_dp"/>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
     <include
         android:id="@+id/no_stats_layout"
         layout="@layout/no_statistics_available"

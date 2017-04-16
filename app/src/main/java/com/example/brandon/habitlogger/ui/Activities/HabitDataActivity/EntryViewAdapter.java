@@ -103,7 +103,7 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         if (mColorPalette == null)
             holder.accent.setBackgroundColor(mHabitDatabase.getHabitColor(item.getHabitId()));
         else
-            holder.accent.setBackgroundColor(mColorPalette.getColorPrimary());
+            holder.accent.setBackgroundColor(mColorPalette.getBaseColor());
 
 
         if (!item.getNote().equals("")) {

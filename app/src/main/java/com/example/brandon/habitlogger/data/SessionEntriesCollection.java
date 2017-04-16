@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.data;
 import android.text.format.DateUtils;
 
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
+import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 
 import java.util.ArrayList;
@@ -48,6 +49,17 @@ public class SessionEntriesCollection extends ArrayList<SessionEntry> {
             mDateFromTime = -1;
             mDateToTime = -1;
         }
+    }
+
+    public boolean hasEntryFor(long targetDate) {
+        targetDate = MyTimeUtils.setTimePortion(targetDate, true, 0, 0, 0, 0);
+        return MyCollectionUtils.binarySearch(this, targetDate, new MyCollectionUtils.KeyComparator() {
+            @Override
+            public int compare(Object element, Object key) {
+                long startingTimeIgnoreTimeOfDay = ((SessionEntry) element).getStartingTimeIgnoreTimeOfDay();
+                return Long.compare(startingTimeIgnoreTimeOfDay, (Long) key);
+            }
+        }) >= 0;
     }
 
     //region Methods With One Time Calculations {}
@@ -129,6 +141,15 @@ public class SessionEntriesCollection extends ArrayList<SessionEntry> {
         invalidate();
         return this.addEntry(newEntry);
     }
+
+    public void setDateFrom(long dateFrom) {
+        mDateFromTime = dateFrom;
+    }
+
+    public void setDateTo(long dateTo) {
+        mDateToTime = dateTo;
+    }
+
     //endregion
 
 

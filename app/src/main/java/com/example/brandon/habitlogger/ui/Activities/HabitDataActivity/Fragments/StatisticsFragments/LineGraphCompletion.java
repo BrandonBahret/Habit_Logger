@@ -9,9 +9,9 @@ package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragment
  * The value stored on each date is the "habit score" that would've been displayed for that day.
  */
 
-import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
@@ -21,12 +21,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.common.ThemeColorPalette;
 import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 import com.example.brandon.habitlogger.databinding.FragmentLineGraphCompletionBinding;
-import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
+import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -39,12 +38,15 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpdateEntries, IHabitCallback.IUpdateColor {
+public class LineGraphCompletion extends Fragment {
+
+    private static String KEY_CALLBACK = "KEY_CALLBACK";
+    private static String KEY_COLOR = "KEY_COLOR";
 
     //region (Member attributes)
     private FragmentLineGraphCompletionBinding ui;
-//    IHabitCallback callbackInterface;
-    private int mColor;
+    IHabitDataCallback.IUpdateEntries mCallbackInterface;
+    private ThemeColorPalette mColorPalette;;
     private int mTextColor;
     private List<Entry> mValues;
     //endregion
@@ -53,11 +55,26 @@ public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpd
         // Required empty public constructor
     }
 
-    public static LineGraphCompletion newInstance() {
-        return new LineGraphCompletion();
+    public static LineGraphCompletion newInstance(IHabitDataCallback.IUpdateEntries callback, ThemeColorPalette colorPalette) {
+
+        LineGraphCompletion fragment = new LineGraphCompletion();
+
+        Bundle args = new Bundle();
+        args.putSerializable(KEY_CALLBACK, callback);
+        args.putSerializable(KEY_COLOR, colorPalette);
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     //region Methods responsible for handling the fragment lifecycle
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mCallbackInterface = (IHabitDataCallback.IUpdateEntries) getArguments().getSerializable(KEY_CALLBACK);
+        mColorPalette = (ThemeColorPalette) getArguments().getSerializable(KEY_COLOR);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -100,45 +117,25 @@ public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpd
         return ui.getRoot();
     }
 
-    //region methods to handle (onAttach - onDetach)
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-//        callbackInterface = (IHabitCallback) context;
-//        callbackInterface.addUpdateEntriesCallback(this);
-//        callbackInterface.addUpdateColorCallback(this);
-//
-//        mColor = callbackInterface.getDefaultColor();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-//        callbackInterface.removeUpdateEntriesCallback(this);
-//        callbackInterface.removeUpdateColorCallback(this);
-    }
-    //endregion
-
     @Override
     public void onStart() {
         super.onStart();
-//        updateEntries(callbackInterface.getSessionEntries());
+        updateEntries(mCallbackInterface.getSessionEntries());
     }
     //endregion
 
     //region Methods responsible for generating the line chart data.
-    List<Entry> calculateDataSet(SessionEntriesCollection dataSample) {
+    List<Entry> calculateDataSet(SessionEntriesCollection sessionEntries) {
 
-        int totalDays = dataSample.calculateTotalDaysLength();
+        int totalDays = sessionEntries.calculateTotalDaysLength();
         List<Entry> values = new ArrayList<>(totalDays);
 
-        long targetDate = dataSample.getDateFromTime();
+        long targetDate = sessionEntries.getDateFromTime();
         int dayCounter = 0; // The number of mDays performed.
 
         for (int dateIndex = 0; dateIndex < totalDays; dateIndex++) {
 
-            if (hasIndexForDate(dataSample.getSessionEntries(), targetDate))
+            if (sessionEntries.hasEntryFor(targetDate))
                 dayCounter++;
 
             float ratio = dayCounter / (float) totalDays * 100;
@@ -150,17 +147,8 @@ public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpd
         return values;
     }
 
-    public boolean hasIndexForDate(List<SessionEntry> sessionEntries, final long searchDate) {
-        return MyCollectionUtils.binarySearch(sessionEntries, searchDate, new MyCollectionUtils.KeyComparator() {
-            @Override
-            public int compare(Object element, Object key) {
-                return Long.compare(((SessionEntry) element).getStartingTimeIgnoreTimeOfDay(), (long) key);
-            }
-        }) >= 0;
-    }
     //endregion
 
-    @Override
     public void updateEntries(SessionEntriesCollection dataSample) {
         if (!dataSample.isEmpty())
             setLineChartData(calculateDataSet(dataSample));
@@ -174,8 +162,8 @@ public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpd
         dataSet.setMode(LineDataSet.Mode.LINEAR);
         dataSet.setDrawCircles(false);
         dataSet.setLineWidth(2f);
-        dataSet.setFillColor(mColor);
-        dataSet.setColor(mColor);
+        dataSet.setFillColor(mColorPalette.getBaseColor());
+        dataSet.setColor(mColorPalette.getBaseColor());
         //endregion
 
         LineData data = new LineData(dataSet);
@@ -186,9 +174,8 @@ public class LineGraphCompletion extends Fragment implements IHabitCallback.IUpd
         ui.chart.invalidate();
     }
 
-    @Override
-    public void updateColor(int color) {
-        mColor = color;
+    public void updateColor(ThemeColorPalette colorPalette) {
+        mColorPalette = colorPalette;
         setLineChartData(mValues);
     }
 

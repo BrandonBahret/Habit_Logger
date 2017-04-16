@@ -5,6 +5,8 @@ import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 
+import java.io.Serializable;
+
 /**
  * Created by Brandon on 2/9/2017.
  * Interface to communicate with fragments within HabitActivity
@@ -48,6 +50,14 @@ public interface IHabitDataCallback {
         void onUpdateColorPalette(ThemeColorPalette palette);
 
         void onTabReselected();
+    }
+
+    interface IUpdateEntries extends Serializable {
+        SessionEntriesCollection getSessionEntries();
+    }
+
+    interface IUpdateCategoryData extends Serializable {
+        CategoryDataSample getCategoryDataSample();
     }
 
     void setStatisticsFragmentCallback(IStatisticsFragment callback);

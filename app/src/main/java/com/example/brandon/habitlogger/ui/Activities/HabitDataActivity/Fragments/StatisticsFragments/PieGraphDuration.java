@@ -1,10 +1,10 @@
 package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.StatisticsFragments;
 
 
-import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -16,6 +16,7 @@ import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.databinding.FragmentPieGraphDurationBinding;
 import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
+import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
@@ -28,19 +29,36 @@ import java.util.List;
 
 public class PieGraphDuration extends Fragment implements IHabitCallback.IUpdateCategorySample {
 
+    private static String KEY_CALLBACK = "KEY_CALLBACK";
+
+    //region (Member attributes)
     private FragmentPieGraphDurationBinding ui;
     private int mTextColor;
-//    IHabitCallback callbackInterface;
+    IHabitDataCallback.IUpdateCategoryData mCallbackInterface;
+    //endregion
 
     public PieGraphDuration() {
         // Required empty public constructor
     }
 
-    public static PieGraphDuration newInstance() {
-        return new PieGraphDuration();
+    public static PieGraphDuration newInstance(IHabitDataCallback.IUpdateCategoryData callback) {
+
+        PieGraphDuration fragment = new PieGraphDuration();
+
+        Bundle args = new Bundle();
+        args.putSerializable(KEY_CALLBACK, callback);
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     //region Methods responsible for handling the fragment lifecycle
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mCallbackInterface = (IHabitDataCallback.IUpdateCategoryData) getArguments().getSerializable(KEY_CALLBACK);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -64,26 +82,10 @@ public class PieGraphDuration extends Fragment implements IHabitCallback.IUpdate
         return ui.getRoot();
     }
 
-    //region (onAttach - onDetach)
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-//        callbackInterface = (IHabitCallback) context;
-//        callbackInterface.addUpdateCategoryDataSampleCallback(this);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-//        callbackInterface.removeUpdateCategoryDataSampleCallback(this);
-    }
-    //endregion
-
     @Override
     public void onStart() {
         super.onStart();
-//        updateCategoryDataSample(callbackInterface.getCategoryDataSample());
+        updateCategoryDataSample(mCallbackInterface.getCategoryDataSample());
     }
     //endregion
 

@@ -1,8 +1,8 @@
 package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.StatisticsFragments;
 
-import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.format.DateUtils;
@@ -12,10 +12,11 @@ import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
+import com.example.brandon.habitlogger.common.ThemeColorPalette;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 import com.example.brandon.habitlogger.databinding.FragmentDistributionStartingTimeBinding;
-import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
+import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
@@ -33,19 +34,42 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class DistributionStartingTime extends Fragment implements IHabitCallback.IUpdateEntries, IHabitCallback.IUpdateColor {
+public class DistributionStartingTime extends Fragment {
+
+    private static String KEY_CALLBACK = "KEY_CALLBACK";
+    private static String KEY_COLOR = "KEY_COLOR";
+
     //region (Member attributes)
-//    IHabitCallback callbackInterface;
+    IHabitDataCallback.IUpdateEntries mCallbackInterface;
     FragmentDistributionStartingTimeBinding ui;
-    private int mColor;
+    private ThemeColorPalette mColorPalette;
     private int mTextColor;
     private List<BarEntry> mEntries = new ArrayList<>();
     private final int INTERVAL = 60;
     //endregion
 
+    public static DistributionStartingTime newInstance(IHabitDataCallback.IUpdateEntries callback, ThemeColorPalette colorPalette) {
+
+        DistributionStartingTime fragment = new DistributionStartingTime();
+
+        Bundle args = new Bundle();
+        args.putSerializable(KEY_CALLBACK, callback);
+        args.putSerializable(KEY_COLOR, colorPalette);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
     //region [ ---- Methods responsible for handling the fragment lifecycle ---- ]
 
     //region Methods (onCreateView - onDestroyView)
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mCallbackInterface = (IHabitDataCallback.IUpdateEntries) getArguments().getSerializable(KEY_CALLBACK);
+        mColorPalette = (ThemeColorPalette) getArguments().getSerializable(KEY_COLOR);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -59,39 +83,16 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
     }
     //endregion -- end --
 
-    //region Methods (onAttach - onDetach)
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-//        callbackInterface = (IHabitCallback) context;
-//        callbackInterface.addUpdateEntriesCallback(this);
-//        callbackInterface.addUpdateColorCallback(this);
-//        mColor = callbackInterface.getDefaultColor();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-//        callbackInterface.removeUpdateEntriesCallback(this);
-//        callbackInterface.removeUpdateColorCallback(this);
-    }
-
-    //endregion -- end --
-
     //region Methods (onStart - onStop)
-
     @Override
     public void onStart() {
         super.onStart();
-//        updateEntries(callbackInterface.getSessionEntries());
+        updateEntries(mCallbackInterface.getSessionEntries());
     }
-
     //endregion -- end --
 
     //endregion [ ---------------- end ---------------- ]
 
-    @Override
     public void updateEntries(SessionEntriesCollection dataSample) {
 
         if (!dataSample.isEmpty()) {
@@ -155,7 +156,7 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
         //region // Add data to CombinedData
         mEntries = entries;
         BarDataSet dataSet = new BarDataSet(entries, "label");
-        dataSet.setColor(mColor);
+        dataSet.setColor(mColorPalette.getBaseColor());
         dataSet.setValueTextColor(mTextColor);
         dataSet.setHighlightEnabled(false);
         BarData barData = new BarData(dataSet);
@@ -177,9 +178,8 @@ public class DistributionStartingTime extends Fragment implements IHabitCallback
         ui.chart.invalidate();
     }
 
-    @Override
-    public void updateColor(int color) {
-        mColor = color;
+    public void updateColor(ThemeColorPalette colorPalette) {
+        mColorPalette = colorPalette;
         setDistributionData(mEntries);
     }
 
