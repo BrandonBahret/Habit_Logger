@@ -23,8 +23,8 @@ public class CalendarFragment extends Fragment implements IHabitDataCallback.ICa
     IHabitDataCallback mCallbackInterface;
 
     private RecyclerView mCalendarViewContainer;
-    private CalendarViewAdapter mAdapter;
-    private int mDefaultColor;
+    private CalendarViewAdapter mCalendarAdapter;
+    private ThemeColorPalette mColorPalette;
     //endregion
 
     public CalendarFragment() {
@@ -36,6 +36,7 @@ public class CalendarFragment extends Fragment implements IHabitDataCallback.ICa
     }
 
     //region Methods responsible for handling fragment lifecycle
+
     //region (onAttach - onDestroy)
     @Override
     public void onAttach(Context context) {
@@ -43,18 +44,17 @@ public class CalendarFragment extends Fragment implements IHabitDataCallback.ICa
 
         mCallbackInterface = (IHabitDataCallback) context;
         mCallbackInterface.setCalendarFragmentCallback(this);
-//        callbackInterface.addOnTabReselectedCallback(this);
-//        callbackInterface.addUpdateColorCallback(this);
     }
-    //endregion
+    //endregion -- end --
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        mColorPalette = mCallbackInterface.getColorPalette();
+
         View v = inflater.inflate(R.layout.fragment_calendar, container, false);
 
-//        mDefaultColor = callbackInterface.getDefaultColor();
         mCalendarViewContainer = (RecyclerView) v.findViewById(R.id.calendar_view_container);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -62,8 +62,8 @@ public class CalendarFragment extends Fragment implements IHabitDataCallback.ICa
         mCalendarViewContainer.setItemAnimator(new DefaultItemAnimator());
         mCalendarViewContainer.addItemDecoration(getSpaceDecoration());
 
-//        updateEntries(callbackInterface.getSessionEntries());
-//        mCalendarViewContainer.scrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
+        onUpdateEntries(mCallbackInterface.getSessionEntries());
+        mCalendarViewContainer.scrollToPosition(mCalendarAdapter.getAdapterPositionForCurrentMonth());
 
         return v;
     }
@@ -75,23 +75,26 @@ public class CalendarFragment extends Fragment implements IHabitDataCallback.ICa
     }
     //endregion
 
+    //region Methods responsible for handling events
     @Override
-    public void onUpdateEntries(SessionEntriesCollection dataSample) {
-        mAdapter = new CalendarViewAdapter(dataSample, mDefaultColor, getContext());
-        mCalendarViewContainer.setAdapter(mAdapter);
+    public void onUpdateEntries(SessionEntriesCollection dataCollection) {
+        mCalendarAdapter = new CalendarViewAdapter(dataCollection, mColorPalette.getColorPrimary(), getContext());
+        mCalendarViewContainer.setAdapter(mCalendarAdapter);
     }
 
     @Override
     public void onUpdateColorPalette(ThemeColorPalette palette) {
-        mDefaultColor = palette.getColorPrimary();
-        if (mAdapter != null) {
-            mAdapter.setColor(mDefaultColor);
-            mCalendarViewContainer.setAdapter(mAdapter);
+        mColorPalette = palette;
+        if (mCalendarAdapter != null) {
+            mCalendarAdapter.setColor(mColorPalette.getColorPrimary());
+            mCalendarViewContainer.setAdapter(mCalendarAdapter);
         }
     }
 
     @Override
     public void onTabReselected() {
-//        mCalendarViewContainer.smoothScrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
+        mCalendarViewContainer.smoothScrollToPosition(mCalendarAdapter.getAdapterPositionForCurrentMonth());
     }
+    //endregion -- end --
+
 }

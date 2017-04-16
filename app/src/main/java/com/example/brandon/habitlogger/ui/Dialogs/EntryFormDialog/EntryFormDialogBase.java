@@ -50,6 +50,7 @@ public abstract class EntryFormDialogBase extends DialogFragment {
 
     //endregion
 
+    //region Methods responsible for handling the lifetime of the dialog
     abstract String getTitle();
 
     abstract String getPositiveButtonText();
@@ -109,6 +110,7 @@ public abstract class EntryFormDialogBase extends DialogFragment {
 
         return entryDialog;
     }
+    //endregion
 
     //region Methods responsible for filling in the entry form initially
     private void setDurationNumberPickersRanges() {

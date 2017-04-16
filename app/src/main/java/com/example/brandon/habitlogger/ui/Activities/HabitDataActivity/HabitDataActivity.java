@@ -32,8 +32,10 @@ import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEven
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity.SessionActivity;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
 import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EditEntryForm;
+import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EntryFormDialogBase;
 import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.NewEntryForm;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;
+import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.HabitDialogBase;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.NewHabitDialog;
 import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 
@@ -127,9 +129,9 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
         mSessionEntries = fetchEntriesWithinTimeRange();
         dateRangeManager.updateSessionEntries(mSessionEntries);
 
-//        dateRangeManager.hideView(false);
-//        ui.container.setCurrentItem(1);
-//        ui.menuFab.hideMenu(false);
+        dateRangeManager.hideView(false);
+        ui.container.setCurrentItem(1);
+        ui.menuFab.hideMenu(false);
 
         setUpActivityWithHabit(mHabit);
 
@@ -251,6 +253,7 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
         updateDateRangeManagerEntries(mSessionEntries);
         if (checkIfEntryFitsWithinConditions(newEntry)) {
             mEntriesCallback.onNotifyEntryAdded(pos);
+            mCalendarCallback.onUpdateEntries(mSessionEntries);
         }
         else {
             mSessionEntries.removeEntry(newEntry);
@@ -262,17 +265,20 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
         int newIndex = mSessionEntries.updateEntry(oldEntry, newEntry);
         dateRangeManager.updateSessionEntries(mSessionEntries);
         mEntriesCallback.onNotifyEntryUpdated(oldIndex, newIndex);
+        mCalendarCallback.onUpdateEntries(mSessionEntries);
     }
 
     private void removeEntry(SessionEntry oldEntry) {
         int pos = mSessionEntries.removeEntry(oldEntry);
         mEntriesCallback.onNotifyEntryRemoved(pos);
+        mCalendarCallback.onUpdateEntries(mSessionEntries);
         dateRangeManager.updateSessionEntries(mSessionEntries);
     }
 
     private void updateEntries(SessionEntriesCollection sessionEntries) {
         updateDateRangeManagerEntries(sessionEntries);
         mEntriesCallback.onUpdateEntries(sessionEntries);
+        mCalendarCallback.onUpdateEntries(sessionEntries);
     }
 
     private void updateDateRangeManagerEntries(SessionEntriesCollection sessionEntries) {
@@ -292,6 +298,7 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
         mSessionEntries.clear();
         dateRangeManager.updateSessionEntries(mSessionEntries);
         mEntriesCallback.onUpdateEntries(mSessionEntries);
+        mCalendarCallback.onUpdateEntries(mSessionEntries);
     }
     //endregion -- end --
 
@@ -394,7 +401,6 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
                         if (mSessionManager.getIsSessionActive(mHabit.getDatabaseId())) {
                             mSessionManager.cancelSession(mHabit.getDatabaseId());
                         }
-//                        HabitDatabase.removeOnEntryChangedListener(getOnEntryChangeInDatabaseListener());
                         mHabitDatabase.deleteHabit(mHabit.getDatabaseId());
                         finish();
                     }
@@ -443,14 +449,17 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
     }
 
     private void onHabitEditClicked() {
-        EditHabitDialog dialog = EditHabitDialog.newInstance(new NewHabitDialog.OnFinishedListener() {
+        HabitDialogBase.OnFinishedListener onFinished = new NewHabitDialog.OnFinishedListener() {
             @Override
             public void onFinishedWithResult(Habit habit) {
                 mHabit = habit;
                 mHabitDatabase.updateHabit(habit.getDatabaseId(), habit);
                 setUpActivityWithHabit(mHabit);
             }
-        }, ContextCompat.getColor(this, R.color.textColorContrastBackground), mHabit);
+        };
+
+        int accentColor = ContextCompat.getColor(this, R.color.textColorContrastBackground);
+        EditHabitDialog dialog = EditHabitDialog.newInstance(onFinished, accentColor, mHabit);
         dialog.show(getSupportFragmentManager(), "edit-mHabit");
     }
     //endregion -- end --
@@ -527,32 +536,24 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
     View.OnClickListener onCreateEntryFabClickedListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            NewEntryForm dialog = NewEntryForm.newInstance(ContextCompat.getColor(HabitDataActivity.this, R.color.textColorContrastBackground));
-            dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
+            ui.menuFab.close(true);
+
+            EntryFormDialogBase.OnFinishedListener onFinished = new NewEntryForm.OnFinishedListener() {
                 @Override
                 public void onPositiveClicked(SessionEntry entry) {
                     if (entry != null) {
                         mHabitDatabase.addEntry(mHabit.getDatabaseId(), entry);
-
                         dateRangeManager.adjustDateRangeForEntry(entry);
                         addNewEntry(entry);
-
-//                        updateEntries(mSessionEntries);
-
-//                        if (mSearchView != null) {
-//                            mSearchView.setQuery("", false);
-//                            mSearchView.clearFocus();
-//                            mSearchView.onActionViewCollapsed();
-//                        }
                     }
                 }
 
                 @Override
-                public void onNegativeClicked(SessionEntry entry) {
-                }
-            });
+                public void onNegativeClicked(SessionEntry entry) {}
+            };
 
-            ui.menuFab.close(true);
+            NewEntryForm dialog = NewEntryForm.newInstance(ContextCompat.getColor(HabitDataActivity.this, R.color.textColorContrastBackground));
+            dialog.setOnFinishedListener(onFinished);
             dialog.show(getSupportFragmentManager(), "new-entry");
         }
     };
@@ -583,7 +584,6 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
     public Habit getHabit() {
         return mHabit;
     }
-
 
     @Override
     public ThemeColorPalette getColorPalette() {

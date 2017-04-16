@@ -4,6 +4,7 @@ package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragment
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -127,10 +128,10 @@ public class StatisticsFragment extends Fragment implements IHabitDataCallback.I
 
     @Override
     public void onTabReselected() {
-//        if (mFragmentView != null) {
-//            NestedScrollView scrollView = (NestedScrollView) mFragmentView.findViewById(R.id.statistics_container);
-//            scrollView.smoothScrollTo(0, 0);
-//        }
+        if (mFragmentView != null) {
+            NestedScrollView scrollView = (NestedScrollView) mFragmentView.findViewById(R.id.statistics_container);
+            scrollView.smoothScrollTo(0, 0);
+        }
     }
     //endregion
 
