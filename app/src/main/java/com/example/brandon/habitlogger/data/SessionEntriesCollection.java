@@ -43,7 +43,8 @@ public class SessionEntriesCollection extends ArrayList<SessionEntry> {
         if (!sessionEntries.isEmpty()) {
             mDateFromTime = Collections.min(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
             mDateToTime = Collections.max(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
-        }else{
+        }
+        else {
             mDateFromTime = -1;
             mDateToTime = -1;
         }
@@ -88,25 +89,31 @@ public class SessionEntriesCollection extends ArrayList<SessionEntry> {
         return mDateToTime;
     }
 
-    public long getMinimumTime(){
+    public long getMinimumTime() {
         if (!this.isEmpty())
             return Collections.min(this, SessionEntry.ICompareStartingTimes).getStartingTime();
         else return -1;
     }
 
-    public long getMaximumTime(){
+    public long getMaximumTime() {
         if (!this.isEmpty())
             return Collections.max(this, SessionEntry.ICompareStartingTimes).getStartingTime();
         else return -1;
     }
     //endregion
 
-    //region Updaters {}
-    public void updateSessionEntries(List<SessionEntry> entries){
+    //region CRUD (Create, Read, Update, Delete) {}
+    public void updateSessionEntries(List<SessionEntry> entries) {
         this.clear();
         this.addAll(entries);
         invalidate();
         calculateMinMaxFromEntries(this);
+    }
+
+    public int addEntry(SessionEntry entry) {
+        int pos = MyCollectionUtils.binarySearchForInsertPosition(this, entry.getStartingTime(), SessionEntry.IKeyCompareStartingTime);
+        this.add(pos, entry);
+        return pos;
     }
     //endregion
 

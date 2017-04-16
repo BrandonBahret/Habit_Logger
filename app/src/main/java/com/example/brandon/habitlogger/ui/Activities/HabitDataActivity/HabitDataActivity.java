@@ -4,23 +4,30 @@ import android.app.Activity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 import com.example.brandon.habitlogger.databinding.ActivityHabitDataBinding;
+import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.EntriesFragment;
+import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
+import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EditEntryForm;
+import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.NewEntryForm;
 import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 
-public class HabitDataActivity extends AppCompatActivity implements IHabitDataCallback {
+public class HabitDataActivity extends AppCompatActivity implements IHabitDataCallback, IScrollEvents, EntriesFragment.IEntriesEvents {
 
     public static String HABIT_ID = "HABIT_ID";
 
@@ -99,7 +106,7 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
         ui.tabs.setupWithViewPager(ui.container);
         ui.menuFab.setClosedOnTouchOutside(true);
 
-//        dateRangeManager.hideView(false);
+        dateRangeManager.hideView(false);
 //        ui.container.setCurrentItem(1);
 //        ui.menuFab.hideMenu(false);
 
@@ -113,7 +120,7 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
 
         ThemeColorPalette palette = new ThemeColorPalette(habit.getColor());
 
-        if(mStatisticsCallback != null && mEntriesCallback != null && mCalendarCallback != null) {
+        if (mStatisticsCallback != null && mEntriesCallback != null && mCalendarCallback != null) {
             mStatisticsCallback.onUpdateColorPalette(palette);
             mEntriesCallback.onUpdateColorPalette(palette);
             mCalendarCallback.onUpdateColorPalette(palette);
@@ -145,7 +152,7 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
 //        ui.container.addOnPageChangeListener(getOnPageChangedListener());
 //        ui.tabs.addOnTabSelectedListener(getTabSelectedListener());
 //        ui.enterSessionFab.setOnClickListener(getOnEnterSessionFabClickedListener());
-//        ui.createEntryFab.setOnClickListener(getOnCreateEntryFabClickedListener());
+        ui.createEntryFab.setOnClickListener(onCreateEntryFabClickedListener);
 //        dateRangeManager.setDateRangeChangeListener(getDateRangeChangeListener());
     }
 
@@ -195,6 +202,96 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
 
         return super.onOptionsItemSelected(item);
     }
+
+    //region Scroll events
+    @Override
+    public void onScrollUp() {
+//        dateRangeManager.showView(true);
+//        if (ui.tabs.getSelectedTabPosition() == 0)
+//            ui.menuFab.showMenu(true);
+    }
+
+    @Override
+    public void onScrollDown() {
+//        dateRangeManager.hideView(true);
+//        if (ui.tabs.getSelectedTabPosition() == 0)
+//            ui.menuFab.hideMenu(true);
+    }
+    //endregion -- end --
+
+    //region Entries fragment events
+    @Override
+    public void onEntryViewClicked(SessionEntry entry) {
+        EditEntryForm dialog = EditEntryForm.newInstance(entry, ContextCompat.getColor(this, R.color.textColorContrastBackground));
+        dialog.setOnFinishedListener(new EditEntryForm.OnFinishedListener() {
+            @Override
+            public void onPositiveClicked(SessionEntry entry) {
+                if (entry != null) {
+                    SessionEntry oldEntry = mHabitDatabase.getEntry(entry.getDatabaseId());
+                    mHabitDatabase.updateEntry(entry.getDatabaseId(), entry);
+                    mEntriesCallback.onUpdateEntry(entry.getDatabaseId(), oldEntry, entry);
+
+//                    updateSessionEntryById(entry.getDatabaseId(), oldEntry, entry);
+                }
+            }
+
+            @Override
+            public void onNegativeClicked(SessionEntry entry) {
+                mHabitDatabase.deleteEntry(entry.getDatabaseId());
+                mEntriesCallback.onRemoveEntry(entry);
+//                removeSessionEntryById(entry.getDatabaseId());
+            }
+        });
+
+        dialog.show(getSupportFragmentManager(), "edit-entry");
+    }
+    //endregion
+
+    View.OnClickListener onCreateEntryFabClickedListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            NewEntryForm dialog = NewEntryForm.newInstance(ContextCompat.getColor(HabitDataActivity.this, R.color.textColorContrastBackground));
+            dialog.setOnFinishedListener(new NewEntryForm.OnFinishedListener() {
+                @Override
+                public void onPositiveClicked(SessionEntry entry) {
+                    if (entry != null) {
+                        mHabitDatabase.addEntry(mHabit.getDatabaseId(), entry);
+
+                        if (checkIfEntryFitsWithinConditions(entry)) {
+                            int pos = mSessionEntries.addEntry(entry);
+                            mEntriesCallback.onNotifyEntryAdded(pos);
+                        }
+//                        updateEntries(mSessionEntries);
+
+//                        if (mSearchView != null) {
+//                            mSearchView.setQuery("", false);
+//                            mSearchView.clearFocus();
+//                            mSearchView.onActionViewCollapsed();
+//                        }
+                    }
+                }
+
+                @Override
+                public void onNegativeClicked(SessionEntry entry) {}
+            });
+
+            ui.menuFab.close(true);
+            dialog.show(getSupportFragmentManager(), "new-entry");
+        }
+    };
+
+    private boolean checkIfEntryFitsWithinConditions(SessionEntry entry) {
+        boolean fitsWithinRange = dateRangeManager.entryFitsRange(entry);
+        boolean fitsQuery = true;
+
+        CharSequence query = mSearchView.getQuery();
+        if (query != null && query.length() != 0) {
+            String stringQuery = String.valueOf(query);
+            fitsQuery = entry.matchesQuery(stringQuery);
+        }
+        return fitsQuery && fitsWithinRange;
+    }
+
     //endregion -- end --
 
     //region Getters {}

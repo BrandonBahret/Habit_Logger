@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * Created by Brandon on 10/26/2016.
@@ -118,6 +119,10 @@ public class SessionEntry implements Serializable {
         String format = "{\n\tStarting Time: %s,\n\tDuration: %s\n\tNote: %s\n}\n";
         String startTimeString = MyTimeUtils.stringifyTimestamp(getStartingTime(), "MMMM/dd/yyyy");
         return String.format(Locale.US, format, startTimeString, stringifyDuration(), getNote());
+    }
+
+    public boolean matchesQuery(String query) {
+        return Pattern.compile(query, Pattern.CASE_INSENSITIVE | Pattern.LITERAL).matcher(getNote()).find();
     }
 
     //region Static helper methods for formatting durations into readable strings

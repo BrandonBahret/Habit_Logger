@@ -3,6 +3,7 @@ package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 
 /**
@@ -15,11 +16,11 @@ public interface IHabitDataCallback {
     interface IEntriesFragment {
         void onUpdateEntries(SessionEntriesCollection dataSample);
 
-        void onRemoveEntry(int adapterPosition);
+        void onRemoveEntry(SessionEntry removedEntry);
 
-        void onAddEntry();
+        void onNotifyEntryAdded(int adapterPosition);
 
-        void onUpdateEntry();
+        void onUpdateEntry(long databaseId, SessionEntry oldEntry, SessionEntry newEntry);
 
         void onUpdateColorPalette(ThemeColorPalette palette);
 

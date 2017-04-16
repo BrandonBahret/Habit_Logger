@@ -125,6 +125,11 @@ public class FloatingDateRangeWidgetManager {
         dialog.show(mActivity.getSupportFragmentManager(), "text");
     }
 
+    public boolean entryFitsRange(SessionEntry entry) {
+        long startingTime = entry.getStartingTime();
+        return (getDateTo() > startingTime) && (startingTime >= getDateFrom());
+    }
+
     //region Methods responsible for handling events
     private AdapterView.OnItemSelectedListener getOnDateRangeTypeSelectedListener() {
         return new AdapterView.OnItemSelectedListener() {

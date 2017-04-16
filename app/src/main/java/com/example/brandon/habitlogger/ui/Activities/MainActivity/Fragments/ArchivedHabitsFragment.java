@@ -15,7 +15,7 @@ import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportMan
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
-import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.HabitDataActivity;
+import com.example.brandon.habitlogger.ui.Activities.HabitActivity.HabitActivity;
 import com.example.brandon.habitlogger.ui.Activities.MainActivity.HabitViewAdapter;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity.SessionActivity;
@@ -369,7 +369,7 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
                 return new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        HabitDataActivity.startActivity(getActivity(), habitId);
+                        HabitActivity.startActivity(getActivity(), habitId);
                     }
                 };
             }

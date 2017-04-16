@@ -44,10 +44,10 @@ public class MyCollectionUtils {
     }
 
     public static <ListType, Collect> List<Collect> collect
-            (List<ListType> list, IGetKey<ListType, Collect> keyGetter){
+            (List<ListType> list, IGetKey<ListType, Collect> keyGetter) {
 
         List<Collect> collection = new ArrayList<>();
-        for(ListType item: list)
+        for (ListType item : list)
             collection.add(keyGetter.get(item));
 
         return collection;
@@ -64,6 +64,12 @@ public class MyCollectionUtils {
             }
         });
     }
+
+    public static int binarySearchForInsertPosition(List<?> list, final Object key, final KeyComparator comparator) {
+        int pos = binarySearch(list, key, comparator);
+        return -pos - 1;
+    }
+
 
     public static <In> double sum(Iterable<In> objects, IGetKey<In, ? extends Number> keyGetter) {
         double sum = 0.0;
