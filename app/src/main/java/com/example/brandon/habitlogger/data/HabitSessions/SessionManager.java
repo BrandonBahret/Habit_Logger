@@ -7,8 +7,8 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.format.DateUtils;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitSessions.DatabaseSchema.DatabaseSchema;
 import com.example.brandon.habitlogger.data.HabitSessions.DatabaseSchema.SessionsTableSchema;
 import com.example.brandon.habitlogger.common.MyDatabaseUtils;

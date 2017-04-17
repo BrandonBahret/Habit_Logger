@@ -11,8 +11,8 @@ import android.widget.TextView;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 
 public class TimeAverages extends Fragment {
 
@@ -65,7 +65,7 @@ public class TimeAverages extends Fragment {
     //endregion
 
 //    @Override
-    public void updateEntries(SessionEntriesCollection dataSample) {
+    public void updateEntries(SessionEntryCollection dataSample) {
 
         if (!dataSample.isEmpty()) {
 
@@ -83,7 +83,7 @@ public class TimeAverages extends Fragment {
             double hoursPerDayTime = days == 0 ? 0 : totalHours / days;
             hoursPerDay.setText(String.valueOf(hoursPerDayTime));
 
-            double daysPerWeekOnAverage = MyCollectionUtils.listToSet(dataSample.asList(), SessionEntry.IGetSessionStartDate).size() / weeks;
+            double daysPerWeekOnAverage = MyCollectionUtils.collectIntoSet(dataSample.asList(), SessionEntry.IGetSessionStartDate).size() / weeks;
             this.habitFrequency.setText(String.valueOf(daysPerWeekOnAverage));
         }
     }

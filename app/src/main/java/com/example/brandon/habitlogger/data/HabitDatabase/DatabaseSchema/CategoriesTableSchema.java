@@ -3,7 +3,7 @@ package com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema;
 import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.DatabaseSchema.SQL_TYPES;
 
 /**
@@ -12,6 +12,7 @@ import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.Databas
  */
 
 public class CategoriesTableSchema {
+
     public static final String TABLE_NAME = "CATEGORIES_TABLE";
     public static final String CATEGORY_ID = "ID";
     public static final String CATEGORY_NAME = "NAME";

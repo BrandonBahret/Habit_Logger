@@ -1,9 +1,9 @@
 package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity;
 
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
-import com.example.brandon.habitlogger.data.CategoryDataSample;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 
 import java.io.Serializable;
 
@@ -15,7 +15,7 @@ import java.io.Serializable;
 public interface IHabitDataCallback {
 
     interface IEntriesFragment {
-        void onUpdateEntries(SessionEntriesCollection dataSample);
+        void onUpdateEntries(SessionEntryCollection dataSample);
 
         void onNotifyEntryRemoved(int adapterPosition);
 
@@ -31,7 +31,7 @@ public interface IHabitDataCallback {
     void setEntriesFragmentCallback(IEntriesFragment callback);
 
     interface ICalendarFragment {
-        void onUpdateEntries(SessionEntriesCollection dataSample);
+        void onUpdateEntries(SessionEntryCollection dataSample);
 
         void onUpdateColorPalette(ThemeColorPalette palette);
 
@@ -43,7 +43,7 @@ public interface IHabitDataCallback {
 
 
     interface IStatisticsFragment {
-        void onUpdateEntries(SessionEntriesCollection dataSample);
+        void onUpdateEntries(SessionEntryCollection dataSample);
 
         void onUpdateCategoryDataSample(CategoryDataSample dataSample);
 
@@ -53,7 +53,7 @@ public interface IHabitDataCallback {
     }
 
     interface IUpdateEntries extends Serializable {
-        SessionEntriesCollection getSessionEntries();
+        SessionEntryCollection getSessionEntries();
     }
 
     interface IUpdateCategoryData extends Serializable {
@@ -66,7 +66,7 @@ public interface IHabitDataCallback {
 
     ThemeColorPalette getColorPalette();
 
-    SessionEntriesCollection getSessionEntries();
+    SessionEntryCollection getSessionEntries();
 
     CategoryDataSample getCategoryDataSample();
 

@@ -23,7 +23,7 @@ import android.view.ViewGroup;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
-import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.databinding.FragmentLineGraphCompletionBinding;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.github.mikephil.charting.components.AxisBase;
@@ -125,7 +125,7 @@ public class LineGraphCompletion extends Fragment {
     //endregion
 
     //region Methods responsible for generating the line chart data.
-    List<Entry> calculateDataSet(SessionEntriesCollection sessionEntries) {
+    List<Entry> calculateDataSet(SessionEntryCollection sessionEntries) {
 
         int totalDays = sessionEntries.calculateTotalDaysLength();
         List<Entry> values = new ArrayList<>(totalDays);
@@ -149,7 +149,7 @@ public class LineGraphCompletion extends Fragment {
 
     //endregion
 
-    public void updateEntries(SessionEntriesCollection dataSample) {
+    public void updateEntries(SessionEntryCollection dataSample) {
         if (!dataSample.isEmpty())
             setLineChartData(calculateDataSet(dataSample));
     }

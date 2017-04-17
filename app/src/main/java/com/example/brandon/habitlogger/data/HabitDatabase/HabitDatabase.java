@@ -11,16 +11,16 @@ import android.support.annotation.Nullable;
 import com.android.internal.util.Predicate;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.MyDatabaseUtils;
-import com.example.brandon.habitlogger.data.CategoryDataSample;
-import com.example.brandon.habitlogger.data.HabitDataSample;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataSample;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.CategoriesTableSchema;
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.DatabaseSchema;
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.EntriesTableSchema;
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.HabitsTableSchema;
-import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -115,7 +115,7 @@ public class HabitDatabase {
         return new HabitDataSample(data, dateFrom, dateTo);
     }
 
-    public HabitDataSample getHabitDataSample(SessionEntriesCollection entriesSample) {
+    public HabitDataSample getHabitDataSample(SessionEntryCollection entriesSample) {
 
         List<Long> habitIdsList = MyCollectionUtils.collect(entriesSample.asList(), new MyCollectionUtils.IGetKey<SessionEntry, Long>() {
             @Override
@@ -142,7 +142,7 @@ public class HabitDatabase {
 
             for (Habit habit : habits) {
                 final long habitId = habit.getDatabaseId();
-                SessionEntriesCollection entries = new SessionEntriesCollection(entriesSample.asList());
+                SessionEntryCollection entries = new SessionEntryCollection(entriesSample.asList());
                 MyCollectionUtils.filter(entries, new Predicate<SessionEntry>() {
                     @Override
                     public boolean apply(SessionEntry sessionEntry) {
@@ -165,19 +165,19 @@ public class HabitDatabase {
         for (Habit habit : habits) {
             long habitId = habit.getDatabaseId();
             Set<Long> ids = findEntriesWithinTimeRange(habitId, dateFrom, dateTo);
-            SessionEntriesCollection entries = lookUpEntries(ids);
+            SessionEntryCollection entries = lookUpEntries(ids);
             habit.setEntries(entries);
         }
 
         return new CategoryDataSample(category, habits, dateFrom, dateTo);
     }
 
-    public SessionEntriesCollection getEntriesSample(long habitId, long dateFrom, long dateTo) {
+    public SessionEntryCollection getEntriesSample(long habitId, long dateFrom, long dateTo) {
         List<SessionEntry> entries = lookUpEntriesAsList(
                 findEntriesWithinTimeRange(habitId, dateFrom, dateTo)
         );
 
-        return new SessionEntriesCollection(entries, dateFrom, dateTo);
+        return new SessionEntryCollection(entries, dateFrom, dateTo);
     }
     //endregion
 
@@ -376,8 +376,8 @@ public class HabitDatabase {
         habit.setDatabaseId(habitId);
 
         // Add entries to the new habit
-        List<SessionEntry> entries = habit.getEntries();
-        if (entries != null) addEntries(habitId, entries);
+        if (habit.getEntries() != null)
+            addEntries(habitId, habit.getEntries());
 
         return habitId;
     }
@@ -908,8 +908,8 @@ public class HabitDatabase {
         return entries;
     }
 
-    public SessionEntriesCollection lookUpEntries(Set<Long> ids) {
-        return new SessionEntriesCollection(lookUpEntriesAsList(ids));
+    public SessionEntryCollection lookUpEntries(Set<Long> ids) {
+        return new SessionEntryCollection(lookUpEntriesAsList(ids));
     }
 
     /**
@@ -954,12 +954,12 @@ public class HabitDatabase {
         return fetchEntriesAtCursor(c);
     }
 
-    public SessionEntriesCollection getEntries(long habitId) {
-        return new SessionEntriesCollection(getEntriesAsList(habitId));
+    public SessionEntryCollection getEntries(long habitId) {
+        return new SessionEntryCollection(getEntriesAsList(habitId));
     }
 
-    public SessionEntriesCollection getEntries() {
-        return new SessionEntriesCollection(getEntriesAsList());
+    public SessionEntryCollection getEntries() {
+        return new SessionEntryCollection(getEntriesAsList());
     }
 
     private List<SessionEntry> fetchEntriesAtCursor(Cursor cursor) {

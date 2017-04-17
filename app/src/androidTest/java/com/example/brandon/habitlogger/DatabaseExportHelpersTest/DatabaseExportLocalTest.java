@@ -4,13 +4,11 @@ import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Instrumentation test, which will execute on an Android device.
@@ -34,7 +32,7 @@ public class DatabaseExportLocalTest extends AndroidTestCase {
         // Add some junk data to the database
         HabitCategory mainCategory = new HabitCategory("color", "name");
 
-        List<SessionEntry> entries = new ArrayList<>(10);
+        SessionEntryCollection entries = new SessionEntryCollection(10);
 
         for (int i = 0; i < entries.size(); i++) {
             entries.add(i, new SessionEntry(0, 0, "note"));

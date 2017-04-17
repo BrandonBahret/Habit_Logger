@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
-import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarView.CalendarViewAdapter;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
@@ -77,7 +77,7 @@ public class CalendarFragment extends Fragment implements IHabitDataCallback.ICa
 
     //region Methods responsible for handling events
     @Override
-    public void onUpdateEntries(SessionEntriesCollection dataCollection) {
+    public void onUpdateEntries(SessionEntryCollection dataCollection) {
         mCalendarAdapter = new CalendarViewAdapter(dataCollection, mColorPalette.getBaseColor(), getContext());
         mCalendarViewContainer.setAdapter(mCalendarAdapter);
     }

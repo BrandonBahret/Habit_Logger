@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.data;
+package com.example.brandon.habitlogger.data.DataModels.DataCollections;
 
 import android.support.annotation.NonNull;
 
@@ -10,15 +10,13 @@ import java.util.Collection;
  * A simple base class for creating collections of data models.
  */
 
-public abstract class MyArrayListBase <ListType> extends ArrayList<ListType> {
+public abstract class MyDataCollectionBase<ListType> extends ArrayList<ListType> {
 
-    public MyArrayListBase(int initialCapacity) {
+    public MyDataCollectionBase(int initialCapacity) {
         super(initialCapacity);
     }
 
-    public MyArrayListBase() {}
-
-    public MyArrayListBase(@NonNull Collection<? extends ListType> c) {
+    public MyDataCollectionBase(@NonNull Collection<? extends ListType> c) {
         super(c);
     }
 

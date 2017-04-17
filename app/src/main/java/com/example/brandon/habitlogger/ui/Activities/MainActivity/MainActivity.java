@@ -23,7 +23,7 @@ import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.RequestCodes;
 import com.example.brandon.habitlogger.data.DataExportHelpers.GoogleDriveDataExportManager;
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionNotificationManager;

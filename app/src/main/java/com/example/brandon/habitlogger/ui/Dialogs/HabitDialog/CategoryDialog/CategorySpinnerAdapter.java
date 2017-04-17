@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.R;
 
 import java.util.List;

@@ -14,10 +14,10 @@ import android.widget.ImageView;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
-import com.example.brandon.habitlogger.data.HabitDataSample;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataSample;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.EntryViewAdapter;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.IDataOverviewCallback;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
@@ -33,7 +33,7 @@ public class OverviewEntriesFragment extends Fragment implements
 
     //region (Member attributes)
     private HabitDatabase mHabitDatabase;
-    private SessionEntriesCollection mSessionEntries;
+    private SessionEntryCollection mSessionEntries;
 
     private IScrollEvents mListener;
     private IDataOverviewCallback mCallbackInterface;
@@ -252,7 +252,7 @@ public class OverviewEntriesFragment extends Fragment implements
     @Override
     public void updateHabitDataSample(HabitDataSample dataSample) {
         if (mEntryAdapter != null) {
-            mSessionEntries = new SessionEntriesCollection(dataSample.buildSessionEntriesList().asList());
+            mSessionEntries = new SessionEntryCollection(dataSample.buildSessionEntriesList().asList());
             mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), mEntryAdapter.getListener());
             mEntriesContainer.setAdapter(mEntryAdapter);
         }

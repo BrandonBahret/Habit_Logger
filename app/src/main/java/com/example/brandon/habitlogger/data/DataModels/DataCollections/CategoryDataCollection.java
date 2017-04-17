@@ -1,13 +1,13 @@
-package com.example.brandon.habitlogger.data;
+package com.example.brandon.habitlogger.data.DataModels.DataCollections;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.android.internal.util.Predicate;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +23,7 @@ public final class CategoryDataCollection extends ArrayList<Habit> implements Pa
     //region (Member Attributes)
     private final HabitCategory mCategory;
     private long mDateFromTime, mDateToTime;
-    private SessionEntriesCollection mAllSessionEntries;
+    private SessionEntryCollection mAllSessionEntries;
     private Long mTotalDuration;
     private boolean mTotalDurationInvalid = true;
     //endregion
@@ -91,11 +91,11 @@ public final class CategoryDataCollection extends ArrayList<Habit> implements Pa
         return mTotalDuration;
     }
 
-    public SessionEntriesCollection buildSessionEntriesList() {
+    public SessionEntryCollection buildSessionEntriesList() {
 
         if (mAllSessionEntries == null) {
-            mAllSessionEntries = new SessionEntriesCollection(
-                    MyCollectionUtils.collectAsList(this, new MyCollectionUtils.IGetList<Habit, SessionEntry>() {
+            mAllSessionEntries = new SessionEntryCollection(
+                    MyCollectionUtils.collectLists(this, new MyCollectionUtils.IGetList<Habit, SessionEntry>() {
                         @Override
                         public List<SessionEntry> getList(Habit habit) {
                             return habit.getEntries();
@@ -117,7 +117,7 @@ public final class CategoryDataCollection extends ArrayList<Habit> implements Pa
             @Override
             public Habit get(Habit habit) {
                 habit = Habit.duplicate(habit);
-                SessionEntriesCollection entriesForDate = habit.filterEntriesForDate(timestamp);
+                SessionEntryCollection entriesForDate = habit.findEntriesWithDate(timestamp);
                 return habit.setEntries(entriesForDate);
             }
         });
@@ -128,7 +128,7 @@ public final class CategoryDataCollection extends ArrayList<Habit> implements Pa
 //
 //        for (int i = 0; i < mHabits.size(); i++) {
 //            habits.add(i, Habit.duplicate(mHabits.get(i)));
-//            List<SessionEntry> entriesForDate = habits.get(i).filterEntriesForDate(timestamp);
+//            List<SessionEntry> entriesForDate = habits.get(i).findEntriesWithDate(timestamp);
 //            habits.get(i).setEntries(entriesForDate);
 //        }
 //

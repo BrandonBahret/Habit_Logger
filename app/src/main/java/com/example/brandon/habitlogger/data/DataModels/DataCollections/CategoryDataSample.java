@@ -1,12 +1,12 @@
-package com.example.brandon.habitlogger.data;
+package com.example.brandon.habitlogger.data.DataModels.DataCollections;
 
 import android.os.Parcel;
 
 import com.android.internal.util.Predicate;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public final class CategoryDataSample extends ExpandableGroup<Habit> {
     private final HabitCategory mCategory;
     private final List<Habit> mHabits;
     private final long mDateFromTime, mDateToTime;
-    private SessionEntriesCollection mSessionEntries;
+    private SessionEntryCollection mSessionEntries;
     private Long mDuration;
     //endregion
 
@@ -93,10 +93,10 @@ public final class CategoryDataSample extends ExpandableGroup<Habit> {
         return mDuration;
     }
 
-    public SessionEntriesCollection buildSessionEntriesList() {
+    public SessionEntryCollection buildSessionEntriesList() {
 
         if (mSessionEntries == null) {
-            mSessionEntries = new SessionEntriesCollection();
+            mSessionEntries = new SessionEntryCollection();
 
             for (Habit habit : mHabits) {
                 List<SessionEntry> entries = habit.getEntries();
@@ -118,7 +118,7 @@ public final class CategoryDataSample extends ExpandableGroup<Habit> {
 
         for (int i = 0; i < mHabits.size(); i++) {
             habits.add(i, Habit.duplicate(mHabits.get(i)));
-            SessionEntriesCollection entriesForDate = habits.get(i).filterEntriesForDate(timestamp);
+            SessionEntryCollection entriesForDate = habits.get(i).findEntriesWithDate(timestamp);
             habits.get(i).setEntries(entriesForDate);
         }
 

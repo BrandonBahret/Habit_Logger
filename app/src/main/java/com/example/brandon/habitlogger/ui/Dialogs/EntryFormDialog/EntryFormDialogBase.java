@@ -13,7 +13,7 @@ import android.view.View;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.databinding.DialogNewEntryBinding;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Dialogs.MyDatePickerDialog;
@@ -125,7 +125,7 @@ public abstract class EntryFormDialogBase extends DialogFragment {
     }
 
     private void setDurationNumberPickers() {
-        int time[] = MyTimeUtils.getTimePortion(mEntry.getDuration());
+        Integer[] time = MyTimeUtils.getTimePortion(mEntry.getDuration());
         ui.hours.setValue(time[0]);
         ui.minutes.setValue(time[1]);
         ui.seconds.setValue(time[2]);

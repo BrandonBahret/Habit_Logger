@@ -11,8 +11,8 @@ import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.ui.Activities.MainActivity.HabitViewHolder;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity.SessionActivity;

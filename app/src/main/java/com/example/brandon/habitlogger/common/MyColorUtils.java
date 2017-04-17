@@ -41,6 +41,17 @@ public class MyColorUtils {
         return "#" + Integer.toHexString(color);
     }
 
+    public static int parseColor(String color) {
+        int result = 0xFF000000;
+        try {
+            result = Color.parseColor(color);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
     //region Get color components {}
     public static int[] getRGBComponents(int color) {
         int red = Color.red(color);

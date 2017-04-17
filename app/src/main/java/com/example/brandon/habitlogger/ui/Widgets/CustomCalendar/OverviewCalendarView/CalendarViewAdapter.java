@@ -9,9 +9,9 @@ import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
-import com.example.brandon.habitlogger.data.CategoryDataSample;
-import com.example.brandon.habitlogger.data.HabitDataSample;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataSample;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarViewAdapterBase;
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarViewModelBase;
 

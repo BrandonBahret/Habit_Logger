@@ -43,7 +43,7 @@ public class MyTimeUtils {
      * @param timestamp The duration in milliseconds
      * @return An array {hours, minutes, seconds}
      */
-    public static int[] getTimePortion(long timestamp){
+    public static Integer[] getTimePortion(long timestamp){
 
         timestamp /= 1000;
 
@@ -55,14 +55,14 @@ public class MyTimeUtils {
 
         int seconds = (int)timestamp;
 
-        return new int[]{hours, minutes, seconds};
+        return new Integer[]{hours, minutes, seconds};
     }
 
     /**
      * @return Time of day formatted as prescribed.
      */
     public static String stringifyTimePortion(long timestamp, String format) {
-        int[] timeComponents = getTimePortion(timestamp);
+        Integer[] timeComponents = getTimePortion(timestamp);
 
         Calendar c = Calendar.getInstance();
 

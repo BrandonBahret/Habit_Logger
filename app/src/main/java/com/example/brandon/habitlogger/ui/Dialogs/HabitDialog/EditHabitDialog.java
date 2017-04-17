@@ -3,7 +3,7 @@ package com.example.brandon.habitlogger.ui.Dialogs.HabitDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
 
 /**
  * Created by Brandon on 3/6/2017.

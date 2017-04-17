@@ -3,8 +3,8 @@ package com.example.brandon.habitlogger.ui.Dialogs.HabitDialog;
 import android.os.Bundle;
 
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 
 /**
  * Created by Brandon on 3/6/2017.

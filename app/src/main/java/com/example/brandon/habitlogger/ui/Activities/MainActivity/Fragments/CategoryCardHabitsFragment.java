@@ -10,10 +10,10 @@ import android.widget.Toast;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
-import com.example.brandon.habitlogger.data.CategoryDataSample;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.HabitDataActivity;
 import com.example.brandon.habitlogger.ui.Activities.MainActivity.CategoryCardAdapter;

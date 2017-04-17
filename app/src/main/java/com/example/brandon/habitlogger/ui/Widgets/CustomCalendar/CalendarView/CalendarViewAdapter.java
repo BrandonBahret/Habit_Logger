@@ -9,9 +9,9 @@ import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarViewAdapterBase;
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarViewModelBase;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,10 +26,10 @@ import java.util.Set;
 
 public class CalendarViewAdapter extends CalendarViewAdapterBase<CalendarViewAdapter.ViewHolder> {
 
-    SessionEntriesCollection mEntriesSample;
+    SessionEntryCollection mEntriesSample;
     private int mStreakColor = -1;
 
-    public CalendarViewAdapter(SessionEntriesCollection entriesSample, int streakColor, Context context) {
+    public CalendarViewAdapter(SessionEntryCollection entriesSample, int streakColor, Context context) {
         super(context);
         mEntriesSample = entriesSample;
         mStreakColor = streakColor;
@@ -69,7 +69,7 @@ public class CalendarViewAdapter extends CalendarViewAdapterBase<CalendarViewAda
     }
     //endregion -- end --
 
-    private void generateMonthDataFromEntries(SessionEntriesCollection entriesSample) {
+    private void generateMonthDataFromEntries(SessionEntryCollection entriesSample) {
         Calendar startCalendar = Calendar.getInstance();
         long minimumTime = entriesSample.getMinimumTime();
         minimumTime = minimumTime == -1 ? System.currentTimeMillis() : minimumTime;

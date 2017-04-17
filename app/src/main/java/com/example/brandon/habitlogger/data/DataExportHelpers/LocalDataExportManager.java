@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.DatabaseSchema;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 

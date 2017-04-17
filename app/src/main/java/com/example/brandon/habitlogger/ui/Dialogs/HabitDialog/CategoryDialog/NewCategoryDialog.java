@@ -9,7 +9,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.databinding.DialogNewCategoryBinding;
 

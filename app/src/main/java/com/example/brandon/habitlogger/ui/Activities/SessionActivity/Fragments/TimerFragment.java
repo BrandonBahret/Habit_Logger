@@ -132,7 +132,7 @@ public class TimerFragment extends Fragment {
 
     public void updateTimeDisplay(Long duration) {
         if (duration != null) {
-            int time[] = MyTimeUtils.getTimePortion(duration);
+            Integer[] time = MyTimeUtils.getTimePortion(duration);
 
             ui.sessionHoursView.setText(String.format(Locale.US, "%02d", time[0]));
             ui.sessionMinutesView.setText(String.format(Locale.US, "%02d", time[1]));

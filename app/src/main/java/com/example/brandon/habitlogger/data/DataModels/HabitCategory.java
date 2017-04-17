@@ -1,12 +1,13 @@
-package com.example.brandon.habitlogger.data.HabitDatabase.DataModels;
+package com.example.brandon.habitlogger.data.DataModels;
 
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 
 import com.example.brandon.habitlogger.common.MyColorUtils;
 
 import java.io.Serializable;
 import java.util.Locale;
+
+import static com.example.brandon.habitlogger.common.MyColorUtils.stringifyColor;
 
 /**
  * Created by Brandon on 10/26/2016.
@@ -25,14 +26,15 @@ public class HabitCategory implements Serializable {
 
     //region Constructors {}
     public HabitCategory(@NonNull String color, @NonNull String name) {
-        this.mColor = color;
-        this.mName = name;
+        mColor = color;
+        mName = name;
     }
 
     public HabitCategory(int color, @NonNull String name) {
-        this.mColor = MyColorUtils.stringifyColor(color);
-        this.mName = name;
+        this(stringifyColor(color), name);
     }
+
+    public HabitCategory() {}
     //endregion
 
     @Override
@@ -53,25 +55,25 @@ public class HabitCategory implements Serializable {
 
     //region Setters {}
     public HabitCategory setColor(@NonNull String color) {
-        this.mColor = color;
+        mColor = color;
         return this;
     }
 
     public HabitCategory setColor(int color) {
-        setColor(MyColorUtils.stringifyColor(color));
+        mColor = MyColorUtils.stringifyColor(color);
         return this;
     }
 
     public HabitCategory setName(@NonNull String name) {
-        this.mName = name;
+        mName = name;
         return this;
     }
 
     public HabitCategory setDatabaseId(long databaseId) {
-        this.mDatabaseId = databaseId;
+        mDatabaseId = databaseId;
         return this;
     }
-    //endregion
+    //endregion -- end --
 
     //region Getters {}
     @NonNull
@@ -80,14 +82,7 @@ public class HabitCategory implements Serializable {
     }
 
     public int getColorAsInt() {
-        int result = 0xFFCCCCCC;
-        try {
-            result = Color.parseColor(getColor());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return result;
+        return MyColorUtils.parseColor(mColor);
     }
 
     @NonNull
@@ -98,5 +93,6 @@ public class HabitCategory implements Serializable {
     public long getDatabaseId() {
         return mDatabaseId;
     }
-    //endregion
+    //endregion -- end --
+
 }

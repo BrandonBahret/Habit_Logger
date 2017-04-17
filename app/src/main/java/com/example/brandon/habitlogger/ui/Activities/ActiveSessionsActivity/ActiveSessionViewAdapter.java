@@ -10,7 +10,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.R;

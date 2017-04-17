@@ -3,15 +3,13 @@ package com.example.brandon.habitlogger.DatabaseTest;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -24,8 +22,8 @@ import static org.junit.Assert.assertEquals;
 @RunWith(AndroidJUnit4.class)
 public class HabitTest {
 
-    private List<SessionEntry> getDummyEntries() {
-        List<SessionEntry> entries = new ArrayList<>(100);
+    private SessionEntryCollection getDummyEntries() {
+        SessionEntryCollection entries = new SessionEntryCollection(100);
         for (int i = 0; i < entries.size(); i++) {
             entries.add(i, new SessionEntry(i, i,
                     "Lorem ipsum dolor sit amet, consectetur adipiscing elit."));

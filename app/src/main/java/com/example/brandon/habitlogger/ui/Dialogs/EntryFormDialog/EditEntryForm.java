@@ -2,7 +2,7 @@ package com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog;
 
 import android.os.Bundle;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 
 /**
  * Created by Brandon on 3/29/2017.

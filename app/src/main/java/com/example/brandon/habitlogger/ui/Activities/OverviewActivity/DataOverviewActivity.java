@@ -17,10 +17,10 @@ import android.view.MenuItem;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
-import com.example.brandon.habitlogger.data.HabitDataSample;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataSample;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.databinding.ActivityDataOverviewBinding;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.Fragments.OverviewCalendarFragment;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.Fragments.OverviewEntriesFragment;
@@ -87,7 +87,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
     private void updateEntries(List<SessionEntry> entries) {
         updateDateRangeManagerEntries(entries);
 
-        SessionEntriesCollection entriesSample = new SessionEntriesCollection(entries);
+        SessionEntryCollection entriesSample = new SessionEntryCollection(entries);
         HabitDataSample dataSample = mHabitDatabase.getHabitDataSample(entriesSample);
 
         for (IUpdateHabitSample callback : mUpdateDataCallbacks)

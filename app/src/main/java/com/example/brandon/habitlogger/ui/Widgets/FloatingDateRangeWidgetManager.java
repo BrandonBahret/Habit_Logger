@@ -12,8 +12,8 @@ import android.widget.TextView;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Dialogs.MyDatePickerDialog;
 
@@ -249,7 +249,7 @@ public class FloatingDateRangeWidgetManager {
         updateMinMaxTimestamps(sessionEntries);
     }
 
-    public void updateSessionEntries(SessionEntriesCollection sessionEntries){
+    public void updateSessionEntries(SessionEntryCollection sessionEntries){
         updateSessionEntries(sessionEntries, sessionEntries.getMinimumTime(), sessionEntries.getMaximumTime());
         sessionEntries.setDateFrom(getDateFrom());
         sessionEntries.setDateTo(getDateTo());

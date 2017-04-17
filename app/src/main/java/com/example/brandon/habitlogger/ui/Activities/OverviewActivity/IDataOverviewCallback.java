@@ -1,6 +1,6 @@
 package com.example.brandon.habitlogger.ui.Activities.OverviewActivity;
 
-import com.example.brandon.habitlogger.data.HabitDataSample;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataSample;
 
 /**
  * Created by Brandon on 3/2/2017.

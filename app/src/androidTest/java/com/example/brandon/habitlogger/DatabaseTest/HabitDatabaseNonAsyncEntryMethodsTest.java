@@ -3,10 +3,10 @@ package com.example.brandon.habitlogger.DatabaseTest;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -18,14 +18,14 @@ import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.RequestCodes;
 import com.example.brandon.habitlogger.common.ResultCodes;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
-import com.example.brandon.habitlogger.data.CategoryDataSample;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.EntriesTableSchema;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
-import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.databinding.ActivityHabitDataBinding;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.EntriesFragment;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
@@ -55,7 +55,7 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
 
     // Data
     private Habit mHabit;
-    private SessionEntriesCollection mSessionEntries = new SessionEntriesCollection();
+    private SessionEntryCollection mSessionEntries = new SessionEntryCollection();
 
     // View related members
     FloatingDateRangeWidgetManager dateRangeManager;
@@ -212,7 +212,7 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
     //endregion [ ---- end ---- ]
 
     //region Methods responsible for manipulating entries
-    private SessionEntriesCollection fetchEntriesWithinConditions(String query) {
+    private SessionEntryCollection fetchEntriesWithinConditions(String query) {
         Set<Long> queryIds = mHabitDatabase.findEntryIdsByComment(
                 mHabit.getDatabaseId(), query
         );
@@ -227,7 +227,7 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
         return mHabitDatabase.lookUpEntries(queryIds);
     }
 
-    private SessionEntriesCollection fetchEntriesWithinTimeRange() {
+    private SessionEntryCollection fetchEntriesWithinTimeRange() {
         Set<Long> dateRangeIds = mHabitDatabase.findEntriesWithinTimeRange(
                 mHabit.getDatabaseId(),
                 dateRangeManager.getDateFrom(), dateRangeManager.getDateTo()
@@ -278,14 +278,14 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
         mStatisticsCallback.onUpdateEntries(mSessionEntries);
     }
 
-    private void updateEntries(SessionEntriesCollection sessionEntries) {
+    private void updateEntries(SessionEntryCollection sessionEntries) {
         updateDateRangeManagerEntries(sessionEntries);
         mEntriesCallback.onUpdateEntries(sessionEntries);
         mCalendarCallback.onUpdateEntries(sessionEntries);
         mStatisticsCallback.onUpdateEntries(mSessionEntries);
     }
 
-    private void updateDateRangeManagerEntries(SessionEntriesCollection sessionEntries) {
+    private void updateDateRangeManagerEntries(SessionEntryCollection sessionEntries) {
         SessionEntry minEntry = mHabitDatabase.getMinEntry(mHabit.getDatabaseId());
         SessionEntry maxEntry = mHabitDatabase.getMaxEntry(mHabit.getDatabaseId());
         if (minEntry != null && maxEntry != null) {
@@ -598,7 +598,7 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
     }
 
     @Override
-    public SessionEntriesCollection getSessionEntries() {
+    public SessionEntryCollection getSessionEntries() {
         return mSessionEntries;
     }
 

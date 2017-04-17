@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.data.HabitDatabase.DataModels;
+package com.example.brandon.habitlogger.data.DataModels;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 
 import com.android.internal.util.Predicate;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
-import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.opencsv.CSVReader;
 
 import java.io.IOException;
@@ -27,12 +27,11 @@ public class Habit implements Serializable, Parcelable {
     //region (Member attributes)
     @NonNull private String mName;
     @NonNull private HabitCategory mCategory;
-    @Nullable private String mDescription;
+    @NonNull private String mDescription;
     @Nullable private String mIconResId;
-    @NonNull private SessionEntriesCollection mSessionEntries;
-
-    private int mIsArchived = 0;
+    @Nullable private SessionEntryCollection mSessionEntries;
     private long mDatabaseId = -1;
+    private boolean mIsArchived = false;
     //endregion
 
     //region (Static Helper Interfaces)
@@ -63,28 +62,19 @@ public class Habit implements Serializable, Parcelable {
             return !item.getIsArchived();
         }
     };
+
+    public static MyCollectionUtils.IGetKey<Habit, Long> IGetEntriesDuration = new MyCollectionUtils.IGetKey<Habit, Long>() {
+        @Override
+        public Long get(Habit habit) {
+            return habit.getEntriesDuration();
+        }
+    };
     //endregion
 
     //region Constructors {}
-    public Habit(@NonNull String name, @NonNull HabitCategory category) {
-        mName = name;
-        mCategory = category;
-        mSessionEntries = new SessionEntriesCollection();
-        mIconResId = "none";
-    }
-
-    public Habit(@NonNull String name, @Nullable String description, @NonNull HabitCategory category,
-                 @Nullable String iconResId, @NonNull SessionEntriesCollection entries) {
-        mName = name;
-        mDescription = description;
-        mCategory = category;
-        mIconResId = iconResId;
-        mSessionEntries = entries;
-    }
-
-    public Habit(@NonNull String name, @Nullable String description, @NonNull HabitCategory category,
-                 @Nullable String iconResId, @NonNull SessionEntriesCollection entries,
-                 int isArchived, long databaseId) {
+    public Habit(@NonNull String name, @NonNull String description, @NonNull HabitCategory category,
+                 @Nullable String iconResId, @NonNull SessionEntryCollection entries,
+                 boolean isArchived, long databaseId) {
 
         mName = name;
         mCategory = category;
@@ -95,13 +85,26 @@ public class Habit implements Serializable, Parcelable {
         mSessionEntries = entries;
     }
 
+    public Habit(@NonNull String name, @NonNull String description, @NonNull HabitCategory category,
+                 @Nullable String iconResId, @NonNull SessionEntryCollection entries) {
+        this(name, description, category, iconResId, entries, false, -1);
+    }
+
+    public Habit(@NonNull String name, @NonNull HabitCategory category) {
+        this(name, "No Description", category, null, new SessionEntryCollection());
+    }
+
+    public Habit() {
+        this("No name", new HabitCategory());
+    }
+    //endregion -- end --
+
+    //region Methods responsible for making this object parcelable
     public Habit(Parcel in) {
         Habit habit = (Habit) in.readSerializable();
         Habit.copy(this, habit);
     }
-    //endregion
 
-    //region Methods responsible for making this object parcelable
     @Override
     public int describeContents() {
         return 0;
@@ -123,7 +126,7 @@ public class Habit implements Serializable, Parcelable {
             return new Habit[size];
         }
     };
-    //endregion
+    //endregion -- end --
 
     //region Methods responsible for enabling deep copying
     private static void copy(Habit dest, Habit source) {
@@ -133,7 +136,7 @@ public class Habit implements Serializable, Parcelable {
         dest.mIconResId = source.mIconResId;
         dest.mDatabaseId = source.mDatabaseId;
         dest.mIsArchived = source.mIsArchived;
-        dest.mSessionEntries = new SessionEntriesCollection(source.getEntries());
+        dest.mSessionEntries = new SessionEntryCollection(source.getEntries());
     }
 
     public static Habit duplicate(Habit habit) {
@@ -167,7 +170,7 @@ public class Habit implements Serializable, Parcelable {
             reader.readNext(); // Skip line
             reader.readNext(); // Skip line
 
-            SessionEntriesCollection entries = new SessionEntriesCollection(numberOfEntries);
+            SessionEntryCollection entries = new SessionEntryCollection(numberOfEntries);
             for (int entryIndex = 0; entryIndex < numberOfEntries; entryIndex++) {
                 SessionEntry entry = createSessionEntryFromStrings(reader.readNext());
                 entries.add(entryIndex, entry);
@@ -182,7 +185,7 @@ public class Habit implements Serializable, Parcelable {
     }
 
     private static Habit createHabitFromStrings(String[] habitArray) {
-        int isArchived = Boolean.parseBoolean(habitArray[0]) ? 1 : 0;
+        boolean isArchived = Boolean.parseBoolean(habitArray[0]);
         String habitName = habitArray[1];
         String habitDescription = habitArray[2];
         String categoryName = habitArray[3];
@@ -190,7 +193,7 @@ public class Habit implements Serializable, Parcelable {
         String habitIconResId = habitArray[5];
         HabitCategory category = new HabitCategory(categoryColor, categoryName);
 
-        return new Habit(habitName, habitDescription, category, habitIconResId, new SessionEntriesCollection(), isArchived, -1);
+        return new Habit(habitName, habitDescription, category, habitIconResId, new SessionEntryCollection(), isArchived, -1);
     }
 
     private static SessionEntry createSessionEntryFromStrings(String[] entryArray) {
@@ -200,7 +203,7 @@ public class Habit implements Serializable, Parcelable {
 
         return new SessionEntry(entryStartTime, entryDuration, entryNote);
     }
-    //endregion
+    //endregion -- end --
 
     /**
      * @return A csv form of the habit
@@ -221,7 +224,10 @@ public class Habit implements Serializable, Parcelable {
 
         String entryFormat = "%d,%d,\"%s\"\n";
 
-        SessionEntriesCollection entries = getEntries();
+        SessionEntryCollection entries = getEntries();
+        if (entries == null)
+            return csv.toString();
+
         for (SessionEntry eachEntry : entries) {
             String appendEntry = String.format(Locale.US, entryFormat,
                     eachEntry.getStartingTime(), eachEntry.getDuration(), eachEntry.getNote());
@@ -249,24 +255,45 @@ public class Habit implements Serializable, Parcelable {
         else return false;
     }
 
-    private long calculateEntriesDurationSum() {
-        return mSessionEntries.calculateDuration();
-    }
-
-    public SessionEntriesCollection filterEntriesForDate(final long timestamp) {
-        SessionEntriesCollection entries = new SessionEntriesCollection(mSessionEntries);
-
-        MyCollectionUtils.filter(entries, new Predicate<SessionEntry>() {
-            @Override
-            public boolean apply(SessionEntry sessionEntry) {
-                return !(sessionEntry.getStartingTimeIgnoreTimeOfDay() == timestamp);
-            }
-        });
-
-        return entries;
+    @Nullable
+    public SessionEntryCollection findEntriesWithDate(final long timestamp) {
+        return mSessionEntries != null ? mSessionEntries.findEntriesWithDate(timestamp) : null;
     }
 
     //region Getters {}
+
+    //region Get fields related to HabitCategory
+
+    /**
+     * @return The mCategory object associated with this habit.
+     */
+    @NonNull
+    public HabitCategory getCategory() {
+        return mCategory;
+    }
+
+    public int getColor() {
+        return getIsArchived() ? 0xFFCCCCCC : mCategory.getColorAsInt();
+    }
+    //endregion -- end --
+
+    //region Get fields related to SessionEntries
+    @Nullable
+    public SessionEntryCollection getEntries() {
+        return mSessionEntries;
+    }
+
+    /**
+     * @return Get the number of mSessionEntries
+     */
+    public long getEntriesLength() {
+        return getEntries() != null ? getEntries().size() : 0;
+    }
+
+    public long getEntriesDuration() {
+        return getEntries() != null ? getEntries().calculateDuration() : 0;
+    }
+    //endregion -- end --
 
     /**
      * @return The habit mName
@@ -279,43 +306,10 @@ public class Habit implements Serializable, Parcelable {
     /**
      * @return the habit mDescription
      */
-    @Nullable
+    @NonNull
     public String getDescription() {
         return mDescription;
     }
-
-    /**
-     * @return The mCategory object associated with this habit.
-     */
-    @NonNull
-    public HabitCategory getCategory() {
-        return mCategory;
-    }
-
-    //region Get fields related to SessionEntries
-    @NonNull
-    public SessionEntriesCollection getEntries() {
-        return mSessionEntries;
-    }
-
-    /**
-     * @return Get the number of mSessionEntries
-     */
-    public long getEntriesLength() {
-        return getEntries().size();
-    }
-
-    public long getEntriesDuration() {
-        return mSessionEntries.calculateDuration();
-    }
-
-    public static MyCollectionUtils.IGetKey<Habit, Long> IGetEntriesDuration = new MyCollectionUtils.IGetKey<Habit, Long>() {
-        @Override
-        public Long get(Habit habit) {
-            return habit.getEntriesDuration();
-        }
-    };
-    //endregion
 
     /**
      * @return the resource id for a drawable as a string. Ex: R.id.ic_launcher becomes "ic_launcher"
@@ -323,10 +317,6 @@ public class Habit implements Serializable, Parcelable {
     @Nullable
     public String getIconResId() {
         return mIconResId;
-    }
-
-    public int getColor() {
-        return getIsArchived() ? 0xFFCCCCCC : mCategory.getColorAsInt();
     }
 
     /**
@@ -340,9 +330,9 @@ public class Habit implements Serializable, Parcelable {
      * @return True if archived, else false.
      */
     public boolean getIsArchived() {
-        return (this.mIsArchived == 1);
+        return mIsArchived;
     }
-    //endregion
+    //endregion -- end --
 
     //region Setters {}
 
@@ -350,7 +340,7 @@ public class Habit implements Serializable, Parcelable {
      * @param name the new habit mName
      */
     public Habit setName(@NonNull String name) {
-        this.mName = name;
+        mName = name;
         return this;
     }
 
@@ -358,7 +348,7 @@ public class Habit implements Serializable, Parcelable {
      * @param newDescription The habit mDescription
      */
     public Habit setDescription(@NonNull String newDescription) {
-        this.mDescription = newDescription;
+        mDescription = newDescription;
         return this;
     }
 
@@ -366,14 +356,14 @@ public class Habit implements Serializable, Parcelable {
      * @param category The mCategory object associated with this habit.
      */
     public Habit setCategory(@NonNull HabitCategory category) {
-        this.mCategory = category;
+        mCategory = category;
         return this;
     }
 
     /**
      * @param newEntries The new entry array to replace the old mSessionEntries.
      */
-    public Habit setEntries(@NonNull SessionEntriesCollection newEntries) {
+    public Habit setEntries(@NonNull SessionEntryCollection newEntries) {
         mSessionEntries = newEntries;
         return this;
     }
@@ -383,7 +373,7 @@ public class Habit implements Serializable, Parcelable {
      *                  Ex: R.id.ic_launcher becomes "ic_launcher"
      */
     public Habit setIconResId(@NonNull String iconResId) {
-        this.mIconResId = iconResId;
+        mIconResId = iconResId;
         return this;
     }
 
@@ -391,7 +381,7 @@ public class Habit implements Serializable, Parcelable {
      * @param databaseId The row id of the Habit in the database, -1 when not available.
      */
     public Habit setDatabaseId(long databaseId) {
-        this.mDatabaseId = databaseId;
+        mDatabaseId = databaseId;
         return this;
     }
 
@@ -399,9 +389,9 @@ public class Habit implements Serializable, Parcelable {
      * @param state 1 if archived, else 0.
      */
     public Habit setIsArchived(boolean state) {
-        this.mIsArchived = state ? 1 : 0;
+        mIsArchived = state;
         return this;
     }
-    //endregion
+    //endregion -- end --
 
 }

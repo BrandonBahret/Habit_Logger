@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.data.HabitDatabase.DataModels;
+package com.example.brandon.habitlogger.data.DataModels;
 
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
@@ -11,6 +11,8 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.regex.Pattern;
+
+import static com.example.brandon.habitlogger.common.MyTimeUtils.getTimePortion;
 
 /**
  * Created by Brandon on 10/26/2016.
@@ -79,15 +81,17 @@ public class SessionEntry implements Serializable {
 
     //region Constructors {}
     public SessionEntry(long startTime, long duration, @NonNull String note) {
-        this.mStartTime = startTime;
-        this.mDuration = duration;
-        this.mNote = note;
+        mStartTime = startTime;
+        mDuration = duration;
+        mNote = note;
     }
 
     public SessionEntry() {
         this(-1, -1, "");
     }
+    //endregion
 
+    //region Methods to enable basic object operations
     public static void copy(SessionEntry dest, SessionEntry source) {
         dest.mStartTime = source.mStartTime;
         dest.mDuration = source.mDuration;
@@ -99,14 +103,13 @@ public class SessionEntry implements Serializable {
         dest.mHabitId = source.mHabitId;
         dest.mHabit = source.mHabit;
     }
-    //endregion
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof SessionEntry) {
             SessionEntry compare = (SessionEntry) obj;
 
-            return (compare.getHabitId() == this.getHabitId()) &&
+            return (compare.getHabitId() == getHabitId()) &&
                     String.valueOf(compare.getNote()).equals(String.valueOf(getNote())) &&
                     compare.getDuration() == getDuration() &&
                     compare.getStartingTime() == getStartingTime();
@@ -120,6 +123,7 @@ public class SessionEntry implements Serializable {
         String startTimeString = MyTimeUtils.stringifyTimestamp(getStartingTime(), "MMMM/dd/yyyy");
         return String.format(Locale.US, format, startTimeString, stringifyDuration(), getNote());
     }
+    //endregion -- end --
 
     public boolean matchesQuery(String query) {
         return Pattern.compile(query, Pattern.CASE_INSENSITIVE | Pattern.LITERAL).matcher(getNote()).find();
@@ -127,7 +131,7 @@ public class SessionEntry implements Serializable {
 
     //region Static helper methods for formatting durations into readable strings
     public static String stringifyDuration(long duration) {
-        int[] timeComponents = MyTimeUtils.getTimePortion(duration);
+        Integer[] timeComponents = getTimePortion(duration);
         int hours = timeComponents[0];
         int minutes = timeComponents[1];
         int seconds = timeComponents[2];
@@ -152,7 +156,7 @@ public class SessionEntry implements Serializable {
     public void setStartingMinute(int minute) {
         mStartTime = MyTimeUtils.setTimestampField(getStartingTime(), Calendar.MINUTE, minute);
     }
-    //endregion
+    //endregion -- end --
 
     //region Methods responsible for getting fields from the timestamp
     public int getStartingTimeMinutes() {
@@ -180,6 +184,7 @@ public class SessionEntry implements Serializable {
      * Ex: (Jan/20/2017 5:60 PM) returns 5:60 PM in millis
      */
     public long getStartingTimePortion() {
+
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(getStartingTime());
 
@@ -193,7 +198,7 @@ public class SessionEntry implements Serializable {
 
     //region Setters {}
     public void setStartingTime(long startTime) {
-        this.mStartTime = startTime;
+        mStartTime = startTime;
     }
 
     public SessionEntry setLastTimePaused(long milliseconds) {
@@ -227,20 +232,20 @@ public class SessionEntry implements Serializable {
     }
 
     public SessionEntry setHabit(Habit habit) {
-        this.mHabit = habit;
+        mHabit = habit;
         setHabitId(habit.getDatabaseId());
         return this;
     }
 
     public SessionEntry setHabitId(long habitId) {
-        this.mHabitId = habitId;
+        mHabitId = habitId;
         return this;
     }
     //endregion
 
     //region Getters {}
     public long getStartingTime() {
-        return this.mStartTime;
+        return mStartTime;
     }
 
     public long getStartingTimeIgnoreTimeOfDay() {
@@ -260,11 +265,11 @@ public class SessionEntry implements Serializable {
     }
 
     public String getNote() {
-        return this.mNote;
+        return mNote;
     }
 
     public long getDuration() {
-        return this.mDuration;
+        return mDuration;
     }
 
     public long getDatabaseId() {
@@ -272,11 +277,11 @@ public class SessionEntry implements Serializable {
     }
 
     public String getCategoryName() {
-        return this.mHabit.getCategory().getName();
+        return mHabit.getCategory().getName();
     }
 
     public boolean getIsPaused() {
-        return this.mIsPaused;
+        return mIsPaused;
     }
 
     public Habit getHabit() {

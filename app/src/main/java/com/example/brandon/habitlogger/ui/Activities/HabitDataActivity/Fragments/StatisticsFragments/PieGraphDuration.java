@@ -12,8 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.data.CategoryDataSample;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.databinding.FragmentPieGraphDurationBinding;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.github.mikephil.charting.data.PieData;

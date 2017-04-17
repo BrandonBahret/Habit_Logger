@@ -13,8 +13,8 @@ import android.view.ViewGroup;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.databinding.FragmentDistributionStartingTimeBinding;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.github.mikephil.charting.charts.CombinedChart;
@@ -93,7 +93,7 @@ public class DistributionStartingTime extends Fragment {
 
     //endregion [ ---------------- end ---------------- ]
 
-    public void updateEntries(SessionEntriesCollection dataSample) {
+    public void updateEntries(SessionEntryCollection dataSample) {
 
         if (!dataSample.isEmpty()) {
             TimeIntervalEntryCounter entryCounter = new TimeIntervalEntryCounter(INTERVAL);

@@ -1,7 +1,7 @@
-package com.example.brandon.habitlogger.data;
+package com.example.brandon.habitlogger.data.DataModels.DataCollections;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,7 +27,7 @@ public class HabitDataSample {
         mDateTo = dateTo;
     }
 
-    public SessionEntriesCollection buildSessionEntriesList() {
+    public SessionEntryCollection buildSessionEntriesList() {
         List<SessionEntry> entries = new ArrayList<>();
 
         for (CategoryDataSample categoryDataSample : mData)
@@ -35,7 +35,7 @@ public class HabitDataSample {
 
         Collections.sort(entries, SessionEntry.ICompareStartingTimes);
 
-        return new SessionEntriesCollection(entries, mDateFrom, mDateTo);
+        return new SessionEntryCollection(entries, mDateFrom, mDateTo);
     }
 
     /**

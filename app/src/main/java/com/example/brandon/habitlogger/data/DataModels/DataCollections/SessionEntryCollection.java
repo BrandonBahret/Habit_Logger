@@ -1,10 +1,11 @@
-package com.example.brandon.habitlogger.data;
+package com.example.brandon.habitlogger.data.DataModels.DataCollections;
 
 import android.text.format.DateUtils;
 
+import com.android.internal.util.Predicate;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +16,7 @@ import java.util.List;
  * A class to structure SessionEntry objects.
  */
 
-public class SessionEntriesCollection extends MyArrayListBase<SessionEntry> {
+public class SessionEntryCollection extends MyDataCollectionBase<SessionEntry> {
 
     //region (Member Attributes)
     private long mDateFromTime, mDateToTime;
@@ -26,25 +27,38 @@ public class SessionEntriesCollection extends MyArrayListBase<SessionEntry> {
     //endregion
 
     //region Constructors {}
-    public SessionEntriesCollection(List<SessionEntry> sessionEntries, long dateFromTime, long dateToTime) {
+    public SessionEntryCollection(List<SessionEntry> sessionEntries, long dateFromTime, long dateToTime) {
         super(sessionEntries);
         mDateFromTime = dateFromTime;
         mDateToTime = dateToTime;
     }
 
-    public SessionEntriesCollection(List<SessionEntry> sessionEntries) {
+    public SessionEntryCollection(List<SessionEntry> sessionEntries) {
         super(sessionEntries);
         updateDateFromToWithEntries(this);
     }
 
-    public SessionEntriesCollection(int initialCapacity) {
+    public SessionEntryCollection(int initialCapacity) {
         this(new ArrayList<SessionEntry>(initialCapacity));
     }
 
-    public SessionEntriesCollection() {
+    public SessionEntryCollection() {
         this(new ArrayList<SessionEntry>());
     }
     //endregion -- end --
+
+    public SessionEntryCollection findEntriesWithDate(final long timestamp) {
+        SessionEntryCollection entries = new SessionEntryCollection(this);
+
+        MyCollectionUtils.filter(entries, new Predicate<SessionEntry>() {
+            @Override
+            public boolean apply(SessionEntry sessionEntry) {
+                return !(sessionEntry.getStartingTimeIgnoreTimeOfDay() == timestamp);
+            }
+        });
+
+        return entries;
+    }
 
     //region Methods With One Time Calculations {}
     @Override

@@ -11,8 +11,8 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.databinding.DialogHabitFormBinding;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.CategoryDialog.CategorySpinnerAdapter;

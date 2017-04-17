@@ -11,8 +11,8 @@ import android.widget.TextView;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,16 +59,16 @@ public class StreaksFragment extends Fragment {
     }
     //endregion
 
-    public void updateEntries(SessionEntriesCollection dataSample) {
+    public void updateEntries(SessionEntryCollection dataSample) {
         value.setText(Streak.listToString(getStreaks(dataSample)));
     }
 
-    public static List<Streak> getStreaks(SessionEntriesCollection dataSample) {
+    public static List<Streak> getStreaks(SessionEntryCollection dataSample) {
         List<Streak> streaks = new ArrayList<>();
 
         if (!dataSample.isEmpty()) {
 
-            Set<Long> sessionDatesSet = MyCollectionUtils.listToSet(dataSample.asList(), SessionEntry.IGetSessionStartDate);
+            Set<Long> sessionDatesSet = MyCollectionUtils.collectIntoSet(dataSample.asList(), SessionEntry.IGetSessionStartDate);
             List<Long> sessionDates = new ArrayList<>(sessionDatesSet);
             Collections.sort(sessionDates);
 

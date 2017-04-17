@@ -14,10 +14,10 @@ import android.widget.ImageView;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.EntryViewAdapter;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
@@ -44,7 +44,7 @@ public class EntriesFragment extends Fragment implements
     private ThemeColorPalette mColorPalette;
     private Habit mHabit;
     private HabitDatabase mHabitDatabase;
-    private SessionEntriesCollection mSessionEntries;
+    private SessionEntryCollection mSessionEntries;
 
     private EntryViewAdapter mEntryAdapter;
     private RecyclerView mEntriesContainer;
@@ -190,7 +190,7 @@ public class EntriesFragment extends Fragment implements
     //region Methods responsible for handling events
 
     @Override
-    public void onUpdateEntries(SessionEntriesCollection dataCollection) {
+    public void onUpdateEntries(SessionEntryCollection dataCollection) {
         if (mEntryAdapter != null) {
             mSessionEntries = dataCollection;
             mEntryAdapter = new EntryViewAdapter(dataCollection, getContext(), mColorPalette, mEntryAdapter.getListener());

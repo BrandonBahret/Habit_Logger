@@ -3,7 +3,7 @@ package com.example.brandon.habitlogger.DatabaseTest;
 import android.graphics.Color;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

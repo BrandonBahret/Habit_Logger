@@ -13,9 +13,9 @@ import android.widget.TextView;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.ui.Widgets.LayoutCheckableTextView;
 
 /**
@@ -26,7 +26,7 @@ import com.example.brandon.habitlogger.ui.Widgets.LayoutCheckableTextView;
 public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.ViewHolder> {
 
     //region (Member attributes)
-    private SessionEntriesCollection mSessionEntries;
+    private SessionEntryCollection mSessionEntries;
     private HabitDatabase mHabitDatabase;
 
     private Context mContext;
@@ -66,14 +66,14 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         }
     }
 
-    public EntryViewAdapter(SessionEntriesCollection sessionEntries, Context context, OnClickListeners listener) {
+    public EntryViewAdapter(SessionEntryCollection sessionEntries, Context context, OnClickListeners listener) {
         mContext = context;
         mSessionEntries = sessionEntries;
         mHabitDatabase = new HabitDatabase(context);
         mListener = listener;
     }
 
-    public EntryViewAdapter(SessionEntriesCollection sessionEntries, Context context, ThemeColorPalette colorPalette, OnClickListeners listener) {
+    public EntryViewAdapter(SessionEntryCollection sessionEntries, Context context, ThemeColorPalette colorPalette, OnClickListeners listener) {
         mContext = context;
         mSessionEntries = sessionEntries;
         mHabitDatabase = new HabitDatabase(context);

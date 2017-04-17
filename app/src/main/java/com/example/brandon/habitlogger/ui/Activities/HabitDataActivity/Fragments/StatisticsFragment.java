@@ -12,9 +12,9 @@ import android.widget.ImageView;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
-import com.example.brandon.habitlogger.data.CategoryDataSample;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.StatisticsFragments.DistributionStartingTime;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.StatisticsFragments.LineGraphCompletion;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.StatisticsFragments.PieGraphCompletion;
@@ -70,7 +70,7 @@ public class StatisticsFragment extends Fragment implements IHabitDataCallback.I
 
         mFragmentView = inflater.inflate(R.layout.fragment_habit_data_statistics, container, false);
 
-        SessionEntriesCollection entries = mCallbackInterface.getSessionEntries();
+        SessionEntryCollection entries = mCallbackInterface.getSessionEntries();
 //        CategoryDataSample categoryDataSample = mCallbackInterface.getCategoryDataSample();
         mPieCompletion = PieGraphCompletion.newInstance(this, mColorPalette);
         mLineCompletion = LineGraphCompletion.newInstance(this, mColorPalette);
@@ -110,7 +110,7 @@ public class StatisticsFragment extends Fragment implements IHabitDataCallback.I
     }
 
     @Override
-    public SessionEntriesCollection getSessionEntries() {
+    public SessionEntryCollection getSessionEntries() {
         return mCallbackInterface.getSessionEntries();
     }
 
@@ -137,7 +137,7 @@ public class StatisticsFragment extends Fragment implements IHabitDataCallback.I
     }
 
     @Override
-    public void onUpdateEntries(SessionEntriesCollection dataCollection) {
+    public void onUpdateEntries(SessionEntryCollection dataCollection) {
         showNoDataScreen(!dataCollection.isEmpty());
         mPieCompletion.updateEntries(dataCollection);
         mLineCompletion.updateEntries(dataCollection);

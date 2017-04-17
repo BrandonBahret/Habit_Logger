@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.data.HabitDataSample;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataSample;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.IDataOverviewCallback;
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.OverviewCalendarView.CalendarViewAdapter;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;

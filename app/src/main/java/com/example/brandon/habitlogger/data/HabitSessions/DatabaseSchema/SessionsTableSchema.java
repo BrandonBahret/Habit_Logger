@@ -3,9 +3,9 @@ package com.example.brandon.habitlogger.data.HabitSessions.DatabaseSchema;
 import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitSessions.DatabaseSchema.DatabaseSchema.SQL_TYPES;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.common.MyDatabaseUtils;
@@ -16,6 +16,7 @@ import com.example.brandon.habitlogger.common.MyDatabaseUtils;
  */
 
 public class SessionsTableSchema {
+
     public static final String TABLE_NAME = "SESSIONS_TABLE";
     public static final String HABIT_NAME = "HABIT_NAME";
     public static final String HABIT_CATEGORY_NAME = "HABIT_CATEGORY";

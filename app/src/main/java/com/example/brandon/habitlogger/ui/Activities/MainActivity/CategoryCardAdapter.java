@@ -4,9 +4,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.data.CategoryDataSample;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;

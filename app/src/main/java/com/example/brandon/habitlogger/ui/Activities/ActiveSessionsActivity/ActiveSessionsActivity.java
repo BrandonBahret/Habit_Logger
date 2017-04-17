@@ -24,8 +24,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.databinding.ActivityActiveSessionsBinding;

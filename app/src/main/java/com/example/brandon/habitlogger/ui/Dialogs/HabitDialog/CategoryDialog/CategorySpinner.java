@@ -16,7 +16,7 @@ import android.widget.SpinnerAdapter;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyColorUtils;
-import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.databinding.DialogCategorySelectorBinding;
 
 /**
