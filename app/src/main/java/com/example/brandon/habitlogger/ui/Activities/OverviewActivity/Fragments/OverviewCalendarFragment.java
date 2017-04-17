@@ -11,12 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.IDataOverviewCallback;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 
 public class OverviewCalendarFragment extends Fragment {
 
     //region (Member attributes)
-//    private IDataOverviewCallback mCallbackInterface;
+    private IDataOverviewCallback mCallbackInterface;
     private RecyclerView mCalendarViewContainer;
 //    private CalendarViewAdapter mAdapter;
     //endregion
@@ -36,7 +37,7 @@ public class OverviewCalendarFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-//        mCallbackInterface = (IDataOverviewCallback) context;
+        mCallbackInterface = (IDataOverviewCallback) context;
 //        mCallbackInterface.addCallback(this);
 //        mCallbackInterface.addOnTabReselectedCallback(this);
     }
