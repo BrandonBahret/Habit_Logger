@@ -13,12 +13,11 @@ import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.SessionEntriesCollection;
-import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
 
-public class TimeAverages extends Fragment implements IHabitCallback.IUpdateEntries {
+public class TimeAverages extends Fragment {
 
     private TextView hoursPerMonth, hoursPerWeek, hoursPerDay, habitFrequency;
-    IHabitCallback callbackInterface;
+//    IHabitDataCallback callbackInterface;
 
     public TimeAverages() {
         // Required empty public constructor
@@ -54,18 +53,18 @@ public class TimeAverages extends Fragment implements IHabitCallback.IUpdateEntr
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        callbackInterface = (IHabitCallback) context;
-        callbackInterface.addUpdateEntriesCallback(this);
+//        callbackInterface = (IHabitCallback) context;
+//        callbackInterface.addUpdateEntriesCallback(this);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        updateEntries(callbackInterface.getSessionEntries());
+//        updateEntries(callbackInterface.getSessionEntries());
     }
     //endregion
 
-    @Override
+//    @Override
     public void updateEntries(SessionEntriesCollection dataSample) {
 
         if (!dataSample.isEmpty()) {

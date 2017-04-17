@@ -13,7 +13,6 @@ import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.SessionEntriesCollection;
-import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +20,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-public class StreaksFragment extends Fragment implements IHabitCallback.IUpdateEntries {
+public class StreaksFragment extends Fragment {
 
     private TextView value;
 //    IHabitCallback mCallbackInterface;
@@ -60,7 +59,6 @@ public class StreaksFragment extends Fragment implements IHabitCallback.IUpdateE
     }
     //endregion
 
-    @Override
     public void updateEntries(SessionEntriesCollection dataSample) {
         value.setText(Streak.listToString(getStreaks(dataSample)));
     }

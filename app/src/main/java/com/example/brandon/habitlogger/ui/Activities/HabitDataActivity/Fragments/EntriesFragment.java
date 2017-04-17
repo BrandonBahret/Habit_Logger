@@ -205,6 +205,7 @@ public class EntriesFragment extends Fragment implements
     public void onNotifyEntryRemoved(int adapterPosition) {
         mEntryAdapter.notifyItemRemoved(adapterPosition);
         showNoDataLayout(mSessionEntries == null || mSessionEntries.isEmpty());
+        mEntriesContainer.invalidate();
     }
 
     @Override

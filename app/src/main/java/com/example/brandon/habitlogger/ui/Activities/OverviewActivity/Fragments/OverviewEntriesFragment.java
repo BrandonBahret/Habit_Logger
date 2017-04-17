@@ -17,7 +17,8 @@ import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.data.HabitDataSample;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.ui.Activities.HabitActivity.EntryViewAdapter;
+import com.example.brandon.habitlogger.data.SessionEntriesCollection;
+import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.EntryViewAdapter;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.IDataOverviewCallback;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
@@ -26,15 +27,13 @@ import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EditEntryForm;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.GroupDecoration;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 
-import java.util.List;
-
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class OverviewEntriesFragment extends Fragment implements
         IDataOverviewCallback.IUpdateHabitSample, IDataOverviewCallback.IOnTabReselected {
 
     //region (Member attributes)
     private HabitDatabase mHabitDatabase;
-    private List<SessionEntry> mSessionEntries;
+    private SessionEntriesCollection mSessionEntries;
 
     private IScrollEvents mListener;
     private IDataOverviewCallback mCallbackInterface;
@@ -114,7 +113,7 @@ public class OverviewEntriesFragment extends Fragment implements
         mDateFormat = preferenceChecker.stringGetDateFormat();
         mMakeDateHeadersSticky = preferenceChecker.makeDateHeadersSticky();
         mHabitDatabase = new HabitDatabase(getContext());
-        mSessionEntries = mHabitDatabase.getEntriesAsList();
+        mSessionEntries = mHabitDatabase.getEntries();
     }
 
     @Override
@@ -253,7 +252,7 @@ public class OverviewEntriesFragment extends Fragment implements
     @Override
     public void updateHabitDataSample(HabitDataSample dataSample) {
         if (mEntryAdapter != null) {
-            mSessionEntries = dataSample.buildSessionEntriesList().getSessionEntries();
+            mSessionEntries = new SessionEntriesCollection(dataSample.buildSessionEntriesList().getSessionEntries());
             mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), mEntryAdapter.getListener());
             mEntriesContainer.setAdapter(mEntryAdapter);
         }

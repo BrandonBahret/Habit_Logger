@@ -15,7 +15,6 @@ import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.databinding.FragmentPieGraphDurationBinding;
-import com.example.brandon.habitlogger.ui.Activities.HabitActivity.IHabitCallback;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -27,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class PieGraphDuration extends Fragment implements IHabitCallback.IUpdateCategorySample {
+public class PieGraphDuration extends Fragment {
 
     private static String KEY_CALLBACK = "KEY_CALLBACK";
 
@@ -89,7 +88,6 @@ public class PieGraphDuration extends Fragment implements IHabitCallback.IUpdate
     }
     //endregion
 
-    @Override
     public void updateCategoryDataSample(CategoryDataSample dataSample) {
         float[] durationRatios = new float[dataSample.getNumberOfHabits()];
 
