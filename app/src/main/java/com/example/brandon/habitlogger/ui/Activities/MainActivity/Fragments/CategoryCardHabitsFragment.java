@@ -9,8 +9,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.common.MyCollectionUtils;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
@@ -36,7 +34,7 @@ import java.util.Locale;
 public class CategoryCardHabitsFragment extends MyFragmentBase {
 
     //region (Member attributes)
-    List<CategoryDataSample> mData;
+//    List<CategoryDataSample> mData;
 
     private CategoryCardAdapter mHabitAdapter;
     private SpaceOffsetDecoration mSpaceDecoration;
@@ -70,11 +68,11 @@ public class CategoryCardHabitsFragment extends MyFragmentBase {
 
     @Override
     void onSetUpView(RecyclerView recyclerView) {
-        mData = mHabitDatabase.getAllData();
-        MyCollectionUtils.filter(mData, CategoryDataSample.IFilterEmptySamples);
-        mHabitAdapter = new CategoryCardAdapter(mData, mSessionManager, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
-        recyclerView.setAdapter(mHabitAdapter);
-        applySpaceDecoration();
+//        mData = mHabitDatabase.getAllData();
+//        MyCollectionUtils.filter(mData, CategoryDataSample.IFilterEmptySamples);
+//        mHabitAdapter = new CategoryCardAdapter(mData, mSessionManager, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
+//        recyclerView.setAdapter(mHabitAdapter);
+//        applySpaceDecoration();
     }
 
     @Override

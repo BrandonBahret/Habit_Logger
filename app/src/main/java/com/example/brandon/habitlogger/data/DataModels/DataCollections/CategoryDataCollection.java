@@ -9,7 +9,6 @@ import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,14 +17,18 @@ import java.util.List;
  * This is a class to structure a sample of session entries on the categorical level.
  */
 
-public final class CategoryDataCollection extends ArrayList<Habit> implements Parcelable {
+public final class CategoryDataCollection extends MyDataCollectionBase<Habit> implements Parcelable {
 
     //region (Member Attributes)
     private final HabitCategory mCategory;
-    private long mDateFromTime, mDateToTime;
+    private long mDateFrom, mDateTo;
+    private boolean mDateFromIsInvalid, mDateToIsInvalid;
+
     private SessionEntryCollection mAllSessionEntries;
+    private boolean mAllSessionEntriesIsInvalid;
+
     private Long mTotalDuration;
-    private boolean mTotalDurationInvalid = true;
+    private boolean mTotalDurationInvalid;
     //endregion
 
     //region Static helper interface methods
@@ -35,6 +38,13 @@ public final class CategoryDataCollection extends ArrayList<Habit> implements Pa
             return dataSample.hasHabits();
         }
     };
+
+    public static MyCollectionUtils.IGetKey<CategoryDataCollection, Long> IGetEntriesDuration = new MyCollectionUtils.IGetKey<CategoryDataCollection, Long>() {
+        @Override
+        public Long get(CategoryDataCollection dataSample) {
+            return dataSample.calculateTotalDuration();
+        }
+    };
     //endregion -- end --
 
     public CategoryDataCollection(HabitCategory category, List<Habit> habits,
@@ -42,8 +52,8 @@ public final class CategoryDataCollection extends ArrayList<Habit> implements Pa
         super(habits);
         Collections.sort(this, Habit.ICompareDuration);
         mCategory = category;
-        mDateFromTime = dateFromTime;
-        mDateToTime = dateToTime;
+        mDateFrom = dateFromTime;
+        mDateTo = dateToTime;
     }
 
     //region Implement Parcelable
@@ -52,8 +62,8 @@ public final class CategoryDataCollection extends ArrayList<Habit> implements Pa
         this.mCategory = sample.getCategory();
         this.clear();
         this.addAll(sample.getHabits());
-        this.mDateFromTime = sample.getDateFromTime();
-        this.mDateToTime = sample.getDateToTime();
+        this.mDateFrom = sample.getDateFrom();
+        this.mDateTo = sample.getDateTo();
         this.mTotalDuration = sample.calculateTotalDuration();
         this.mAllSessionEntries = sample.buildSessionEntriesList();
     }
@@ -79,9 +89,15 @@ public final class CategoryDataCollection extends ArrayList<Habit> implements Pa
             return new CategoryDataCollection[size];
         }
     };
-    //endregion
+    //endregion -- end --
 
     //region Methods With One Time Calculations {}
+    @Override
+    void invalidate() {
+        mAllSessionEntriesIsInvalid = true;
+        mTotalDurationInvalid = true;
+    }
+
     public long calculateTotalDuration() {
         if (mTotalDuration == null || mTotalDurationInvalid) {
             mTotalDuration = (long) MyCollectionUtils.sum(this, Habit.IGetEntriesDuration);
@@ -93,7 +109,7 @@ public final class CategoryDataCollection extends ArrayList<Habit> implements Pa
 
     public SessionEntryCollection buildSessionEntriesList() {
 
-        if (mAllSessionEntries == null) {
+        if (mAllSessionEntries == null || mAllSessionEntriesIsInvalid) {
             mAllSessionEntries = new SessionEntryCollection(
                     MyCollectionUtils.collectLists(this, new MyCollectionUtils.IGetList<Habit, SessionEntry>() {
                         @Override
@@ -102,11 +118,12 @@ public final class CategoryDataCollection extends ArrayList<Habit> implements Pa
                         }
                     })
             );
+            mAllSessionEntriesIsInvalid = false;
         }
 
         return mAllSessionEntries;
     }
-    //endregion
+    //endregion -- end --
 
     /**
      * @param timestamp Epoch timestamp for a certain date to search for.
@@ -124,24 +141,36 @@ public final class CategoryDataCollection extends ArrayList<Habit> implements Pa
 
         return new CategoryDataCollection(mCategory, habits, timestamp, timestamp);
 
-//        List<Habit> habits = new ArrayList<>(this.size());
-//
-//        for (int i = 0; i < mHabits.size(); i++) {
-//            habits.add(i, Habit.duplicate(mHabits.get(i)));
-//            List<SessionEntry> entriesForDate = habits.get(i).findEntriesWithDate(timestamp);
-//            habits.get(i).setEntries(entriesForDate);
-//        }
-//
-//        return new CategoryDataCollection(mCategory, habits, timestamp, timestamp);
     }
 
     //region Getters {}
-    public static MyCollectionUtils.IGetKey<CategoryDataCollection, Long> IGetEntriesDuration = new MyCollectionUtils.IGetKey<CategoryDataCollection, Long>() {
-        @Override
-        public Long get(CategoryDataCollection dataSample) {
-            return dataSample.calculateTotalDuration();
+    public long getDateFrom() {
+        if(mDateFromIsInvalid){
+            SessionEntryCollection sessionEntries = buildSessionEntriesList();
+            if (!sessionEntries.isEmpty()) {
+                mDateFrom = Collections.min(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
+            }
+            else{
+                mDateFrom = -1;
+            }
+            mDateFromIsInvalid = false;
         }
-    };
+        return mDateFrom;
+    }
+
+    public long getDateTo() {
+        if(mDateToIsInvalid){
+            SessionEntryCollection sessionEntries = buildSessionEntriesList();
+            if (!sessionEntries.isEmpty()) {
+                mDateTo = Collections.max(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
+            }
+            else{
+                mDateTo = -1;
+            }
+            mDateToIsInvalid = false;
+        }
+        return mDateTo;
+    }
 
     public String getCategoryName() {
         return mCategory.getName();
@@ -159,14 +188,6 @@ public final class CategoryDataCollection extends ArrayList<Habit> implements Pa
         return getNumberOfHabits() > 0;
     }
 
-    public long getDateFromTime() {
-        return mDateFromTime;
-    }
-
-    public long getDateToTime() {
-        return mDateToTime;
-    }
-
     public long getHabitDuration(int index) {
         return this.get(index).getEntriesDuration();
     }
@@ -179,5 +200,9 @@ public final class CategoryDataCollection extends ArrayList<Habit> implements Pa
         return this;
     }
     //endregion
+
+    //region CRUD (Create, Read, Update, Delete) {}
+
+    //endregion -- end --
 
 }

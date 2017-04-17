@@ -255,9 +255,8 @@ public class Habit implements Serializable, Parcelable {
         else return false;
     }
 
-    @Nullable
     public SessionEntryCollection findEntriesWithDate(final long timestamp) {
-        return mSessionEntries != null ? mSessionEntries.findEntriesWithDate(timestamp) : null;
+        return mSessionEntries != null ? mSessionEntries.findEntriesWithDate(timestamp) : new SessionEntryCollection();
     }
 
     //region Getters {}

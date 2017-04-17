@@ -4,9 +4,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
@@ -77,10 +76,10 @@ public class CategoryCardAdapter extends ExpandableRecyclerViewAdapter<CategoryV
     public void onBindGroupViewHolder(CategoryViewHolder holder, int flatPosition,
                                       ExpandableGroup group) {
 
-        CategoryDataSample container = (CategoryDataSample) group;
+//        CategoryDataCollection container = (CategoryDataCollection) group;
 
         holder.setTitle(group);
-        holder.setColor(container.getCategory().getColorAsInt());
+//        holder.setColor(container.getCategory().getColorAsInt());
         holder.setNumberOfEntries(group.getItemCount());
     }
 

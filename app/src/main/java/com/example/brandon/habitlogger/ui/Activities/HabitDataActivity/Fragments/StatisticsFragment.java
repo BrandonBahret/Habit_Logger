@@ -12,9 +12,9 @@ import android.widget.ImageView;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
-import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataCollection;
 import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.StatisticsFragments.DistributionStartingTime;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.StatisticsFragments.LineGraphCompletion;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.StatisticsFragments.PieGraphCompletion;
@@ -115,7 +115,7 @@ public class StatisticsFragment extends Fragment implements IHabitDataCallback.I
     }
 
     @Override
-    public CategoryDataSample getCategoryDataSample() {
+    public CategoryDataCollection getCategoryDataSample() {
         return mCallbackInterface.getCategoryDataSample();
     }
 
@@ -145,7 +145,7 @@ public class StatisticsFragment extends Fragment implements IHabitDataCallback.I
     }
 
     @Override
-    public void onUpdateCategoryDataSample(CategoryDataSample dataSample) {
+    public void onUpdateCategoryDataSample(CategoryDataCollection dataSample) {
         mPieDuration.updateCategoryDataSample(dataSample);
     }
 

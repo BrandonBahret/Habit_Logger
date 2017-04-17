@@ -11,12 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.IDataOverviewCallback;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataSample;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataCollection;
 import com.example.brandon.habitlogger.databinding.FragmentPieChartCategoriesDurationBinding;
+import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.IDataOverviewCallback;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
@@ -90,11 +90,11 @@ public class PieChartCategoriesDuration extends Fragment implements IDataOvervie
     //endregion --- end ---
 
     @Override
-    public void updateHabitDataSample(HabitDataSample dataSample) {
+    public void updateHabitDataSample(HabitDataCollection dataSample) {
         List<PieEntry> entries = new ArrayList<>();
         final long totalDuration = dataSample.calculateTotalDuration();
 
-        for (CategoryDataSample categoryDataSample : dataSample.getData()) {
+        for (CategoryDataCollection categoryDataSample : dataSample.getData()) {
             float ratio = 100 * categoryDataSample.calculateTotalDuration() / (float) totalDuration;
             if (ratio > 0) {
                 String categoryName = categoryDataSample.getCategoryName();

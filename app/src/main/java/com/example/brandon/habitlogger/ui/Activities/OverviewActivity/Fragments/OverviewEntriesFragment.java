@@ -14,7 +14,7 @@ import android.widget.ImageView;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataSample;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataCollection;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
@@ -250,7 +250,7 @@ public class OverviewEntriesFragment extends Fragment implements
     //endregion -- end --
 
     @Override
-    public void updateHabitDataSample(HabitDataSample dataSample) {
+    public void updateHabitDataSample(HabitDataCollection dataSample) {
         if (mEntryAdapter != null) {
             mSessionEntries = new SessionEntryCollection(dataSample.buildSessionEntriesList().asList());
             mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), mEntryAdapter.getListener());

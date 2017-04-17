@@ -18,14 +18,14 @@ import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.RequestCodes;
 import com.example.brandon.habitlogger.common.ResultCodes;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.EntriesTableSchema;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.databinding.ActivityHabitDataBinding;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.EntriesFragment;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
@@ -603,7 +603,7 @@ public class HabitDataActivity extends AppCompatActivity implements IHabitDataCa
     }
 
     @Override
-    public CategoryDataSample getCategoryDataSample() {
+    public CategoryDataCollection getCategoryDataSample() {
         return mHabitDatabase.getCategoryDataSample
                 (mHabit.getCategory(), dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
     }

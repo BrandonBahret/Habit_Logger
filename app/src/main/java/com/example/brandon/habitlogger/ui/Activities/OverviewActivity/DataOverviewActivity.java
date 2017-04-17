@@ -17,7 +17,7 @@ import android.view.MenuItem;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataSample;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataCollection;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
@@ -69,7 +69,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
     //endregion
 
     public void updateEntries() {
-        HabitDataSample dataSample = getDataSample();
+        HabitDataCollection dataSample = getDataSample();
         List<SessionEntry> sessionEntries = dataSample.buildSessionEntriesList().asList();
 
         updateDateRangeManagerEntries(sessionEntries);
@@ -88,14 +88,14 @@ public class DataOverviewActivity extends AppCompatActivity implements
         updateDateRangeManagerEntries(entries);
 
         SessionEntryCollection entriesSample = new SessionEntryCollection(entries);
-        HabitDataSample dataSample = mHabitDatabase.getHabitDataSample(entriesSample);
+        HabitDataCollection dataSample = mHabitDatabase.getHabitDataSample(entriesSample);
 
         for (IUpdateHabitSample callback : mUpdateDataCallbacks)
             callback.updateHabitDataSample(dataSample);
     }
 
     @Override
-    public HabitDataSample getDataSample() {
+    public HabitDataCollection getDataSample() {
         return mHabitDatabase.getHabitDataSample(mDateRangeManager.getDateFrom(), mDateRangeManager.getDateTo());
     }
     //endregion --- end --
@@ -241,7 +241,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
         return new HabitDatabase.OnEntryChangedListener() {
             @Override
             public void onEntryDeleted(SessionEntry removedEntry) {
-                HabitDataSample dataSample = getDataSample();
+                HabitDataCollection dataSample = getDataSample();
 
                 List<SessionEntry> sessionEntries = dataSample.buildSessionEntriesList().asList();
                 updateDateRangeManagerEntries(sessionEntries);
@@ -261,7 +261,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
             public void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
                 mDateRangeManager.adjustDateRangeForEntry(newEntry);
 
-                HabitDataSample dataSample = getDataSample();
+                HabitDataCollection dataSample = getDataSample();
                 List<SessionEntry> sessionEntries = dataSample.buildSessionEntriesList().asList();
                 updateDateRangeManagerEntries(sessionEntries);
             }

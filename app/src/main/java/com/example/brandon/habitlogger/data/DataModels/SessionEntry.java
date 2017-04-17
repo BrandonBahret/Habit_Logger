@@ -23,15 +23,20 @@ import static com.example.brandon.habitlogger.common.MyTimeUtils.getTimePortion;
 public class SessionEntry implements Serializable {
 
     //region (Member attributes)
-    private long mStartTime, mDuration;
-    private boolean mIsPaused = false;
-    private long mLastTimePaused;
-    private long mTotalPauseTime;
-    private long mDatabaseId = -1;
-    @NonNull private String mNote;
 
+    // Fields used for representing inactive sessions
+    private long mStartTime;
+    private long mDuration;
+    @NonNull private String mNote;
+    private long mDatabaseId = -1;
     private Habit mHabit;
     private long mHabitId;
+
+    // Fields used for managing active sessions
+    private long mTotalPauseTime;
+    private long mLastTimePaused;
+    private boolean mIsPaused = false;
+
     //endregion
 
     //region (Static Helper Interfaces)

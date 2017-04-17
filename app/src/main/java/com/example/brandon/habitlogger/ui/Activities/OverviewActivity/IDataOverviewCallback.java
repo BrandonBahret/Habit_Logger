@@ -1,6 +1,6 @@
 package com.example.brandon.habitlogger.ui.Activities.OverviewActivity;
 
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataSample;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataCollection;
 
 /**
  * Created by Brandon on 3/2/2017.
@@ -10,7 +10,7 @@ import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitData
 public interface IDataOverviewCallback {
 
     interface IUpdateHabitSample {
-        void updateHabitDataSample(HabitDataSample dataSample);
+        void updateHabitDataSample(HabitDataCollection dataSample);
     }
 
     interface IOnTabReselected {
@@ -18,7 +18,7 @@ public interface IDataOverviewCallback {
     }
 
 
-    HabitDataSample getDataSample();
+    HabitDataCollection getDataSample();
 
     void addCallback(IUpdateHabitSample callback);
 

@@ -20,6 +20,8 @@ public abstract class MyDataCollectionBase<ListType> extends ArrayList<ListType>
         super(c);
     }
 
+    public MyDataCollectionBase() {}
+
     /**
      * Called whenever a super method that modifies data is called.
      */

@@ -78,7 +78,7 @@ public class CalendarViewAdapter extends CalendarViewAdapterBase<CalendarViewAda
 
         Calendar endCalendar = Calendar.getInstance();
         endCalendar.setTimeInMillis(DateUtils.YEAR_IN_MILLIS * 200);
-//        endCalendar.setTimeInMillis(entriesSample.getDateToTime());
+//        endCalendar.setTimeInMillis(entriesSample.getDateTo());
 
         int diffYear = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
         int diffMonth = diffYear * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH) + 1;

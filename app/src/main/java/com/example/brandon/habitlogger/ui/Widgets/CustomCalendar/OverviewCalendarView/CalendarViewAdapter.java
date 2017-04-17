@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataSample;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataCollection;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarViewAdapterBase;
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarViewModelBase;
@@ -29,7 +29,7 @@ import java.util.Set;
 
 public class CalendarViewAdapter extends CalendarViewAdapterBase<CalendarViewAdapter.ViewHolder> {
 
-    HabitDataSample mDataSample;
+    HabitDataCollection mDataSample;
 
     //region Code responsible for creating and binding view holders
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -53,13 +53,13 @@ public class CalendarViewAdapter extends CalendarViewAdapterBase<CalendarViewAda
     }
     //endregion -- end --
 
-    public CalendarViewAdapter(HabitDataSample habitDataSample, Context context) {
+    public CalendarViewAdapter(HabitDataCollection habitDataCollection, Context context) {
         super(context);
-        mDataSample = habitDataSample;
+        mDataSample = habitDataCollection;
         generateMonthDataFromEntries(mDataSample);
     }
 
-    private void generateMonthDataFromEntries(HabitDataSample dataSample) {
+    private void generateMonthDataFromEntries(HabitDataCollection dataSample) {
 
         Calendar startCalendar = Calendar.getInstance();
         long minimumTime = dataSample.getMinimumTime();
@@ -130,11 +130,11 @@ public class CalendarViewAdapter extends CalendarViewAdapterBase<CalendarViewAda
         return dataSets;
     }
 
-    public CalendarPieDataSet getPieDataSet(HabitDataSample dataSample, int date) {
+    public CalendarPieDataSet getPieDataSet(HabitDataCollection dataSample, int date) {
         final long totalDuration = dataSample.calculateTotalDuration();
         List<CalendarPieDataSet.CalendarPieEntry> entries = new ArrayList<>();
 
-        for (CategoryDataSample categoryDataSample : dataSample.getData()) {
+        for (CategoryDataCollection categoryDataSample : dataSample.getData()) {
             float ratio = categoryDataSample.calculateTotalDuration() / (float) totalDuration;
             if (ratio > 0) {
                 entries.add(new CalendarPieDataSet.CalendarPieEntry(ratio, categoryDataSample.getCategory().getColorAsInt()));

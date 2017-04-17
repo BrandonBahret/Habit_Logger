@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataCollection;
 import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.databinding.FragmentPieGraphDurationBinding;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
@@ -88,16 +88,16 @@ public class PieGraphDuration extends Fragment {
     }
     //endregion
 
-    public void updateCategoryDataSample(CategoryDataSample dataSample) {
-        float[] durationRatios = new float[dataSample.getNumberOfHabits()];
+    public void updateCategoryDataSample(CategoryDataCollection dataCollection) {
+        float[] durationRatios = new float[dataCollection.getNumberOfHabits()];
 
         for (int i = 0; i < durationRatios.length; i++)
-            durationRatios[i] = dataSample.getHabitDuration(i) / (float) dataSample.calculateTotalDuration() * 100;
+            durationRatios[i] = dataCollection.getHabitDuration(i) / (float) dataCollection.calculateTotalDuration() * 100;
 
-        setPieData(durationRatios, dataSample);
+        setPieData(durationRatios, dataCollection);
     }
 
-    public void setPieData(float[] durationRatios, CategoryDataSample dataSample) {
+    public void setPieData(float[] durationRatios, CategoryDataCollection dataSample) {
         HabitCategory category = dataSample.getCategory();
         ui.chart.setCenterText(category.getName());
 

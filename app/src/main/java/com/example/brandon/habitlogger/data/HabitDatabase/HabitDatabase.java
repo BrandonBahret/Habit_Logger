@@ -11,8 +11,9 @@ import android.support.annotation.Nullable;
 import com.android.internal.util.Predicate;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.MyDatabaseUtils;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataSample;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
@@ -20,7 +21,6 @@ import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.Categor
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.DatabaseSchema;
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.EntriesTableSchema;
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.HabitsTableSchema;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,28 +94,28 @@ public class HabitDatabase {
     }
 
     //region Methods responsible for sampling data from the database
-    public List<CategoryDataSample> getAllData() {
+    public List<CategoryDataCollection> getAllData() {
         int size = getNumberOfCategories();
-        List<CategoryDataSample> containers = new ArrayList<>(size);
+        List<CategoryDataCollection> containers = new ArrayList<>(size);
 
         for (int i = 0; i < size; i++) {
             long categoryId = getCategoryIdFromIndex(i);
-            CategoryDataSample data = getCategoryDataSample(getCategory(categoryId), 0, Long.MAX_VALUE);
+            CategoryDataCollection data = getCategoryDataSample(getCategory(categoryId), 0, Long.MAX_VALUE);
             containers.add(data);
         }
 
         return containers;
     }
 
-    public HabitDataSample getHabitDataSample(long dateFrom, long dateTo) {
-        List<CategoryDataSample> data = new ArrayList<>();
+    public HabitDataCollection getHabitDataSample(long dateFrom, long dateTo) {
+        List<CategoryDataCollection> data = new ArrayList<>();
         for (HabitCategory category : getCategories())
             data.add(getCategoryDataSample(category, dateFrom, dateTo));
 
-        return new HabitDataSample(data, dateFrom, dateTo);
+        return new HabitDataCollection(data, dateFrom, dateTo);
     }
 
-    public HabitDataSample getHabitDataSample(SessionEntryCollection entriesSample) {
+    public HabitDataCollection getHabitDataSample(SessionEntryCollection entriesSample) {
 
         List<Long> habitIdsList = MyCollectionUtils.collect(entriesSample.asList(), new MyCollectionUtils.IGetKey<SessionEntry, Long>() {
             @Override
@@ -135,7 +135,7 @@ public class HabitDatabase {
         long dateFrom = entriesSample.getDateFromTime();
         long dateTo = entriesSample.getDateToTime();
 
-        List<CategoryDataSample> categoryDataSamples = new ArrayList<>();
+        List<CategoryDataCollection> categoryDataSamples = new ArrayList<>();
 
         for (long categoryId : categoryIdSet) {
             List<Habit> habits = getHabits(categoryId);
@@ -152,13 +152,13 @@ public class HabitDatabase {
                 habit.setEntries(entries);
             }
 
-            categoryDataSamples.add(new CategoryDataSample(getCategory(categoryId), habits, dateFrom, dateTo));
+            categoryDataSamples.add(new CategoryDataCollection(getCategory(categoryId), habits, dateFrom, dateTo));
         }
 
-        return new HabitDataSample(categoryDataSamples, dateFrom, dateTo);
+        return new HabitDataCollection(categoryDataSamples, dateFrom, dateTo);
     }
 
-    public CategoryDataSample getCategoryDataSample(HabitCategory category, long dateFrom, long dateTo) {
+    public CategoryDataCollection getCategoryDataSample(HabitCategory category, long dateFrom, long dateTo) {
         List<Habit> habits = getHabits(category.getDatabaseId());
         MyCollectionUtils.filter(habits, Habit.ICheckIfIsArchived);
 
@@ -169,7 +169,7 @@ public class HabitDatabase {
             habit.setEntries(entries);
         }
 
-        return new CategoryDataSample(category, habits, dateFrom, dateTo);
+        return new CategoryDataCollection(category, habits, dateFrom, dateTo);
     }
 
     public SessionEntryCollection getEntriesSample(long habitId, long dateFrom, long dateTo) {

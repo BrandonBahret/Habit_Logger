@@ -1,9 +1,9 @@
 package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity;
 
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataSample;
-import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataCollection;
 import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
 
 import java.io.Serializable;
 
@@ -45,7 +45,7 @@ public interface IHabitDataCallback {
     interface IStatisticsFragment {
         void onUpdateEntries(SessionEntryCollection dataSample);
 
-        void onUpdateCategoryDataSample(CategoryDataSample dataSample);
+        void onUpdateCategoryDataSample(CategoryDataCollection dataSample);
 
         void onUpdateColorPalette(ThemeColorPalette palette);
 
@@ -57,7 +57,7 @@ public interface IHabitDataCallback {
     }
 
     interface IUpdateCategoryData extends Serializable {
-        CategoryDataSample getCategoryDataSample();
+        CategoryDataCollection getCategoryDataSample();
     }
 
     void setStatisticsFragmentCallback(IStatisticsFragment callback);
@@ -68,6 +68,6 @@ public interface IHabitDataCallback {
 
     SessionEntryCollection getSessionEntries();
 
-    CategoryDataSample getCategoryDataSample();
+    CategoryDataCollection getCategoryDataSample();
 
 }
