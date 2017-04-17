@@ -55,7 +55,7 @@ public class StreaksFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-//        updateEntries(mCallbackInterface.getSessionEntries());
+//        updateEntries(mCallbackInterface.asList());
     }
     //endregion
 
@@ -68,7 +68,7 @@ public class StreaksFragment extends Fragment {
 
         if (!dataSample.isEmpty()) {
 
-            Set<Long> sessionDatesSet = MyCollectionUtils.listToSet(dataSample.getSessionEntries(), SessionEntry.IGetSessionStartDate);
+            Set<Long> sessionDatesSet = MyCollectionUtils.listToSet(dataSample.asList(), SessionEntry.IGetSessionStartDate);
             List<Long> sessionDates = new ArrayList<>(sessionDatesSet);
             Collections.sort(sessionDates);
 

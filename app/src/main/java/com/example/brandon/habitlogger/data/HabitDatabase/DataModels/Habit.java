@@ -7,14 +7,13 @@ import android.support.annotation.Nullable;
 
 import com.android.internal.util.Predicate;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
+import com.example.brandon.habitlogger.data.SessionEntriesCollection;
 import com.opencsv.CSVReader;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -30,8 +29,7 @@ public class Habit implements Serializable, Parcelable {
     @NonNull private HabitCategory mCategory;
     @Nullable private String mDescription;
     @Nullable private String mIconResId;
-    @Nullable private List<SessionEntry> mEntries;
-    private long mEntriesDuration;
+    @NonNull private SessionEntriesCollection mSessionEntries;
 
     private int mIsArchived = 0;
     private long mDatabaseId = -1;
@@ -69,35 +67,36 @@ public class Habit implements Serializable, Parcelable {
 
     //region Constructors {}
     public Habit(@NonNull String name, @NonNull HabitCategory category) {
-        this.mName = name;
-        this.mCategory = category;
+        mName = name;
+        mCategory = category;
+        mSessionEntries = new SessionEntriesCollection();
         mIconResId = "none";
     }
 
     public Habit(@NonNull String name, @Nullable String description, @NonNull HabitCategory category,
-                 @Nullable String iconResId, List<SessionEntry> entries) {
-        this.mName = name;
-        this.mDescription = description;
-        this.mCategory = category;
-        this.mIconResId = iconResId;
-        setEntries(entries);
+                 @Nullable String iconResId, @NonNull SessionEntriesCollection entries) {
+        mName = name;
+        mDescription = description;
+        mCategory = category;
+        mIconResId = iconResId;
+        mSessionEntries = entries;
     }
 
     public Habit(@NonNull String name, @Nullable String description, @NonNull HabitCategory category,
-                 @Nullable String iconResId, List<SessionEntry> entries,
+                 @Nullable String iconResId, @NonNull SessionEntriesCollection entries,
                  int isArchived, long databaseId) {
 
-        this.mName = name;
-        this.mCategory = category;
-        this.mDescription = description;
-        this.mIconResId = iconResId;
-        this.mIsArchived = isArchived;
-        this.mDatabaseId = databaseId;
-        setEntries(entries);
+        mName = name;
+        mCategory = category;
+        mDescription = description;
+        mIconResId = iconResId;
+        mIsArchived = isArchived;
+        mDatabaseId = databaseId;
+        mSessionEntries = entries;
     }
 
     public Habit(Parcel in) {
-        Habit habit = (Habit)in.readSerializable();
+        Habit habit = (Habit) in.readSerializable();
         Habit.copy(this, habit);
     }
     //endregion
@@ -134,11 +133,7 @@ public class Habit implements Serializable, Parcelable {
         dest.mIconResId = source.mIconResId;
         dest.mDatabaseId = source.mDatabaseId;
         dest.mIsArchived = source.mIsArchived;
-
-        if (source.getEntries() != null) {
-            dest.mEntries = new ArrayList<>(source.getEntries());
-            dest.mEntriesDuration = source.calculateEntriesDurationSum();
-        }
+        dest.mSessionEntries = new SessionEntriesCollection(source.getEntries());
     }
 
     public static Habit duplicate(Habit habit) {
@@ -151,6 +146,7 @@ public class Habit implements Serializable, Parcelable {
     //region Methods responsible for converting to and from CSV
 
     //region Create from CSV
+
     /**
      * @param CSV The CSV form of a habit
      * @return a habit object created from the csv
@@ -171,10 +167,10 @@ public class Habit implements Serializable, Parcelable {
             reader.readNext(); // Skip line
             reader.readNext(); // Skip line
 
-            List<SessionEntry> entries = new ArrayList<>(numberOfEntries);
+            SessionEntriesCollection entries = new SessionEntriesCollection(numberOfEntries);
             for (int entryIndex = 0; entryIndex < numberOfEntries; entryIndex++) {
                 SessionEntry entry = createSessionEntryFromStrings(reader.readNext());
-                entries.add(entryIndex,  entry);
+                entries.add(entryIndex, entry);
             }
             habit.setEntries(entries);
 
@@ -185,7 +181,7 @@ public class Habit implements Serializable, Parcelable {
         return habit;
     }
 
-    private static Habit createHabitFromStrings(String[] habitArray){
+    private static Habit createHabitFromStrings(String[] habitArray) {
         int isArchived = Boolean.parseBoolean(habitArray[0]) ? 1 : 0;
         String habitName = habitArray[1];
         String habitDescription = habitArray[2];
@@ -194,10 +190,10 @@ public class Habit implements Serializable, Parcelable {
         String habitIconResId = habitArray[5];
         HabitCategory category = new HabitCategory(categoryColor, categoryName);
 
-        return new Habit(habitName, habitDescription, category, habitIconResId, null, isArchived, -1);
+        return new Habit(habitName, habitDescription, category, habitIconResId, new SessionEntriesCollection(), isArchived, -1);
     }
 
-    private static SessionEntry createSessionEntryFromStrings(String[] entryArray){
+    private static SessionEntry createSessionEntryFromStrings(String[] entryArray) {
         long entryStartTime = Long.parseLong(entryArray[0]);
         long entryDuration = Long.parseLong(entryArray[1]);
         String entryNote = entryArray[2];
@@ -225,14 +221,12 @@ public class Habit implements Serializable, Parcelable {
 
         String entryFormat = "%d,%d,\"%s\"\n";
 
-        List<SessionEntry> entries = getEntries();
-        if (entries != null) {
-            for (SessionEntry eachEntry : entries) {
-                String appendEntry = String.format(Locale.US, entryFormat,
-                        eachEntry.getStartingTime(), eachEntry.getDuration(), eachEntry.getNote());
+        SessionEntriesCollection entries = getEntries();
+        for (SessionEntry eachEntry : entries) {
+            String appendEntry = String.format(Locale.US, entryFormat,
+                    eachEntry.getStartingTime(), eachEntry.getDuration(), eachEntry.getNote());
 
-                csv.append(appendEntry);
-            }
+            csv.append(appendEntry);
         }
 
         return csv.toString();
@@ -256,28 +250,24 @@ public class Habit implements Serializable, Parcelable {
     }
 
     private long calculateEntriesDurationSum() {
-        return (long) MyCollectionUtils.sum(mEntries, SessionEntry.IGetSessionDuration);
+        return mSessionEntries.calculateDuration();
     }
 
-    @Nullable
-    public List<SessionEntry> filterEntriesForDate(final long timestamp) {
-        if(mEntries != null) {
-            List<SessionEntry> entries = new ArrayList<>(mEntries);
+    public SessionEntriesCollection filterEntriesForDate(final long timestamp) {
+        SessionEntriesCollection entries = new SessionEntriesCollection(mSessionEntries);
 
-            MyCollectionUtils.filter(entries, new Predicate<SessionEntry>() {
-                @Override
-                public boolean apply(SessionEntry sessionEntry) {
-                    return !(sessionEntry.getStartingTimeIgnoreTimeOfDay() == timestamp);
-                }
-            });
+        MyCollectionUtils.filter(entries, new Predicate<SessionEntry>() {
+            @Override
+            public boolean apply(SessionEntry sessionEntry) {
+                return !(sessionEntry.getStartingTimeIgnoreTimeOfDay() == timestamp);
+            }
+        });
 
-            return entries;
-        }
-
-        return null;
+        return entries;
     }
 
     //region Getters {}
+
     /**
      * @return The habit mName
      */
@@ -303,20 +293,20 @@ public class Habit implements Serializable, Parcelable {
     }
 
     //region Get fields related to SessionEntries
-    @Nullable
-    public List<SessionEntry> getEntries() {
-        return mEntries != null ? mEntries : null;
+    @NonNull
+    public SessionEntriesCollection getEntries() {
+        return mSessionEntries;
     }
 
     /**
-     * @return Get the number of mEntries
+     * @return Get the number of mSessionEntries
      */
     public long getEntriesLength() {
-        return getEntries() != null ? getEntries().size() : 0;
+        return getEntries().size();
     }
 
     public long getEntriesDuration() {
-        return this.mEntriesDuration;
+        return mSessionEntries.calculateDuration();
     }
 
     public static MyCollectionUtils.IGetKey<Habit, Long> IGetEntriesDuration = new MyCollectionUtils.IGetKey<Habit, Long>() {
@@ -355,6 +345,7 @@ public class Habit implements Serializable, Parcelable {
     //endregion
 
     //region Setters {}
+
     /**
      * @param name the new habit mName
      */
@@ -380,14 +371,10 @@ public class Habit implements Serializable, Parcelable {
     }
 
     /**
-     * @param newEntries The new entry array to replace the old mEntries.
+     * @param newEntries The new entry array to replace the old mSessionEntries.
      */
-    public Habit setEntries(List<SessionEntry> newEntries) {
-        if (newEntries != null) {
-            this.mEntries = newEntries;
-            this.mEntriesDuration = calculateEntriesDurationSum();
-        }
-
+    public Habit setEntries(@NonNull SessionEntriesCollection newEntries) {
+        mSessionEntries = newEntries;
         return this;
     }
 

@@ -21,7 +21,11 @@ public class MyCollectionUtils {
         Out get(In object);
     }
 
-    public interface KeyComparator {
+    public interface IGetList<In, Out> {
+        List<Out> getList(In object);
+    }
+
+    public interface ICompareKey {
         int compare(Object element, Object key);
     }
 
@@ -53,10 +57,20 @@ public class MyCollectionUtils {
         return collection;
     }
 
+    public static <ListType, Collect> List<Collect> collectAsList
+            (List<ListType> list, IGetList<ListType, Collect> keyGetter) {
+
+        List<Collect> collection = new ArrayList<>();
+        for (ListType item : list)
+            collection.addAll(keyGetter.getList(item));
+
+        return collection;
+    }
+
     /**
      * @return The non-negative index of the element, or a negative index which is the -index - 1 where the element would be inserted
      */
-    public static int binarySearch(List<?> list, final Object key, final KeyComparator comparator) {
+    public static int binarySearch(List<?> list, final Object key, final ICompareKey comparator) {
         return Collections.binarySearch(list, null, new Comparator<Object>() {
             @Override
             public int compare(Object obj, Object nullObj) {
@@ -65,7 +79,7 @@ public class MyCollectionUtils {
         });
     }
 
-    public static int binarySearchForInsertPosition(List<?> list, final Object key, final KeyComparator comparator) {
+    public static int binarySearchForInsertPosition(List<?> list, final Object key, final ICompareKey comparator) {
         int pos = binarySearch(list, key, comparator);
         return -pos - 1;
     }

@@ -60,7 +60,7 @@ public class TimeAverages extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-//        updateEntries(callbackInterface.getSessionEntries());
+//        updateEntries(callbackInterface.asList());
     }
     //endregion
 
@@ -83,7 +83,7 @@ public class TimeAverages extends Fragment {
             double hoursPerDayTime = days == 0 ? 0 : totalHours / days;
             hoursPerDay.setText(String.valueOf(hoursPerDayTime));
 
-            double daysPerWeekOnAverage = MyCollectionUtils.listToSet(dataSample.getSessionEntries(), SessionEntry.IGetSessionStartDate).size() / weeks;
+            double daysPerWeekOnAverage = MyCollectionUtils.listToSet(dataSample.asList(), SessionEntry.IGetSessionStartDate).size() / weeks;
             this.habitFrequency.setText(String.valueOf(daysPerWeekOnAverage));
         }
     }

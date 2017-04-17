@@ -252,7 +252,7 @@ public class OverviewEntriesFragment extends Fragment implements
     @Override
     public void updateHabitDataSample(HabitDataSample dataSample) {
         if (mEntryAdapter != null) {
-            mSessionEntries = new SessionEntriesCollection(dataSample.buildSessionEntriesList().getSessionEntries());
+            mSessionEntries = new SessionEntriesCollection(dataSample.buildSessionEntriesList().asList());
             mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), mEntryAdapter.getListener());
             mEntriesContainer.setAdapter(mEntryAdapter);
         }

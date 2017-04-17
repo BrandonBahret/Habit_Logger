@@ -98,11 +98,11 @@ public class DistributionStartingTime extends Fragment {
         if (!dataSample.isEmpty()) {
             TimeIntervalEntryCounter entryCounter = new TimeIntervalEntryCounter(INTERVAL);
 
-            for (SessionEntry entry : dataSample.getSessionEntries())
+            for (SessionEntry entry : dataSample.asList())
                 entryCounter.incrementCounter(entry.getStartingTimePortion());
 
 
-            int totalEntriesCount = dataSample.getSessionEntries().size();
+            int totalEntriesCount = dataSample.asList().size();
             List<BarEntry> entries = new ArrayList<>();
             for (int counterIndex = 0; counterIndex < entryCounter.COUNTERS_LENGTH; counterIndex++) {
                 float ratio = entryCounter.getCounter(counterIndex) / (float) totalEntriesCount * 100;

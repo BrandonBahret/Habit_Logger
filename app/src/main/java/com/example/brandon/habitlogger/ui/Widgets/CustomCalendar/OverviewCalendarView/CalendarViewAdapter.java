@@ -77,7 +77,7 @@ public class CalendarViewAdapter extends CalendarViewAdapterBase<CalendarViewAda
         mCalendarData = new ArrayList<>(diffMonth);
 
         int entryIndex = 0;
-        List<SessionEntry> entries = dataSample.buildSessionEntriesList().getSessionEntries();
+        List<SessionEntry> entries = dataSample.buildSessionEntriesList().asList();
 
         Set<Integer> dates;
 

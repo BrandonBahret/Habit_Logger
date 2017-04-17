@@ -118,7 +118,7 @@ public final class CategoryDataSample extends ExpandableGroup<Habit> {
 
         for (int i = 0; i < mHabits.size(); i++) {
             habits.add(i, Habit.duplicate(mHabits.get(i)));
-            List<SessionEntry> entriesForDate = habits.get(i).filterEntriesForDate(timestamp);
+            SessionEntriesCollection entriesForDate = habits.get(i).filterEntriesForDate(timestamp);
             habits.get(i).setEntries(entriesForDate);
         }
 

@@ -117,7 +117,7 @@ public class HabitDatabase {
 
     public HabitDataSample getHabitDataSample(SessionEntriesCollection entriesSample) {
 
-        List<Long> habitIdsList = MyCollectionUtils.collect(entriesSample.getSessionEntries(), new MyCollectionUtils.IGetKey<SessionEntry, Long>() {
+        List<Long> habitIdsList = MyCollectionUtils.collect(entriesSample.asList(), new MyCollectionUtils.IGetKey<SessionEntry, Long>() {
             @Override
             public Long get(SessionEntry entry) {
                 return entry.getHabitId();
@@ -142,7 +142,7 @@ public class HabitDatabase {
 
             for (Habit habit : habits) {
                 final long habitId = habit.getDatabaseId();
-                List<SessionEntry> entries = new ArrayList<>(entriesSample.getSessionEntries());
+                SessionEntriesCollection entries = new SessionEntriesCollection(entriesSample.asList());
                 MyCollectionUtils.filter(entries, new Predicate<SessionEntry>() {
                     @Override
                     public boolean apply(SessionEntry sessionEntry) {
@@ -165,7 +165,7 @@ public class HabitDatabase {
         for (Habit habit : habits) {
             long habitId = habit.getDatabaseId();
             Set<Long> ids = findEntriesWithinTimeRange(habitId, dateFrom, dateTo);
-            List<SessionEntry> entries = lookUpEntriesAsList(ids);
+            SessionEntriesCollection entries = lookUpEntries(ids);
             habit.setEntries(entries);
         }
 

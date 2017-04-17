@@ -40,7 +40,7 @@ public class SessionEntry implements Serializable {
         }
     };
 
-    public static MyCollectionUtils.KeyComparator IKeyCompareStartingTime = new MyCollectionUtils.KeyComparator() {
+    public static MyCollectionUtils.ICompareKey IKeyCompareStartingTime = new MyCollectionUtils.ICompareKey() {
         @Override
         public int compare(Object element, Object key) {
             long elementStartTime = ((SessionEntry) element).getStartingTime();

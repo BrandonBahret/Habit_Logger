@@ -15,7 +15,7 @@ import java.util.List;
  * A class to structure SessionEntry objects.
  */
 
-public class SessionEntriesCollection extends ArrayList<SessionEntry> {
+public class SessionEntriesCollection extends MyArrayListBase<SessionEntry> {
 
     //region (Member Attributes)
     private long mDateFromTime, mDateToTime;
@@ -25,6 +25,7 @@ public class SessionEntriesCollection extends ArrayList<SessionEntry> {
     private boolean mTotalDaysLengthIsInvalid;
     //endregion
 
+    //region Constructors {}
     public SessionEntriesCollection(List<SessionEntry> sessionEntries, long dateFromTime, long dateToTime) {
         super(sessionEntries);
         mDateFromTime = dateFromTime;
@@ -33,37 +34,21 @@ public class SessionEntriesCollection extends ArrayList<SessionEntry> {
 
     public SessionEntriesCollection(List<SessionEntry> sessionEntries) {
         super(sessionEntries);
-        calculateMinMaxFromEntries(this);
+        updateDateFromToWithEntries(this);
+    }
+
+    public SessionEntriesCollection(int initialCapacity) {
+        this(new ArrayList<SessionEntry>(initialCapacity));
     }
 
     public SessionEntriesCollection() {
         this(new ArrayList<SessionEntry>());
     }
-
-    private void calculateMinMaxFromEntries(List<SessionEntry> sessionEntries) {
-        if (!sessionEntries.isEmpty()) {
-            mDateFromTime = Collections.min(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
-            mDateToTime = Collections.max(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
-        }
-        else {
-            mDateFromTime = -1;
-            mDateToTime = -1;
-        }
-    }
-
-    public boolean hasEntryFor(long targetDate) {
-        targetDate = MyTimeUtils.setTimePortion(targetDate, true, 0, 0, 0, 0);
-        return MyCollectionUtils.binarySearch(this, targetDate, new MyCollectionUtils.KeyComparator() {
-            @Override
-            public int compare(Object element, Object key) {
-                long startingTimeIgnoreTimeOfDay = ((SessionEntry) element).getStartingTimeIgnoreTimeOfDay();
-                return Long.compare(startingTimeIgnoreTimeOfDay, (Long) key);
-            }
-        }) >= 0;
-    }
+    //endregion -- end --
 
     //region Methods With One Time Calculations {}
-    private void invalidate() {
+    @Override
+    void invalidate() {
         mTotalDaysLengthIsInvalid = true;
         mDurationIsInvalid = true;
     }
@@ -89,7 +74,7 @@ public class SessionEntriesCollection extends ArrayList<SessionEntry> {
     //endregion
 
     //region Getters {}
-    public List<SessionEntry> getSessionEntries() {
+    public List<SessionEntry> asList() {
         return this;
     }
 
@@ -118,27 +103,45 @@ public class SessionEntriesCollection extends ArrayList<SessionEntry> {
     public void updateSessionEntries(List<SessionEntry> entries) {
         this.clear();
         this.addAll(entries);
-        invalidate();
-        calculateMinMaxFromEntries(this);
+        updateDateFromToWithEntries(this);
+    }
+
+    private void updateDateFromToWithEntries(List<SessionEntry> sessionEntries) {
+        if (!sessionEntries.isEmpty()) {
+            mDateFromTime = Collections.min(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
+            mDateToTime = Collections.max(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
+        }
+        else {
+            mDateFromTime = -1;
+            mDateToTime = -1;
+        }
+    }
+
+    public boolean hasEntryFor(long targetDate) {
+        targetDate = MyTimeUtils.setTimePortion(targetDate, true, 0, 0, 0, 0);
+        return MyCollectionUtils.binarySearch(this, targetDate, new MyCollectionUtils.ICompareKey() {
+            @Override
+            public int compare(Object element, Object key) {
+                long startingTimeIgnoreTimeOfDay = ((SessionEntry) element).getStartingTimeIgnoreTimeOfDay();
+                return Long.compare(startingTimeIgnoreTimeOfDay, (Long) key);
+            }
+        }) >= 0;
     }
 
     public int addEntry(SessionEntry entry) {
         int pos = MyCollectionUtils.binarySearchForInsertPosition(this, entry.getStartingTime(), SessionEntry.IKeyCompareStartingTime);
         this.add(pos, entry);
-        invalidate();
         return pos;
     }
 
     public int removeEntry(SessionEntry entry) {
         int pos = this.indexOf(entry);
         this.remove(pos);
-        invalidate();
         return pos;
     }
 
     public int updateEntry(SessionEntry oldEntry, SessionEntry newEntry) {
         this.removeEntry(oldEntry);
-        invalidate();
         return this.addEntry(newEntry);
     }
 
@@ -149,8 +152,6 @@ public class SessionEntriesCollection extends ArrayList<SessionEntry> {
     public void setDateTo(long dateTo) {
         mDateToTime = dateTo;
     }
-
     //endregion
-
 
 }

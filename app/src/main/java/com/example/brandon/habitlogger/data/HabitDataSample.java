@@ -84,7 +84,7 @@ public class HabitDataSample {
     }
 
     public long getMinimumTime(){
-        List<SessionEntry> sessionEntries = buildSessionEntriesList().getSessionEntries();
+        List<SessionEntry> sessionEntries = buildSessionEntriesList().asList();
 
         if (!sessionEntries.isEmpty())
             return Collections.min(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();
@@ -92,7 +92,7 @@ public class HabitDataSample {
     }
 
     public long getMaximumTime(){
-        List<SessionEntry> sessionEntries = buildSessionEntriesList().getSessionEntries();
+        List<SessionEntry> sessionEntries = buildSessionEntriesList().asList();
 
         if (!sessionEntries.isEmpty())
             return Collections.max(sessionEntries, SessionEntry.ICompareStartingTimes).getStartingTime();

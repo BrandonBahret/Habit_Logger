@@ -99,7 +99,7 @@ public class PieGraphCompletion extends Fragment {
     public void updateEntries(SessionEntriesCollection dataSample) {
         if (!dataSample.isEmpty()) {
             Set<Long> uniqueEntryStartDates = MyCollectionUtils.listToSet(
-                    dataSample.getSessionEntries(), SessionEntry.IGetSessionStartDate
+                    dataSample.asList(), SessionEntry.IGetSessionStartDate
             );
 
             int totalDaysWithEntries = uniqueEntryStartDates.size();
