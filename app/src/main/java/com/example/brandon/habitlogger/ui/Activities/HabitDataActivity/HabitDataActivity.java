@@ -44,7 +44,8 @@ import java.util.Set;
 
 import static com.example.brandon.habitlogger.R.string.menu_unarchive;
 
-public class HabitDataActivity extends AppCompatActivity implements IHabitDataCallback, IScrollEvents, EntriesFragment.IEntriesEvents {
+public class HabitDataActivity extends AppCompatActivity implements
+        IHabitDataCallback, IScrollEvents, EntriesFragment.IEntriesEvents {
 
     //region (Member attributes)
 

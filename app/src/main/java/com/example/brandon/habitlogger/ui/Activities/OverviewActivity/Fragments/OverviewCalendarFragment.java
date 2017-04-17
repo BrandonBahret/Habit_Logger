@@ -11,18 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataCollection;
-import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.IDataOverviewCallback;
-import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.OverviewCalendarView.CalendarViewAdapter;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 
-public class OverviewCalendarFragment extends Fragment implements
-        IDataOverviewCallback.IUpdateHabitSample, IDataOverviewCallback.IOnTabReselected {
+public class OverviewCalendarFragment extends Fragment {
 
     //region (Member attributes)
-    private IDataOverviewCallback mCallbackInterface;
+//    private IDataOverviewCallback mCallbackInterface;
     private RecyclerView mCalendarViewContainer;
-    private CalendarViewAdapter mAdapter;
+//    private CalendarViewAdapter mAdapter;
     //endregion
 
     public OverviewCalendarFragment() {
@@ -40,16 +36,16 @@ public class OverviewCalendarFragment extends Fragment implements
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        mCallbackInterface = (IDataOverviewCallback) context;
-        mCallbackInterface.addCallback(this);
-        mCallbackInterface.addOnTabReselectedCallback(this);
+//        mCallbackInterface = (IDataOverviewCallback) context;
+//        mCallbackInterface.addCallback(this);
+//        mCallbackInterface.addOnTabReselectedCallback(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mCallbackInterface.removeCallback(this);
-        mCallbackInterface.removeOnTabReselectedCallback(this);
+//        mCallbackInterface.removeCallback(this);
+//        mCallbackInterface.removeOnTabReselectedCallback(this);
     }
 
     @Override
@@ -64,7 +60,7 @@ public class OverviewCalendarFragment extends Fragment implements
         mCalendarViewContainer.setItemAnimator(new DefaultItemAnimator());
         mCalendarViewContainer.addItemDecoration(getSpaceDecoration());
 
-        updateHabitDataSample(mCallbackInterface.getDataSample());
+//        updateHabitDataSample(mCallbackInterface.getDataSample());
 
         return v;
     }
@@ -79,18 +75,19 @@ public class OverviewCalendarFragment extends Fragment implements
 
     //endregion [ -------- end -------- ]
 
-    @Override
-    public void updateHabitDataSample(HabitDataCollection dataSample) {
-        if (mCalendarViewContainer != null) {
-            mAdapter = new CalendarViewAdapter(dataSample, getContext());
-            mCalendarViewContainer.setAdapter(mAdapter);
-            mCalendarViewContainer.scrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
-        }
-    }
+//    @Override
+//    public void updateHabitDataSample(HabitDataCollection dataSample) {
+//        if (mCalendarViewContainer != null) {
+//            mAdapter = new CalendarViewAdapter(dataSample, getContext());
+//            mCalendarViewContainer.setAdapter(mAdapter);
+//            mCalendarViewContainer.scrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
+//        }
+//    }
 
-    @Override
-    public void onTabReselected(int position) {
-        if (position == 1)
-            mCalendarViewContainer.smoothScrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
-    }
+//    @Override
+//    public void onTabReselected(int position) {
+//        if (position == 1)
+//            mCalendarViewContainer.smoothScrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
+//    }
+
 }

@@ -94,7 +94,7 @@ public class HabitDatabase {
     }
 
     //region Methods responsible for sampling data from the database
-    public List<CategoryDataCollection> getAllData() {
+    public HabitDataCollection getAllData() {
         int size = getNumberOfCategories();
         List<CategoryDataCollection> containers = new ArrayList<>(size);
 
@@ -104,7 +104,7 @@ public class HabitDatabase {
             containers.add(data);
         }
 
-        return containers;
+        return new HabitDataCollection(containers);
     }
 
     public HabitDataCollection getHabitDataSample(long dateFrom, long dateTo) {

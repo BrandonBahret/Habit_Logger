@@ -28,11 +28,21 @@ public class HabitDataCollection extends MyDataCollectionBase<CategoryDataCollec
     private boolean mColorsArrayIsInvalid;
     //endregion
 
+    //region Constructors {}
     public HabitDataCollection(List<CategoryDataCollection> data, long dateFrom, long dateTo) {
         super(data);
-        mDateFrom = dateFrom;
-        mDateTo = dateTo;
+        mDateFrom = dateFrom != -1 ? dateFrom : getDateFrom();
+        mDateTo = dateTo != -1 ? dateTo : getDateTo();
     }
+
+    public HabitDataCollection(List<CategoryDataCollection> data) {
+        this(data, -1, -1);
+    }
+
+    public HabitDataCollection() {
+        this(new ArrayList<CategoryDataCollection>(), -1, -1);
+    }
+    //endregion -- end --
 
     /**
      * @param timestamp Epoch timestamp for a certain date to search for.

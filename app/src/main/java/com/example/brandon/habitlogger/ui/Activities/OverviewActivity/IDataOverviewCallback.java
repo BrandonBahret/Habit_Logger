@@ -1,6 +1,11 @@
 package com.example.brandon.habitlogger.ui.Activities.OverviewActivity;
 
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataCollection;
+import com.example.brandon.habitlogger.common.ThemeColorPalette;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
+import com.example.brandon.habitlogger.data.DataModels.Habit;
+
+import java.io.Serializable;
 
 /**
  * Created by Brandon on 3/2/2017.
@@ -9,24 +14,45 @@ import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitData
 
 public interface IDataOverviewCallback {
 
-    interface IUpdateHabitSample {
-        void updateHabitDataSample(HabitDataCollection dataSample);
+    interface IEntriesFragment {
+        void onUpdateEntries(SessionEntryCollection dataSample);
+
+        void onNotifyEntryRemoved(int adapterPosition);
+
+        void onNotifyEntryAdded(int adapterPosition);
+
+        void onNotifyEntryUpdated(int oldPosition, int newPosition);
+
+        void onTabReselected();
     }
 
-    interface IOnTabReselected {
-        void onTabReselected(int position);
+    void setEntriesFragmentCallback(IEntriesFragment callback);
+
+    interface ICalendarFragment {
+        void onUpdateEntries(SessionEntryCollection dataSample);
+
+        void onTabReselected();
     }
 
+    void setCalendarFragmentCallback(ICalendarFragment callback);
 
-    HabitDataCollection getDataSample();
 
-    void addCallback(IUpdateHabitSample callback);
+    interface IStatisticsFragment {
+        void onUpdateEntries(SessionEntryCollection dataSample);
 
-    void removeCallback(IUpdateHabitSample callback);
+        void onTabReselected();
+    }
 
-    void addOnTabReselectedCallback(IOnTabReselected callback);
+    void setStatisticsFragmentCallback(IStatisticsFragment callback);
 
-    void removeOnTabReselectedCallback(IOnTabReselected callback);
+    interface IUpdateEntries extends Serializable {
+        SessionEntryCollection getSessionEntries();
 
+    }
+    interface IUpdateCategoryData extends Serializable {
+        CategoryDataCollection getCategoryDataSample();
+    }
+
+    SessionEntryCollection getSessionEntries();
 
 }

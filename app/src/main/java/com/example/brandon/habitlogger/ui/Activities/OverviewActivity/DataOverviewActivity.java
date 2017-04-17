@@ -1,151 +1,128 @@
 package com.example.brandon.habitlogger.ui.Activities.OverviewActivity;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.brandon.habitlogger.R;
-import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.HabitDataCollection;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.databinding.ActivityDataOverviewBinding;
-import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.Fragments.OverviewCalendarFragment;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.Fragments.OverviewEntriesFragment;
-import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.Fragments.OverviewStatisticsFragment;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
+import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EditEntryForm;
 import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 public class DataOverviewActivity extends AppCompatActivity implements
-        IDataOverviewCallback, IScrollEvents {
+        IDataOverviewCallback, IScrollEvents, OverviewEntriesFragment.IEntriesEvents {
 
     //region (Member attributes)
-    private FloatingDateRangeWidgetManager mDateRangeManager;
+
+    // Dependencies
     private HabitDatabase mHabitDatabase;
-    private LocalDataExportManager mExportManager;
-    private ActivityDataOverviewBinding ui;
-    //endregion
 
-    //region Code responsible for providing an interface to this activity
+    // Data
+    private SessionEntryCollection mSessionEntries = new SessionEntryCollection();
 
-    List<IUpdateHabitSample> mUpdateDataCallbacks = new ArrayList<>();
-    List<IOnTabReselected> mOnTabReselectedCallbacks = new ArrayList<>();
+    // View related members
+    FloatingDateRangeWidgetManager mDateRangeManager;
+    private SearchView mSearchView;
+    private DataOverviewActivityPagerAdapter mSectionsPagerAdapter;
+    ActivityDataOverviewBinding ui;
 
-    //region Methods to add and remove callbacks
-    @Override
-    public void addCallback(IUpdateHabitSample callback) {
-        mUpdateDataCallbacks.add(callback);
-    }
+    //endregion -- end --
 
-    @Override
-    public void removeCallback(IUpdateHabitSample callback) {
-        mUpdateDataCallbacks.remove(callback);
-    }
+    //region Code responsible for providing communication between child fragments and this activity
 
-    @Override
-    public void addOnTabReselectedCallback(IOnTabReselected callback) {
-        mOnTabReselectedCallbacks.add(callback);
-    }
+    // Callbacks
+    private IEntriesFragment mEntriesCallback;
+    private IStatisticsFragment mStatisticsCallback;
+    private ICalendarFragment mCalendarCallback;
 
     @Override
-    public void removeOnTabReselectedCallback(IOnTabReselected callback) {
-        mOnTabReselectedCallbacks.remove(callback);
-    }
-    //endregion
-
-    public void updateEntries() {
-        HabitDataCollection dataSample = getDataSample();
-        List<SessionEntry> sessionEntries = dataSample.buildSessionEntriesList().asList();
-
-        updateDateRangeManagerEntries(sessionEntries);
-
-        for (IUpdateHabitSample callback : mUpdateDataCallbacks)
-            callback.updateHabitDataSample(dataSample);
-    }
-
-    private void updateDateRangeManagerEntries(List<SessionEntry> sessionEntries) {
-        long minTime = mHabitDatabase.getMinEntry().getStartingTimeIgnoreTimeOfDay();
-        long maxTime = mHabitDatabase.getMaxEntry().getStartingTimeIgnoreTimeOfDay();
-        mDateRangeManager.updateSessionEntries(sessionEntries, minTime, maxTime);
-    }
-
-    private void updateEntries(List<SessionEntry> entries) {
-        updateDateRangeManagerEntries(entries);
-
-        SessionEntryCollection entriesSample = new SessionEntryCollection(entries);
-        HabitDataCollection dataSample = mHabitDatabase.getHabitDataSample(entriesSample);
-
-        for (IUpdateHabitSample callback : mUpdateDataCallbacks)
-            callback.updateHabitDataSample(dataSample);
+    public void setEntriesFragmentCallback(IEntriesFragment callback) {
+        mEntriesCallback = callback;
     }
 
     @Override
-    public HabitDataCollection getDataSample() {
-        return mHabitDatabase.getHabitDataSample(mDateRangeManager.getDateFrom(), mDateRangeManager.getDateTo());
+    public void setCalendarFragmentCallback(ICalendarFragment callback) {
+        mCalendarCallback = callback;
     }
-    //endregion --- end --
 
-    //region Methods responsible for handling the activity lifecycle
+    @Override
+    public void setStatisticsFragmentCallback(IStatisticsFragment callback) {
+        mStatisticsCallback = callback;
+    }
+
+    //endregion -- end --
+
+    //region [ ---- Methods responsible for handling the activity lifecycle ---- ]
+
+    //region entire lifetime (onCreate - onDestroy)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Create dependencies
+        mHabitDatabase = new HabitDatabase(this);
+
+        // Fetch data from database
+        mSessionEntries = mHabitDatabase.getEntries();
+
+        // Set up activity
         ui = DataBindingUtil.setContentView(this, R.layout.activity_data_overview);
 
-        gatherDependencies();
-
-        setUpViews();
-
-        updateEntries();
-    }
-
-    private void gatherDependencies() {
-        mHabitDatabase = new HabitDatabase(this);
-        HabitDatabase.addOnEntryChangedListener(getDatabaseListener());
-
-        mExportManager = new LocalDataExportManager(this);
-
-        mDateRangeManager = new FloatingDateRangeWidgetManager
-                (this, findViewById(R.id.date_range), mHabitDatabase.getEntriesAsList());
-        mDateRangeManager.hideView(false);
-
-    }
-
-    private void setUpViews() {
-        int statusColor = ContextCompat.getColor(DataOverviewActivity.this, R.color.colorPrimaryDark);
-        getWindow().setStatusBarColor(statusColor);
-
         setSupportActionBar(ui.toolbar);
-        if (getSupportActionBar() != null)
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        mSectionsPagerAdapter = new DataOverviewActivityPagerAdapter(getSupportFragmentManager(), this);
+        mDateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), mSessionEntries);
+        ui.container.setAdapter(mSectionsPagerAdapter);
         ui.tabs.setupWithViewPager(ui.container);
-        ui.tabs.addOnTabSelectedListener(getTabSelectedListener());
 
-        mDateRangeManager.setDateRangeChangeListener(getDateRangeListener());
+        mSessionEntries = fetchEntriesWithinTimeRange();
+        mDateRangeManager.updateSessionEntries(mSessionEntries);
 
-        ui.container.setAdapter(new SectionsPagerAdapter(getSupportFragmentManager()));
-        ui.container.addOnPageChangeListener(getPageChangeListener());
+        mDateRangeManager.hideView(false);
         ui.container.setCurrentItem(1);
+
+    }
+    //endregion -- end --
+
+    //region visible lifetime (onStart - onStop)
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // Set/Add listeners
+        ui.tabs.addOnTabSelectedListener(onTabSelectedListener);
+        mDateRangeManager.setDateRangeChangeListener(onDateRangeChangeListener);
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+
+        // remove listeners
+        ui.tabs.removeOnTabSelectedListener(onTabSelectedListener);
+    }
+    //endregion -- end --
+
+    //region Methods to handle the menu lifetime
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_overall_statistcs, menu);
         return true;
     }
@@ -154,20 +131,93 @@ public class DataOverviewActivity extends AppCompatActivity implements
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem search = menu.findItem(R.id.search);
         if (search != null) {
-            SearchView searchView = (SearchView) search.getActionView();
-            searchView.setQueryHint(getString(R.string.filter_entries));
-            searchView.setOnQueryTextListener(getSearchViewListener());
+            mSearchView = (SearchView) search.getActionView();
+            mSearchView.setQueryHint(getString(R.string.filter_entries));
+            mSearchView.setOnQueryTextListener(onSearchQueryListener);
         }
 
         return super.onPrepareOptionsMenu(menu);
     }
-    //endregion --- end ---
+    //endregion
 
-    //region [ ---- Methods responsible for handling events ---- ]
+    //endregion [ ---- end ---- ]
 
-    //region [ -- methods responsible for handling ui events -- ]
+    //region Methods responsible for manipulating entries
+    private SessionEntryCollection fetchEntriesWithinConditions(String query) {
+        Set<Long> queryIds = mHabitDatabase.findEntryIdsByComment(query);
 
-    //region Methods responsible for handling scroll events
+        Set<Long> dateRangeIds = mHabitDatabase.findEntriesWithinTimeRange(
+                mDateRangeManager.getDateFrom(), mDateRangeManager.getDateTo()
+        );
+
+        queryIds.retainAll(dateRangeIds);
+
+        return mHabitDatabase.lookUpEntries(queryIds);
+    }
+
+    private SessionEntryCollection fetchEntriesWithinTimeRange() {
+        Set<Long> dateRangeIds = mHabitDatabase.findEntriesWithinTimeRange(
+                mDateRangeManager.getDateFrom(), mDateRangeManager.getDateTo()
+        );
+
+        return mHabitDatabase.lookUpEntries(dateRangeIds);
+    }
+
+    private boolean checkIfEntryFitsWithinConditions(SessionEntry entry) {
+        boolean fitsWithinRange = mDateRangeManager.entryFitsRange(entry);
+        boolean fitsQuery = true;
+
+        CharSequence query = mSearchView.getQuery();
+        if (query != null && query.length() != 0) {
+            String stringQuery = String.valueOf(query);
+            fitsQuery = entry.matchesQuery(stringQuery);
+        }
+        return fitsQuery && fitsWithinRange;
+    }
+
+    private void updateEntry(SessionEntry oldEntry, SessionEntry newEntry) {
+        int oldIndex = mSessionEntries.indexOf(oldEntry);
+        int newIndex = mSessionEntries.updateEntry(oldEntry, newEntry);
+        mDateRangeManager.updateSessionEntries(mSessionEntries);
+        mEntriesCallback.onNotifyEntryUpdated(oldIndex, newIndex);
+//        mCalendarCallback.onUpdateEntries(mSessionEntries);
+//        mStatisticsCallback.onUpdateEntries(mSessionEntries);
+    }
+
+    private void removeEntry(SessionEntry oldEntry) {
+        int pos = mSessionEntries.removeEntry(oldEntry);
+        mDateRangeManager.updateSessionEntries(mSessionEntries);
+        mEntriesCallback.onNotifyEntryRemoved(pos);
+//        mCalendarCallback.onUpdateEntries(mSessionEntries);
+//        mStatisticsCallback.onUpdateEntries(mSessionEntries);
+    }
+
+    private void updateEntries(SessionEntryCollection sessionEntries) {
+        updateDateRangeManagerEntries(sessionEntries);
+        mEntriesCallback.onUpdateEntries(sessionEntries);
+//        mCalendarCallback.onUpdateEntries(sessionEntries);
+//        mStatisticsCallback.onUpdateEntries(mSessionEntries);
+    }
+
+    private void updateDateRangeManagerEntries(SessionEntryCollection sessionEntries) {
+        SessionEntry minEntry = mHabitDatabase.getMinEntry();
+        SessionEntry maxEntry = mHabitDatabase.getMaxEntry();
+        if (minEntry != null && maxEntry != null) {
+            long minTime = minEntry.getStartingTimeIgnoreTimeOfDay();
+            long maxTime = maxEntry.getStartingTimeIgnoreTimeOfDay();
+            mDateRangeManager.updateSessionEntries(sessionEntries.size(), sessionEntries.calculateDuration(), minTime, maxTime);
+            sessionEntries.setDateFrom(mDateRangeManager.getDateFrom());
+            sessionEntries.setDateTo(mDateRangeManager.getDateTo());
+        }
+        else {
+            mDateRangeManager.updateSessionEntries(new ArrayList<SessionEntry>(), -1, -1);
+        }
+    }
+    //endregion -- end --
+
+    //region Methods responsible for handling/dispatching events
+
+    //region Scroll events
     @Override
     public void onScrollUp() {
         mDateRangeManager.showView(true);
@@ -179,135 +229,113 @@ public class DataOverviewActivity extends AppCompatActivity implements
     }
     //endregion -- end --
 
-    private TabLayout.OnTabSelectedListener getTabSelectedListener() {
-        return new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {}
+    //region Entries fragment events
+    @Override
+    public void onEntryViewClicked(final long entryId, SessionEntry entry) {
+        EditEntryForm dialog = EditEntryForm.newInstance(
+                entry, ContextCompat.getColor(this, R.color.textColorContrastBackground)
+        );
 
+        dialog.setOnFinishedListener(new EditEntryForm.OnFinishedListener() {
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
+            public void onPositiveClicked(SessionEntry newEntry) {
+                if (newEntry != null) {
+                    SessionEntry oldEntry = mHabitDatabase.getEntry(entryId);
+                    mHabitDatabase.updateEntry(entryId, newEntry);
 
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-                int position = tab.getPosition();
-                for (IOnTabReselected callback : mOnTabReselectedCallbacks)
-                    callback.onTabReselected(position);
+                    mDateRangeManager.adjustDateRangeForEntry(newEntry);
+                    if (checkIfEntryFitsWithinConditions(newEntry)) updateEntry(oldEntry, newEntry);
+                    else removeEntry(oldEntry);
+                }
             }
-        };
+
+            @Override
+            public void onNegativeClicked(SessionEntry entry) {
+                mHabitDatabase.deleteEntry(entryId);
+                removeEntry(entry);
+            }
+        });
+
+        dialog.show(getSupportFragmentManager(), "edit-entry");
     }
+    //endregion
 
-    private SearchView.OnQueryTextListener getSearchViewListener() {
-        return new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
+    FloatingDateRangeWidgetManager.DateRangeChangeListener onDateRangeChangeListener =
+            new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
+                @Override
+                public void onDateRangeChanged(long dateFrom, long dateTo) {
+                    String query = String.valueOf(mSearchView.getQuery());
+                    mSessionEntries = fetchEntriesWithinConditions(query);
+                    updateEntries(mSessionEntries);
+                }
+            };
 
-            @Override
-            public boolean onQueryTextChange(String query) {
-                List<SessionEntry> entries = mHabitDatabase.lookUpEntriesAsList(
-                        mHabitDatabase.findEntryIdsByComment(query)
-                );
-
-                updateDateRangeManagerEntries(entries);
-                updateEntries(entries);
-                return true;
-            }
-        };
-    }
-
-    private FloatingDateRangeWidgetManager.DateRangeChangeListener getDateRangeListener() {
-        return new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
-            @Override
-            public void onDateRangeChanged(long dateFrom, long dateTo) {
-                updateEntries();
-            }
-        };
-    }
-
-    private ViewPager.OnPageChangeListener getPageChangeListener() {
-        return new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                boolean dateRangeShownStates[] = {true, false, true};
-                mDateRangeManager.setViewShown(dateRangeShownStates[position]);
-            }
-        };
-    }
-
-    //endregion [ -- end -- ]
-
-    private HabitDatabase.OnEntryChangedListener getDatabaseListener() {
-        return new HabitDatabase.OnEntryChangedListener() {
-            @Override
-            public void onEntryDeleted(SessionEntry removedEntry) {
-                HabitDataCollection dataSample = getDataSample();
-
-                List<SessionEntry> sessionEntries = dataSample.buildSessionEntriesList().asList();
-                updateDateRangeManagerEntries(sessionEntries);
-            }
-
-            @Override
-            public void onEntryAdded(SessionEntry newEntry) {
-
-            }
-
-            @Override
-            public void onEntriesReset(long habitId) {
-                updateEntries();
-            }
-
-            @Override
-            public void onEntryUpdated(SessionEntry oldEntry, SessionEntry newEntry) {
-                mDateRangeManager.adjustDateRangeForEntry(newEntry);
-
-                HabitDataCollection dataSample = getDataSample();
-                List<SessionEntry> sessionEntries = dataSample.buildSessionEntriesList().asList();
-                updateDateRangeManagerEntries(sessionEntries);
-            }
-        };
-    }
-
-    //endregion [ ---------------- end ---------------- ]
-
-    public static void startActivity(Context context) {
-        Intent startTargetActivity = new Intent(context, DataOverviewActivity.class);
-        context.startActivity(startTargetActivity);
-    }
-
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public final String[] titles = getResources().getStringArray(R.array.tab_titles);
-
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
+    SearchView.OnQueryTextListener onSearchQueryListener = new SearchView.OnQueryTextListener() {
+        @Override
+        public boolean onQueryTextSubmit(String query) {
+            return false;
         }
 
         @Override
-        public Fragment getItem(int position) {
+        public boolean onQueryTextChange(String newText) {
+            mSessionEntries = newText.length() > 0 ?
+                    fetchEntriesWithinConditions(newText) : fetchEntriesWithinTimeRange();
+
+            updateEntries(mSessionEntries);
+
+            return false;
+        }
+    };
+
+    TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
+
+        @Override
+        public void onTabSelected(TabLayout.Tab tab) {
+            int position = tab.getPosition();
             switch (position) {
                 case 0:
-                    return OverviewEntriesFragment.newInstance();
+                    mDateRangeManager.showView(true);
+                    break;
 
                 case 1:
-                    return OverviewCalendarFragment.newInstance();
+                    mDateRangeManager.hideView(true);
+                    break;
 
                 case 2:
-                    return OverviewStatisticsFragment.newInstance();
+                    mDateRangeManager.showView(true);
+                    break;
             }
-
-            return null;
         }
 
         @Override
-        public int getCount() {
-            // Show 3 pages in total
-            return 3;
+        public void onTabUnselected(TabLayout.Tab tab) {
+
         }
 
         @Override
-        public CharSequence getPageTitle(int position) {
-            return titles[position];
+        public void onTabReselected(TabLayout.Tab tab) {
+            if (tab.getPosition() == 0 && mEntriesCallback != null)
+                mEntriesCallback.onTabReselected();
+            else if (tab.getPosition() == 1 && mCalendarCallback != null)
+                mCalendarCallback.onTabReselected();
+            else if (tab.getPosition() == 2 && mStatisticsCallback != null)
+                mStatisticsCallback.onTabReselected();
         }
+
+    };
+
+    //endregion -- end --
+
+    //region Getters {}
+    @Override
+    public SessionEntryCollection getSessionEntries() {
+        return mSessionEntries;
     }
+    //endregion -- end --
+
+    public static void startActivity(Activity activity) {
+        Intent intent = new Intent(activity, DataOverviewActivity.class);
+        activity.startActivity(intent);
+    }
+
 }

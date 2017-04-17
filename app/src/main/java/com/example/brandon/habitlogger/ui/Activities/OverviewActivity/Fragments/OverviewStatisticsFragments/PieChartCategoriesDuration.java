@@ -27,11 +27,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class PieChartCategoriesDuration extends Fragment implements IDataOverviewCallback.IUpdateHabitSample {
+public class PieChartCategoriesDuration extends Fragment {
 
     //region (Member attributes)
     FragmentPieChartCategoriesDurationBinding ui;
-    IDataOverviewCallback ICallback;
+//    IDataOverviewCallback ICallback;
     private int mTextColor;
     //endregion
 
@@ -68,14 +68,14 @@ public class PieChartCategoriesDuration extends Fragment implements IDataOvervie
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        ICallback = (IDataOverviewCallback) context;
-        ICallback.addCallback(this);
+//        ICallback = (IDataOverviewCallback) context;
+//        ICallback.addCallback(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        ICallback.removeCallback(this);
+//        ICallback.removeCallback(this);
     }
     //endregion -- end --
 
@@ -83,35 +83,35 @@ public class PieChartCategoriesDuration extends Fragment implements IDataOvervie
     @Override
     public void onStart() {
         super.onStart();
-        updateHabitDataSample(ICallback.getDataSample());
+//        updateHabitDataSample(ICallback.getDataSample());
     }
     //endregion -- end --
 
     //endregion --- end ---
 
-    @Override
-    public void updateHabitDataSample(HabitDataCollection dataSample) {
-        List<PieEntry> entries = new ArrayList<>();
-        final long totalDuration = dataSample.calculateTotalDuration();
-
-        for (CategoryDataCollection categoryDataSample : dataSample.getData()) {
-            float ratio = 100 * categoryDataSample.calculateTotalDuration() / (float) totalDuration;
-            if (ratio > 0) {
-                String categoryName = categoryDataSample.getCategoryName();
-                int categoryColor = categoryDataSample.getCategory().getColorAsInt();
-                entries.add(new PieEntry(ratio, categoryName, categoryColor));
-            }
-        }
-
-        Collections.sort(entries, new Comparator<PieEntry>() {
-            @Override
-            public int compare(PieEntry entryOne, PieEntry entryTwo) {
-                return entryOne.getLabel().compareTo(entryTwo.getLabel());
-            }
-        });
-
-        setPieData(entries);
-    }
+//    @Override
+//    public void updateHabitDataSample(HabitDataCollection dataSample) {
+//        List<PieEntry> entries = new ArrayList<>();
+//        final long totalDuration = dataSample.calculateTotalDuration();
+//
+//        for (CategoryDataCollection categoryDataSample : dataSample.getData()) {
+//            float ratio = 100 * categoryDataSample.calculateTotalDuration() / (float) totalDuration;
+//            if (ratio > 0) {
+//                String categoryName = categoryDataSample.getCategoryName();
+//                int categoryColor = categoryDataSample.getCategory().getColorAsInt();
+//                entries.add(new PieEntry(ratio, categoryName, categoryColor));
+//            }
+//        }
+//
+//        Collections.sort(entries, new Comparator<PieEntry>() {
+//            @Override
+//            public int compare(PieEntry entryOne, PieEntry entryTwo) {
+//                return entryOne.getLabel().compareTo(entryTwo.getLabel());
+//            }
+//        });
+//
+//        setPieData(entries);
+//    }
 
     public void setPieData(List<PieEntry> entries) {
 
