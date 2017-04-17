@@ -24,7 +24,7 @@ public final class CategoryDataSample extends ExpandableGroup<Habit> {
     private final HabitCategory mCategory;
     private final List<Habit> mHabits;
     private final long mDateFromTime, mDateToTime;
-    private List<SessionEntry> mSessionEntries;
+    private SessionEntriesCollection mSessionEntries;
     private Long mDuration;
     //endregion
 
@@ -93,10 +93,10 @@ public final class CategoryDataSample extends ExpandableGroup<Habit> {
         return mDuration;
     }
 
-    public List<SessionEntry> buildSessionEntriesList() {
+    public SessionEntriesCollection buildSessionEntriesList() {
 
         if (mSessionEntries == null) {
-            mSessionEntries = new ArrayList<>();
+            mSessionEntries = new SessionEntriesCollection();
 
             for (Habit habit : mHabits) {
                 List<SessionEntry> entries = habit.getEntries();

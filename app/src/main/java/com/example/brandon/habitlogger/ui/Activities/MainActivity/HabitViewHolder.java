@@ -38,10 +38,9 @@ public class HabitViewHolder extends ChildViewHolder {
     }
 
     //region Bind habit object
-    public void bindItem(
-            final Habit item,
-            final HabitViewAdapter.MenuItemClickListener menuItemClickListener,
-            final HabitViewAdapter.ButtonClickCallback buttonClickCallback) {
+    public void bindItem(final Habit item,
+                         final HabitViewAdapter.MenuItemClickListener menuItemClickListener,
+                         final HabitViewAdapter.ButtonClickCallback buttonClickCallback) {
 
         // Make sure menu hasn't been inflated yet.
         int menuSize = toolbar.getMenu().size();
@@ -68,15 +67,15 @@ public class HabitViewHolder extends ChildViewHolder {
 
         long habitId = item.getDatabaseId();
         playButton.setOnClickListener(
-                buttonClickCallback.getPlayButtonClickedListener(habitId)
+                buttonClickCallback.getPlayButtonClickedListener(habitId, this)
         );
 
         playButton.setOnLongClickListener(
-                buttonClickCallback.getPlayButtonLongClickedListener(habitId)
+                buttonClickCallback.getPlayButtonLongClickedListener(habitId, this)
         );
 
         rootView.setOnClickListener(
-                buttonClickCallback.getHabitViewClickedListener(habitId)
+                buttonClickCallback.getHabitViewClickedListener(habitId, this)
         );
     }
 
@@ -91,27 +90,27 @@ public class HabitViewHolder extends ChildViewHolder {
 
                 switch (id) {
                     case R.id.habit_menu_edit:
-                        menuItemClickListener.onHabitEditClick(habitId);
+                        menuItemClickListener.onHabitEditClick(habitId, HabitViewHolder.this);
                         break;
 
                     case R.id.menu_enter_session:
-                        menuItemClickListener.onHabitStartSession(habitId);
+                        menuItemClickListener.onHabitStartSession(habitId, HabitViewHolder.this);
                         break;
 
                     case R.id.habit_menu_reset:
-                        menuItemClickListener.onHabitResetClick(habitId);
+                        menuItemClickListener.onHabitResetClick(habitId, HabitViewHolder.this);
                         break;
 
                     case R.id.habit_menu_delete:
-                        menuItemClickListener.onHabitDeleteClick(habitId);
+                        menuItemClickListener.onHabitDeleteClick(habitId, HabitViewHolder.this);
                         break;
 
                     case R.id.habit_menu_export:
-                        menuItemClickListener.onHabitExportClick(habitId);
+                        menuItemClickListener.onHabitExportClick(habitId, HabitViewHolder.this);
                         break;
 
                     case R.id.habit_menu_archive:
-                        menuItemClickListener.onHabitArchiveClick(habitId);
+                        menuItemClickListener.onHabitArchiveClick(habitId, HabitViewHolder.this);
                         break;
                 }
 

@@ -29,25 +29,25 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
     private ButtonClickCallback mButtonClickCallback;
 
     public interface MenuItemClickListener {
-        void onHabitEditClick(long habitId);
+        void onHabitEditClick(long habitId, HabitViewHolder habitViewHolder);
 
-        void onHabitResetClick(long habitId);
+        void onHabitResetClick(long habitId, HabitViewHolder habitViewHolder);
 
-        void onHabitDeleteClick(long habitId);
+        void onHabitDeleteClick(long habitId, HabitViewHolder habitViewHolder);
 
-        void onHabitExportClick(long habitId);
+        void onHabitExportClick(long habitId, HabitViewHolder habitViewHolder);
 
-        void onHabitArchiveClick(long habitId);
+        void onHabitArchiveClick(long habitId, HabitViewHolder habitViewHolder);
 
-        void onHabitStartSession(long habitId);
+        void onHabitStartSession(long habitId, HabitViewHolder habitViewHolder);
     }
 
     public interface ButtonClickCallback {
-        View.OnClickListener getPlayButtonClickedListener(final long habitId);
+        View.OnClickListener getPlayButtonClickedListener(final long habitId, HabitViewHolder habitViewHolder);
 
-        View.OnLongClickListener getPlayButtonLongClickedListener(final long habitId);
+        View.OnLongClickListener getPlayButtonLongClickedListener(final long habitId, HabitViewHolder habitViewHolder);
 
-        View.OnClickListener getHabitViewClickedListener(final long habitId);
+        View.OnClickListener getHabitViewClickedListener(final long habitId, HabitViewHolder habitViewHolder);
     }
     //endregion -- end --
 

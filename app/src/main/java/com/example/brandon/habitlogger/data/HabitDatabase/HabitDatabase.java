@@ -160,6 +160,8 @@ public class HabitDatabase {
 
     public CategoryDataSample getCategoryDataSample(HabitCategory category, long dateFrom, long dateTo) {
         List<Habit> habits = getHabits(category.getDatabaseId());
+        MyCollectionUtils.filter(habits, Habit.ICheckIfIsArchived);
+
         for (Habit habit : habits) {
             long habitId = habit.getDatabaseId();
             Set<Long> ids = findEntriesWithinTimeRange(habitId, dateFrom, dateTo);

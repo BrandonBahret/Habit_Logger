@@ -903,7 +903,7 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RequestCodes.SETTINGS_ACTIVITY) {
-            mFragment.refreshLayout();
+            recreate();
         }
 
         if (resultCode == RESULT_OK) {

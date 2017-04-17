@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.Habit;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.CategoryDataSample;
+import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 
@@ -20,15 +21,17 @@ import java.util.List;
 public class CategoryCardAdapter extends ExpandableRecyclerViewAdapter<CategoryViewHolder, HabitViewHolder> {
 
     //region (Member attributes)
+    private final SessionManager mSessionManager;
     private HabitViewAdapter.MenuItemClickListener mMenuItemClickListener;
     private HabitViewAdapter.ButtonClickCallback mButtonClickCallback;
     //endregion
 
-    public CategoryCardAdapter(
-            List<? extends ExpandableGroup> groups,
-            HabitViewAdapter.MenuItemClickListener menuItemClickListener,
-            HabitViewAdapter.ButtonClickCallback buttonClickCallback) {
+    public CategoryCardAdapter(List<? extends ExpandableGroup> groups,
+                               SessionManager sessionManager,
+                               HabitViewAdapter.MenuItemClickListener menuItemClickListener,
+                               HabitViewAdapter.ButtonClickCallback buttonClickCallback) {
         super(groups);
+        mSessionManager = sessionManager;
         mMenuItemClickListener = menuItemClickListener;
         mButtonClickCallback = buttonClickCallback;
     }
@@ -86,6 +89,8 @@ public class CategoryCardAdapter extends ExpandableRecyclerViewAdapter<CategoryV
                                       ExpandableGroup group, int childIndex) {
         Habit item = (Habit) group.getItems().get(childIndex);
         holder.bindItem(item, mMenuItemClickListener, mButtonClickCallback);
+        holder.bindSessionEntry(mSessionManager.getSession(item.getDatabaseId()));
     }
     //endregion -- end --
+
 }

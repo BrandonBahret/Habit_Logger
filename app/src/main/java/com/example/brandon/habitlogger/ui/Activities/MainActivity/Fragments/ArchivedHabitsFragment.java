@@ -17,6 +17,7 @@ import com.example.brandon.habitlogger.data.HabitDatabase.DataModels.SessionEntr
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.HabitDataActivity;
 import com.example.brandon.habitlogger.ui.Activities.MainActivity.HabitViewAdapter;
+import com.example.brandon.habitlogger.ui.Activities.MainActivity.HabitViewHolder;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity.SessionActivity;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
@@ -243,7 +244,7 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
     private HabitViewAdapter.MenuItemClickListener getHabitMenuItemClickListener() {
         return new HabitViewAdapter.MenuItemClickListener() {
             @Override
-            public void onHabitEditClick(long habitId) {
+            public void onHabitEditClick(long habitId, HabitViewHolder habitViewHolder) {
                 Habit habit = mHabitDatabase.getHabit(habitId);
                 EditHabitDialog dialog = EditHabitDialog.newInstance(new EditHabitDialog.OnFinishedListener() {
                     @Override
@@ -260,7 +261,7 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
             }
 
             @Override
-            public void onHabitResetClick(final long habitId) {
+            public void onHabitResetClick(final long habitId, HabitViewHolder habitViewHolder) {
                 String habitName = mHabitDatabase.getHabitName(habitId);
                 String messageFormat = getString(R.string.confirm_habit_data_reset_message_format);
                 String message = String.format(Locale.getDefault(), messageFormat, habitName);
@@ -278,7 +279,7 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
             }
 
             @Override
-            public void onHabitDeleteClick(final long habitId) {
+            public void onHabitDeleteClick(final long habitId, HabitViewHolder habitViewHolder) {
                 String habitName = mHabitDatabase.getHabitName(habitId);
                 new ConfirmationDialog(getActivity())
                         .setTitle("Confirm Delete")
@@ -300,13 +301,13 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
             }
 
             @Override
-            public void onHabitExportClick(long habitId) {
+            public void onHabitExportClick(long habitId, HabitViewHolder habitViewHolder) {
                 Habit habit = mHabitDatabase.getHabit(habitId);
                 mLocalExportManager.shareExportHabit(habit);
             }
 
             @Override
-            public void onHabitArchiveClick(final long habitId) {
+            public void onHabitArchiveClick(final long habitId, HabitViewHolder habitViewHolder) {
                 String habitName = mHabitDatabase.getHabitName(habitId);
                 final boolean archivedState = mHabitDatabase.getIsHabitArchived(habitId);
                 String actionName = archivedState ? "Unarchive" : "Archive";
@@ -328,7 +329,7 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
             }
 
             @Override
-            public void onHabitStartSession(long habitId) {
+            public void onHabitStartSession(long habitId, HabitViewHolder habitViewHolder) {
                 SessionActivity.startActivity(getActivity(), mHabitDatabase.getHabit(habitId));
             }
         };
@@ -338,7 +339,7 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
         return new HabitViewAdapter.ButtonClickCallback() {
 
             @Override
-            public View.OnClickListener getPlayButtonClickedListener(final long habitId) {
+            public View.OnClickListener getPlayButtonClickedListener(final long habitId, HabitViewHolder habitViewHolder) {
                 return new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -354,7 +355,7 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
             }
 
             @Override
-            public View.OnLongClickListener getPlayButtonLongClickedListener(final long habitId) {
+            public View.OnLongClickListener getPlayButtonLongClickedListener(final long habitId, HabitViewHolder habitViewHolder) {
                 return new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
@@ -365,7 +366,7 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
             }
 
             @Override
-            public View.OnClickListener getHabitViewClickedListener(final long habitId) {
+            public View.OnClickListener getHabitViewClickedListener(final long habitId, HabitViewHolder habitViewHolder) {
                 return new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
