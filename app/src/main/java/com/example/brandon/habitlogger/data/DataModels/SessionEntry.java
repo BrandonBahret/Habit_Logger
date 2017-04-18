@@ -62,6 +62,27 @@ public class SessionEntry implements Serializable {
         }
     };
 
+    public static Comparator<? super SessionEntry> ICompareCategoryIds = new Comparator<SessionEntry>() {
+        @Override
+        public int compare(SessionEntry sessionOne, SessionEntry sessionTwo) {
+            return Long.compare(
+                    sessionOne.getHabit().getCategory().getDatabaseId(),
+                    sessionTwo.getHabit().getCategory().getDatabaseId()
+            );
+        }
+    };
+
+    public static Comparator<? super SessionEntry> ICompareHabitIds = new Comparator<SessionEntry>() {
+        @Override
+        public int compare(SessionEntry sessionOne, SessionEntry sessionTwo) {
+            return Long.compare(
+                    sessionOne.getHabit().getDatabaseId(),
+                    sessionTwo.getHabit().getDatabaseId()
+            );
+        }
+    };
+
+
     public static Comparator<SessionEntry> ICompareHabitNames = new Comparator<SessionEntry>() {
         @Override
         public int compare(SessionEntry sessionOne, SessionEntry sessionTwo) {

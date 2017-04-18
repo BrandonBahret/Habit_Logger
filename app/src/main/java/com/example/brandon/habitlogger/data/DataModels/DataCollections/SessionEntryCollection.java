@@ -60,6 +60,29 @@ public class SessionEntryCollection extends MyDataCollectionBase<SessionEntry> {
         return entries;
     }
 
+    public HabitDataCollection buildHabitDataCollection() {
+
+        SessionEntryCollection entries = new SessionEntryCollection(this);
+
+        Collections.sort(entries, SessionEntry.ICompareCategoryIds);
+
+        List<List<SessionEntry>> categoryEntries = MyCollectionUtils.split(entries, new MyCollectionUtils.IGetKey<SessionEntry, Long>() {
+            @Override
+            public Long get(SessionEntry entry) {
+                return entry.getHabit().getCategory().getDatabaseId();
+            }
+        });
+
+        List<CategoryDataCollection> data = MyCollectionUtils.map(categoryEntries,
+                new MyCollectionUtils.IMapValue<List<SessionEntry>, CategoryDataCollection>() {
+                    @Override
+                    public CategoryDataCollection apply(List<SessionEntry> entries) {return CategoryDataCollection.buildCategoryDataCollection(new SessionEntryCollection(entries));}
+                }
+        );
+
+        return new HabitDataCollection(data, getDateFromTime(), getDateToTime());
+    }
+
     //region Methods With One Time Calculations {}
     @Override
     void invalidate() {

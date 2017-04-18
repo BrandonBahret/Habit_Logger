@@ -125,6 +125,32 @@ public final class CategoryDataCollection extends MyDataCollectionBase<Habit> im
     }
     //endregion -- end --
 
+    public static CategoryDataCollection buildCategoryDataCollection(SessionEntryCollection entries) {
+
+        HabitCategory category = entries.get(0).getHabit().getCategory();
+        long dateFrom = entries.getDateFromTime();
+        long dateTo = entries.getDateToTime();
+
+        Collections.sort(entries, SessionEntry.ICompareHabitIds);
+
+        List<List<SessionEntry>> habitEntries = MyCollectionUtils.split(entries, new MyCollectionUtils.IGetKey<SessionEntry, Long>() {
+            @Override
+            public Long get(SessionEntry entry) {
+                return entry.getHabit().getDatabaseId();
+            }
+        });
+
+        List<Habit> habits = MyCollectionUtils.map(habitEntries, new MyCollectionUtils.IMapValue<List<SessionEntry>, Habit>() {
+            @Override
+            public Habit apply(List<SessionEntry> sessionEntries) {
+                return new Habit().setEntries(new SessionEntryCollection(sessionEntries));
+            }
+        });
+
+        return new CategoryDataCollection(category, habits, dateFrom, dateTo);
+    }
+
+
     /**
      * @param timestamp Epoch timestamp for a certain date to search for.
      */

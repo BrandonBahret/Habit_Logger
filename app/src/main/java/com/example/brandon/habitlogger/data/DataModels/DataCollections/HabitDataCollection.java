@@ -42,6 +42,12 @@ public class HabitDataCollection extends MyDataCollectionBase<CategoryDataCollec
     public HabitDataCollection() {
         this(new ArrayList<CategoryDataCollection>(), -1, -1);
     }
+
+    public HabitDataCollection(SessionEntryCollection sessionEntries){
+        super(sessionEntries.buildHabitDataCollection());
+        mDateFrom = sessionEntries.getDateFromTime();
+        mDateTo = sessionEntries.getDateToTime();
+    }
     //endregion -- end --
 
     /**

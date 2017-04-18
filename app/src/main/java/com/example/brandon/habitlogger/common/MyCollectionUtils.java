@@ -29,6 +29,11 @@ public class MyCollectionUtils {
         int compare(Object element, Object key);
     }
 
+    public interface IMapValue<In, Out> {
+        Out apply(In value);
+    }
+
+
     //region Methods to collect from lists
     public static <ListType, Collect> List<Collect> collect
     (List<ListType> list, IGetKey<ListType, Collect> keyGetter) {
@@ -81,6 +86,54 @@ public class MyCollectionUtils {
         return -pos - 1;
     }
     //endregion -- end --
+
+    /**
+     * @param list A list of elements sorted by <SplitBy>
+     * @param keyGetter Interface that fetches <SplitBy> objects to determine where to make splits
+     * @param <ListType> The type of the input list
+     * @param <SplitBy> The type to split the list by.
+     * @return A list of lists of the type <ListType>
+     */
+    public static <ListType, SplitBy> List<List<ListType>> split
+            (List<ListType> list, IGetKey<ListType, SplitBy> keyGetter){
+
+        // List to hold all of the accumulated lists during the split
+        ArrayList<List<ListType>> splitList = new ArrayList<>();
+
+        // List to accumulate lists of elements to be added to SplitList
+        List<ListType> listAccumulator = new ArrayList<>();
+
+        // The objects used to detect where the list should be split
+        SplitBy lastSplitBy = null, currentSplitBy;
+
+        for (ListType currentElement : list) {
+            currentSplitBy = keyGetter.get(currentElement);
+            if (currentSplitBy == lastSplitBy || lastSplitBy == null)
+                listAccumulator.add(currentElement);
+            else {
+                splitList.add(listAccumulator);
+                listAccumulator = new ArrayList<>();
+                listAccumulator.add(currentElement);
+            }
+            lastSplitBy = currentSplitBy;
+        }
+
+        if(!listAccumulator.isEmpty())
+            splitList.add(listAccumulator);
+
+        return splitList;
+    }
+
+    public static <ListType, MapType> List<MapType> map
+            (List<ListType> list, IMapValue<ListType, MapType> valueMapper){
+
+        List<MapType> mappedValues = new ArrayList<>(list.size());
+
+        for(ListType element : list)
+            mappedValues.add(valueMapper.apply(element));
+
+        return mappedValues;
+    }
 
     public static <T> void filter(List<T> list, Predicate<? super T> removeIf) {
         if(list == null) return;
