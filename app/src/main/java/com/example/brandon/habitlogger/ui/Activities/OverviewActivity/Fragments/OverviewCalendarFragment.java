@@ -11,15 +11,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.IDataOverviewCallback;
+import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.OverviewCalendarView.CalendarViewAdapter;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 
-public class OverviewCalendarFragment extends Fragment {
+public class OverviewCalendarFragment extends Fragment implements IDataOverviewCallback.ICalendarFragment {
 
     //region (Member attributes)
     private IDataOverviewCallback mCallbackInterface;
     private RecyclerView mCalendarViewContainer;
-//    private CalendarViewAdapter mAdapter;
+    private CalendarViewAdapter mAdapter;
     //endregion
 
     public OverviewCalendarFragment() {
@@ -38,16 +40,9 @@ public class OverviewCalendarFragment extends Fragment {
         super.onAttach(context);
 
         mCallbackInterface = (IDataOverviewCallback) context;
-//        mCallbackInterface.addCallback(this);
-//        mCallbackInterface.addOnTabReselectedCallback(this);
+        mCallbackInterface.setCalendarFragmentCallback(this);
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-//        mCallbackInterface.removeCallback(this);
-//        mCallbackInterface.removeOnTabReselectedCallback(this);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,8 +56,6 @@ public class OverviewCalendarFragment extends Fragment {
         mCalendarViewContainer.setItemAnimator(new DefaultItemAnimator());
         mCalendarViewContainer.addItemDecoration(getSpaceDecoration());
 
-//        updateHabitDataSample(mCallbackInterface.getDataSample());
-
         return v;
     }
 
@@ -71,24 +64,22 @@ public class OverviewCalendarFragment extends Fragment {
         float bottom = getContext().getResources().getDimension(R.dimen.bottom_offset_dp);
         return new SpaceOffsetDecoration((int) bottom, (int) top);
     }
-    //endregion -- end --
 
-
-    //endregion [ -------- end -------- ]
-
-//    @Override
-//    public void updateHabitDataSample(HabitDataCollection dataSample) {
+    @Override
+    public void onUpdateEntries(SessionEntryCollection dataSample) {
 //        if (mCalendarViewContainer != null) {
-//            mAdapter = new CalendarViewAdapter(dataSample, getContext());
+//            mAdapter = new CalendarViewAdapter(dataSample.buildHabitDataCollection(), getContext());
 //            mCalendarViewContainer.setAdapter(mAdapter);
 //            mCalendarViewContainer.scrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
 //        }
-//    }
+    }
 
-//    @Override
-//    public void onTabReselected(int position) {
-//        if (position == 1)
-//            mCalendarViewContainer.smoothScrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
-//    }
+    @Override
+    public void onTabReselected() {
+        mCalendarViewContainer.smoothScrollToPosition(mAdapter.getAdapterPositionForCurrentMonth());
+    }
+    //endregion -- end --
+
+    //endregion [ -------- end -------- ]
 
 }
