@@ -125,6 +125,10 @@ public final class CategoryDataCollection extends MyDataCollectionBase<Habit> im
     }
     //endregion -- end --
 
+    /**
+     * This method only works when the entries have their mHabit field set, otherwise the app
+     * will crash.
+     */
     public static CategoryDataCollection buildCategoryDataCollection(SessionEntryCollection entries) {
 
         HabitCategory category = entries.get(0).getHabit().getCategory();

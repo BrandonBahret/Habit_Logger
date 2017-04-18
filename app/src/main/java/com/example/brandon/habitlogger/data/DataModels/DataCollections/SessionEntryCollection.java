@@ -60,6 +60,10 @@ public class SessionEntryCollection extends MyDataCollectionBase<SessionEntry> {
         return entries;
     }
 
+    /**
+     * This method only works when the entries have their mHabit field set, otherwise the app
+     * will crash.
+     */
     public HabitDataCollection buildHabitDataCollection() {
 
         SessionEntryCollection entries = new SessionEntryCollection(this);

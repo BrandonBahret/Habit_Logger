@@ -34,7 +34,6 @@ import com.example.brandon.habitlogger.ui.Activities.MainActivity.Fragments.AllH
 import com.example.brandon.habitlogger.ui.Activities.MainActivity.Fragments.ArchivedHabitsFragment;
 import com.example.brandon.habitlogger.ui.Activities.MainActivity.Fragments.CategoryCardHabitsFragment;
 import com.example.brandon.habitlogger.ui.Activities.MainActivity.Fragments.MyFragmentBase;
-import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.DataOverviewActivity;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.SettingsActivity;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
@@ -869,9 +868,9 @@ public class MainActivity extends AppCompatActivity
                 setFragmentForNavId(id);
                 break;
 
-            case (R.id.overall_stats_nav):
-                DataOverviewActivity.startActivity(this);
-                break;
+//            case (R.id.overall_stats_nav):
+//                DataOverviewActivity.startActivity(this);
+//                break;
 
             case R.id.settings_nav:
                 SettingsActivity.startActivity(this);

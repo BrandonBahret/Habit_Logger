@@ -180,7 +180,7 @@ public class DataOverviewActivity extends AppCompatActivity implements
         int newIndex = mSessionEntries.updateEntry(oldEntry, newEntry);
         mDateRangeManager.updateSessionEntries(mSessionEntries);
         mEntriesCallback.onNotifyEntryUpdated(oldIndex, newIndex);
-//        mCalendarCallback.onUpdateEntries(mSessionEntries);
+        mCalendarCallback.onUpdateEntries(mSessionEntries);
 //        mStatisticsCallback.onUpdateEntries(mSessionEntries);
     }
 
@@ -188,14 +188,14 @@ public class DataOverviewActivity extends AppCompatActivity implements
         int pos = mSessionEntries.removeEntry(oldEntry);
         mDateRangeManager.updateSessionEntries(mSessionEntries);
         mEntriesCallback.onNotifyEntryRemoved(pos);
-//        mCalendarCallback.onUpdateEntries(mSessionEntries);
+        mCalendarCallback.onUpdateEntries(mSessionEntries);
 //        mStatisticsCallback.onUpdateEntries(mSessionEntries);
     }
 
     private void updateEntries(SessionEntryCollection sessionEntries) {
         updateDateRangeManagerEntries(sessionEntries);
         mEntriesCallback.onUpdateEntries(sessionEntries);
-//        mCalendarCallback.onUpdateEntries(sessionEntries);
+        mCalendarCallback.onUpdateEntries(sessionEntries);
 //        mStatisticsCallback.onUpdateEntries(mSessionEntries);
     }
 

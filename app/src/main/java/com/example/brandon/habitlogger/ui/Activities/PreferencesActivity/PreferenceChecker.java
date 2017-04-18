@@ -17,7 +17,7 @@ import static java.lang.Integer.parseInt;
 public class PreferenceChecker {
 
     //region (Member attributes)
-    public static final int AS_CARDS = 0, AS_SECTIONS = 1, WITHOUT_CATEGORIES = 2;
+    public static final int AS_CARDS = -1, AS_SECTIONS = 0, WITHOUT_CATEGORIES = 1;
 
     public SharedPreferences preferences;
     private Context mContext;

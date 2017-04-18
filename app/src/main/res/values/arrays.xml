@@ -10,14 +10,12 @@
     </string-array>
 
     <string-array name="category_options">
-        <item>Cards</item>
         <item>Headers</item>
         <item>Without</item>
     </string-array>
     <string-array name="category_options_values">
         <item>0</item>
         <item>1</item>
-        <item>2</item>
     </string-array>
 
     <string-array name="theme_options">
