@@ -1,5 +1,7 @@
 package com.example.brandon.habitlogger.data.DataModels;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 
@@ -20,7 +22,7 @@ import static com.example.brandon.habitlogger.common.MyTimeUtils.getTimePortion;
  * This object is used to store the session data for the habits.
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class SessionEntry implements Serializable {
+public class SessionEntry implements Serializable, Parcelable {
 
     //region (Member attributes)
 
@@ -36,7 +38,6 @@ public class SessionEntry implements Serializable {
     private long mTotalPauseTime;
     private long mLastTimePaused;
     private boolean mIsPaused = false;
-
     //endregion
 
     //region (Static Helper Interfaces)
@@ -115,7 +116,39 @@ public class SessionEntry implements Serializable {
     public SessionEntry() {
         this(-1, -1, "");
     }
+
+    public SessionEntry(SessionEntry sessionEntry) {
+        this(sessionEntry.getStartingTime(), sessionEntry.getDuration(), sessionEntry.getNote());
+    }
     //endregion
+
+    //region Methods responsible for making this object parcelable
+    public SessionEntry(Parcel in) {
+        this((SessionEntry)in.readParcelable(SessionEntry.class.getClassLoader()));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeSerializable(this);
+    }
+
+    public static final Creator<SessionEntry> CREATOR = new Creator<SessionEntry>() {
+        @Override
+        public SessionEntry createFromParcel(Parcel in) {
+            return new SessionEntry(in);
+        }
+
+        @Override
+        public SessionEntry[] newArray(int size) {
+            return new SessionEntry[size];
+        }
+    };
+    //endregion -- end --
 
     //region Methods to enable basic object operations
     public static void copy(SessionEntry dest, SessionEntry source) {
