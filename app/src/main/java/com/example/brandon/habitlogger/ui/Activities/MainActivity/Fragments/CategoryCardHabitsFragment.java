@@ -275,7 +275,8 @@ public class CategoryCardHabitsFragment extends MyFragmentBase {
     @Override
     @StringRes
     public int getFragmentTitle() {
-        return R.string.home_nav_string;
+        return R.string.category_card_fragment_title;
     }
 
 }
+

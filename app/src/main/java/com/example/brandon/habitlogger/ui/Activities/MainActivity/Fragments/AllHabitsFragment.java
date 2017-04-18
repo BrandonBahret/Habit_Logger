@@ -38,6 +38,7 @@ import java.util.Set;
 public class AllHabitsFragment extends MyFragmentBase {
 
     //region (Member attributes)
+    private final String KEY_DATA = "KEY_DATA";
     List<Habit> mData;
 
     private HabitViewAdapter mHabitAdapter;
@@ -70,12 +71,18 @@ public class AllHabitsFragment extends MyFragmentBase {
         mSessionManager = new SessionManager(getContext());
         mLocalExportManager = new LocalDataExportManager(getContext());
         mPreferenceChecker = new PreferenceChecker(getContext());
+
+//        if (savedInstanceState != null)
+//            mData = savedInstanceState.getParcelableArrayList(KEY_DATA);
     }
 
     @Override
     void onSetUpView(RecyclerView recyclerView) {
-        mData = mHabitDatabase.getHabits();
-        MyCollectionUtils.filter(mData, Habit.ICheckIfIsArchived);
+//        if (mData == null) {
+            mData = mHabitDatabase.getHabits();
+            MyCollectionUtils.filter(mData, Habit.ICheckIfIsArchived);
+//        }
+
         mHabitAdapter = new HabitViewAdapter(mData, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
         recyclerView.setAdapter(mHabitAdapter);
         applyGroupDecoration();
@@ -94,6 +101,12 @@ public class AllHabitsFragment extends MyFragmentBase {
         mRecyclerView.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
         mNoDataLayout.setVisibility(habitsAvailable ? View.GONE : View.VISIBLE);
     }
+
+//    @Override
+//    public void onSaveInstanceState(Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//        outState.putParcelableArrayList(KEY_DATA, (ArrayList<? extends Parcelable>) mData);
+//    }
 
     //endregion
 
@@ -382,7 +395,7 @@ public class AllHabitsFragment extends MyFragmentBase {
     @Override
     @StringRes
     public int getFragmentTitle() {
-        return R.string.home_nav_string;
+        return R.string.all_habits_fragment_title;
     }
 
 }

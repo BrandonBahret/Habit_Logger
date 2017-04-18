@@ -161,5 +161,7 @@
     <string name="pref_allow_upon_no_active_sessions">preference_close_upon_no_active_sessions</string>
     <string name="title_activity_habit_data">HabitDataActivity</string>
     <string name="confirm_delete">Confirm Delete</string>
+    <string name="category_card_fragment_title">Home</string>
+    <string name="all_habits_fragment_title">Home</string>
 
 </resources>

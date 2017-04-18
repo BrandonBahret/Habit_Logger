@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.util.Comparator;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * Created by Brandon on 10/26/2016.
@@ -257,6 +258,11 @@ public class Habit implements Serializable, Parcelable {
 
     public SessionEntryCollection findEntriesWithDate(final long timestamp) {
         return mSessionEntries != null ? mSessionEntries.findEntriesWithDate(timestamp) : new SessionEntryCollection();
+    }
+
+    public boolean matchesQuery(String query) {
+        Pattern pattern = Pattern.compile(query, Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
+        return pattern.matcher(getName()).find() || pattern.matcher(getCategory().getName()).find();
     }
 
     //region Getters {}

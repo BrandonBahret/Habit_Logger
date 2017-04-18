@@ -76,6 +76,7 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
     void onSetUpView(RecyclerView recyclerView) {
         mData = mHabitDatabase.getHabits();
         MyCollectionUtils.filter(mData, Habit.ICheckIfIsNotArchived);
+
         mHabitAdapter = new HabitViewAdapter(mData, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
         recyclerView.setAdapter(mHabitAdapter);
         applyGroupDecoration();

@@ -139,14 +139,18 @@ public class StatisticsFragment extends Fragment implements IHabitDataCallback.I
     @Override
     public void onUpdateEntries(SessionEntryCollection dataCollection) {
         showNoDataScreen(!dataCollection.isEmpty());
-        mPieCompletion.updateEntries(dataCollection);
-        mLineCompletion.updateEntries(dataCollection);
-        mDistributionStartingTime.updateEntries(dataCollection);
+        if (mPieCompletion != null)
+            mPieCompletion.updateEntries(dataCollection);
+        if (mLineCompletion != null)
+            mLineCompletion.updateEntries(dataCollection);
+        if (mDistributionStartingTime != null)
+            mDistributionStartingTime.updateEntries(dataCollection);
     }
 
     @Override
     public void onUpdateCategoryDataSample(CategoryDataCollection dataSample) {
-        mPieDuration.updateCategoryDataSample(dataSample);
+        if (mPieDuration != null)
+            mPieDuration.updateCategoryDataSample(dataSample);
     }
 
     @Override

@@ -67,6 +67,7 @@ public class MyCollectionUtils {
     //endregion -- end --
 
     //region Methods to search lists
+
     /**
      * @return The non-negative index of the element, or a negative index which is the -index - 1 where the element would be inserted
      */
@@ -88,14 +89,14 @@ public class MyCollectionUtils {
     //endregion -- end --
 
     /**
-     * @param list A list of elements sorted by <SplitBy>
-     * @param keyGetter Interface that fetches <SplitBy> objects to determine where to make splits
+     * @param list       A list of elements sorted by <SplitBy>
+     * @param keyGetter  Interface that fetches <SplitBy> objects to determine where to make splits
      * @param <ListType> The type of the input list
-     * @param <SplitBy> The type to split the list by.
+     * @param <SplitBy>  The type to split the list by.
      * @return A list of lists of the type <ListType>
      */
     public static <ListType, SplitBy> List<List<ListType>> split
-            (List<ListType> list, IGetKey<ListType, SplitBy> keyGetter){
+    (List<ListType> list, IGetKey<ListType, SplitBy> keyGetter) {
 
         // List to hold all of the accumulated lists during the split
         ArrayList<List<ListType>> splitList = new ArrayList<>();
@@ -118,25 +119,25 @@ public class MyCollectionUtils {
             lastSplitBy = currentSplitBy;
         }
 
-        if(!listAccumulator.isEmpty())
+        if (!listAccumulator.isEmpty())
             splitList.add(listAccumulator);
 
         return splitList;
     }
 
     public static <ListType, MapType> List<MapType> map
-            (List<ListType> list, IMapValue<ListType, MapType> valueMapper){
+            (List<ListType> list, IMapValue<ListType, MapType> valueMapper) {
 
         List<MapType> mappedValues = new ArrayList<>(list.size());
 
-        for(ListType element : list)
+        for (ListType element : list)
             mappedValues.add(valueMapper.apply(element));
 
         return mappedValues;
     }
 
     public static <T> void filter(List<T> list, Predicate<? super T> removeIf) {
-        if(list == null) return;
+        if (list == null) return;
 
         Iterator<T> iterator = list.iterator();
         while (iterator.hasNext()) {
