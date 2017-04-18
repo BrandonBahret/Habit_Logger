@@ -27,6 +27,7 @@
     <color name="dialogPickerHeaderColor">@color/contrastBackgroundAccent</color>
 
     <!-- Icon Colors -->
+    <color name="actionBarIconTint">#ffffffff</color>
     <color name="iconTint1">#4e4d4d</color>
     <color name="iconTint2">#ffffff</color>
 

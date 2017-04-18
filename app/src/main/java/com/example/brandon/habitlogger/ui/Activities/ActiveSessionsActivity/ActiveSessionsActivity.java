@@ -7,9 +7,11 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -45,6 +47,9 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
         SearchView.OnQueryTextListener {
 
     //region (Member attributes)
+    private static final String KEY_ACTIVE_SESSIONS = "KEY_ACTIVE_SESSIONS";
+    private static final String KEY_SEARCH_QUERY = "KEY_SEARCH_QUERY";
+
     private List<Pair<SessionEntry, Integer>> mUndoStack = new ArrayList<>();
     private List<SessionEntry> mActiveSessions;
     private SessionManager mSessionManager;
@@ -53,6 +58,10 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     private Handler mUpdateHandler = new Handler();
     private ActiveSessionViewAdapter mSessionViewAdapter;
     private ActivityActiveSessionsBinding ui;
+
+    private SearchView mSearchView;
+    private String mSearchQuery;
+
     //endregion
 
     //region [ ---- Methods responsible for handling the lifecycle of the activity. ---- ]
@@ -69,10 +78,16 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
 
         mSessionManager = new SessionManager(this);
         mPreferenceChecker = new PreferenceChecker(this);
-        mActiveSessions = mSessionManager.getActiveSessionList();
 
-        Collections.sort(mActiveSessions, SessionEntry.ICompareHabitNames);
-        Collections.sort(mActiveSessions, SessionEntry.ICompareCategoryNames);
+        if (savedInstanceState != null) {
+            mActiveSessions = savedInstanceState.getParcelableArrayList(KEY_ACTIVE_SESSIONS);
+            mSearchQuery = savedInstanceState.getString(KEY_SEARCH_QUERY);
+        }
+        else {
+            mActiveSessions = mSessionManager.getActiveSessionList();
+            Collections.sort(mActiveSessions, SessionEntry.ICompareHabitNames);
+            Collections.sort(mActiveSessions, SessionEntry.ICompareCategoryNames);
+        }
 
         mSessionViewAdapter = new ActiveSessionViewAdapter(mActiveSessions, this, this);
 
@@ -84,26 +99,29 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
         ItemTouchHelper touchHelper = new ItemTouchHelper(createItemTouchCallback());
         touchHelper.attachToRecyclerView(ui.sessionViewContainer);
 
-        showNoActiveSessionsLayout(mActiveSessions.isEmpty());
+        showNoDataLayouts(mActiveSessions.isEmpty());
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.active_sessions_menu, menu);
+
+        MenuItem searchMenuItem = menu.findItem(R.id.search);
+        mSearchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+
+        //focus the SearchView
+        if (mSearchQuery != null && !mSearchQuery.isEmpty()) {
+            searchMenuItem.expandActionView();
+            mSearchView.setQuery(mSearchQuery, false);
+            mSearchView.clearFocus();
+        }
+
+        mSearchView.setQueryHint(getString(R.string.search));
+        mSearchView.setOnQueryTextListener(this);
+
         return super.onCreateOptionsMenu(menu);
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem search = menu.findItem(R.id.search);
-        if (search != null) {
-            SearchView searchView = (SearchView) search.getActionView();
-            searchView.setQueryHint(getString(R.string.search));
-            searchView.setOnQueryTextListener(this);
-        }
-
-        return super.onPrepareOptionsMenu(menu);
-    }
     //endregion -- end --
 
     //region visible lifetime (onStart - onStop)
@@ -129,7 +147,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
             finish();
 
         startRepeatingTask();
-        showNoActiveSessionsLayout(!mSessionManager.hasActiveSessions());
+        showNoDataLayouts(mActiveSessions == null || mActiveSessions.isEmpty());
     }
 
     @Override
@@ -140,6 +158,13 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     //endregion -- end --
 
     //endregion [ ---------------- end ---------------- ]
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(KEY_ACTIVE_SESSIONS, (ArrayList<? extends Parcelable>) mActiveSessions);
+        outState.putString(KEY_SEARCH_QUERY, mSearchQuery);
+    }
 
     //region Methods responsible for updating the ui
 
@@ -181,13 +206,20 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
         }
     };
 
-    public void showNoActiveSessionsLayout(boolean noActiveSessions) {
-        int visibilityMode = noActiveSessions ? View.VISIBLE : View.GONE;
+    public void showNoDataLayouts(boolean noEntriesDisplayed) {
+
+        int noActiveSessionsLayoutVisibility = !mSessionManager.hasActiveSessions() ? View.VISIBLE : View.GONE;
         View noActiveSessionsLayout = findViewById(R.id.no_active_sessions_layout);
-        if (visibilityMode != noActiveSessionsLayout.getVisibility()) {
-            noActiveSessionsLayout.setVisibility(visibilityMode);
-            findViewById(R.id.content).setVisibility(noActiveSessions ? View.GONE : View.VISIBLE);
+        if (noActiveSessionsLayoutVisibility != noActiveSessionsLayout.getVisibility()) {
+            noActiveSessionsLayout.setVisibility(noActiveSessionsLayoutVisibility);
         }
+
+        int noResultsLayoutVisibility = noEntriesDisplayed && mSessionManager.hasActiveSessions() ? View.VISIBLE : View.GONE;
+        View noResultsLayout = findViewById(R.id.no_results_layout);
+        if (noResultsLayoutVisibility != noResultsLayout.getVisibility())
+            noResultsLayout.setVisibility(noResultsLayoutVisibility);
+
+        findViewById(R.id.content).setVisibility(noEntriesDisplayed ? View.GONE : View.VISIBLE);
     }
 
     //endregion
@@ -247,7 +279,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
 
                 mSessionManager.cancelSession(habitId);
                 mActiveSessions.remove(position);
-                showNoActiveSessionsLayout(mActiveSessions.isEmpty());
+                showNoDataLayouts(mActiveSessions.isEmpty());
                 mSessionViewAdapter.notifyItemRemoved(position);
 
                 Snackbar.make(findViewById(R.id.activity_active_sessions), "Session canceled", Snackbar.LENGTH_LONG)
@@ -275,7 +307,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
                                     mSessionViewAdapter.notifyItemInserted((Integer) entryPair.second);
                                 }
 
-                                showNoActiveSessionsLayout(mActiveSessions.isEmpty());
+                                showNoDataLayouts(mActiveSessions.isEmpty());
                                 mUndoStack.clear();
                             }
                         })
@@ -294,6 +326,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     @Override
     public boolean onQueryTextChange(String query) {
 
+        mSearchQuery = query;
         List<SessionEntry> entries = mSessionManager.queryActiveSessionList(query);
 
         if (query.isEmpty())
@@ -304,10 +337,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
 
         mSessionViewAdapter.notifyDataSetChanged();
 
-        int visibilityMode = entries.isEmpty() && mSessionManager.hasActiveSessions() ? View.VISIBLE : View.GONE;
-        View noResultsLayout = findViewById(R.id.no_results_layout);
-        if (visibilityMode != noResultsLayout.getVisibility())
-            noResultsLayout.setVisibility(visibilityMode);
+        showNoDataLayouts(mActiveSessions.isEmpty());
 
         return true;
     }

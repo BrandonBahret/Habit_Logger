@@ -4,12 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.brandon.habitlogger.HabitActivity">
 
+
     <item
         android:id="@+id/search"
-        android:icon="@drawable/ic_search_24dp"
+        android:icon="@drawable/ic_search_menu_24dp"
         android:title="@string/filter_entries"
+        android:actionViewClass="android.support.v7.widget.SearchView"
         app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="always"/>
+        app:showAsAction="always|collapseActionView"/>
 
     <item
         android:id="@+id/menu_habit_edit"

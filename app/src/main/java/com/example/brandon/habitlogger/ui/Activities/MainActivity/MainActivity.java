@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if (mSearchView.getQuery().length() != 0)
+        if (mSearchView != null && mSearchView.getQuery().length() != 0)
             outState.putCharSequence(KEY_QUERY, mSearchView.getQuery());
     }
 
