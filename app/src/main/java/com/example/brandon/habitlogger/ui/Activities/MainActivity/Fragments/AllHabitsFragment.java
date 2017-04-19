@@ -131,7 +131,7 @@ public class AllHabitsFragment extends MyFragmentBase {
     }
 
     @Override
-    public void refreshLayout() {
+    public void restartFragment() {
         mData = mHabitDatabase.getHabits();
         MyCollectionUtils.filter(mData, Habit.ICheckIfIsArchived);
         mHabitAdapter = new HabitViewAdapter(mData, getHabitMenuItemClickListener(), getHabitButtonClickCallback());

@@ -30,7 +30,7 @@ import java.io.Serializable;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class SessionActivity extends AppCompatActivity implements
-        SessionManager.SessionChangeListeners, TimerFragment.ITimerFragment {
+        SessionManager.SessionChangeCallback, TimerFragment.ITimerFragment {
 
     public static String RESULT_NEW_ENTRY = "RESULT_NEW_ENTRY";
 

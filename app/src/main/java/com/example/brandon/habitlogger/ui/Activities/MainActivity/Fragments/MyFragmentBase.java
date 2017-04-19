@@ -170,7 +170,7 @@ public abstract class MyFragmentBase extends Fragment {
         checkIfHabitsAreAvailable();
     }
 
-    abstract public void refreshLayout();
+    abstract public void restartFragment();
 
     //region Methods to handle events
     abstract public boolean handleOnQuery(String query);

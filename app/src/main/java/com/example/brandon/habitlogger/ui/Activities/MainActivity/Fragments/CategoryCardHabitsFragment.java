@@ -106,7 +106,7 @@ public class CategoryCardHabitsFragment extends MyFragmentBase {
     }
 
     @Override
-    public void refreshLayout() {
+    public void restartFragment() {
 
     }
 

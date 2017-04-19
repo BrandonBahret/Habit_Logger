@@ -32,9 +32,9 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
     //endregion
 
     //region Code responsible for providing an interface to the database
-    private static ArrayList<SessionChangeListeners> sessionChangeListeners = new ArrayList<>();
+    private static ArrayList<SessionChangeCallback> sessionChangeCallbacks = new ArrayList<>();
 
-    public interface SessionChangeListeners {
+    public interface SessionChangeCallback {
         void onSessionPauseStateChanged(long habitId, boolean isPaused);
 
         void beforeSessionEnded(long habitId, boolean wasCanceled);
@@ -44,12 +44,12 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         void onSessionStarted(long habitId);
     }
 
-    public void addSessionChangedCallback(SessionChangeListeners callback) {
-        sessionChangeListeners.add(callback);
+    public void addSessionChangedCallback(SessionChangeCallback callback) {
+        sessionChangeCallbacks.add(callback);
     }
 
-    public void removeSessionChangedCallback(SessionChangeListeners callback) {
-        sessionChangeListeners.remove(callback);
+    public void removeSessionChangedCallback(SessionChangeCallback callback) {
+        sessionChangeCallbacks.remove(callback);
     }
     //endregion
 
@@ -88,8 +88,8 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         if (pause) pauseSession(habitId);
         else playSession(habitId);
 
-        if (sessionChangeListeners != null) {
-            for (SessionChangeListeners listener : sessionChangeListeners)
+        if (sessionChangeCallbacks != null) {
+            for (SessionChangeCallback listener : sessionChangeCallbacks)
                 listener.onSessionPauseStateChanged(habitId, pause);
         }
     }
@@ -122,8 +122,8 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         if (getIsPaused(habitId))
             setPauseState(habitId, false);
 
-        if (sessionChangeListeners != null) {
-            for (SessionChangeListeners listener : sessionChangeListeners)
+        if (sessionChangeCallbacks != null) {
+            for (SessionChangeCallback listener : sessionChangeCallbacks)
                 listener.beforeSessionEnded(habitId, false);
         }
 
@@ -135,15 +135,15 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
     }
 
     public long cancelSession(long habitId) {
-        if (sessionChangeListeners != null) {
-            for (SessionChangeListeners listener : sessionChangeListeners)
+        if (sessionChangeCallbacks != null) {
+            for (SessionChangeCallback listener : sessionChangeCallbacks)
                 listener.beforeSessionEnded(habitId, true);
         }
 
         long res = deleteSession(habitId);
 
-        if (sessionChangeListeners != null) {
-            for (SessionChangeListeners listener : sessionChangeListeners)
+        if (sessionChangeCallbacks != null) {
+            for (SessionChangeCallback listener : sessionChangeCallbacks)
                 listener.afterSessionEnded(habitId, true);
         }
 
@@ -186,7 +186,7 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
         );
 
         long habitId = entry.getHabit().getDatabaseId();
-        for (SessionChangeListeners listener : sessionChangeListeners)
+        for (SessionChangeCallback listener : sessionChangeCallbacks)
             listener.onSessionStarted(habitId);
 
         return recordId;

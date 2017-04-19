@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setListeners() {
-        mSessionManager.addSessionChangedCallback(getOnSessionChangedListener());
+        mSessionManager.addSessionChangedCallback(onSessionChangeCallback);
         ui.mainInclude.fab.setOnClickListener(getOnNewHabitButtonClicked());
         ui.navView.setNavigationItemSelectedListener(this);
         mCurrentSessionCard.setOnClickListener(getOnSessionsCardClickListener());
@@ -144,6 +144,12 @@ public class MainActivity extends AppCompatActivity
     }
     //endregion
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mFragment == null) getContentFragment();
+    }
+
     //region foreground lifetime (onResume - onPause)
     @Override
     protected void onResume() {
@@ -156,7 +162,7 @@ public class MainActivity extends AppCompatActivity
 
         prepareNavigationDrawer();
         mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
-//        getContentFragment().refreshLayout();
+//        getContentFragment().restartFragment();
     }
     //endregion
 
@@ -229,7 +235,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public MyFragmentBase getContentFragment() {
-        if(mFragment == null){
+        if (mFragment == null) {
             mFragment = (MyFragmentBase) getSupportFragmentManager().findFragmentById(R.id.content_frame);
         }
 
@@ -311,33 +317,31 @@ public class MainActivity extends AppCompatActivity
         };
     }
 
-    private SessionManager.SessionChangeListeners getOnSessionChangedListener() {
-        return new SessionManager.SessionChangeListeners() {
-            @Override
-            public void onSessionPauseStateChanged(long habitId, boolean isPaused) {}
+    private SessionManager.SessionChangeCallback onSessionChangeCallback = new SessionManager.SessionChangeCallback() {
+        @Override
+        public void onSessionPauseStateChanged(long habitId, boolean isPaused) {}
 
-            @Override
-            public void beforeSessionEnded(long habitId, boolean wasCanceled) {
-                mSessionNotificationManager.cancel((int) habitId);
-                getContentFragment().notifySessionEnded(habitId);
+        @Override
+        public void beforeSessionEnded(long habitId, boolean wasCanceled) {
+            mSessionNotificationManager.cancel((int) habitId);
+            getContentFragment().notifySessionEnded(habitId);
+        }
+
+        @Override
+        public void afterSessionEnded(long habitId, boolean wasCanceled) {
+            mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
+        }
+
+        @Override
+        public void onSessionStarted(long habitId) {
+            if (mPreferenceChecker.doShowNotificationsAutomatically() && mPreferenceChecker.doShowNotifications()) {
+                Habit habit = mHabitDatabase.getHabit(habitId);
+                mSessionNotificationManager.updateNotification(habit);
             }
 
-            @Override
-            public void afterSessionEnded(long habitId, boolean wasCanceled) {
-                mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
-            }
-
-            @Override
-            public void onSessionStarted(long habitId) {
-                if (mPreferenceChecker.doShowNotificationsAutomatically() && mPreferenceChecker.doShowNotifications()) {
-                    Habit habit = mHabitDatabase.getHabit(habitId);
-                    mSessionNotificationManager.updateNotification(habit);
-                }
-
-                mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
-            }
-        };
-    }
+            mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
+        }
+    };
 
     private View.OnClickListener getOnNewHabitButtonClicked() {
         return new View.OnClickListener() {
@@ -426,7 +430,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mLocalExportManager.importDatabase(true);
-                        getContentFragment().refreshLayout();
+                        getContentFragment().restartFragment();
                         makeText(MainActivity.this, R.string.data_restored, Toast.LENGTH_SHORT).show();
                     }
                 })

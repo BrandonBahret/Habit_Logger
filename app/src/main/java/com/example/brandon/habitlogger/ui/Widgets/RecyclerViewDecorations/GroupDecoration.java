@@ -132,7 +132,7 @@ public class GroupDecoration extends RecyclerView.ItemDecoration {
             final int childPosition = parent.getChildAdapterPosition(view);
 
             // If this is the same group then skip
-            prevGroupId = groupId;
+            prevGroupId = mCallback.getGroupId(childPosition - 1);
             groupId = mCallback.getGroupId(childPosition);
             boolean isTheSameGroup = groupId == prevGroupId;
             if (groupId < 0 || isTheSameGroup) continue;

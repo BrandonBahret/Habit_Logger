@@ -43,7 +43,7 @@ import static android.widget.Toast.makeText;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class ActiveSessionsActivity extends AppCompatActivity implements
-        SessionManager.SessionChangeListeners, ActiveSessionViewAdapter.OnClickListeners,
+        SessionManager.SessionChangeCallback, ActiveSessionViewAdapter.OnClickListeners,
         SearchView.OnQueryTextListener {
 
     //region (Member attributes)
