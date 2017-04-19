@@ -84,6 +84,7 @@ public abstract class MyFragmentBase extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         getActivity().findViewById(R.id.no_habits_available_layout).setVisibility(View.GONE);
         getActivity().findViewById(R.id.no_archived_habits_available_layout).setVisibility(View.GONE);
         getActivity().findViewById(R.id.no_results_layout).setVisibility(View.GONE);

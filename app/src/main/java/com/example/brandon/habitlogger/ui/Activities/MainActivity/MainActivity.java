@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity
 
     ActivityMainBinding ui;
     private SearchView mSearchView;
-    private CharSequence mSearchViewQuery = null;
+    private String mSearchViewQuery;
     private MyFragmentBase mFragment;
     //endregion
 
@@ -77,13 +78,17 @@ public class MainActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
 
+        if (savedInstanceState != null) {
+            mSearchViewQuery = savedInstanceState.getString(KEY_QUERY, null);
+        }
+
         ui = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         gatherDependencies();
 
         setListeners();
 
-        setUpActivityUi();
+        setUpActivityUi(savedInstanceState != null);
 
     }
 
@@ -94,7 +99,7 @@ public class MainActivity extends AppCompatActivity
         mLastThemeMode = themeMode;
     }
 
-    private void setUpActivityUi() {
+    private void setUpActivityUi(boolean hasSavedInstanceState) {
         setSupportActionBar(ui.toolbar);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, ui.drawerLayout, ui.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -108,7 +113,8 @@ public class MainActivity extends AppCompatActivity
 
         prepareNavigationDrawer();
 
-        setFragmentForNavId(R.id.home_nav);
+        if (!hasSavedInstanceState)
+            setFragmentForNavId(R.id.home_nav);
 
     }
 
@@ -150,7 +156,7 @@ public class MainActivity extends AppCompatActivity
 
         prepareNavigationDrawer();
         mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
-        mFragment.refreshLayout();
+//        mFragment.refreshLayout();
     }
     //endregion
 
@@ -158,17 +164,18 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
 
-        MenuItem search = menu.findItem(R.id.search);
-        if (search != null) {
-            mSearchView = (SearchView) search.getActionView();
-            mSearchView.setQueryHint(getString(R.string.filter_main_activity));
-            mSearchView.setOnQueryTextListener(getSearchListener());
-//            if (mSearchViewQuery != null) {
-//                mSearchView.onActionViewExpanded();
-//                mSearchView.setQuery(mSearchViewQuery, false);
-//                mSearchView.clearFocus();
-//            }
+        MenuItem searchMenuItem = menu.findItem(R.id.search);
+        mSearchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+
+        //focus the SearchView
+        if (mSearchViewQuery != null && !mSearchViewQuery.isEmpty()) {
+            searchMenuItem.expandActionView();
+            mSearchView.setQuery(mSearchViewQuery, false);
+            mSearchView.clearFocus();
         }
+
+        mSearchView.setQueryHint(getString(R.string.filter_main_activity));
+        mSearchView.setOnQueryTextListener(getSearchListener());
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -179,14 +186,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        if (mSearchView != null && mSearchView.getQuery().length() != 0)
-            outState.putCharSequence(KEY_QUERY, mSearchView.getQuery());
-    }
-
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        mSearchViewQuery = savedInstanceState.getCharSequence(KEY_QUERY, null);
+        outState.putString(KEY_QUERY, mSearchViewQuery);
     }
     //endregion -- end --
 
@@ -229,6 +229,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     public MyFragmentBase getContentFragment() {
+        if(mFragment == null){
+            mFragment = (MyFragmentBase) getSupportFragmentManager().findFragmentById(R.id.content_frame);
+        }
+
         return mFragment;
     }
     //endregion -- end --
@@ -240,11 +244,13 @@ public class MainActivity extends AppCompatActivity
         return new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                mSearchViewQuery = query;
                 return getContentFragment().handleOnQuery(query);
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                mSearchViewQuery = newText;
                 return getContentFragment().handleOnQuery(newText);
             }
         };

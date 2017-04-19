@@ -7,6 +7,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
@@ -40,6 +41,7 @@ import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.NewHabitDialog;
 import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static com.example.brandon.habitlogger.R.string.menu_unarchive;
@@ -48,6 +50,10 @@ public class HabitDataActivity extends AppCompatActivity implements
         IHabitDataCallback, IScrollEvents, EntriesFragment.IEntriesEvents {
 
     //region (Member attributes)
+
+    private static final String KEY_SEARCH_QUERY = "KEY_SEARCH_QUERY";
+    private static final String KEY_SESSION_ENTRIES = "KEY_SESSION_ENTRIES";
+    private String mSearchQuery = "";
 
     // Dependencies
     private HabitDatabase mHabitDatabase;
@@ -102,6 +108,13 @@ public class HabitDataActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        boolean usesSavedInstance = savedInstanceState != null;
+        if (usesSavedInstance) {
+            mSearchQuery = savedInstanceState.getString(KEY_SEARCH_QUERY);
+            List<SessionEntry> entries = savedInstanceState.getParcelableArrayList(KEY_SESSION_ENTRIES);
+            mSessionEntries = new SessionEntryCollection(entries);
+        }
+
         // Gather data from intent
         Intent data = getIntent();
         long habitId = data.getLongExtra(EntriesTableSchema.ENTRY_HABIT_ID, -1);
@@ -113,7 +126,9 @@ public class HabitDataActivity extends AppCompatActivity implements
 
         // Fetch data from database
         mHabit = mHabitDatabase.getHabit(habitId);
-        mSessionEntries = mHabitDatabase.getEntries(habitId);
+        if (!usesSavedInstance) {
+            mSessionEntries = mHabitDatabase.getEntries(habitId);
+        }
 
         // Set up activity
         ui = DataBindingUtil.setContentView(this, R.layout.activity_habit_data);
@@ -127,12 +142,18 @@ public class HabitDataActivity extends AppCompatActivity implements
         ui.tabs.setupWithViewPager(ui.container);
         ui.menuFab.setClosedOnTouchOutside(true);
 
-        mSessionEntries = fetchEntriesWithinTimeRange();
-        dateRangeManager.updateSessionEntries(mSessionEntries);
+        if(ui.tabs.getSelectedTabPosition() != 1){
+            dateRangeManager.hideView(false);
+            ui.menuFab.hideMenu(false);
+            ui.container.setCurrentItem(1);
+        }
 
-        dateRangeManager.hideView(false);
-        ui.container.setCurrentItem(1);
-        ui.menuFab.hideMenu(false);
+        if (!usesSavedInstance) {
+            mSessionEntries = fetchEntriesWithinTimeRange();
+            dateRangeManager.updateSessionEntries(mSessionEntries);
+        }else{
+            dateRangeManager.restoreState(savedInstanceState);
+        }
 
         setUpActivityWithHabit(mHabit);
 
@@ -188,6 +209,20 @@ public class HabitDataActivity extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_habit_data, menu);
+
+        MenuItem searchMenuItem = menu.findItem(R.id.search);
+        mSearchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+
+        //focus the SearchView
+        if (mSearchQuery != null && !mSearchQuery.isEmpty()) {
+            searchMenuItem.expandActionView();
+            mSearchView.setQuery(mSearchQuery, false);
+            mSearchView.clearFocus();
+        }
+
+        mSearchView.setQueryHint(getString(R.string.filter_entries));
+        mSearchView.setOnQueryTextListener(onSearchQueryListener);
+
         return true;
     }
 
@@ -199,18 +234,19 @@ public class HabitDataActivity extends AppCompatActivity implements
             else archive.setTitle(R.string.menu_archive);
         }
 
-        MenuItem search = menu.findItem(R.id.search);
-        if (search != null) {
-            mSearchView = (SearchView) search.getActionView();
-            mSearchView.setQueryHint(getString(R.string.filter_entries));
-            mSearchView.setOnQueryTextListener(onSearchQueryListener);
-        }
-
         return super.onPrepareOptionsMenu(menu);
     }
     //endregion
 
     //endregion [ ---- end ---- ]
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(KEY_SEARCH_QUERY, mSearchQuery);
+        outState.putParcelableArrayList(KEY_SESSION_ENTRIES, mSessionEntries);
+        dateRangeManager.onSaveInstanceState(outState);
+    }
 
     //region Methods responsible for manipulating entries
     private SessionEntryCollection fetchEntriesWithinConditions(String query) {
@@ -476,8 +512,7 @@ public class HabitDataActivity extends AppCompatActivity implements
             new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
                 @Override
                 public void onDateRangeChanged(long dateFrom, long dateTo) {
-                    String query = String.valueOf(mSearchView.getQuery());
-                    mSessionEntries = fetchEntriesWithinConditions(query);
+                    mSessionEntries = fetchEntriesWithinConditions(mSearchQuery);
                     updateEntries(mSessionEntries);
                 }
             };
@@ -485,11 +520,13 @@ public class HabitDataActivity extends AppCompatActivity implements
     SearchView.OnQueryTextListener onSearchQueryListener = new SearchView.OnQueryTextListener() {
         @Override
         public boolean onQueryTextSubmit(String query) {
+            mSearchQuery = query;
             return false;
         }
 
         @Override
         public boolean onQueryTextChange(String newText) {
+            mSearchQuery = newText;
             mSessionEntries = newText.length() > 0 ?
                     fetchEntriesWithinConditions(newText) : fetchEntriesWithinTimeRange();
 

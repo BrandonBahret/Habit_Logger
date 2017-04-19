@@ -2,6 +2,7 @@ package com.example.brandon.habitlogger.ui.Activities.MainActivity.Fragments;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +26,7 @@ import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.GroupDecoration;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -39,6 +41,7 @@ public class AllHabitsFragment extends MyFragmentBase {
 
     //region (Member attributes)
     private final String KEY_DATA = "KEY_DATA";
+    private boolean mCreatedUsingSavedInstance = false;
     List<Habit> mData;
 
     private HabitViewAdapter mHabitAdapter;
@@ -72,16 +75,21 @@ public class AllHabitsFragment extends MyFragmentBase {
         mLocalExportManager = new LocalDataExportManager(getContext());
         mPreferenceChecker = new PreferenceChecker(getContext());
 
-//        if (savedInstanceState != null)
-//            mData = savedInstanceState.getParcelableArrayList(KEY_DATA);
+        mCreatedUsingSavedInstance = savedInstanceState != null;
+        if (mCreatedUsingSavedInstance) {
+            mData = savedInstanceState.getParcelableArrayList(KEY_DATA);
+        }
     }
 
     @Override
     void onSetUpView(RecyclerView recyclerView) {
-//        if (mData == null) {
+        if (!mCreatedUsingSavedInstance) {
             mData = mHabitDatabase.getHabits();
             MyCollectionUtils.filter(mData, Habit.ICheckIfIsArchived);
-//        }
+        }
+        else {
+            updateNoResultsLayout(mData == null || mData.isEmpty());
+        }
 
         mHabitAdapter = new HabitViewAdapter(mData, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
         recyclerView.setAdapter(mHabitAdapter);
@@ -102,13 +110,13 @@ public class AllHabitsFragment extends MyFragmentBase {
         mNoDataLayout.setVisibility(habitsAvailable ? View.GONE : View.VISIBLE);
     }
 
-//    @Override
-//    public void onSaveInstanceState(Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//        outState.putParcelableArrayList(KEY_DATA, (ArrayList<? extends Parcelable>) mData);
-//    }
-
     //endregion
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(KEY_DATA, (ArrayList<? extends Parcelable>) mData);
+    }
 
     //region Methods responsible for updating the Ui
     @Override

@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.ui.Widgets;
 
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.format.DateUtils;
@@ -12,8 +13,8 @@ import android.widget.TextView;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
-import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Dialogs.MyDatePickerDialog;
 
@@ -37,6 +38,13 @@ public class FloatingDateRangeWidgetManager {
     private long mDateFromTime, mDateToTime, mMinimumTime, mMaximumTime;
     public boolean mIsShown = true;
     private int mLastPosition = -1;
+
+    private static final String KEY_DATE_FROM = "KEY_DATE_FROM";
+    private static final String KEY_DATE_TO = "KEY_DATE_TO";
+    private static final String KEY_MIN_TIME = "KEY_MIN_TIME";
+    private static final String KEY_MAX_TIME = "KEY_MAX_TIME";
+    private static final String KEY_IS_SHOWN = "KEY_IS_SHOWN";
+    private static final String KEY_LAST_POS = "KEY_LAST_POS";
     //endregion
 
     //region Code responsible for providing an interface
@@ -239,7 +247,7 @@ public class FloatingDateRangeWidgetManager {
 //        }
 //    }
 
-    private void updateSessionEntries(List<SessionEntry> sessionEntries){
+    private void updateSessionEntries(List<SessionEntry> sessionEntries) {
         int numberOfEntries = sessionEntries.size();
         mViewHolder.entriesCountText.setText(String.valueOf(numberOfEntries));
 
@@ -249,7 +257,7 @@ public class FloatingDateRangeWidgetManager {
         updateMinMaxTimestamps(sessionEntries);
     }
 
-    public void updateSessionEntries(SessionEntryCollection sessionEntries){
+    public void updateSessionEntries(SessionEntryCollection sessionEntries) {
         updateSessionEntries(sessionEntries, sessionEntries.getMinimumTime(), sessionEntries.getMaximumTime());
         sessionEntries.setDateFrom(getDateFrom());
         sessionEntries.setDateTo(getDateTo());
@@ -285,7 +293,7 @@ public class FloatingDateRangeWidgetManager {
     }
 
     private void updateDateRangeLabels(boolean shouldNotifyListeners) {
-        if(mMinimumTime == -1 || mMaximumTime == -1){
+        if (mMinimumTime == -1 || mMaximumTime == -1) {
             mViewHolder.dateTo.setText(mNoDataString);
             mViewHolder.dateFrom.setText(mNoDataString);
             setDateRangeEnabled(false);
@@ -313,6 +321,24 @@ public class FloatingDateRangeWidgetManager {
         }
     }
     //endregion -- end --
+
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putLong(KEY_DATE_FROM, mDateFromTime);
+        outState.putLong(KEY_DATE_TO, mDateToTime);
+        outState.putLong(KEY_MIN_TIME, mMinimumTime);
+        outState.putLong(KEY_MAX_TIME, mMaximumTime);
+        outState.putBoolean(KEY_IS_SHOWN, mIsShown);
+        outState.putLong(KEY_LAST_POS, mLastPosition);
+    }
+
+    public void restoreState(Bundle savedInstanceState) {
+        mDateFromTime = savedInstanceState.getLong(KEY_DATE_FROM);
+        mDateToTime = savedInstanceState.getLong(KEY_DATE_TO);
+        mMinimumTime = savedInstanceState.getLong(KEY_MIN_TIME);
+        mMaximumTime = savedInstanceState.getLong(KEY_MAX_TIME);
+        mIsShown = savedInstanceState.getBoolean(KEY_IS_SHOWN);
+        mLastPosition = (int) savedInstanceState.getLong(KEY_LAST_POS);
+    }
 
     //region Setters {}
     private void setDateRangeEnabled(boolean state) {
