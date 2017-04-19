@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity
 
         prepareNavigationDrawer();
         mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
-//        mFragment.refreshLayout();
+//        getContentFragment().refreshLayout();
     }
     //endregion
 
@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity
 
 
         // Change the title accordingly
-        setTitle(mFragment.getFragmentTitle());
+        setTitle(getContentFragment().getFragmentTitle());
         ui.drawerLayout.closeDrawer(GravityCompat.START);
     }
 
@@ -319,7 +319,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void beforeSessionEnded(long habitId, boolean wasCanceled) {
                 mSessionNotificationManager.cancel((int) habitId);
-                mFragment.notifySessionEnded(habitId);
+                getContentFragment().notifySessionEnded(habitId);
             }
 
             @Override
@@ -347,7 +347,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onFinishedWithResult(Habit habit) {
                         mHabitDatabase.addHabit(habit);
-                        mFragment.addHabitToLayout(habit);
+                        getContentFragment().addHabitToLayout(habit);
                         clearFocusFromSearchView();
                         findViewById(R.id.no_habits_available_layout).setVisibility(View.GONE);
                     }
@@ -426,7 +426,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mLocalExportManager.importDatabase(true);
-                        mFragment.refreshLayout();
+                        getContentFragment().refreshLayout();
                         makeText(MainActivity.this, R.string.data_restored, Toast.LENGTH_SHORT).show();
                     }
                 })
