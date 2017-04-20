@@ -25,7 +25,7 @@ public class MyColorUtils {
      * @return True if the color's lightness is greater than 0.5f
      */
     public static boolean isColorBright(int color) {
-        return getLuminance(color) > 0.645f;
+        return getLuminance(color) > 0.6f;
     }
 
     public static float getLuminance(@ColorInt int color) {
