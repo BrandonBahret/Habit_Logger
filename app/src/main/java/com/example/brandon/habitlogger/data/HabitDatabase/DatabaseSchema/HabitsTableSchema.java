@@ -65,7 +65,8 @@ public class HabitsTableSchema {
         values.put(HABIT_NAME, habit.getName());
         values.put(HABIT_DESCRIPTION, habit.getDescription());
         values.put(HABIT_CATEGORY_ID, habit.getCategory().getDatabaseId());
-        values.put(HABIT_ICON_RES_ID, habit.getIconResId());
+        String iconResId = habit.getIconResId() == null ? "NO_ICON" : habit.getIconResId();
+        values.put(HABIT_ICON_RES_ID, iconResId);
 
         return values;
     }

@@ -1,6 +1,7 @@
 package com.example.brandon.habitlogger.common;
 
 import android.graphics.Color;
+import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
 import android.support.v4.graphics.ColorUtils;
 
@@ -23,9 +24,20 @@ public class MyColorUtils {
     /**
      * @return True if the color's lightness is greater than 0.5f
      */
-    public boolean isColorBright(int color) {
-        return getLightness(color) > 0.5f;
+    public static boolean isColorBright(int color) {
+        return getLuminance(color) > 0.645f;
     }
+
+    public static float getLuminance(@ColorInt int color) {
+        double red = Color.red(color) / 255.0;
+        red = red < 0.03928 ? red / 12.92 : Math.pow((red + 0.055) / 1.055, 2.4);
+        double green = Color.green(color) / 255.0;
+        green = green < 0.03928 ? green / 12.92 : Math.pow((green + 0.055) / 1.055, 2.4);
+        double blue = Color.blue(color) / 255.0;
+        blue = blue < 0.03928 ? blue / 12.92 : Math.pow((blue + 0.055) / 1.055, 2.4);
+        return (float) ((0.2126 * red) + (0.7152 * green) + (0.0722 * blue));
+    }
+
 
     public static int getRandomColor() {
         Random r = new Random();

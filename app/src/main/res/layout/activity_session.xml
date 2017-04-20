@@ -1,41 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <RelativeLayout
+    <android.support.constraint.ConstraintLayout
         android:id="@+id/activity_session"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:descendantFocusability="beforeDescendants"
         android:focusableInTouchMode="true"
         android:theme="@style/AppTheme.ContrastBackground"
-        tools:context=".ui.Activities.SessionActivity.SessionActivity">
+        tools:context=".ui.Activities.SessionActivity.SessionActivity"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
 
         <fragment
             android:id="@+id/fragment_timer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:name="com.example.brandon.habitlogger.ui.Activities.SessionActivity.Fragments.TimerFragment"
-            tools:layout="@layout/fragment_timer"/>
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout="@layout/fragment_timer"
+            tools:layout_conversion_absoluteHeight="105dp"
+            tools:layout_conversion_absoluteWidth="384dp"
+            tools:layout_conversion_absoluteX="0dp"
+            tools:layout_conversion_absoluteY="0dp"/>
 
         <EditText
             android:id="@+id/session_note"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_below="@+id/fragment_timer"
-            android:layout_marginBottom="4dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="8dp"
             android:background="@drawable/background_simple_rectangle"
-            android:cropToPadding="false"
-            android:elevation="3dp"
-            android:fadingEdgeLength="@dimen/activity_vertical_margin"
             android:hint="@string/session_note_hint"
             android:inputType="textMultiLine"
-            android:padding="16dp"/>
+            android:padding="16dp"
+            android:scrollbars="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_timer"
+            tools:layout_conversion_absoluteHeight="394dp"
+            tools:layout_conversion_absoluteWidth="376dp"/>
 
-    </RelativeLayout>
+    </android.support.constraint.ConstraintLayout>
 </layout>

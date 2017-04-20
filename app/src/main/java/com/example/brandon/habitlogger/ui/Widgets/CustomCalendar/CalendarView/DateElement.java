@@ -38,7 +38,7 @@ public class DateElement extends DateElementBase {
 
             if (mHasEntries) {
                 int backgroundColor = mTextPaint.getColor();
-                if (MyColorUtils.isColorBright(backgroundColor, 0.50f))
+                if (MyColorUtils.isColorBright(backgroundColor))
                     paint.setColor(Color.DKGRAY);
                 else
                     paint.setColor(Color.WHITE);

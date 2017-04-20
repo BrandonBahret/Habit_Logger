@@ -103,18 +103,6 @@
         </activity>
 
         <!-- Habit Data Activity -->
-        <!-- todo remove -->
-        <activity
-            android:name=".ui.Activities.HabitActivity.HabitActivity"
-            android:label="@string/title_activity_habit"
-            android:launchMode="singleTop"
-            android:parentActivityName=".ui.Activities.MainActivity.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.Activities.MainActivity.MainActivity"/>
-        </activity>
-
         <activity
             android:name=".ui.Activities.HabitDataActivity.HabitDataActivity"
             android:label="@string/title_activity_habit_data"

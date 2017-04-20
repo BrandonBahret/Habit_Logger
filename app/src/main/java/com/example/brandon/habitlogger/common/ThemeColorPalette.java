@@ -22,7 +22,7 @@ public class ThemeColorPalette implements Serializable {
     public ThemeColorPalette(int baseColor) {
         mBaseColor = baseColor;
         int color = baseColor;
-        int darkerColor = MyColorUtils.darkenColorBy(baseColor, 0.08f);
+        int darkerColor = MyColorUtils.darkenColorBy(baseColor, 0.05f);
         int accentColor = baseColor;
         int accentDarkerColor = accentColor;
 

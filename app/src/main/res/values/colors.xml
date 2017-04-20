@@ -19,16 +19,16 @@
     <color name="colorAccentDisabled">#8695b3</color>
 
     <!-- Background Color -->
-    <color name="appBackground">#e1e1e1</color>
-    <color name="background2">#f2f2f2</color>
+    <color name="appBackground">#e0e0e0</color>
+    <color name="background2">#eeeeee</color>
     <color name="background3">#cccccc</color>
-    <color name="background4">#d9d9d9</color>
+    <color name="background4">#d4d4d4</color>
     <color name="background5">#999999</color>
     <color name="dialogPickerHeaderColor">@color/contrastBackgroundAccent</color>
 
     <!-- Icon Colors -->
     <color name="actionBarIconTint">#ffffffff</color>
-    <color name="iconTint1">#4e4d4d</color>
+    <color name="iconTint1">#6b6b6b</color>
     <color name="iconTint2">#ffffff</color>
 
     <!-- Text Colors -->
