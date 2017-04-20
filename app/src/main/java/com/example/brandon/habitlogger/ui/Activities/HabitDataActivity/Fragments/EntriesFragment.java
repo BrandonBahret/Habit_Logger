@@ -14,10 +14,10 @@ import android.widget.ImageView;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.EntryViewAdapter;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
@@ -211,8 +211,9 @@ public class EntriesFragment extends Fragment implements
     @Override
     public void onNotifyEntryAdded(int adapterPosition) {
         // Todo this doesn't work well with item decorations
-        mEntryAdapter.notifyItemInserted(adapterPosition);
         showNoDataLayout(mSessionEntries == null || mSessionEntries.isEmpty());
+        mEntryAdapter.notifyItemInserted(adapterPosition);
+        mEntriesContainer.smoothScrollToPosition(adapterPosition);
 //        mEntryAdapter.notifyDataSetChanged();
     }
 
@@ -220,6 +221,7 @@ public class EntriesFragment extends Fragment implements
     public void onNotifyEntryUpdated(int oldPosition, int newPosition) {
         mEntryAdapter.notifyItemMoved(oldPosition, newPosition);
         mEntryAdapter.notifyItemChanged(newPosition);
+        mEntriesContainer.smoothScrollToPosition(newPosition);
     }
 
     @Override
