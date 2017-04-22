@@ -23,8 +23,7 @@ import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDat
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.NestedScrollObserver;
 
-public class StatisticsFragment extends Fragment implements IHabitDataCallback.IStatisticsFragment,
-        IHabitDataCallback.IUpdateEntries, IHabitDataCallback.IUpdateCategoryData {
+public class StatisticsFragment extends Fragment implements IHabitDataCallback.IStatisticsFragment{
 
     //region (Member attributes)
     private View mFragmentView;
@@ -72,10 +71,10 @@ public class StatisticsFragment extends Fragment implements IHabitDataCallback.I
 
         SessionEntryCollection entries = mCallbackInterface.getSessionEntries();
 //        CategoryDataSample categoryDataSample = mCallbackInterface.getCategoryDataSample();
-        mPieCompletion = PieGraphCompletion.newInstance(this, mColorPalette);
-        mLineCompletion = LineGraphCompletion.newInstance(this, mColorPalette);
-        mDistributionStartingTime = DistributionStartingTime.newInstance(this, mColorPalette);
-        mPieDuration = PieGraphDuration.newInstance(this);
+        mPieCompletion = PieGraphCompletion.newInstance(mColorPalette);
+        mLineCompletion = LineGraphCompletion.newInstance(mColorPalette);
+        mDistributionStartingTime = DistributionStartingTime.newInstance(mColorPalette);
+        mPieDuration = PieGraphDuration.newInstance();
 
         getFragmentManager().beginTransaction()
                 .add(R.id.fragment_pie_completion, mPieCompletion)
@@ -107,16 +106,6 @@ public class StatisticsFragment extends Fragment implements IHabitDataCallback.I
 
             noStatisticsLayout.setVisibility(noStatsLayoutVisibilityMode);
         }
-    }
-
-    @Override
-    public SessionEntryCollection getSessionEntries() {
-        return mCallbackInterface.getSessionEntries();
-    }
-
-    @Override
-    public CategoryDataCollection getCategoryDataSample() {
-        return mCallbackInterface.getCategoryDataSample();
     }
 
     //region Methods responsible for handling events

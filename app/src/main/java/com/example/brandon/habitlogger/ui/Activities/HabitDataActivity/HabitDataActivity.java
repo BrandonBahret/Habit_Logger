@@ -47,6 +47,7 @@ import java.util.Set;
 import static com.example.brandon.habitlogger.R.string.menu_unarchive;
 
 public class HabitDataActivity extends AppCompatActivity implements
+        IHabitDataCallback.IUpdateEntries, IHabitDataCallback.IUpdateCategoryData,
         IHabitDataCallback, IScrollEvents, EntriesFragment.IEntriesEvents {
 
     //region (Member attributes)
@@ -142,7 +143,7 @@ public class HabitDataActivity extends AppCompatActivity implements
         ui.tabs.setupWithViewPager(ui.container);
         ui.menuFab.setClosedOnTouchOutside(true);
 
-        if(ui.tabs.getSelectedTabPosition() != 1){
+        if (ui.tabs.getSelectedTabPosition() != 1) {
             dateRangeManager.hideView(false);
             ui.menuFab.hideMenu(false);
             ui.container.setCurrentItem(1);
@@ -151,7 +152,8 @@ public class HabitDataActivity extends AppCompatActivity implements
         if (!usesSavedInstance) {
             mSessionEntries = fetchEntriesWithinTimeRange();
             dateRangeManager.updateSessionEntries(mSessionEntries);
-        }else{
+        }
+        else {
             dateRangeManager.restoreState(savedInstanceState);
         }
 

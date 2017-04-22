@@ -1,10 +1,10 @@
 package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.StatisticsFragments;
 
 
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -28,8 +28,6 @@ import java.util.List;
 
 public class PieGraphDuration extends Fragment {
 
-    private static String KEY_CALLBACK = "KEY_CALLBACK";
-
     //region (Member attributes)
     private FragmentPieGraphDurationBinding ui;
     private int mTextColor;
@@ -40,22 +38,27 @@ public class PieGraphDuration extends Fragment {
         // Required empty public constructor
     }
 
-    public static PieGraphDuration newInstance(IHabitDataCallback.IUpdateCategoryData callback) {
-
-        PieGraphDuration fragment = new PieGraphDuration();
-
-        Bundle args = new Bundle();
-        args.putSerializable(KEY_CALLBACK, callback);
-        fragment.setArguments(args);
-
-        return fragment;
+    public static PieGraphDuration newInstance() {
+        return new PieGraphDuration();
     }
 
     //region Methods responsible for handling the fragment lifecycle
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mCallbackInterface = (IHabitDataCallback.IUpdateCategoryData) getArguments().getSerializable(KEY_CALLBACK);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof IHabitDataCallback.IUpdateCategoryData) {
+            mCallbackInterface = (IHabitDataCallback.IUpdateCategoryData) context;
+        }
+        else {
+            throw new RuntimeException(context.toString()
+                    + " must implement IHabitDataCallback.IUpdateCategoryData");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbackInterface = null;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.StatisticsFragments;
 
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,8 +14,8 @@ import android.view.ViewGroup;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
-import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
+import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.databinding.FragmentDistributionStartingTimeBinding;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.github.mikephil.charting.charts.CombinedChart;
@@ -36,7 +37,6 @@ import java.util.Locale;
 
 public class DistributionStartingTime extends Fragment {
 
-    private static String KEY_CALLBACK = "KEY_CALLBACK";
     private static String KEY_COLOR = "KEY_COLOR";
 
     //region (Member attributes)
@@ -48,12 +48,11 @@ public class DistributionStartingTime extends Fragment {
     private final int INTERVAL = 60;
     //endregion
 
-    public static DistributionStartingTime newInstance(IHabitDataCallback.IUpdateEntries callback, ThemeColorPalette colorPalette) {
+    public static DistributionStartingTime newInstance(ThemeColorPalette colorPalette) {
 
         DistributionStartingTime fragment = new DistributionStartingTime();
 
         Bundle args = new Bundle();
-        args.putSerializable(KEY_CALLBACK, callback);
         args.putSerializable(KEY_COLOR, colorPalette);
         fragment.setArguments(args);
 
@@ -64,9 +63,26 @@ public class DistributionStartingTime extends Fragment {
 
     //region Methods (onCreateView - onDestroyView)
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof IHabitDataCallback.IUpdateEntries) {
+            mCallbackInterface = (IHabitDataCallback.IUpdateEntries) context;
+        }
+        else {
+            throw new RuntimeException(context.toString()
+                    + " must implement IHabitDataCallback.IUpdateEntries");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbackInterface = null;
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mCallbackInterface = (IHabitDataCallback.IUpdateEntries) getArguments().getSerializable(KEY_CALLBACK);
         mColorPalette = (ThemeColorPalette) getArguments().getSerializable(KEY_COLOR);
     }
 

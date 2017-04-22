@@ -9,6 +9,7 @@ package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragment
  * The value stored on each date is the "habit score" that would've been displayed for that day.
  */
 
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -40,7 +41,6 @@ import java.util.List;
 
 public class LineGraphCompletion extends Fragment {
 
-    private static String KEY_CALLBACK = "KEY_CALLBACK";
     private static String KEY_COLOR = "KEY_COLOR";
 
     //region (Member attributes)
@@ -55,12 +55,11 @@ public class LineGraphCompletion extends Fragment {
         // Required empty public constructor
     }
 
-    public static LineGraphCompletion newInstance(IHabitDataCallback.IUpdateEntries callback, ThemeColorPalette colorPalette) {
+    public static LineGraphCompletion newInstance(ThemeColorPalette colorPalette) {
 
         LineGraphCompletion fragment = new LineGraphCompletion();
 
         Bundle args = new Bundle();
-        args.putSerializable(KEY_CALLBACK, callback);
         args.putSerializable(KEY_COLOR, colorPalette);
         fragment.setArguments(args);
 
@@ -68,10 +67,28 @@ public class LineGraphCompletion extends Fragment {
     }
 
     //region Methods responsible for handling the fragment lifecycle
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof IHabitDataCallback.IUpdateEntries) {
+            mCallbackInterface = (IHabitDataCallback.IUpdateEntries) context;
+        }
+        else {
+            throw new RuntimeException(context.toString()
+                    + " must implement IHabitDataCallback.IUpdateEntries");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbackInterface = null;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mCallbackInterface = (IHabitDataCallback.IUpdateEntries) getArguments().getSerializable(KEY_CALLBACK);
         mColorPalette = (ThemeColorPalette) getArguments().getSerializable(KEY_COLOR);
     }
 
