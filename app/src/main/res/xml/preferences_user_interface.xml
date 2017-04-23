@@ -5,14 +5,14 @@
     <PreferenceCategory android:title="Habits">
 
         <com.example.brandon.habitlogger.ui.Widgets.DependentListPreference
-            android:defaultValue="2"
+            android:defaultValue="0"
             android:dialogTitle="Display categories as..."
             android:entries="@array/category_options"
             android:entryValues="@array/category_options_values"
             android:key="@string/pref_show_categories"
             android:summary="Change how the app uses habit categories."
             android:title="Category mode"
-            app:dependentValue="1"/>
+            app:dependentValue="0"/>
 
         <CheckBoxPreference
             android:defaultValue="false"

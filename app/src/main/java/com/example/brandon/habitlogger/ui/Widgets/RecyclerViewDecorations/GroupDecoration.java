@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.support.annotation.DimenRes;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextPaint;
 import android.view.View;
@@ -132,10 +133,15 @@ public class GroupDecoration extends RecyclerView.ItemDecoration {
             final int childPosition = parent.getChildAdapterPosition(view);
 
             // If this is the same group then skip
+
             prevGroupId = mCallback.getGroupId(childPosition - 1);
             groupId = mCallback.getGroupId(childPosition);
             boolean isTheSameGroup = groupId == prevGroupId;
-            if (groupId < 0 || isTheSameGroup) continue;
+
+            int firstPosition = ((LinearLayoutManager) parent.getLayoutManager())
+                    .findFirstVisibleItemPosition();
+
+            if ((groupId < 0 || isTheSameGroup) && firstPosition != childPosition) continue;
 
             // If there isn't any text to draw then skip
             final String textLine = mCallback.getGroupFirstLine(childPosition);

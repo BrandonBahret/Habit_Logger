@@ -214,7 +214,6 @@ public class EntriesFragment extends Fragment implements
         showNoDataLayout(mSessionEntries == null || mSessionEntries.isEmpty());
         mEntryAdapter.notifyItemInserted(adapterPosition);
         mEntriesContainer.smoothScrollToPosition(adapterPosition);
-//        mEntryAdapter.notifyDataSetChanged();
     }
 
     @Override
