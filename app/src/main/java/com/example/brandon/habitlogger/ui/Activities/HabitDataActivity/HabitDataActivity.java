@@ -29,6 +29,7 @@ import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.databinding.ActivityHabitDataBinding;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.EntriesFragment;
+import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity.SessionActivity;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
@@ -60,6 +61,7 @@ public class HabitDataActivity extends AppCompatActivity implements
     private HabitDatabase mHabitDatabase;
     private LocalDataExportManager mExportManager;
     private SessionManager mSessionManager;
+    private PreferenceChecker mPreferenceChecker;
 
     // Data
     private Habit mHabit;
@@ -123,6 +125,7 @@ public class HabitDataActivity extends AppCompatActivity implements
         // Create dependencies
         mHabitDatabase = new HabitDatabase(this);
         mSessionManager = new SessionManager(this);
+        mPreferenceChecker = new PreferenceChecker(this);
         mExportManager = new LocalDataExportManager(this);
 
         // Fetch data from database
@@ -354,14 +357,14 @@ public class HabitDataActivity extends AppCompatActivity implements
     @Override
     public void onScrollUp() {
         dateRangeManager.showView(true);
-        if (ui.tabs.getSelectedTabPosition() == 0)
+        if (mPreferenceChecker.hideFabOnScroll() && ui.tabs.getSelectedTabPosition() == 0)
             ui.menuFab.showMenu(true);
     }
 
     @Override
     public void onScrollDown() {
         dateRangeManager.hideView(true);
-        if (ui.tabs.getSelectedTabPosition() == 0)
+        if (mPreferenceChecker.hideFabOnScroll() && ui.tabs.getSelectedTabPosition() == 0)
             ui.menuFab.hideMenu(true);
     }
     //endregion -- end --

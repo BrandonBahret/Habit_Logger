@@ -9,7 +9,7 @@ import android.support.v4.widget.NestedScrollView;
 
 public abstract class NestedScrollObserver implements NestedScrollView.OnScrollChangeListener {
 
-    private static final int THRESHOLD = 5;
+    private static final int THRESHOLD = 2;
     private boolean mControl = false;
 
     public abstract void onScrollUp();

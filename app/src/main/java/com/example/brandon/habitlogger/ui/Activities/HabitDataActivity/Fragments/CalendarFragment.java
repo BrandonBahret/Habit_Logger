@@ -1,11 +1,12 @@
 package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,13 +58,20 @@ public class CalendarFragment extends Fragment implements IHabitDataCallback.ICa
 
         mCalendarViewContainer = (RecyclerView) v.findViewById(R.id.calendar_view_container);
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        CenterLinearLayoutManager layoutManager = new CenterLinearLayoutManager(getContext());
         mCalendarViewContainer.setLayoutManager(layoutManager);
         mCalendarViewContainer.setItemAnimator(new DefaultItemAnimator());
         mCalendarViewContainer.addItemDecoration(getSpaceDecoration());
 
         onUpdateEntries(mCallbackInterface.getSessionEntries());
-        mCalendarViewContainer.scrollToPosition(mCalendarAdapter.getAdapterPositionForCurrentMonth());
+//        mCalendarViewContainer.scrollToPosition(mCalendarAdapter.getAdapterPositionForCurrentMonth());
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) getContext()).getWindowManager()
+                .getDefaultDisplay()
+                .getMetrics(displayMetrics);
+        int offset = (int) (getResources().getDimensionPixelSize(R.dimen.calendar_view_height) / 3.0f);
+        layoutManager.scrollToPositionWithOffset(mCalendarAdapter.getAdapterPositionForCurrentMonth(), offset);
 
         return v;
     }

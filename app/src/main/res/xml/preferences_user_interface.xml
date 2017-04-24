@@ -24,8 +24,8 @@
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="@string/pref_hide_fab_on_scroll"
-            android:summary="Scrolling the list will hide the new habit button."
-            android:title="Hide new habit button on scroll"/>
+            android:summary="Scrolling will hide the 'create new' action buttons."
+            android:title="Hide action buttons on scroll"/>
 
     </PreferenceCategory>
 
@@ -47,7 +47,7 @@
             android:defaultValue="false"
             android:dependency="@string/pref_display_current_sessions_card"
             android:key="@string/pref_hide_current_sessions_card_on_scroll"
-            android:summary="Scrolling the list will hide the active sessions card."
+            android:summary="Scrolling will hide the active sessions card."
             android:title="Hide on scroll"/>
 
         <CheckBoxPreference

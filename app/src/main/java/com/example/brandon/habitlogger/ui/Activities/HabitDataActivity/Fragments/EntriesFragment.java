@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -134,7 +133,8 @@ public class EntriesFragment extends Fragment implements
         SpaceOffsetDecoration spaceOffsetDecoration = new SpaceOffsetDecoration(bottomOffset, topOffset);
         mEntriesContainer.addItemDecoration(spaceOffsetDecoration);
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+//        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        RecyclerView.LayoutManager layoutManager = new CenterLinearLayoutManager(getContext());
         mEntriesContainer.setLayoutManager(layoutManager);
         mEntriesContainer.setItemAnimator(new DefaultItemAnimator());
         mEntriesContainer.setAdapter(mEntryAdapter);
@@ -220,7 +220,7 @@ public class EntriesFragment extends Fragment implements
     public void onNotifyEntryUpdated(int oldPosition, int newPosition) {
         mEntryAdapter.notifyItemMoved(oldPosition, newPosition);
         mEntryAdapter.notifyItemChanged(newPosition);
-        mEntriesContainer.smoothScrollToPosition(newPosition);
+//        mEntriesContainer.smoothScrollToPosition(newPosition);
     }
 
     @Override
@@ -230,8 +230,6 @@ public class EntriesFragment extends Fragment implements
         if (mEntryAdapter != null) {
             mEntryAdapter.setColorPalette(mColorPalette);
             mEntryAdapter.notifyDataSetChanged();
-//            mEntryAdapter = new EntryViewAdapter(mSessionEntries, getContext(), mColorPalette, mEntryAdapter.getListener());
-//            mEntriesContainer.setAdapter(mEntryAdapter);
         }
 
         if (mView != null) {
