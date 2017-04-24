@@ -36,11 +36,6 @@ public class CalendarViewAdapter extends CalendarViewAdapterBase<CalendarViewAda
         generateMonthDataFromEntries(mEntriesSample);
     }
 
-    public void setColor(int color) {
-        mStreakColor = color;
-        this.notifyDataSetChanged();
-    }
-
     //region Code responsible for creating and binding view holders
     public class ViewHolder extends RecyclerView.ViewHolder {
         CalendarView calendarView;
@@ -115,6 +110,11 @@ public class CalendarViewAdapter extends CalendarViewAdapterBase<CalendarViewAda
 
             startCalendar.add(Calendar.MONTH, 1);
         }
+    }
+
+    public void setColor(int color) {
+        mStreakColor = color;
+        this.notifyDataSetChanged();
     }
 
 }

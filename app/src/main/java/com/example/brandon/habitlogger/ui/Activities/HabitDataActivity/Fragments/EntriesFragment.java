@@ -17,6 +17,7 @@ import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEn
 import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
+import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.CenterLinearLayoutManager;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.EntryViewAdapter;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
@@ -212,8 +213,8 @@ public class EntriesFragment extends Fragment implements
     public void onNotifyEntryAdded(int adapterPosition) {
         // Todo this doesn't work well with item decorations
         showNoDataLayout(mSessionEntries == null || mSessionEntries.isEmpty());
-        mEntryAdapter.notifyItemInserted(adapterPosition);
         mEntriesContainer.smoothScrollToPosition(adapterPosition);
+        mEntryAdapter.notifyItemInserted(adapterPosition);
     }
 
     @Override

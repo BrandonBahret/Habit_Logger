@@ -16,6 +16,7 @@
     <dimen name="land_time_display">40sp</dimen>
     <dimen name="default_elevation">2dp</dimen>
     <dimen name="calendar_view_height">300dp</dimen>
+    <dimen name="default_top_bottom_margin">2dp</dimen>
 
     <!-- Item decorators -->
     <dimen name="indent_pad_top">16dp</dimen>

@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments;
+package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity;
 
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
 import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
+import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.CenterLinearLayoutManager;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarView.CalendarViewAdapter;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
@@ -66,12 +67,18 @@ public class CalendarFragment extends Fragment implements IHabitDataCallback.ICa
         onUpdateEntries(mCallbackInterface.getSessionEntries());
 //        mCalendarViewContainer.scrollToPosition(mCalendarAdapter.getAdapterPositionForCurrentMonth());
 
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        ((Activity) getContext()).getWindowManager()
-                .getDefaultDisplay()
-                .getMetrics(displayMetrics);
-        int offset = (int) (getResources().getDimensionPixelSize(R.dimen.calendar_view_height) / 3.0f);
-        layoutManager.scrollToPositionWithOffset(mCalendarAdapter.getAdapterPositionForCurrentMonth(), offset);
+        if (savedInstanceState == null) {
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            ((Activity) getContext()).getWindowManager()
+                    .getDefaultDisplay()
+                    .getMetrics(displayMetrics);
+            int windowOffset = (int) (displayMetrics.heightPixels / 3.0f);
+            int viewOffset = (int) (getResources().getDimensionPixelSize(R.dimen.calendar_view_height) / 3.0f);
+            int adapterPositionForCurrentMonth = mCalendarAdapter.getAdapterPositionForCurrentMonth();
+
+            layoutManager.scrollToPositionWithOffset(adapterPositionForCurrentMonth, windowOffset - viewOffset);
+            mCalendarViewContainer.smoothScrollToPosition(adapterPositionForCurrentMonth);
+        }
 
         return v;
     }
