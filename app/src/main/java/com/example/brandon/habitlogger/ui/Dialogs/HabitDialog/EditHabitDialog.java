@@ -16,10 +16,10 @@ public class EditHabitDialog extends HabitDialogBase {
     private Habit mEditHabit;
     //endregion
 
-    public static EditHabitDialog newInstance(OnFinishedListener listener, Habit editHabit) {
+    public static EditHabitDialog newInstance(Habit editHabit, OnFinishedListener listener) {
         EditHabitDialog dialog = new EditHabitDialog();
 
-        Bundle args = new Bundle(1);
+        Bundle args = new Bundle(2);
         args.putSerializable(KEY_HABIT, editHabit);
         args.putSerializable(KEY_LISTENER, listener);
         dialog.setArguments(args);
@@ -30,7 +30,7 @@ public class EditHabitDialog extends HabitDialogBase {
     public static EditHabitDialog newInstance(OnFinishedListener listener, int accentColor, Habit editHabit) {
         EditHabitDialog dialog = new EditHabitDialog();
 
-        Bundle args = new Bundle(2);
+        Bundle args = new Bundle(3);
         args.putSerializable(KEY_HABIT, editHabit);
         args.putSerializable(KEY_LISTENER, listener);
         args.putInt(KEY_COLOR, accentColor);

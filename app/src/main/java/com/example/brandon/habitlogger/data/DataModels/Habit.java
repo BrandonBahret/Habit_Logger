@@ -43,6 +43,14 @@ public class Habit implements Serializable, Parcelable {
         }
     };
 
+    public static MyCollectionUtils.ICompareKey IKeyCompareCategoryName =
+            new MyCollectionUtils.ICompareKey() {
+                @Override
+                public int compare(Object element, Object key) {
+                    return ((Habit)element).getCategory().getName().compareTo((String)key);
+                }
+            };
+
     public static Comparator<Habit> ICompareDuration = new Comparator<Habit>() {
         @Override
         public int compare(Habit itemOne, Habit itemTwo) {

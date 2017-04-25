@@ -139,7 +139,7 @@ public class CategoryCardHabitsFragment extends MyFragmentBase {
             @Override
             public void onHabitEditClick(long habitId, final HabitViewHolder habitViewHolder) {
                 Habit habit = mHabitDatabase.getHabit(habitId);
-                EditHabitDialog dialog = EditHabitDialog.newInstance(new EditHabitDialog.OnFinishedListener() {
+                EditHabitDialog dialog = EditHabitDialog.newInstance(habit, new EditHabitDialog.OnFinishedListener() {
                     @Override
                     public void onFinishedWithResult(Habit habit) {
                         mHabitDatabase.updateHabit(habit.getDatabaseId(), habit);
@@ -149,7 +149,7 @@ public class CategoryCardHabitsFragment extends MyFragmentBase {
 //                        mData.set(position, habit);
 //                        mHabitAdapter.notifyItemChanged(position);
                     }
-                }, habit);
+                });
 
                 dialog.show(getActivity().getSupportFragmentManager(), "edit-habit");
             }

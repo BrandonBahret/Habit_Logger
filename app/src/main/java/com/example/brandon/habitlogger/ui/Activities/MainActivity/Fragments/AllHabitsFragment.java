@@ -262,21 +262,43 @@ public class AllHabitsFragment extends MyFragmentBase {
         }
     }
 
+    public int updateHabit(Habit oldHabit, Habit newHabit) {
+        int pos = mData.indexOf(oldHabit);
+        mData.remove(pos);
+        mHabitAdapter.notifyItemRemoved(pos);
+
+        int insertPos = MyCollectionUtils.binarySearchForInsertPosition
+                (mData, newHabit.getCategory().getName(), Habit.IKeyCompareCategoryName);
+        mData.add(insertPos, newHabit);
+        mHabitAdapter.notifyItemInserted(insertPos);
+
+        return insertPos;
+    }
+
     private HabitViewAdapter.MenuItemClickListener getHabitMenuItemClickListener() {
         return new HabitViewAdapter.MenuItemClickListener() {
             @Override
             public void onHabitEditClick(long habitId, HabitViewHolder habitViewHolder) {
-                Habit habit = mHabitDatabase.getHabit(habitId);
-                EditHabitDialog dialog = EditHabitDialog.newInstance(new EditHabitDialog.OnFinishedListener() {
-                    @Override
-                    public void onFinishedWithResult(Habit habit) {
-                        mHabitDatabase.updateHabit(habit.getDatabaseId(), habit);
 
-                        int position = mHabitAdapter.getAdapterItemPosition(habit.getDatabaseId());
-                        mData.set(position, habit);
-                        mHabitAdapter.notifyItemChanged(position);
-                    }
-                }, habit);
+                Habit oldHabit = mHabitDatabase.getHabit(habitId);
+
+                EditHabitDialog dialog = EditHabitDialog.newInstance(oldHabit,
+                        new EditHabitDialog.OnFinishedListener() {
+                            @Override
+                            public void onFinishedWithResult(Habit newHabit) {
+
+                                long habitId = newHabit.getDatabaseId();
+                                Habit oldHabit = mHabitDatabase.getHabit(habitId);
+                                int position = mData.indexOf(oldHabit);
+
+                                mData.set(position, newHabit);
+                                Collections.sort(mData, Habit.ICompareCategoryName);
+                                mHabitAdapter.notifyDataSetChanged();
+
+                                mHabitDatabase.updateHabit(habitId, newHabit);
+                            }
+                        }
+                );
 
                 dialog.show(getActivity().getSupportFragmentManager(), "edit-habit");
             }
