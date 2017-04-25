@@ -269,12 +269,17 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
                 Habit habit = mHabitDatabase.getHabit(habitId);
                 EditHabitDialog dialog = EditHabitDialog.newInstance(habit, new EditHabitDialog.OnFinishedListener() {
                     @Override
-                    public void onFinishedWithResult(Habit habit) {
-                        mHabitDatabase.updateHabit(habit.getDatabaseId(), habit);
+                    public void onFinishedWithResult(Habit newHabit) {
+                        long habitId = newHabit.getDatabaseId();
+                        Habit oldHabit = mHabitDatabase.getHabit(habitId);
+                        int position = mData.indexOf(oldHabit);
 
-                        int position = mHabitAdapter.getAdapterItemPosition(habit.getDatabaseId());
-                        mData.set(position, habit);
-                        mHabitAdapter.notifyItemChanged(position);
+                        // Todo : replace with a insert at appropriate location solution
+                        mData.set(position, newHabit);
+                        Collections.sort(mData, Habit.ICompareCategoryName);
+                        mHabitAdapter.notifyDataSetChanged();
+
+                        mHabitDatabase.updateHabit(habitId, newHabit);
                     }
                 });
 

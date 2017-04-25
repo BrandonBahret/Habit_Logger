@@ -287,10 +287,12 @@ public class AllHabitsFragment extends MyFragmentBase {
                             @Override
                             public void onFinishedWithResult(Habit newHabit) {
 
+
                                 long habitId = newHabit.getDatabaseId();
                                 Habit oldHabit = mHabitDatabase.getHabit(habitId);
                                 int position = mData.indexOf(oldHabit);
 
+                                // Todo : replace with a insert at appropriate location solution
                                 mData.set(position, newHabit);
                                 Collections.sort(mData, Habit.ICompareCategoryName);
                                 mHabitAdapter.notifyDataSetChanged();

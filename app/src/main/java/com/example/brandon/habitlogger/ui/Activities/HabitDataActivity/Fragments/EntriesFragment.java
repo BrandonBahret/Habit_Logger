@@ -204,23 +204,24 @@ public class EntriesFragment extends Fragment implements
 
     @Override
     public void onNotifyEntryRemoved(int adapterPosition) {
-        mEntryAdapter.notifyItemRemoved(adapterPosition);
+        mEntryAdapter.notifyDataSetChanged();
+        // Todo : replace with mEntryAdapter.notifyItemRemoved(adapterPosition);
         showNoDataLayout(mSessionEntries == null || mSessionEntries.isEmpty());
-        mEntriesContainer.invalidate();
     }
 
     @Override
     public void onNotifyEntryAdded(int adapterPosition) {
-        // Todo this doesn't work well with item decorations
         showNoDataLayout(mSessionEntries == null || mSessionEntries.isEmpty());
+        // Todo : replace with mEntryAdapter.notifyItemInserted(adapterPosition);
+        mEntryAdapter.notifyDataSetChanged();
         mEntriesContainer.smoothScrollToPosition(adapterPosition);
-        mEntryAdapter.notifyItemInserted(adapterPosition);
     }
 
     @Override
     public void onNotifyEntryUpdated(int oldPosition, int newPosition) {
         mEntryAdapter.notifyItemMoved(oldPosition, newPosition);
-        mEntryAdapter.notifyItemChanged(newPosition);
+        // Todo : replace with mEntryAdapter.notifyItemChanged(newPosition);
+        mEntryAdapter.notifyDataSetChanged();
 //        mEntriesContainer.smoothScrollToPosition(newPosition);
     }
 
