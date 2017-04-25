@@ -37,7 +37,7 @@ import java.util.Set;
  * Use the {@link ArchivedHabitsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ArchivedHabitsFragment extends MyFragmentBase {
+public class ArchivedHabitsFragment extends MyFragmentBase implements EditHabitDialog.OnFinishedListener {
 
     //region (Member attributes)
     private final String KEY_DATA = "KEY_DATA";
@@ -262,26 +262,26 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
         }
     }
 
+    @Override
+    public void onFinishedWithResult(Habit newHabit) {
+        long habitId = newHabit.getDatabaseId();
+        Habit oldHabit = mHabitDatabase.getHabit(habitId);
+        int position = mData.indexOf(oldHabit);
+
+        // Todo : replace with a insert at appropriate location solution
+        mData.set(position, newHabit);
+        Collections.sort(mData, Habit.ICompareCategoryName);
+        mHabitAdapter.notifyDataSetChanged();
+
+        mHabitDatabase.updateHabit(habitId, newHabit);
+    }
+
     private HabitViewAdapter.MenuItemClickListener getHabitMenuItemClickListener() {
         return new HabitViewAdapter.MenuItemClickListener() {
             @Override
             public void onHabitEditClick(long habitId, HabitViewHolder habitViewHolder) {
                 Habit habit = mHabitDatabase.getHabit(habitId);
-                EditHabitDialog dialog = EditHabitDialog.newInstance(habit, new EditHabitDialog.OnFinishedListener() {
-                    @Override
-                    public void onFinishedWithResult(Habit newHabit) {
-                        long habitId = newHabit.getDatabaseId();
-                        Habit oldHabit = mHabitDatabase.getHabit(habitId);
-                        int position = mData.indexOf(oldHabit);
-
-                        // Todo : replace with a insert at appropriate location solution
-                        mData.set(position, newHabit);
-                        Collections.sort(mData, Habit.ICompareCategoryName);
-                        mHabitAdapter.notifyDataSetChanged();
-
-                        mHabitDatabase.updateHabit(habitId, newHabit);
-                    }
-                });
+                EditHabitDialog dialog = EditHabitDialog.newInstance(habit);
 
                 dialog.show(getActivity().getSupportFragmentManager(), "edit-habit");
             }

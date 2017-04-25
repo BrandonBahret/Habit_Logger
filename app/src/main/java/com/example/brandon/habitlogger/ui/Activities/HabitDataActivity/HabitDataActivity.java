@@ -38,7 +38,6 @@ import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EntryFormDialo
 import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.NewEntryForm;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.HabitDialogBase;
-import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.NewHabitDialog;
 import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 
 import java.util.ArrayList;
@@ -49,7 +48,7 @@ import static com.example.brandon.habitlogger.R.string.menu_unarchive;
 
 public class HabitDataActivity extends AppCompatActivity implements
         IHabitDataCallback.IUpdateEntries, IHabitDataCallback.IUpdateCategoryData,
-        IHabitDataCallback, IScrollEvents, EntriesFragment.IEntriesEvents {
+        IHabitDataCallback, IScrollEvents, EntriesFragment.IEntriesEvents, HabitDialogBase.OnFinishedListener {
 
     //region (Member attributes)
 
@@ -498,19 +497,18 @@ public class HabitDataActivity extends AppCompatActivity implements
     }
 
     private void onHabitEditClicked() {
-        HabitDialogBase.OnFinishedListener onFinished = new NewHabitDialog.OnFinishedListener() {
-            @Override
-            public void onFinishedWithResult(Habit habit) {
-                mHabit = habit;
-                mHabitDatabase.updateHabit(habit.getDatabaseId(), habit);
-                setUpActivityWithHabit(mHabit);
-            }
-        };
-
         int accentColor = ContextCompat.getColor(this, R.color.textColorContrastBackground);
-        EditHabitDialog dialog = EditHabitDialog.newInstance(onFinished, accentColor, mHabit);
+        EditHabitDialog dialog = EditHabitDialog.newInstance(accentColor, mHabit);
         dialog.show(getSupportFragmentManager(), "edit-mHabit");
     }
+
+    @Override
+    public void onFinishedWithResult(Habit habit) {
+        mHabit = habit;
+        mHabitDatabase.updateHabit(habit.getDatabaseId(), habit);
+        setUpActivityWithHabit(mHabit);
+    }
+
     //endregion -- end --
 
     FloatingDateRangeWidgetManager.DateRangeChangeListener onDateRangeChangeListener =

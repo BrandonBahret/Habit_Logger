@@ -1,6 +1,7 @@
 package com.example.brandon.habitlogger.ui.Dialogs.HabitDialog;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -44,8 +45,6 @@ public abstract class HabitDialogBase extends DialogFragment {
     public interface OnFinishedListener extends Serializable {
         void onFinishedWithResult(Habit habit);
     }
-
-//
     //endregion
 
     public abstract Habit getInitialHabit();
@@ -55,7 +54,23 @@ public abstract class HabitDialogBase extends DialogFragment {
     protected abstract String getTitle();
 
     //region Methods responsible for creating the dialog
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFinishedListener) {
+            onFinishedListener = (OnFinishedListener) context;
+        }
+        else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFinishedListener");
+        }
+    }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        onFinishedListener = null;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -136,4 +151,5 @@ public abstract class HabitDialogBase extends DialogFragment {
         mHabit.setCategory(category);
         return mHabit;
     }
+
 }

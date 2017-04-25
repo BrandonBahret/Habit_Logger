@@ -31,7 +31,7 @@ import java.util.Locale;
  * Use the {@link CategoryCardHabitsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CategoryCardHabitsFragment extends MyFragmentBase {
+public class CategoryCardHabitsFragment extends MyFragmentBase implements EditHabitDialog.OnFinishedListener {
 
     //region (Member attributes)
 //    List<CategoryDataSample> mData;
@@ -48,7 +48,7 @@ public class CategoryCardHabitsFragment extends MyFragmentBase {
         // Required empty public constructor
     }
 
-    public static CategoryCardHabitsFragment newInstance(){
+    public static CategoryCardHabitsFragment newInstance() {
         return new CategoryCardHabitsFragment();
     }
 
@@ -134,22 +134,23 @@ public class CategoryCardHabitsFragment extends MyFragmentBase {
         return true;
     }
 
-    private HabitViewAdapter.MenuItemClickListener getHabitMenuItemClickListener() {
-        return new HabitViewAdapter.MenuItemClickListener() {
-            @Override
-            public void onHabitEditClick(long habitId, final HabitViewHolder habitViewHolder) {
-                Habit habit = mHabitDatabase.getHabit(habitId);
-                EditHabitDialog dialog = EditHabitDialog.newInstance(habit, new EditHabitDialog.OnFinishedListener() {
-                    @Override
-                    public void onFinishedWithResult(Habit habit) {
-                        mHabitDatabase.updateHabit(habit.getDatabaseId(), habit);
+    @Override
+    public void onFinishedWithResult(Habit habit) {
+        mHabitDatabase.updateHabit(habit.getDatabaseId(), habit);
 
 //                        int position = mHabitAdapter.getAdapterItemPosition(habit.getDatabaseId());
 //                        int position = habitViewHolder.getAdapterPosition();
 //                        mData.set(position, habit);
 //                        mHabitAdapter.notifyItemChanged(position);
-                    }
-                });
+    }
+
+
+    private HabitViewAdapter.MenuItemClickListener getHabitMenuItemClickListener() {
+        return new HabitViewAdapter.MenuItemClickListener() {
+            @Override
+            public void onHabitEditClick(long habitId, final HabitViewHolder habitViewHolder) {
+                Habit habit = mHabitDatabase.getHabit(habitId);
+                EditHabitDialog dialog = EditHabitDialog.newInstance(habit);
 
                 dialog.show(getActivity().getSupportFragmentManager(), "edit-habit");
             }

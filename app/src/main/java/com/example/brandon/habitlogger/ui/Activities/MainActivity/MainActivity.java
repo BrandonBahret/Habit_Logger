@@ -48,7 +48,8 @@ import java.util.Locale;
 import static android.widget.Toast.makeText;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, MyFragmentBase.IMainActivity {
+        implements NavigationView.OnNavigationItemSelectedListener, MyFragmentBase.IMainActivity,
+        NewHabitDialog.OnFinishedListener {
 
     //region (Member attributes)
     private static final String KEY_QUERY = "KEY_QUERY";
@@ -347,19 +348,18 @@ public class MainActivity extends AppCompatActivity
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NewHabitDialog dialog = NewHabitDialog.newInstance(new NewHabitDialog.OnFinishedListener() {
-                    @Override
-                    public void onFinishedWithResult(Habit habit) {
-                        mHabitDatabase.addHabit(habit);
-                        getContentFragment().addHabitToLayout(habit);
-                        clearFocusFromSearchView();
-                        findViewById(R.id.no_habits_available_layout).setVisibility(View.GONE);
-                    }
-                });
-
+                NewHabitDialog dialog = NewHabitDialog.newInstance();
                 dialog.show(getSupportFragmentManager(), "new-habit");
             }
         };
+    }
+
+    @Override
+    public void onFinishedWithResult(Habit habit) {
+        mHabitDatabase.addHabit(habit);
+        getContentFragment().addHabitToLayout(habit);
+        clearFocusFromSearchView();
+        findViewById(R.id.no_habits_available_layout).setVisibility(View.GONE);
     }
 
     private void clearFocusFromSearchView() {
