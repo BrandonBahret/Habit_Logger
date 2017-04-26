@@ -124,7 +124,7 @@ public class SessionEntry implements Serializable, Parcelable {
 
     //region Methods responsible for making this object parcelable
     public SessionEntry(Parcel in) {
-        this((SessionEntry)in.readParcelable(SessionEntry.class.getClassLoader()));
+        this((SessionEntry)in.readSerializable());
     }
 
     @Override

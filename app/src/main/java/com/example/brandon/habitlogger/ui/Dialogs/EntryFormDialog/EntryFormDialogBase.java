@@ -35,22 +35,8 @@ public abstract class EntryFormDialogBase extends DialogFragment {
     DialogNewEntryBinding ui;
     //endregion
 
-    //region Code responsible for providing an interface
-    protected OnFinishedListener mOnFinishedListener;
-
-    public interface OnFinishedListener {
-        void onPositiveClicked(SessionEntry entry);
-
-        void onNegativeClicked(SessionEntry entry);
-    }
-
-    public void setOnFinishedListener(OnFinishedListener listener) {
-        mOnFinishedListener = listener;
-    }
-
-    //endregion
-
     //region Methods responsible for handling the lifetime of the dialog
+
     abstract String getTitle();
 
     abstract String getPositiveButtonText();
@@ -110,7 +96,8 @@ public abstract class EntryFormDialogBase extends DialogFragment {
 
         return entryDialog;
     }
-    //endregion
+
+    //endregion -- end --
 
     //region Methods responsible for filling in the entry form initially
     private void setDurationNumberPickersRanges() {
@@ -141,23 +128,23 @@ public abstract class EntryFormDialogBase extends DialogFragment {
     //endregion
 
     //region Methods responsible for handling events
+    public abstract void onNegativeClicked(SessionEntry removeEntry);
     private DialogInterface.OnClickListener getOnNegativeButtonClickListener() {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                if (mOnFinishedListener != null)
-                    mOnFinishedListener.onNegativeClicked(mEntry);
+                onNegativeClicked(mEntry);
             }
         };
     }
 
+    public abstract void onPositiveClicked(SessionEntry newEntry);
     private DialogInterface.OnClickListener getOnPositiveButtonClickListener() {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 SessionEntry entry = getEntry();
-                if (mOnFinishedListener != null)
-                    mOnFinishedListener.onPositiveClicked(entry);
+                onPositiveClicked(entry);
 
                 dismiss();
             }
@@ -220,4 +207,5 @@ public abstract class EntryFormDialogBase extends DialogFragment {
 
         return mEntry;
     }
+
 }

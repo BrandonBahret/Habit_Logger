@@ -257,7 +257,7 @@ public class SessionActivity extends AppCompatActivity implements
         HabitDatabase database = new HabitDatabase(SessionActivity.this);
         database.addEntry(mHabit.getDatabaseId(), entry);
 
-        Intent data = new Intent().putExtra(RESULT_NEW_ENTRY, (Serializable) entry);
+        Intent data = new Intent().putExtra(SessionActivity.RESULT_NEW_ENTRY, (Serializable) entry);
         setResult(ResultCodes.SESSION_FINISH, data);
 
         finish();

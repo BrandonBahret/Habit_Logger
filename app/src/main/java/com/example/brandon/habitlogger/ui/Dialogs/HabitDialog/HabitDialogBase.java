@@ -31,7 +31,6 @@ public abstract class HabitDialogBase extends DialogFragment {
     //region (Member attributes)
     protected static final String KEY_HABIT = "KEY_HABIT";
     protected static final String KEY_COLOR = "KEY_COLOR";
-    protected static final String KEY_LISTENER = "KEY_LISTENER";
 
     protected Habit mHabit;
     Integer mAccentColor = 0;
@@ -78,7 +77,6 @@ public abstract class HabitDialogBase extends DialogFragment {
 
         if (getArguments() != null) {
             mAccentColor = getArguments().getInt(KEY_COLOR, 0);
-            onFinishedListener = (OnFinishedListener) getArguments().getSerializable(KEY_LISTENER);
         }
     }
 
