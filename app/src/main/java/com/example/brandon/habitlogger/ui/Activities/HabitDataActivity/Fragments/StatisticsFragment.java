@@ -80,7 +80,7 @@ public class StatisticsFragment extends Fragment implements IHabitDataCallback.I
                 .add(R.id.fragment_pie_completion, mPieCompletion)
                 .add(R.id.fragment_line_completion, mLineCompletion)
                 .add(R.id.fragment_distribution_starting_time, mDistributionStartingTime)
-                .add(R.id.fragment_pie_duration, mPieDuration)
+//                .add(R.id.fragment_pie_duration, mPieDuration)
                 .commit();
 
         NestedScrollView scrollView = (NestedScrollView) mFragmentView.findViewById(R.id.scroll_container);

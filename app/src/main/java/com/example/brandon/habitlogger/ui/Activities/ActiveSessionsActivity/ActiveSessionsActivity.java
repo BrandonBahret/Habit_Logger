@@ -22,7 +22,6 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.brandon.habitlogger.R;
@@ -59,7 +58,6 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     private ActiveSessionViewAdapter mSessionViewAdapter;
     private ActivityActiveSessionsBinding ui;
 
-    private SearchView mSearchView;
     private String mSearchQuery;
 
     //endregion
@@ -107,17 +105,17 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
         getMenuInflater().inflate(R.menu.active_sessions_menu, menu);
 
         MenuItem searchMenuItem = menu.findItem(R.id.search);
-        mSearchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
 
         //focus the SearchView
         if (mSearchQuery != null && !mSearchQuery.isEmpty()) {
             searchMenuItem.expandActionView();
-            mSearchView.setQuery(mSearchQuery, false);
-            mSearchView.clearFocus();
+            searchView.setQuery(mSearchQuery, false);
+            searchView.clearFocus();
         }
 
-        mSearchView.setQueryHint(getString(R.string.search));
-        mSearchView.setOnQueryTextListener(this);
+        searchView.setQueryHint(getString(R.string.search));
+        searchView.setOnQueryTextListener(this);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -129,12 +127,14 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     protected void onStart() {
         super.onStart();
         mSessionManager.addSessionChangedCallback(this);
+        startRepeatingTask();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         mSessionManager.removeSessionChangedCallback(this);
+        stopRepeatingTask();
     }
     //endregion -- end --
 
@@ -146,14 +146,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
         if (!mPreferenceChecker.allowActiveSessionsActivity(mSessionManager.hasActiveSessions()))
             finish();
 
-        startRepeatingTask();
         showNoDataLayouts(mActiveSessions == null || mActiveSessions.isEmpty());
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        stopRepeatingTask();
     }
     //endregion -- end --
 
@@ -187,13 +180,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
                 if (mSessionManager.getIsSessionActive(habitId)) {
                     SessionEntry entry = mSessionManager.getSession(habitId);
                     mActiveSessions.set(i, entry);
-
-                    View item = ui.sessionViewContainer.getChildAt(i);
-
-                    if (item != null) {
-                        TextView timeTextView = (TextView) item.findViewById(R.id.active_habit_time);
-                        timeTextView.setText(entry.stringifyDuration());
-                    }
+                    mSessionViewAdapter.notifyItemChanged(i, entry);
                 }
                 else {
                     mActiveSessions.remove(i);

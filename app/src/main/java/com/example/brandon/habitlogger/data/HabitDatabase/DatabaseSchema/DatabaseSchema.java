@@ -34,6 +34,7 @@ public class DatabaseSchema extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(HabitsTableSchema.getCreateTableStatement());
         db.execSQL(CategoriesTableSchema.getCreateTableStatement());
+        db.execSQL(CategoriesTableSchema.getDefaultCategoryStatement());
         db.execSQL(EntriesTableSchema.getCreateTableStatement());
     }
 

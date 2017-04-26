@@ -135,7 +135,6 @@
     <string name="pref_display_current_sessions_card">preference_display_current_sessions_card</string>
     <string name="pref_display_current_sessions_card_at_zero">preference_display_current_sessions_at_zero</string>
     <string name="pref_do_show_notifications">preference_do_show_notifications</string>
-    <string name="pref_do_show_notifications_auto">preference_do_automatically_show_notifications</string>
     <string name="pref_date_format">preference_date_format</string>
     <string name="pref_category_sticky">preference_make_categories_sticky</string>
     <string name="pref_date_header_sticky">preference_date_headers_sticky</string>

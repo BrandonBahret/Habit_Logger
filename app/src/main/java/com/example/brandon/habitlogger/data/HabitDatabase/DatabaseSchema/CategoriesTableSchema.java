@@ -27,6 +27,12 @@ public class CategoriesTableSchema {
                 ");";
     }
 
+    public static String getDefaultCategoryStatement() {
+        return "insert into " + TABLE_NAME +
+                "(" + CATEGORY_ID + "," + CATEGORY_NAME + "," + CATEGORY_COLOR + ")" +
+                " values(1,'Uncategorized','#ff000000')";
+    }
+
     public static String getDropTableStatement() {
         return "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
@@ -48,4 +54,5 @@ public class CategoriesTableSchema {
 
         return values;
     }
+
 }

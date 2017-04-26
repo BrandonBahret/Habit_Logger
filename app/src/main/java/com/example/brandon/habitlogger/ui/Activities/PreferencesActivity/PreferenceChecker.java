@@ -47,7 +47,7 @@ public class PreferenceChecker {
 
     public boolean hideFabOnScroll() {
         return preferences.getBoolean(
-                mContext.getString(R.string.pref_hide_fab_on_scroll), true
+                mContext.getString(R.string.pref_hide_fab_on_scroll), false
         );
     }
     //endregion -- end --
@@ -75,7 +75,7 @@ public class PreferenceChecker {
 
     public boolean doHideCurrentSessionCard() {
         return preferences.getBoolean(
-                mContext.getString(R.string.pref_hide_current_sessions_card_on_scroll), false
+                mContext.getString(R.string.pref_hide_current_sessions_card_on_scroll), true
         );
     }
 
@@ -114,18 +114,12 @@ public class PreferenceChecker {
                 mContext.getString(R.string.pref_do_show_notifications), true
         );
     }
-
-    public boolean doShowNotificationsAutomatically(){
-        return preferences.getBoolean(
-                mContext.getString(R.string.pref_do_show_notifications_auto), true
-        );
-    }
     //endregion -- end --
 
     //region Methods related to appearance settings
     public boolean isNightMode(){
         return preferences.getBoolean(
-                mContext.getString(R.string.pref_is_night_mode), false
+                mContext.getString(R.string.pref_is_night_mode), true
         );
     }
 
@@ -143,7 +137,7 @@ public class PreferenceChecker {
     public String stringGetDateFormat(){
         String[] dateOptions = mContext.getResources().getStringArray(R.array.date_format_options);
         int optionIndex = Integer.parseInt(
-                preferences.getString(mContext.getString(R.string.pref_date_format), "0")
+                preferences.getString(mContext.getString(R.string.pref_date_format), "3")
         );
         return dateOptions[optionIndex];
     }

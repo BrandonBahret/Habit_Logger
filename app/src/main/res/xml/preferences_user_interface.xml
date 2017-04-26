@@ -22,7 +22,7 @@
             android:title="Sticky category headers"/>
 
         <CheckBoxPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="@string/pref_hide_fab_on_scroll"
             android:summary="Scrolling will hide the 'create new' action buttons."
             android:title="Hide action buttons on scroll"/>
@@ -44,7 +44,7 @@
             android:title="Show with zero active sessions"/>
 
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:dependency="@string/pref_display_current_sessions_card"
             android:key="@string/pref_hide_current_sessions_card_on_scroll"
             android:summary="Scrolling will hide the active sessions card."
@@ -77,7 +77,7 @@
     <PreferenceCategory android:title="Dates">
 
         <ListPreference
-            android:defaultValue="2"
+            android:defaultValue="3"
             android:dialogTitle="Select a format"
             android:entries="@array/date_format_options"
             android:entryValues="@array/date_format_options_values"

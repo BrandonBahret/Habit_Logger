@@ -109,13 +109,16 @@ public class MainActivity extends AppCompatActivity
 
         mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
 
-        if (mPreferenceChecker.doShowNotificationsAutomatically())
+        if (mPreferenceChecker.doShowNotifications())
             mSessionNotificationManager.launchNotificationsForAllActiveSessions();
 
         prepareNavigationDrawer();
 
         if (!hasSavedInstanceState)
             setFragmentForNavId(R.id.home_nav);
+        else {
+            setTitle(getContentFragment().getFragmentTitle());
+        }
 
     }
 
@@ -145,12 +148,6 @@ public class MainActivity extends AppCompatActivity
     }
     //endregion
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (mFragment == null) getContentFragment();
-    }
-
     //region foreground lifetime (onResume - onPause)
     @Override
     protected void onResume() {
@@ -166,6 +163,12 @@ public class MainActivity extends AppCompatActivity
 //        getContentFragment().restartFragment();
     }
     //endregion
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mFragment == null) getContentFragment();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -335,7 +338,7 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         public void onSessionStarted(long habitId) {
-            if (mPreferenceChecker.doShowNotificationsAutomatically() && mPreferenceChecker.doShowNotifications()) {
+            if (mPreferenceChecker.doShowNotifications()) {
                 Habit habit = mHabitDatabase.getHabit(habitId);
                 mSessionNotificationManager.updateNotification(habit);
             }

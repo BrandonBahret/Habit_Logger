@@ -65,6 +65,45 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
             this.accent = (ImageView) view.findViewById(R.id.card_accent);
             this.rootView = (CardView) view.getRootView();
         }
+
+        public void bindSessionEntry(SessionEntry entry){
+            long habitId = entry.getHabit().getDatabaseId();
+
+            if (mSessionManager.getIsSessionActive(habitId)) {
+                this.habitId = habitId;
+                this.name.setText(entry.getHabit().getName());
+                this.time.setText(entry.stringifyDuration());
+                this.timeStarted.setText(entry.stringifyStartingTime("h:mm a"));
+
+                int color = mHabitDatabase.getHabitColor(habitId);
+                this.accent.setColorFilter(color);
+
+                boolean isPaused = mSessionManager.getIsPaused(habitId);
+                int res = HabitViewHolder.getResourceIdForPauseButton(isPaused);
+                this.pauseButton.setImageResource(res);
+
+                float alpha = isPaused ? 0.50f : 1.0f;
+                this.accent.setAlpha(alpha);
+                this.name.setAlpha(alpha);
+                this.time.setAlpha(alpha);
+                this.timeStarted.setAlpha(alpha);
+
+                this.rootView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mListener.onSessionViewClick(ViewHolder.this.habitId);
+                    }
+                });
+
+                this.pauseButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mListener.onSessionPauseButtonClick(ViewHolder.this, ViewHolder.this.habitId);
+                    }
+                });
+            }
+        }
+
     }
 
     //region Methods responsible for creating and binding rootView holders
@@ -78,43 +117,19 @@ public class ActiveSessionViewAdapter extends RecyclerView.Adapter<ActiveSession
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        final SessionEntry item = mSessionEntries.get(position);
-        long habitId = item.getHabit().getDatabaseId();
+    public void onBindViewHolder(final ViewHolder holder, int position, List<Object> payloads) {
+        super.onBindViewHolder(holder, position, payloads);
 
-        if (mSessionManager.getIsSessionActive(habitId)) {
-            holder.habitId = habitId;
-            holder.name.setText(item.getHabit().getName());
-            holder.time.setText(item.stringifyDuration());
-            holder.timeStarted.setText(item.stringifyStartingTime("h:mm a"));
-
-            int color = mHabitDatabase.getHabitColor(habitId);
-            holder.accent.setColorFilter(color);
-
-            boolean isPaused = mSessionManager.getIsPaused(habitId);
-            int res = HabitViewHolder.getResourceIdForPauseButton(isPaused);
-            holder.pauseButton.setImageResource(res);
-
-            float alpha = isPaused ? 0.50f : 1.0f;
-            holder.accent.setAlpha(alpha);
-            holder.name.setAlpha(alpha);
-            holder.time.setAlpha(alpha);
-            holder.timeStarted.setAlpha(alpha);
-
-            holder.rootView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mListener.onSessionViewClick(holder.habitId);
-                }
-            });
-
-            holder.pauseButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mListener.onSessionPauseButtonClick(holder, holder.habitId);
-                }
-            });
+        if (!payloads.isEmpty()) {
+            SessionEntry entry = (SessionEntry)payloads.get(0);
+            holder.bindSessionEntry(entry);
         }
+    }
+
+    @Override
+    public void onBindViewHolder(final ViewHolder holder, int position) {
+        SessionEntry entry = mSessionEntries.get(position);
+        holder.bindSessionEntry(entry);
     }
 
     public static void setMargins(View view, int left, int top, int right, int bottom) {
