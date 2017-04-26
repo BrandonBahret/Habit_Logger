@@ -50,6 +50,5 @@
             android:layout_below="@+id/habit_description_layout"
             android:spinnerMode="dialog"/>
 
-
     </RelativeLayout>
 </layout>
