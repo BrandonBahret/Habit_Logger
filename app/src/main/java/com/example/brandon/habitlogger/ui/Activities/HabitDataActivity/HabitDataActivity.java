@@ -34,7 +34,6 @@ import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEven
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity.SessionActivity;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
 import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EditEntryForm;
-import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EntryFormDialogBase;
 import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.NewEntryForm;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.HabitDialogBase;
@@ -48,7 +47,8 @@ import static com.example.brandon.habitlogger.R.string.menu_unarchive;
 
 public class HabitDataActivity extends AppCompatActivity implements
         IHabitDataCallback.IUpdateEntries, IHabitDataCallback.IUpdateCategoryData,
-        IHabitDataCallback, IScrollEvents, EntriesFragment.IEntriesEvents, HabitDialogBase.OnFinishedListener {
+        IHabitDataCallback, IScrollEvents, EntriesFragment.IEntriesEvents, HabitDialogBase.OnFinishedListener,
+        EditEntryForm.OnFinishedListener, NewEntryForm.OnFinishedListener {
 
     //region (Member attributes)
 
@@ -371,31 +371,9 @@ public class HabitDataActivity extends AppCompatActivity implements
     //region Entries fragment events
     @Override
     public void onEntryViewClicked(final long entryId, SessionEntry entry) {
-        EditEntryForm dialog = EditEntryForm.newInstance(
-                entry, ContextCompat.getColor(this, R.color.textColorContrastBackground)
-        );
-
-        dialog.setOnFinishedListener(new EditEntryForm.OnFinishedListener() {
-            @Override
-            public void onPositiveClicked(SessionEntry newEntry) {
-                if (newEntry != null) {
-                    SessionEntry oldEntry = mHabitDatabase.getEntry(entryId);
-                    mHabitDatabase.updateEntry(entryId, newEntry);
-
-                    dateRangeManager.adjustDateRangeForEntry(newEntry);
-                    if (checkIfEntryFitsWithinConditions(newEntry)) updateEntry(oldEntry, newEntry);
-                    else removeEntry(oldEntry);
-                }
-            }
-
-            @Override
-            public void onNegativeClicked(SessionEntry entry) {
-                mHabitDatabase.deleteEntry(entryId);
-                removeEntry(entry);
-            }
-        });
-
-        dialog.show(getSupportFragmentManager(), "edit-entry");
+        EditEntryForm.newInstance
+                (entry, ContextCompat.getColor(this, R.color.textColorContrastBackground))
+                .show(getSupportFragmentManager(), "edit-entry");
     }
     //endregion
 
@@ -511,6 +489,37 @@ public class HabitDataActivity extends AppCompatActivity implements
 
     //endregion -- end --
 
+    //region EditEntryDialog.OnFinishedListener
+    @Override
+    public void onEditEntryUpdateEntry(SessionEntry newEntry) {
+        if (newEntry != null) {
+            SessionEntry oldEntry = mHabitDatabase.getEntry(newEntry.getDatabaseId());
+            mHabitDatabase.updateEntry(newEntry.getDatabaseId(), newEntry);
+
+            dateRangeManager.adjustDateRangeForEntry(newEntry);
+            if (checkIfEntryFitsWithinConditions(newEntry)) updateEntry(oldEntry, newEntry);
+            else removeEntry(oldEntry);
+        }
+    }
+
+    @Override
+    public void onEditEntryDeleteEntry(SessionEntry removeEntry) {
+        mHabitDatabase.deleteEntry(removeEntry.getDatabaseId());
+        removeEntry(removeEntry);
+    }
+    //endregion
+
+    //region NewEntryDialog.OnFinishedListener
+    @Override
+    public void onNewEntryCreated(SessionEntry newEntry) {
+        if (newEntry != null) {
+            mHabitDatabase.addEntry(mHabit.getDatabaseId(), newEntry);
+            dateRangeManager.adjustDateRangeForEntry(newEntry);
+            addNewEntry(newEntry);
+        }
+    }
+    //endregion
+
     FloatingDateRangeWidgetManager.DateRangeChangeListener onDateRangeChangeListener =
             new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
                 @Override
@@ -586,23 +595,9 @@ public class HabitDataActivity extends AppCompatActivity implements
         public void onClick(View v) {
             ui.menuFab.close(true);
 
-            EntryFormDialogBase.OnFinishedListener onFinished = new NewEntryForm.OnFinishedListener() {
-                @Override
-                public void onPositiveClicked(SessionEntry entry) {
-                    if (entry != null) {
-                        mHabitDatabase.addEntry(mHabit.getDatabaseId(), entry);
-                        dateRangeManager.adjustDateRangeForEntry(entry);
-                        addNewEntry(entry);
-                    }
-                }
-
-                @Override
-                public void onNegativeClicked(SessionEntry entry) {}
-            };
-
-            NewEntryForm dialog = NewEntryForm.newInstance(ContextCompat.getColor(HabitDataActivity.this, R.color.textColorContrastBackground));
-            dialog.setOnFinishedListener(onFinished);
-            dialog.show(getSupportFragmentManager(), "new-entry");
+            NewEntryForm.newInstance
+                    (ContextCompat.getColor(HabitDataActivity.this, R.color.textColorContrastBackground))
+                    .show(getSupportFragmentManager(), "new-entry");
         }
     };
 
