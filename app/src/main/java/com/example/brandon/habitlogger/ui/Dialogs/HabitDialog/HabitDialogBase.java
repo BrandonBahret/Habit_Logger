@@ -1,7 +1,6 @@
 package com.example.brandon.habitlogger.ui.Dialogs.HabitDialog;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -18,7 +17,6 @@ import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.databinding.DialogHabitFormBinding;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.CategoryDialog.CategorySpinnerAdapter;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -38,39 +36,14 @@ public abstract class HabitDialogBase extends DialogFragment {
     protected CategorySpinnerAdapter mAdapter;
     //endregion
 
-    //region Code responsible for providing an interface
-    private OnFinishedListener onFinishedListener;
-
-    public interface OnFinishedListener extends Serializable {
-        void onFinishedWithResult(Habit habit);
-    }
-    //endregion
-
     public abstract Habit getInitialHabit();
 
     protected abstract String getPositiveButtonText();
 
     protected abstract String getTitle();
 
+
     //region Methods responsible for creating the dialog
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFinishedListener) {
-            onFinishedListener = (OnFinishedListener) context;
-        }
-        else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFinishedListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        onFinishedListener = null;
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,12 +97,15 @@ public abstract class HabitDialogBase extends DialogFragment {
         return habitDialog;
     }
 
+    abstract void onHabitDialogFinished(Habit newHabit);
+
     protected DialogInterface.OnClickListener getOnPositiveButtonClickListener() {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Habit habit = getHabitFromDialog();
-                onFinishedListener.onFinishedWithResult(habit);
+                onHabitDialogFinished(habit);
+//                onFinishedListener.onFinishedWithResult(habit);
             }
         };
     }

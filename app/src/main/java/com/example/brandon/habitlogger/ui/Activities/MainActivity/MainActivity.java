@@ -33,12 +33,12 @@ import com.example.brandon.habitlogger.ui.Activities.AboutActivity;
 import com.example.brandon.habitlogger.ui.Activities.ActiveSessionsActivity.ActiveSessionsActivity;
 import com.example.brandon.habitlogger.ui.Activities.MainActivity.Fragments.AllHabitsFragment;
 import com.example.brandon.habitlogger.ui.Activities.MainActivity.Fragments.ArchivedHabitsFragment;
-import com.example.brandon.habitlogger.ui.Activities.MainActivity.Fragments.CategoryCardHabitsFragment;
 import com.example.brandon.habitlogger.ui.Activities.MainActivity.Fragments.MyFragmentBase;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.SettingsActivity;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
+import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.NewHabitDialog;
 import com.example.brandon.habitlogger.ui.Widgets.CurrentSessionCardManager;
 import com.github.clans.fab.FloatingActionButton;
@@ -49,7 +49,7 @@ import static android.widget.Toast.makeText;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, MyFragmentBase.IMainActivity,
-        NewHabitDialog.OnFinishedListener {
+        NewHabitDialog.OnFinishedListener, EditHabitDialog.OnFinishedListener {
 
     //region (Member attributes)
     private static final String KEY_QUERY = "KEY_QUERY";
@@ -202,13 +202,35 @@ public class MainActivity extends AppCompatActivity
 
     //region [ ---- Code responsible for updating the ui ---- ]
 
+    //region Methods responsible for hiding/showing elements on the screen.
+    @Override
+    public void hideFab(boolean animate) {
+        ui.mainInclude.fab.hide(animate);
+    }
+
+    @Override
+    public void showFab(boolean animate) {
+        ui.mainInclude.fab.show(animate);
+    }
+
+    @Override
+    public void hideCurrentSessionsCard(boolean animate) {
+        mCurrentSessionCard.hideView(animate);
+    }
+
+    @Override
+    public void showCurrentSessionsCard(boolean animate) {
+        mCurrentSessionCard.showView(animate);
+    }
+    //endregion -- end --
+
     private void setFragmentForNavId(@IdRes int menuId) {
         // Create a new fragment and specify the planet to onSessionToggleClick based on position
         switch (menuId) {
             case R.id.home_nav:
-                if (mPreferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_CARDS)
-                    mFragment = CategoryCardHabitsFragment.newInstance();
-                else
+//                if (mPreferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_CARDS)
+//                    mFragment = CategoryCardHabitsFragment.newInstance();
+//                else
                     mFragment = AllHabitsFragment.newInstance();
 
                 break;
@@ -266,26 +288,6 @@ public class MainActivity extends AppCompatActivity
         };
     }
     //endregion -- end --
-
-    @Override
-    public void hideFab(boolean animate) {
-        ui.mainInclude.fab.hide(animate);
-    }
-
-    @Override
-    public void showFab(boolean animate) {
-        ui.mainInclude.fab.show(animate);
-    }
-
-    @Override
-    public void hideCurrentSessionsCard(boolean animate) {
-        mCurrentSessionCard.hideView(animate);
-    }
-
-    @Override
-    public void showCurrentSessionsCard(boolean animate) {
-        mCurrentSessionCard.showView(animate);
-    }
 
     @Override
     public IScrollEvents getScrollEventsListener() {
@@ -358,11 +360,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onFinishedWithResult(Habit habit) {
-        mHabitDatabase.addHabit(habit);
-        getContentFragment().addHabitToLayout(habit);
+    public void onNewHabitCreated(Habit newHabit) {
+        mHabitDatabase.addHabit(newHabit);
+        getContentFragment().addHabitToLayout(newHabit);
         clearFocusFromSearchView();
         findViewById(R.id.no_habits_available_layout).setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onUpdateHabit(Habit oldHabit, Habit newHabit) {
+        getContentFragment().onUpdateHabit(oldHabit, newHabit);
     }
 
     private void clearFocusFromSearchView() {
@@ -371,73 +378,6 @@ public class MainActivity extends AppCompatActivity
             mSearchView.clearFocus();
             mSearchView.onActionViewCollapsed();
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        final int id = item.getItemId();
-
-        switch (id) {
-            case R.id.menu_database_export:
-                handleOnExportDatabase();
-                break;
-
-            case R.id.menu_database_restore:
-                handleOnDatabaseRestore();
-                break;
-
-            case R.id.menu_export_database_as_csv:
-                handleOnExportDatabaseCsv();
-                break;
-
-            case R.id.menu_settings:
-                SettingsActivity.startActivity(this);
-                break;
-
-            case R.id.menu_about:
-                AboutActivity.startActivity(this);
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void handleOnExportDatabaseCsv() {
-        String filepath = mLocalExportManager.exportDatabaseAsCsv();
-        String messageFormat = getString(R.string.database_export_format);
-        String message = String.format(Locale.getDefault(), messageFormat, filepath);
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-    }
-
-    private void handleOnExportDatabase() {
-        new ConfirmationDialog(this)
-                .setTitle(getString(R.string.confirm_data_export))
-                .setMessage(getString(R.string.confirm_data_export_message))
-                .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mLocalExportManager.exportDatabase(true);
-                        if (mGoogleDriveExportManager.isConnected())
-                            mGoogleDriveExportManager.backupDatabase();
-                        Toast.makeText(MainActivity.this, R.string.backup_created, Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .show();
-    }
-
-    private void handleOnDatabaseRestore() {
-        new ConfirmationDialog(this)
-                .setTitle(getString(R.string.confirm_data_restore))
-                .setMessage(getString(R.string.confirm_data_restore_message))
-                .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mLocalExportManager.importDatabase(true);
-                        getContentFragment().restartFragment();
-                        makeText(MainActivity.this, R.string.data_restored, Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .show();
     }
 
     @Override
@@ -485,6 +425,73 @@ public class MainActivity extends AppCompatActivity
         if (ui.drawerLayout.isDrawerOpen(GravityCompat.START))
             ui.drawerLayout.closeDrawer(GravityCompat.START);
         else super.onBackPressed();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        final int id = item.getItemId();
+
+        switch (id) {
+            case R.id.menu_database_export:
+                handleOnExportDatabase();
+                break;
+
+            case R.id.menu_database_restore:
+                handleOnDatabaseRestore();
+                break;
+
+            case R.id.menu_export_database_as_csv:
+                handleOnExportDatabaseCsv();
+                break;
+
+            case R.id.menu_settings:
+                SettingsActivity.startActivity(this);
+                break;
+
+            case R.id.menu_about:
+                AboutActivity.startActivity(this);
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void handleOnExportDatabaseCsv() {
+        String filepath = mLocalExportManager.exportDatabaseAsCsv();
+        String messageFormat = getString(R.string.database_export_format);
+        String message = String.format(Locale.getDefault(), messageFormat, filepath);
+        makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    private void handleOnExportDatabase() {
+        new ConfirmationDialog(this)
+                .setTitle(getString(R.string.confirm_data_export))
+                .setMessage(getString(R.string.confirm_data_export_message))
+                .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mLocalExportManager.exportDatabase(true);
+                        if (mGoogleDriveExportManager.isConnected())
+                            mGoogleDriveExportManager.backupDatabase();
+                        makeText(MainActivity.this, R.string.backup_created, Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .show();
+    }
+
+    private void handleOnDatabaseRestore() {
+        new ConfirmationDialog(this)
+                .setTitle(getString(R.string.confirm_data_restore))
+                .setMessage(getString(R.string.confirm_data_restore_message))
+                .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mLocalExportManager.importDatabase(true);
+                        getContentFragment().restartFragment();
+                        makeText(MainActivity.this, R.string.data_restored, Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .show();
     }
 
     @Override

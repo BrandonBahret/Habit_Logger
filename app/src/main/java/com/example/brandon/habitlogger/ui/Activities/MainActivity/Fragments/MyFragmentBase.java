@@ -162,6 +162,8 @@ public abstract class MyFragmentBase extends Fragment {
 
     abstract protected void checkIfHabitsAreAvailable();
 
+    public abstract void onUpdateHabit(Habit oldHabit, Habit newHabit);
+
     public void addHabitToLayout(Habit habit) {
         checkIfHabitsAreAvailable();
     }

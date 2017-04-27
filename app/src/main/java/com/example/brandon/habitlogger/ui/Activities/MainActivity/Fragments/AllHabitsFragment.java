@@ -37,7 +37,7 @@ import java.util.Set;
  * Use the {@link AllHabitsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AllHabitsFragment extends MyFragmentBase implements EditHabitDialog.OnFinishedListener {
+public class AllHabitsFragment extends MyFragmentBase {
 
     //region (Member attributes)
     private final String KEY_DATA = "KEY_DATA";
@@ -262,6 +262,19 @@ public class AllHabitsFragment extends MyFragmentBase implements EditHabitDialog
         }
     }
 
+    @Override
+    public void onUpdateHabit(Habit oldHabit, Habit newHabit) {
+        mHabitDatabase.updateHabit(oldHabit.getDatabaseId(), newHabit);
+
+        int oldPos = mData.indexOf(oldHabit);
+        mData.set(oldPos, newHabit);
+
+        Collections.sort(mData, Habit.ICompareHabitName);
+        Collections.sort(mData, Habit.ICompareCategoryName);
+
+        mHabitAdapter.notifyDataSetChanged();
+    }
+
     public int updateHabit(Habit oldHabit, Habit newHabit) {
         int pos = mData.indexOf(oldHabit);
         mData.remove(pos);
@@ -273,20 +286,6 @@ public class AllHabitsFragment extends MyFragmentBase implements EditHabitDialog
         mHabitAdapter.notifyItemInserted(insertPos);
 
         return insertPos;
-    }
-
-    @Override
-    public void onFinishedWithResult(Habit newHabit) {
-        long habitId = newHabit.getDatabaseId();
-        Habit oldHabit = mHabitDatabase.getHabit(habitId);
-        int position = mData.indexOf(oldHabit);
-
-        // Todo : replace with a insert at appropriate location solution
-        mData.set(position, newHabit);
-        Collections.sort(mData, Habit.ICompareCategoryName);
-        mHabitAdapter.notifyDataSetChanged();
-
-        mHabitDatabase.updateHabit(habitId, newHabit);
     }
 
     private HabitViewAdapter.MenuItemClickListener getHabitMenuItemClickListener() {

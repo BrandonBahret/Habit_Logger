@@ -36,7 +36,6 @@ import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
 import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EditEntryForm;
 import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.NewEntryForm;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;
-import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.HabitDialogBase;
 import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ import static com.example.brandon.habitlogger.R.string.menu_unarchive;
 
 public class HabitDataActivity extends AppCompatActivity implements
         IHabitDataCallback.IUpdateEntries, IHabitDataCallback.IUpdateCategoryData,
-        IHabitDataCallback, IScrollEvents, EntriesFragment.IEntriesEvents, HabitDialogBase.OnFinishedListener,
+        IHabitDataCallback, IScrollEvents, EntriesFragment.IEntriesEvents, EditHabitDialog.OnFinishedListener,
         EditEntryForm.OnFinishedListener, NewEntryForm.OnFinishedListener {
 
     //region (Member attributes)
@@ -481,9 +480,9 @@ public class HabitDataActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onFinishedWithResult(Habit habit) {
-        mHabit = habit;
-        mHabitDatabase.updateHabit(habit.getDatabaseId(), habit);
+    public void onUpdateHabit(Habit oldHabit, Habit newHabit) {
+        mHabit = newHabit;
+        mHabitDatabase.updateHabit(oldHabit.getDatabaseId(), newHabit);
         setUpActivityWithHabit(mHabit);
     }
 

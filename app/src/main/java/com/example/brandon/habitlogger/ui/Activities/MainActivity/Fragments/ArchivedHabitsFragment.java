@@ -37,7 +37,7 @@ import java.util.Set;
  * Use the {@link ArchivedHabitsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ArchivedHabitsFragment extends MyFragmentBase implements EditHabitDialog.OnFinishedListener {
+public class ArchivedHabitsFragment extends MyFragmentBase {
 
     //region (Member attributes)
     private final String KEY_DATA = "KEY_DATA";
@@ -263,17 +263,16 @@ public class ArchivedHabitsFragment extends MyFragmentBase implements EditHabitD
     }
 
     @Override
-    public void onFinishedWithResult(Habit newHabit) {
-        long habitId = newHabit.getDatabaseId();
-        Habit oldHabit = mHabitDatabase.getHabit(habitId);
-        int position = mData.indexOf(oldHabit);
+    public void onUpdateHabit(Habit oldHabit, Habit newHabit) {
+        mHabitDatabase.updateHabit(oldHabit.getDatabaseId(), newHabit);
 
-        // Todo : replace with a insert at appropriate location solution
-        mData.set(position, newHabit);
+        int oldPos = mData.indexOf(oldHabit);
+        mData.set(oldPos, newHabit);
+
+        Collections.sort(mData, Habit.ICompareHabitName);
         Collections.sort(mData, Habit.ICompareCategoryName);
-        mHabitAdapter.notifyDataSetChanged();
 
-        mHabitDatabase.updateHabit(habitId, newHabit);
+        mHabitAdapter.notifyDataSetChanged();
     }
 
     private HabitViewAdapter.MenuItemClickListener getHabitMenuItemClickListener() {
@@ -282,7 +281,6 @@ public class ArchivedHabitsFragment extends MyFragmentBase implements EditHabitD
             public void onHabitEditClick(long habitId, HabitViewHolder habitViewHolder) {
                 Habit habit = mHabitDatabase.getHabit(habitId);
                 EditHabitDialog dialog = EditHabitDialog.newInstance(habit);
-
                 dialog.show(getActivity().getSupportFragmentManager(), "edit-habit");
             }
 

@@ -93,13 +93,13 @@ public class TimerFragment extends Fragment {
         updateSessionPlayButton(mCallbackInterface.getSessionState());
         startRepeatingTask();
     }
+    //endregion -- end --
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onStop() {
+        super.onStop();
         stopRepeatingTask();
     }
-    //endregion -- end --
 
     //endregion [ ---- end ---- ]
 
