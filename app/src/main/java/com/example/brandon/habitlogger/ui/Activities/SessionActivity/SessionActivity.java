@@ -90,6 +90,9 @@ public class SessionActivity extends AppCompatActivity implements
         }
 
         mSessionManager.addSessionChangedCallback(this);
+
+        mTimerFragment.callOnUpdateTimer();
+
     }
 
     @Override

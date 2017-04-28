@@ -141,6 +141,7 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
         mRecyclerView.removeItemDecoration(mGroupDecoration);
         applyGroupDecoration();
         applySpaceDecoration();
+        checkIfHabitsAreAvailable();
     }
 
     @Override
@@ -158,6 +159,17 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
         mHabitAdapter.notifyItemRemoved(position);
         applySpaceDecoration();
         mRecyclerView.invalidateItemDecorations();
+    }
+
+    @Override
+    public void reapplySpaceDecoration() {
+        mRecyclerView.removeItemDecoration(mSpaceDecoration);
+        applySpaceDecoration();
+    }
+
+    @Override
+    public void callNotifyDataSetChanged() {
+        mHabitAdapter.notifyDataSetChanged();
     }
 
     private void applySpaceDecoration() {

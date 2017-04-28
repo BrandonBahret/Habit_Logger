@@ -446,6 +446,7 @@ public class HabitDatabase {
             habits.addAll(getHabits(categoryId));
         }
 
+        Collections.sort(habits, Habit.ICompareHabitName);
         Collections.sort(habits, Habit.ICompareCategoryName);
 
         return habits;

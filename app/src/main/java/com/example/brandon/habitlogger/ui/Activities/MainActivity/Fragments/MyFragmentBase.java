@@ -70,16 +70,16 @@ public abstract class MyFragmentBase extends Fragment {
         mCallbackInterface = (IMainActivity) context;
     }
 
+    abstract void onSetUpView(RecyclerView recyclerView);
+
+    abstract protected int getNoDataLayoutId();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSessionManager = new SessionManager(getContext());
         mHabitDatabase = new HabitDatabase(getContext());
     }
-
-    abstract void onSetUpView(RecyclerView recyclerView);
-
-    abstract protected int getNoDataLayoutId();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -98,16 +98,14 @@ public abstract class MyFragmentBase extends Fragment {
 
         onSetUpView(mRecyclerView);
 
-        checkIfHabitsAreAvailable();
-
         return mRecyclerView;
     }
 
 
+    //region foreground lifetime (onResume - onPause)
     @Override
     public void onResume() {
         super.onResume();
-        startRepeatingTask();
 
         if (getActivity().getIntent().hasExtra(RECYCLER_STATE)) {
             mRecyclerView.getLayoutManager().onRestoreInstanceState(
@@ -119,11 +117,26 @@ public abstract class MyFragmentBase extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        stopRepeatingTask();
+
         getActivity().getIntent().putExtra(
                 RECYCLER_STATE, mRecyclerView.getLayoutManager().onSaveInstanceState()
         );
     }
+    //endregion -- end --
+
+    //region visible lifetime (onStart - onStop)
+    @Override
+    public void onStart() {
+        super.onStart();
+        startRepeatingTask();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        stopRepeatingTask();
+    }
+    //endregion -- end --
 
     //endregion
 
@@ -172,7 +185,11 @@ public abstract class MyFragmentBase extends Fragment {
         checkIfHabitsAreAvailable();
     }
 
+    abstract public void reapplySpaceDecoration();
+
     abstract public void restartFragment();
+
+    public abstract void callNotifyDataSetChanged();
 
     //region Methods to handle events
     abstract public boolean handleOnQuery(String query);

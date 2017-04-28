@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.RequestCodes;
+import com.example.brandon.habitlogger.common.ResultCodes;
 import com.example.brandon.habitlogger.data.DataExportHelpers.GoogleDriveDataExportManager;
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.data.DataModels.Habit;
@@ -132,7 +133,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setListeners() {
-        mSessionManager.addSessionChangedCallback(onSessionChangeCallback);
         ui.mainInclude.fab.setOnClickListener(getOnNewHabitButtonClicked());
         ui.navView.setNavigationItemSelectedListener(this);
         mCurrentSessionCard.setOnClickListener(getOnSessionsCardClickListener());
@@ -160,15 +160,25 @@ public class MainActivity extends AppCompatActivity
 
         prepareNavigationDrawer();
         mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
+        getContentFragment().reapplySpaceDecoration();
+        getContentFragment().callNotifyDataSetChanged();
 //        getContentFragment().restartFragment();
     }
     //endregion
 
+    //region visible lifetime (onStart - onStop)
     @Override
     protected void onStart() {
         super.onStart();
-        if (mFragment == null) getContentFragment();
+        mSessionManager.addSessionChangedCallback(onSessionChangeCallback);
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mSessionManager.removeSessionChangedCallback(onSessionChangeCallback);
+    }
+    //endregion -- end --
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -231,7 +241,7 @@ public class MainActivity extends AppCompatActivity
 //                if (mPreferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_CARDS)
 //                    mFragment = CategoryCardHabitsFragment.newInstance();
 //                else
-                    mFragment = AllHabitsFragment.newInstance();
+                mFragment = AllHabitsFragment.newInstance();
 
                 break;
 
@@ -336,6 +346,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void afterSessionEnded(long habitId, boolean wasCanceled) {
             mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
+            getContentFragment().reapplySpaceDecoration();
         }
 
         @Override
@@ -346,6 +357,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
+            getContentFragment().reapplySpaceDecoration();
         }
     };
 
@@ -497,17 +509,18 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RequestCodes.SETTINGS_ACTIVITY) {
-            recreate();
+
+        switch (requestCode) {
+            case RequestCodes.SETTINGS_ACTIVITY:
+                recreate();
+                break;
+
+            case RequestCodes.HABIT_DATA_ACTIVITY:
+                if (resultCode == ResultCodes.HABIT_CHANGED)
+                    getContentFragment().restartFragment();
+                break;
         }
 
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case RequestCodes.GOOGLE_DRIVE_REQUEST_CODE:
-                    mGoogleDriveExportManager.connect();
-                    break;
-            }
-        }
     }
     //endregion [ ---------------- end ---------------- ]
 

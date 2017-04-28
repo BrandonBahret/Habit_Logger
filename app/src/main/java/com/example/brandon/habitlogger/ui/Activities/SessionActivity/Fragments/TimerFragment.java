@@ -120,6 +120,10 @@ public class TimerFragment extends Fragment {
         mUpdateHandler.removeCallbacks(updateTimeDisplayRunnable);
     }
 
+    public void callOnUpdateTimer() {
+        updateTimeDisplay(mCallbackInterface.getSessionDuration(false));
+    }
+
     public void updateSessionPlayButton(boolean isPaused) {
         ui.sessionPausePlay.setImageResource(
                 HabitViewHolder.getResourceIdForPauseButton(isPaused)

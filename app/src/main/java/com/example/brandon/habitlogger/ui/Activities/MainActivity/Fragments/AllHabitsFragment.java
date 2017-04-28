@@ -110,13 +110,13 @@ public class AllHabitsFragment extends MyFragmentBase {
         mNoDataLayout.setVisibility(habitsAvailable ? View.GONE : View.VISIBLE);
     }
 
-    //endregion
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(KEY_DATA, (ArrayList<? extends Parcelable>) mData);
     }
+
+    //endregion
 
     //region Methods responsible for updating the Ui
     @Override
@@ -142,12 +142,14 @@ public class AllHabitsFragment extends MyFragmentBase {
         mRecyclerView.removeItemDecoration(mGroupDecoration);
         applyGroupDecoration();
         applySpaceDecoration();
+        checkIfHabitsAreAvailable();
     }
 
     @Override
     public void addHabitToLayout(Habit habit) {
         super.addHabitToLayout(habit);
         mData.add(habit);
+        Collections.sort(mData, Habit.ICompareHabitName);
         Collections.sort(mData, Habit.ICompareCategoryName);
         mHabitAdapter.notifyDataSetChanged();
     }
@@ -159,6 +161,17 @@ public class AllHabitsFragment extends MyFragmentBase {
         mHabitAdapter.notifyItemRemoved(position);
         applySpaceDecoration();
         mRecyclerView.invalidateItemDecorations();
+    }
+
+    @Override
+    public void reapplySpaceDecoration() {
+        mRecyclerView.removeItemDecoration(mSpaceDecoration);
+        applySpaceDecoration();
+    }
+
+    @Override
+    public void callNotifyDataSetChanged() {
+        mHabitAdapter.notifyDataSetChanged();
     }
 
     private void applySpaceDecoration() {

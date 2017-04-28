@@ -427,6 +427,7 @@ public class HabitDataActivity extends AppCompatActivity implements
                             mSessionManager.cancelSession(mHabit.getDatabaseId());
                         }
                         mHabitDatabase.deleteHabit(mHabit.getDatabaseId());
+                        setResult(ResultCodes.HABIT_CHANGED);
                         finish();
                     }
                 })
@@ -467,6 +468,7 @@ public class HabitDataActivity extends AppCompatActivity implements
                         mHabitDatabase.updateHabitIsArchived(mHabit.getDatabaseId(), !archivedState);
                         mHabit.setIsArchived(!archivedState);
                         setUpActivityWithHabit(mHabit);
+                        setResult(ResultCodes.HABIT_CHANGED);
                     }
                 })
                 .setAccentColor(ContextCompat.getColor(this, R.color.textColorContrastBackground))
@@ -484,6 +486,8 @@ public class HabitDataActivity extends AppCompatActivity implements
         mHabit = newHabit;
         mHabitDatabase.updateHabit(oldHabit.getDatabaseId(), newHabit);
         setUpActivityWithHabit(mHabit);
+
+        setResult(ResultCodes.HABIT_CHANGED);
     }
 
     //endregion -- end --
@@ -647,7 +651,7 @@ public class HabitDataActivity extends AppCompatActivity implements
     public static void startActivity(Activity activity, long habitId) {
         Intent intent = new Intent(activity, HabitDataActivity.class);
         intent.putExtra(EntriesTableSchema.ENTRY_HABIT_ID, habitId);
-        activity.startActivity(intent);
+        activity.startActivityForResult(intent, RequestCodes.HABIT_DATA_ACTIVITY);
     }
 
 }

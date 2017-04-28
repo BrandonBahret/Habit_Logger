@@ -17,4 +17,6 @@ public final class RequestCodes {
     public static final int GOOGLE_DRIVE_REQUEST_CODE = 300;
 
     public static final int SESSION_ACTIVITY = 400;
+
+    public static final int HABIT_DATA_ACTIVITY = 500;
 }
