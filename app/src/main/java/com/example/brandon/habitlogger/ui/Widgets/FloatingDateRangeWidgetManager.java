@@ -199,14 +199,17 @@ public class FloatingDateRangeWidgetManager {
                     .translationY(-mViewHolder.rootView.getHeight());
         }
         else {
-            mViewHolder.rootView.setTranslationY(mViewHolder.rootView.getHeight());
+                mViewHolder.rootView.setTranslationY(-mActivity.getResources().getDimension(R.dimen.date_range_height)); //mViewHolder.rootView.getMeasuredHeight());
             mViewHolder.rootView.setAlpha(0);
+            mViewHolder.rootView.setVisibility(View.GONE);
         }
 
         mIsShown = false;
     }
 
     public void showView(boolean animate) {
+        mViewHolder.rootView.setVisibility(View.VISIBLE);
+
         if (animate) {
             mViewHolder.rootView.animate()
                     .setStartDelay(0)
@@ -370,6 +373,10 @@ public class FloatingDateRangeWidgetManager {
     //endregion
 
     //region Getters {}
+    ViewHolder getViewHolder() {
+        return mViewHolder;
+    }
+
     public long getDateFrom() {
         return mDateFromTime;
     }

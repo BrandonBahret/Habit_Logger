@@ -477,6 +477,7 @@ public class MainActivity extends AppCompatActivity
 
     private void handleOnExportDatabase() {
         new ConfirmationDialog(this)
+                .setIcon(R.drawable.ic_save_2_24dp)
                 .setTitle(getString(R.string.confirm_data_export))
                 .setMessage(getString(R.string.confirm_data_export_message))
                 .setOnYesClickListener(new DialogInterface.OnClickListener() {
@@ -493,6 +494,7 @@ public class MainActivity extends AppCompatActivity
 
     private void handleOnDatabaseRestore() {
         new ConfirmationDialog(this)
+                .setIcon(R.drawable.ic_data_restore_24dp)
                 .setTitle(getString(R.string.confirm_data_restore))
                 .setMessage(getString(R.string.confirm_data_restore_message))
                 .setOnYesClickListener(new DialogInterface.OnClickListener() {

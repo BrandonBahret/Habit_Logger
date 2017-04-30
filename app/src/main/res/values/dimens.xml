@@ -17,6 +17,7 @@
     <dimen name="default_elevation">2dp</dimen>
     <dimen name="calendar_view_height">300dp</dimen>
     <dimen name="default_top_bottom_margin">2dp</dimen>
+    <dimen name="date_range_height">97dp</dimen>
 
     <!-- Item decorators -->
     <dimen name="indent_pad_top">16dp</dimen>

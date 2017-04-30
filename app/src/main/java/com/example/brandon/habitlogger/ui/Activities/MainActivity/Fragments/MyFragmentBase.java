@@ -72,6 +72,7 @@ public abstract class MyFragmentBase extends Fragment {
 
     abstract void onSetUpView(RecyclerView recyclerView);
 
+    //region Methods responsible for creating the fragment
     abstract protected int getNoDataLayoutId();
 
     @Override
@@ -97,10 +98,11 @@ public abstract class MyFragmentBase extends Fragment {
         mRecyclerView.addOnScrollListener(getOnScrollListener());
 
         onSetUpView(mRecyclerView);
+        checkIfHabitsAreAvailable();
 
         return mRecyclerView;
     }
-
+    //endregion
 
     //region foreground lifetime (onResume - onPause)
     @Override
@@ -160,7 +162,7 @@ public abstract class MyFragmentBase extends Fragment {
             List<SessionEntry> entries = mSessionManager.getActiveSessionList();
             updateHabitCards(entries);
 
-            mUpdateHandler.postDelayed(mUpdateCards, 1000);
+            mUpdateHandler.postDelayed(mUpdateCards, 500);
         }
     };
 

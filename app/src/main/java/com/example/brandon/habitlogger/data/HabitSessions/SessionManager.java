@@ -216,20 +216,19 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
     }
 
     private List<SessionEntry> fetchEntriesAtCursor(Cursor cursor) {
-        if (cursor.moveToFirst()) {
-            List<SessionEntry> resultList = new ArrayList<>(cursor.getCount());
+        List<SessionEntry> resultList = new ArrayList<>();
 
+        if (cursor.moveToFirst()) {
             // Load all the entries in the database into the ArrayList.
             do resultList.add(getSessionEntryFromCursor(cursor)); while (cursor.moveToNext());
 
             // Sort the entries by Category Name
             Collections.sort(resultList, SessionEntry.ICompareCategoryNames);
-            cursor.close();
-
-            return resultList;
         }
 
-        return new ArrayList<>();
+        cursor.close();
+
+        return resultList;
     }
     //endregion -- end --
 

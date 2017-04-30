@@ -27,21 +27,29 @@ public class ThemeColorPalette implements Serializable {
         int accentDarkerColor = accentColor;
 
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-            // Darken colors for night mode, we don't want bright colors at night.
-
+            // Apply a different filter for night mode
             if (MyColorUtils.getLightness(color) > 0.40) {
                 darkerColor = MyColorUtils.setLightness(darkerColor, 0.40f);
                 accentDarkerColor = MyColorUtils.setLightness(accentDarkerColor, 0.45f);
                 color = MyColorUtils.setLightness(color, 0.45f);
                 accentColor = MyColorUtils.setLightness(accentColor, 0.50f);
             }
-
-            if (MyColorUtils.getSaturation(color) > 0.45) {
-                darkerColor = MyColorUtils.setSaturation(darkerColor, 0.45f);
-                accentDarkerColor = MyColorUtils.setSaturation(accentDarkerColor, 0.45f);
-                color = MyColorUtils.setSaturation(color, 0.45f);
-                accentColor = MyColorUtils.setSaturation(accentColor, 0.45f);
+        }
+        else {
+            // Apply a different filter for day mode
+            if (MyColorUtils.getLightness(color) > 0.40) {
+                darkerColor = MyColorUtils.setLightness(darkerColor, 0.60f);
+                accentDarkerColor = MyColorUtils.setLightness(accentDarkerColor, 0.65f);
+                color = MyColorUtils.setLightness(color, 0.65f);
+                accentColor = MyColorUtils.setLightness(accentColor, 0.70f);
             }
+        }
+
+        if (MyColorUtils.getSaturation(color) > 0.45) {
+            darkerColor = MyColorUtils.setSaturation(darkerColor, 0.45f);
+            accentDarkerColor = MyColorUtils.setSaturation(accentDarkerColor, 0.45f);
+            color = MyColorUtils.setSaturation(color, 0.45f);
+            accentColor = MyColorUtils.setSaturation(accentColor, 0.45f);
         }
 
         mColorPrimary = color;

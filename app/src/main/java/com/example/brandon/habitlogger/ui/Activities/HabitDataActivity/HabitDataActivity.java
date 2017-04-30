@@ -145,9 +145,9 @@ public class HabitDataActivity extends AppCompatActivity implements
         ui.menuFab.setClosedOnTouchOutside(true);
 
         if (ui.tabs.getSelectedTabPosition() != 1) {
+            ui.container.setCurrentItem(1);
             dateRangeManager.hideView(false);
             ui.menuFab.hideMenu(false);
-            ui.container.setCurrentItem(1);
         }
 
         if (!usesSavedInstance) {
@@ -418,6 +418,7 @@ public class HabitDataActivity extends AppCompatActivity implements
         String habitName = mHabitDatabase.getHabitName(mHabit.getDatabaseId());
 
         new ConfirmationDialog(HabitDataActivity.this)
+                .setIcon(R.drawable.ic_delete_forever_24dp)
                 .setTitle(R.string.confirm_delete)
                 .setMessage("Do you really want to delete '" + habitName + "'?")
                 .setOnYesClickListener(new DialogInterface.OnClickListener() {
@@ -439,6 +440,7 @@ public class HabitDataActivity extends AppCompatActivity implements
         String habitName = mHabitDatabase.getHabitName(mHabit.getDatabaseId());
 
         new ConfirmationDialog(HabitDataActivity.this)
+                .setIcon(R.drawable.ic_delete_sweep_24dp)
                 .setTitle(R.string.confirm_habit_data_reset_title)
                 .setMessage("Do you really want to delete all entries for '" + habitName + "'?")
                 .setOnYesClickListener(new DialogInterface.OnClickListener() {
@@ -455,11 +457,14 @@ public class HabitDataActivity extends AppCompatActivity implements
 
     private void onMenuToggleArchiveClicked() {
         String habitName = mHabitDatabase.getHabitName(mHabit.getDatabaseId());
+
         final boolean archivedState = mHabitDatabase.getIsHabitArchived(mHabit.getDatabaseId());
         String actionName = archivedState ? getString(R.string.menu_unarchive) : getString(R.string.menu_archive);
         String actionNameLower = archivedState ? "unarchive" : "archive";
+        int iconRes = archivedState ? R.drawable.ic_unarchive_24dp : R.drawable.ic_archive_2_24dp;
 
         new ConfirmationDialog(HabitDataActivity.this)
+                .setIcon(iconRes)
                 .setTitle("Confirm " + actionName)
                 .setMessage("Do you really want to " + actionNameLower + " '" + habitName + "'? ")
                 .setOnYesClickListener(new DialogInterface.OnClickListener() {

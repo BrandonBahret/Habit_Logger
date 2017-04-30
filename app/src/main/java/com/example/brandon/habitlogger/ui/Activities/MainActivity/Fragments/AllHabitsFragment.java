@@ -319,6 +319,7 @@ public class AllHabitsFragment extends MyFragmentBase {
                 String messageFormat = getString(R.string.confirm_habit_data_reset_message_format);
                 String message = String.format(Locale.getDefault(), messageFormat, habitName);
                 new ConfirmationDialog(getActivity())
+                        .setIcon(R.drawable.ic_delete_sweep_24dp)
                         .setTitle(getString(R.string.confirm_habit_data_reset_title))
                         .setMessage(message)
                         .setOnYesClickListener(new DialogInterface.OnClickListener() {
@@ -335,6 +336,7 @@ public class AllHabitsFragment extends MyFragmentBase {
             public void onHabitDeleteClick(final long habitId, HabitViewHolder habitViewHolder) {
                 String habitName = mHabitDatabase.getHabitName(habitId);
                 new ConfirmationDialog(getActivity())
+                        .setIcon(R.drawable.ic_delete_forever_24dp)
                         .setTitle("Confirm Delete")
                         .setMessage("Do you really want to delete '" + habitName + "'?")
                         .setOnYesClickListener(new DialogInterface.OnClickListener() {
@@ -362,17 +364,15 @@ public class AllHabitsFragment extends MyFragmentBase {
             @Override
             public void onHabitArchiveClick(final long habitId, HabitViewHolder habitViewHolder) {
                 String habitName = mHabitDatabase.getHabitName(habitId);
-                final boolean archivedState = mHabitDatabase.getIsHabitArchived(habitId);
-                String actionName = archivedState ? "Unarchive" : "Archive";
-                String actionNameLower = archivedState ? "unarchive" : "archive";
 
                 new ConfirmationDialog(getContext())
-                        .setTitle("Confirm " + actionName)
-                        .setMessage("Do you really want to " + actionNameLower + " '" + habitName + "'? ")
+                        .setIcon(R.drawable.ic_archive_2_24dp)
+                        .setTitle("Confirm Archive")
+                        .setMessage("Do you really want to archive '" + habitName + "'? ")
                         .setOnYesClickListener(new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                mHabitDatabase.updateHabitIsArchived(habitId, !archivedState);
+                                mHabitDatabase.updateHabitIsArchived(habitId, true);
 
                                 int position = mHabitAdapter.getAdapterItemPosition(habitId);
                                 removeHabitFromLayout(position);
