@@ -119,7 +119,7 @@ public class PieGraphCompletion extends Fragment {
             );
 
             int totalDaysWithEntries = uniqueEntryStartDates.size();
-            int totalDays = dataSample.calculateTotalDaysLength() + 1;
+            int totalDays = dataSample.calculateTotalDaysLength();
             float ratio = totalDaysWithEntries / (float) totalDays * 100;
 
             mStatisticData = new StatisticData(totalDaysWithEntries, totalDays, ratio);

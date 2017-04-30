@@ -1,5 +1,7 @@
 package com.example.brandon.habitlogger.common;
 
+import android.text.format.DateUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,21 +41,22 @@ public class MyTimeUtils {
     //endregion
 
     //region Get time of day from timestamp
+
     /**
      * @param timestamp The duration in milliseconds
      * @return An array {hours, minutes, seconds}
      */
-    public static Integer[] getTimePortion(long timestamp){
+    public static Integer[] getTimePortion(long timestamp) {
 
         timestamp /= 1000;
 
-        int hours = (int)((timestamp - (timestamp % 3600)) / 3600);
+        int hours = (int) ((timestamp - (timestamp % 3600)) / 3600);
         timestamp -= hours * 3600;
 
-        int minutes = (int)((timestamp - (timestamp % 60)) / 60);
+        int minutes = (int) ((timestamp - (timestamp % 60)) / 60);
         timestamp -= minutes * 60;
 
-        int seconds = (int)timestamp;
+        int seconds = (int) timestamp;
 
         return new Integer[]{hours, minutes, seconds};
     }
@@ -85,14 +88,35 @@ public class MyTimeUtils {
         return (month1 == month2) && (year1 == year2);
     }
 
-    public static int getTimestampField(long timestamp, int field){
+    public static boolean isSameMonthOfYear(long timestampOne, long timestampTwo) {
+        Calendar calendarOne = Calendar.getInstance();
+        calendarOne.setTimeInMillis(timestampOne);
+
+        Calendar calendarTwo = Calendar.getInstance();
+        calendarTwo.setTimeInMillis(timestampTwo);
+
+        return MyTimeUtils.isSameMonthOfYear(calendarOne, calendarTwo);
+    }
+
+    private static boolean isSameDay(long timestampOne, long timestampTwo) {
+        boolean isSameDay = MyTimeUtils.isSameMonthOfYear(timestampOne, timestampTwo);
+
+        int dayOne = MyTimeUtils.getTimestampField(timestampOne, Calendar.DAY_OF_MONTH);
+        int dayTwo = MyTimeUtils.getTimestampField(timestampTwo, Calendar.DAY_OF_MONTH);
+
+        isSameDay &= dayOne == dayTwo;
+
+        return isSameDay;
+    }
+
+    public static int getTimestampField(long timestamp, int field) {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(timestamp);
 
         return c.get(field);
     }
 
-    public static long setTimestampField(long timestamp, int field, int value){
+    public static long setTimestampField(long timestamp, int field, int value) {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(timestamp);
         c.set(field, value);
@@ -102,13 +126,21 @@ public class MyTimeUtils {
     /**
      * Return date in specified format.
      *
-     * @param timestamp Date in milliseconds
-     * @param dateFormat   Date format
+     * @param timestamp  Date in milliseconds
+     * @param dateFormat Date format
      * @return String representing date in specified format
      */
     public static String stringifyTimestamp(long timestamp, String dateFormat) {
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.getDefault());
         return formatter.format(new Date(timestamp));
+    }
+
+    public static int getElapsedTimeInDays(long timestampOne, long timestampTwo) {
+        timestampOne = MyTimeUtils.setTimePortion(timestampOne, true, 0, 0, 0, 0);
+        timestampTwo = MyTimeUtils.setTimePortion(timestampTwo, true, 0, 0, 0, 0);
+        long delta = Math.abs(timestampOne - timestampTwo);
+        delta += MyTimeUtils.isSameDay(timestampOne, timestampTwo) ? DateUtils.DAY_IN_MILLIS : 0;
+        return (int) Math.ceil(delta / DateUtils.DAY_IN_MILLIS);
     }
 
 }

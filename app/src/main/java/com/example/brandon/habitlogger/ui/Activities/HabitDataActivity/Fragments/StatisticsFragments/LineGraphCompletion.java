@@ -118,7 +118,7 @@ public class LineGraphCompletion extends Fragment {
 
         XAxis xAxis = ui.chart.getXAxis();
         xAxis.setTextColor(mTextColor);
-        xAxis.setLabelCount(5);
+        xAxis.setLabelCount(5, false);
         xAxis.setGranularity(1f);
         xAxis.setGranularityEnabled(true);
         xAxis.setGridColor(ColorUtils.setAlphaComponent(xAxis.getGridColor(), 50));
@@ -147,10 +147,10 @@ public class LineGraphCompletion extends Fragment {
         int totalDays = sessionEntries.calculateTotalDaysLength();
         List<Entry> values = new ArrayList<>(totalDays);
 
-        long targetDate = sessionEntries.getDateFromTime();
+        long targetDate = sessionEntries.getDateFromTime() - DateUtils.DAY_IN_MILLIS;
         int dayCounter = 0; // The number of mDays performed.
 
-        for (int dateIndex = 0; dateIndex < totalDays; dateIndex++) {
+        for (int dateIndex = 0; dateIndex <= totalDays; dateIndex++) {
 
             if (sessionEntries.hasEntryFor(targetDate))
                 dayCounter++;
@@ -174,6 +174,7 @@ public class LineGraphCompletion extends Fragment {
     private void setLineChartData(List<Entry> values) {
         mValues = values;
         LineDataSet dataSet = new LineDataSet(values, "");
+
         //region Stylize the data set
         dataSet.setDrawFilled(true);
         dataSet.setMode(LineDataSet.Mode.LINEAR);

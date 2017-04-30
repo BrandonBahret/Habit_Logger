@@ -10,8 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        tools:context=".ui.Activities.HabitDataActivity.HabitDataActivity"
-        android:theme="@style/AppTheme.ContrastBackground">
+        android:theme="@style/AppTheme.ContrastBackground"
+        tools:context=".ui.Activities.HabitDataActivity.HabitDataActivity">
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar"
@@ -60,14 +60,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="bottom|end"
-            android:layout_margin="8dp"
-            android:elevation="3dp"
+            android:elevation="@dimen/fab_elevation"
+            android:padding="@dimen/fab_margin"
             app:menu_colorNormal="?attr/colorAccent"
             app:menu_colorPressed="?attr/colorPrimaryDark"
             app:menu_fab_hide_animation="@anim/hide_fab"
             app:menu_fab_show_animation="@anim/show_fab"
             app:menu_shadowColor="@color/shadowBlack"
             app:theme="@style/fabMenuButtonsStyle"
+            fab:menu_backgroundColor="#96ffffff"
             fab:menu_fab_size="normal"
             fab:menu_labels_ellipsize="end"
             fab:menu_labels_singleLine="true"

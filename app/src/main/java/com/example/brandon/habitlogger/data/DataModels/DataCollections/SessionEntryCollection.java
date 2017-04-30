@@ -1,7 +1,5 @@
 package com.example.brandon.habitlogger.data.DataModels.DataCollections;
 
-import android.text.format.DateUtils;
-
 import com.android.internal.util.Predicate;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
@@ -105,8 +103,7 @@ public class SessionEntryCollection extends MyDataCollectionBase<SessionEntry> {
 
     public int calculateTotalDaysLength() {
         if (mTotalDaysLength == null || mTotalDaysLengthIsInvalid) {
-            long totalTime = getDateToTime() - getDateFromTime();
-            mTotalDaysLength = (int) Math.ceil(totalTime / DateUtils.DAY_IN_MILLIS);
+            mTotalDaysLength = MyTimeUtils.getElapsedTimeInDays(getDateToTime(), getDateFromTime());
             mTotalDaysLengthIsInvalid = false;
         }
 

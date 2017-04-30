@@ -144,7 +144,7 @@ public class HabitDataActivity extends AppCompatActivity implements
         ui.tabs.setupWithViewPager(ui.container);
         ui.menuFab.setClosedOnTouchOutside(true);
 
-        if (ui.tabs.getSelectedTabPosition() != 1) {
+        if (savedInstanceState == null) {
             ui.container.setCurrentItem(1);
             dateRangeManager.hideView(false);
             ui.menuFab.hideMenu(false);
@@ -383,7 +383,9 @@ public class HabitDataActivity extends AppCompatActivity implements
 
         switch (id) {
             case (android.R.id.home):
-                finish();
+                if(ui.menuFab.isOpened())
+                    ui.menuFab.close(true);
+                else finish();
                 break;
 
             case (R.id.menu_habit_edit):
@@ -527,6 +529,13 @@ public class HabitDataActivity extends AppCompatActivity implements
         }
     }
     //endregion
+
+    @Override
+    public void onBackPressed() {
+        if(ui.menuFab.isOpened())
+            ui.menuFab.close(true);
+        else super.onBackPressed();
+    }
 
     FloatingDateRangeWidgetManager.DateRangeChangeListener onDateRangeChangeListener =
             new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
