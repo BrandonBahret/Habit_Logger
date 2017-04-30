@@ -53,6 +53,7 @@ public class HabitDataActivity extends AppCompatActivity implements
 
     private static final String KEY_SEARCH_QUERY = "KEY_SEARCH_QUERY";
     private static final String KEY_SESSION_ENTRIES = "KEY_SESSION_ENTRIES";
+    private static final String KEY_TABS_POSITION = "KEY_TABS_POSITION";
     private String mSearchQuery = "";
 
     // Dependencies
@@ -144,7 +145,8 @@ public class HabitDataActivity extends AppCompatActivity implements
         ui.tabs.setupWithViewPager(ui.container);
         ui.menuFab.setClosedOnTouchOutside(true);
 
-        if (savedInstanceState == null) {
+
+        if (savedInstanceState == null || savedInstanceState.getInt(KEY_TABS_POSITION) == 1) {
             ui.container.setCurrentItem(1);
             dateRangeManager.hideView(false);
             ui.menuFab.hideMenu(false);
@@ -248,6 +250,7 @@ public class HabitDataActivity extends AppCompatActivity implements
         super.onSaveInstanceState(outState);
         outState.putString(KEY_SEARCH_QUERY, mSearchQuery);
         outState.putParcelableArrayList(KEY_SESSION_ENTRIES, mSessionEntries);
+        outState.putInt(KEY_TABS_POSITION, ui.tabs.getSelectedTabPosition());
         dateRangeManager.onSaveInstanceState(outState);
     }
 

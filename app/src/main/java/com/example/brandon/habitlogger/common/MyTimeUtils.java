@@ -139,8 +139,7 @@ public class MyTimeUtils {
         timestampOne = MyTimeUtils.setTimePortion(timestampOne, true, 0, 0, 0, 0);
         timestampTwo = MyTimeUtils.setTimePortion(timestampTwo, true, 0, 0, 0, 0);
         long delta = Math.abs(timestampOne - timestampTwo);
-        delta += MyTimeUtils.isSameDay(timestampOne, timestampTwo) ? DateUtils.DAY_IN_MILLIS : 0;
-        return (int) Math.ceil(delta / DateUtils.DAY_IN_MILLIS);
+        return (int) Math.ceil(delta / DateUtils.DAY_IN_MILLIS) + 1;
     }
 
 }
