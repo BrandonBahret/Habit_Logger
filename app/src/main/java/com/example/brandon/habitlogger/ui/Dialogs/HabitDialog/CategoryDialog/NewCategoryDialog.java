@@ -60,7 +60,8 @@ public class NewCategoryDialog {
                 .setCancelable(true)
                 .setView(ui.getRoot())
                 .setTitle("New Category")
-                .setPositiveButton("Create", OnPositiveButtonClicked);
+                .setPositiveButton("Create", OnPositiveButtonClicked)
+                .setNegativeButton("Cancel", null);
     }
 
     private void setColorPreview(String color) {

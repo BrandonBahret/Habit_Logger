@@ -100,6 +100,7 @@ public class CategorySpinner extends AppCompatSpinner {
                         public void onShow(DialogInterface dialog) {
                             int color = mAccentColor == 0 ? ContextCompat.getColor(getContext(), R.color.colorAccent) : mAccentColor;
                             categoryDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(color);
+                            categoryDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(color);
                         }
                     });
                     categoryDialog.show();

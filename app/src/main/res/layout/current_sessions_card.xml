@@ -46,7 +46,7 @@
                     android:paddingEnd="5dp"
                     android:paddingStart="5dp"
                     android:paddingTop="5dp"
-                    android:text="@string/current_sessions"
+                    android:text="@string/active_sessions_upper"
                     android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"/>
 
                 <TextView

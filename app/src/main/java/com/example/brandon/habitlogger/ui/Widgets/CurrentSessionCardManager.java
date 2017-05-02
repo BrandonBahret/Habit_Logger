@@ -120,7 +120,7 @@ public class CurrentSessionCardManager {
 
         if (sessionCount == 0) {
             mViewHolder.captionValue.setText(R.string.no);
-            mViewHolder.captionDescription.setText(R.string.active_sessions);
+            mViewHolder.captionDescription.setText(R.string.active_sessions_lower);
         }
         else if (sessionCount == 1) {
             mViewHolder.captionValue.setText(R.string.one);
@@ -128,7 +128,7 @@ public class CurrentSessionCardManager {
         }
         else {
             mViewHolder.captionValue.setText(String.valueOf(sessionCount));
-            mViewHolder.captionDescription.setText(R.string.active_sessions);
+            mViewHolder.captionDescription.setText(R.string.active_sessions_lower);
         }
     }
     //endregion

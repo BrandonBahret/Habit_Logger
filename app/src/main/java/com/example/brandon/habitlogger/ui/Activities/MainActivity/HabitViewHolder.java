@@ -8,9 +8,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.R;
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder;
 
 /**
@@ -26,6 +26,7 @@ public class HabitViewHolder extends ChildViewHolder {
     public Toolbar toolbar;
     public ImageButton playButton;
     public TextView time;
+    public TextView cardTitle;
     //endregion
 
     public HabitViewHolder(View view) {
@@ -35,6 +36,7 @@ public class HabitViewHolder extends ChildViewHolder {
         this.playButton = (ImageButton) view.findViewById(R.id.session_control_button);
         this.time = (TextView) view.findViewById(R.id.habit_card_time_display);
         this.rootView = (CardView) view;
+        this.cardTitle = (TextView) view.findViewById(R.id.card_title);
     }
 
     //region Bind habit object
@@ -51,7 +53,7 @@ public class HabitViewHolder extends ChildViewHolder {
         }
 
         categoryAccent.setBackgroundColor(item.getColor());
-        toolbar.setTitle(item.getName());
+        cardTitle.setText(item.getName());
 
         setListeners(item, menuItemClickListener, buttonClickCallback);
     }

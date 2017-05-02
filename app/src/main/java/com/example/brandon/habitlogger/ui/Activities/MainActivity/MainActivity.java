@@ -286,14 +286,14 @@ public class MainActivity extends AppCompatActivity
         return new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mSearchViewQuery = query;
-                return getContentFragment().handleOnQuery(query);
+                mSearchViewQuery = query.trim();
+                return getContentFragment().handleOnQuery(mSearchViewQuery);
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                mSearchViewQuery = newText;
-                return getContentFragment().handleOnQuery(newText);
+                mSearchViewQuery = newText.trim();
+                return getContentFragment().handleOnQuery(mSearchViewQuery);
             }
         };
     }

@@ -552,15 +552,15 @@ public class HabitDataActivity extends AppCompatActivity implements
     SearchView.OnQueryTextListener onSearchQueryListener = new SearchView.OnQueryTextListener() {
         @Override
         public boolean onQueryTextSubmit(String query) {
-            mSearchQuery = query;
+            mSearchQuery = query.trim();
             return false;
         }
 
         @Override
-        public boolean onQueryTextChange(String newText) {
-            mSearchQuery = newText;
-            mSessionEntries = newText.length() > 0 ?
-                    fetchEntriesWithinConditions(newText) : fetchEntriesWithinTimeRange();
+        public boolean onQueryTextChange(String query) {
+            mSearchQuery = query.trim();
+            mSessionEntries = query.length() > 0 ?
+                    fetchEntriesWithinConditions(query) : fetchEntriesWithinTimeRange();
 
             updateEntries(mSessionEntries);
 

@@ -307,16 +307,16 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     //region Methods responsible for handling search events
     @Override
     public boolean onQueryTextSubmit(String query) {
-        return onQueryTextChange(query);
+        return onQueryTextChange(mSearchQuery);
     }
 
     @Override
     public boolean onQueryTextChange(String query) {
 
-        mSearchQuery = query;
-        List<SessionEntry> entries = mSessionManager.queryActiveSessionList(query);
+        mSearchQuery = query.trim();
+        List<SessionEntry> entries = mSessionManager.queryActiveSessionList(mSearchQuery);
 
-        if (query.isEmpty())
+        if (mSearchQuery.isEmpty())
             entries = mSessionManager.getActiveSessionList();
 
         mActiveSessions.clear();

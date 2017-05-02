@@ -28,6 +28,27 @@
             android:layout_height="wrap_content"
             android:background="@color/defaultCardViewBackground">
 
+            <TextView
+                android:id="@+id/card_title"
+                style="@style/cardTitle"
+                android:textAlignment="textStart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textColor1"
+                android:text="@string/habit_name"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:lines="1"
+                android:layout_marginTop="8.5dp"
+                android:layout_marginBottom="8dp"
+                android:layout_toStartOf="@+id/card_toolbar"/>
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/card_toolbar"
+                android:layout_width="43dp"
+                android:layout_height="43dp"
+                android:layout_alignParentEnd="true"/>
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -57,19 +78,6 @@
                     android:textSize="16sp"/>
 
             </LinearLayout>
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/card_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:background="@color/defaultCardViewBackground"
-                card_view:contentInsetEnd="0dp"
-                card_view:contentInsetLeft="8dp"
-                card_view:contentInsetRight="0dp"
-                card_view:contentInsetStart="8dp"
-                card_view:title="@string/habit_name"
-                card_view:titleTextAppearance="@style/cardTitle"
-                card_view:titleTextColor="@color/textColor1"/>
 
         </RelativeLayout>
 
