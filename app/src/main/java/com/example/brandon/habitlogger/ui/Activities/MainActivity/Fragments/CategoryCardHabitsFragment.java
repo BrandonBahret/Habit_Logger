@@ -135,7 +135,7 @@
 //    }
 //
 //    @Override
-//    public void onFinishedWithResult(Habit habit) {
+//    public void onTimePickerResult(Habit habit) {
 //        mHabitDatabase.onUpdateHabit(habit.getDatabaseId(), habit);
 //
 ////                        int position = mHabitAdapter.getAdapterItemPosition(habit.getDatabaseId());

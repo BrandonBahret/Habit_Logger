@@ -105,7 +105,7 @@ public abstract class HabitDialogBase extends DialogFragment {
             public void onClick(DialogInterface dialog, int which) {
                 Habit habit = getHabitFromDialog();
                 onHabitDialogFinished(habit);
-//                onFinishedListener.onFinishedWithResult(habit);
+//                onFinishedListener.onTimePickerResult(habit);
             }
         };
     }

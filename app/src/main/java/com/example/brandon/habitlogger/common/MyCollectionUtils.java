@@ -33,7 +33,6 @@ public class MyCollectionUtils {
         Out apply(In value);
     }
 
-
     //region Methods to collect from lists
     public static <ListType, Collect> List<Collect> collect
     (List<ListType> list, IGetKey<ListType, Collect> keyGetter) {

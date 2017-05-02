@@ -1,6 +1,7 @@
 package com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog;
 
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TimePicker;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyTimeUtils;
@@ -57,6 +59,8 @@ public abstract class EntryFormDialogBase extends DialogFragment {
                 mAccentColor = getArguments().getInt(KEY_COLOR, 0);
         }
 
+        setListenerOnTimePickerIfShown("get-time");
+        setListenerOnDatePickerIfShown("get-date");
     }
 
     @NonNull
@@ -129,6 +133,7 @@ public abstract class EntryFormDialogBase extends DialogFragment {
 
     //region Methods responsible for handling events
     public abstract void onNegativeClicked(SessionEntry removeEntry);
+
     private DialogInterface.OnClickListener getOnNegativeButtonClickListener() {
         return new DialogInterface.OnClickListener() {
             @Override
@@ -139,6 +144,7 @@ public abstract class EntryFormDialogBase extends DialogFragment {
     }
 
     public abstract void onPositiveClicked(SessionEntry newEntry);
+
     private DialogInterface.OnClickListener getOnPositiveButtonClickListener() {
         return new DialogInterface.OnClickListener() {
             @Override
@@ -158,18 +164,11 @@ public abstract class EntryFormDialogBase extends DialogFragment {
                 int hours = mEntry.getStartingTimeHours();
                 int minutes = mEntry.getStartingTimeMinutes();
 
-                MyTimePickerDialog dialog = MyTimePickerDialog.newInstance(hours, minutes, mAccentColor);
-                dialog.setOnFinishedListener(new MyTimePickerDialog.OnFinishedListener() {
-                    @Override
-                    public void onFinishedWithResult(int hours, int minutes) {
-                        mEntry.setStartingHour(hours);
-                        mEntry.setStartingMinute(minutes);
-
-                        ui.startingTime.setText(mEntry.stringifyStartingTime("h:mm a"));
-                    }
-                });
-                dialog.show(getFragmentManager(), "get-date");
+                MyTimePickerDialog dialog = MyTimePickerDialog.newInstance(hours, minutes);
+                setListenerOnTimePicker(dialog);
+                dialog.show(getFragmentManager(), "get-time");
             }
+
         };
     }
 
@@ -177,22 +176,55 @@ public abstract class EntryFormDialogBase extends DialogFragment {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MyDatePickerDialog dialog = MyDatePickerDialog.newInstance(-1, mAccentColor, mEntry.getStartingTime());
-
-                dialog.setOnFinishedListener(new MyDatePickerDialog.OnFinishedListener() {
-                    @Override
-                    public void onFinished(long time) {
-                        mEntry.setStartingTime(time);
-                        String dateString = mEntry.stringifyStartingTime(new PreferenceChecker(getContext()).stringGetDateFormat());
-                        ui.sessionDate.setText(dateString);
-                    }
-                });
-
+                MyDatePickerDialog dialog = MyDatePickerDialog.newInstance(-1, mEntry.getStartingTime());
+                setListenerOnDatePicker(dialog);
                 dialog.show(getFragmentManager(), "get-date");
             }
         };
     }
-    //endregion
+
+    //region Methods to set listeners on dialogs
+    private void setListenerOnTimePickerIfShown(String tag){
+        MyTimePickerDialog dialog = (MyTimePickerDialog) getFragmentManager().findFragmentByTag(tag);
+        setListenerOnTimePicker(dialog);
+    }
+
+    private void setListenerOnTimePicker(MyTimePickerDialog picker){
+        if (picker != null) {
+            TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
+                @Override
+                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                    mEntry.setStartingHour(hourOfDay);
+                    mEntry.setStartingMinute(minute);
+
+                    ui.startingTime.setText(mEntry.stringifyStartingTime("h:mm a"));
+                }
+            };
+
+            picker.setOnFinishedListener(listener);
+        }
+    }
+
+    private void setListenerOnDatePickerIfShown(String tag){
+        MyDatePickerDialog dialog = (MyDatePickerDialog) getFragmentManager().findFragmentByTag(tag);
+        setListenerOnDatePicker(dialog);
+    }
+
+    private void setListenerOnDatePicker(MyDatePickerDialog dialog){
+        if(dialog != null){
+            dialog.setOnFinishedListener(new MyDatePickerDialog.OnFinishedListener() {
+                @Override
+                public void onFinished(long time) {
+                    mEntry.setStartingTime(time);
+                    String dateString = mEntry.stringifyStartingTime(new PreferenceChecker(getContext()).stringGetDateFormat());
+                    ui.sessionDate.setText(dateString);
+                }
+            });
+        }
+    }
+    //endregion -- end --
+
+    //endregion -- end --
 
     protected SessionEntry getEntry() {
         long duration = 0;

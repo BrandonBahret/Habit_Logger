@@ -5,7 +5,6 @@ import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.widget.TimePicker;
 
 import com.example.brandon.habitlogger.R;
 
@@ -14,27 +13,22 @@ import com.example.brandon.habitlogger.R;
  * Dialog to get time.
  */
 
-public class MyTimePickerDialog extends DialogFragment
-        implements TimePickerDialog.OnTimeSetListener {
+public class MyTimePickerDialog extends DialogFragment {
 
+    //region (Member attributes)
     public static final String KEY_HOURS = "KEY_HOURS";
     public static final String KEY_MINUTES = "KEY_MINUTES";
-    public static final String KEY_COLOR = "KEY_COLOR";
-
-    private Integer mAccentColor = null;
+    //endregion -- end --
 
     //region Code responsible for providing an interface
-    private OnFinishedListener mFinishedListener;
+    private TimePickerDialog.OnTimeSetListener mOnTimeSetListener;
 
-    public interface OnFinishedListener {
-        void onFinishedWithResult(int hours, int minutes);
+    public void setOnFinishedListener(TimePickerDialog.OnTimeSetListener onTimeSetListener) {
+        mOnTimeSetListener = onTimeSetListener;
     }
+    //endregion -- end --
 
-    public void setOnFinishedListener(OnFinishedListener listener) {
-        mFinishedListener = listener;
-    }
-    //endregion
-
+    //region Methods for creating new instances
     public static MyTimePickerDialog newInstance(int hours, int minutes) {
         MyTimePickerDialog dialog = new MyTimePickerDialog();
 
@@ -45,18 +39,7 @@ public class MyTimePickerDialog extends DialogFragment
 
         return dialog;
     }
-
-    public static MyTimePickerDialog newInstance(int hours, int minutes, int accentColor) {
-        MyTimePickerDialog dialog = new MyTimePickerDialog();
-
-        Bundle args = new Bundle();
-        args.putInt(KEY_HOURS, hours);
-        args.putInt(KEY_MINUTES, minutes);
-        args.putInt(KEY_COLOR, accentColor);
-        dialog.setArguments(args);
-
-        return dialog;
-    }
+    //endregion -- end --
 
     @NonNull
     @Override
@@ -65,27 +48,9 @@ public class MyTimePickerDialog extends DialogFragment
         Bundle args = getArguments();
         int hours = args.getInt(KEY_HOURS, 0);
         int minutes = args.getInt(KEY_MINUTES, 0);
-        mAccentColor = args.getInt(KEY_COLOR);
 
         // Create a new instance of DatePickerDialog and return it
-        final TimePickerDialog pickerDialog = new TimePickerDialog(getActivity(), R.style.MyTimePickerDialogTheme, this, hours, minutes, false);
-
-//        if (mAccentColor != 0) {
-//            pickerDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-//                @Override
-//                public void onShow(DialogInterface dialog) {
-//                    pickerDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(mAccentColor);
-//                    pickerDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(mAccentColor);
-//                }
-//            });
-//        }
-
-        return pickerDialog;
+        return new TimePickerDialog(getActivity(), R.style.MyTimePickerDialogTheme, mOnTimeSetListener, hours, minutes, false);
     }
 
-    @Override
-    public void onTimeSet(TimePicker timePicker, int hours, int minutes) {
-        if (mFinishedListener != null)
-            mFinishedListener.onFinishedWithResult(hours, minutes);
-    }
 }

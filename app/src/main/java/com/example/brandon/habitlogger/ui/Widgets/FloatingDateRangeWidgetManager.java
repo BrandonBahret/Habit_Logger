@@ -92,14 +92,14 @@ public class FloatingDateRangeWidgetManager {
         mViewHolder.dateFrom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showDatePickerDialog(true, mDateFromTime);
+                showDateFromPicker(mDateFromTime);
             }
         });
 
         mViewHolder.dateTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showDatePickerDialog(false, mDateToTime);
+                showDateToPicker(mDateToTime);
             }
         });
 
@@ -107,31 +107,6 @@ public class FloatingDateRangeWidgetManager {
 
         updateSessionEntries(sessionEntries);
         setStartRange(true);
-    }
-
-    public void showDatePickerDialog(final boolean shouldSetDateFrom, long currentTime) {
-        MyDatePickerDialog dialog;
-
-        if (shouldSetDateFrom)
-            dialog = MyDatePickerDialog.newInstance(-1, currentTime);
-        else
-            dialog = MyDatePickerDialog.newInstance(mDateFromTime + DateUtils.DAY_IN_MILLIS, currentTime);
-
-        dialog.setOnFinishedListener(new MyDatePickerDialog.OnFinishedListener() {
-            @Override
-            public void onFinished(long time) {
-                if (shouldSetDateFrom) {
-                    if (time < mDateToTime)
-                        mDateFromTime = time;
-                }
-                else {
-                    if (time > mDateFromTime)
-                        mDateToTime = time;
-                }
-                updateDateRangeLabels(true);
-            }
-        });
-        dialog.show(mActivity.getSupportFragmentManager(), "text");
     }
 
     public boolean entryFitsRange(SessionEntry entry) {
@@ -199,7 +174,7 @@ public class FloatingDateRangeWidgetManager {
                     .translationY(-mViewHolder.rootView.getHeight());
         }
         else {
-                mViewHolder.rootView.setTranslationY(-mActivity.getResources().getDimension(R.dimen.date_range_height)); //mViewHolder.rootView.getMeasuredHeight());
+            mViewHolder.rootView.setTranslationY(-mActivity.getResources().getDimension(R.dimen.date_range_height)); //mViewHolder.rootView.getMeasuredHeight());
             mViewHolder.rootView.setAlpha(0);
             mViewHolder.rootView.setVisibility(View.GONE);
         }
@@ -224,6 +199,48 @@ public class FloatingDateRangeWidgetManager {
 
         mIsShown = true;
     }
+    //endregion -- end --
+
+    //region Methods responsible for handling dialog pickers
+
+    private void setListenerOnDateFromPicker(MyDatePickerDialog dialog){
+        if (dialog != null) {
+            dialog.setOnFinishedListener(new MyDatePickerDialog.OnFinishedListener() {
+                @Override
+                public void onFinished(long time) {
+                    if (time < mDateToTime)
+                        mDateFromTime = time;
+                    updateDateRangeLabels(true);
+                }
+            });
+        }
+    }
+
+    public void showDateFromPicker(long currentTime) {
+        MyDatePickerDialog dialog = MyDatePickerDialog.newInstance(-1, currentTime);
+        setListenerOnDateFromPicker(dialog);
+        dialog.show(mActivity.getSupportFragmentManager(), "set-date-from");
+    }
+
+    private void setListenerOnDateToPicker(MyDatePickerDialog dialog){
+        if (dialog != null) {
+            dialog.setOnFinishedListener(new MyDatePickerDialog.OnFinishedListener() {
+                @Override
+                public void onFinished(long time) {
+                    if (time > mDateFromTime)
+                        mDateToTime = time;
+                    updateDateRangeLabels(true);
+                }
+            });
+        }
+    }
+
+    public void showDateToPicker(long currentTime) {
+        MyDatePickerDialog dialog = MyDatePickerDialog.newInstance(mDateFromTime + DateUtils.DAY_IN_MILLIS, currentTime);
+        setListenerOnDateToPicker(dialog);
+        dialog.show(mActivity.getSupportFragmentManager(), "set-date-to");
+    }
+
     //endregion -- end --
 
     //region Methods responsible for updating the ui
@@ -341,6 +358,14 @@ public class FloatingDateRangeWidgetManager {
         mMaximumTime = savedInstanceState.getLong(KEY_MAX_TIME);
         mIsShown = savedInstanceState.getBoolean(KEY_IS_SHOWN);
         mLastPosition = (int) savedInstanceState.getLong(KEY_LAST_POS);
+
+        MyDatePickerDialog dialogFrom = (MyDatePickerDialog) mActivity.getSupportFragmentManager().findFragmentByTag("set-date-from");
+        setListenerOnDateFromPicker(dialogFrom);
+
+        MyDatePickerDialog dialogTo = (MyDatePickerDialog) mActivity.getSupportFragmentManager().findFragmentByTag("set-date-to");
+        setListenerOnDateToPicker(dialogTo);
+
+
     }
 
     //region Setters {}
