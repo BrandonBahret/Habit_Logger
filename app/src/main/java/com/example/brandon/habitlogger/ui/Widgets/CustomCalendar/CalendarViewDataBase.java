@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.ui.Widgets.CustomCalendar;
 
+import android.content.Context;
 import android.text.TextPaint;
 
 /**
@@ -65,9 +66,11 @@ public abstract class CalendarViewDataBase <DateElement extends DateElementBase>
         mDayNameTextElements = new TextElement[mDays.length];
 
         for (int i = 0; i < mDays.length; i++) {
-            mDayNameTextElements[i] = new TextElement(mDays[i], paint);
+            mDayNameTextElements[i] = new TextElement(getContext(), mDays[i], paint);
         }
     }
+
+    protected abstract Context getContext();
 
     public abstract void setDateElementsPaint(TextPaint paint);
 
@@ -79,11 +82,11 @@ public abstract class CalendarViewDataBase <DateElement extends DateElementBase>
     }
 
     public void setTitle(String title, TextPaint paint) {
-        mTitle = new TextElement(title, paint);
+        mTitle = new TextElement(getContext(), title, paint);
     }
 
     public void setNoDataAvailableText(String text, TextPaint paint) {
-        mNoDataAvailableText = new TextElement(text, paint);
+        mNoDataAvailableText = new TextElement(getContext(), text, paint);
     }
 
     public void setContentMarginTop(float contentMarginTop) {

@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.ui.Widgets.CustomCalendar;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.support.annotation.Dimension;
 import android.text.TextPaint;
@@ -12,6 +13,7 @@ import android.text.TextPaint;
 abstract public class ViewElement {
 
     //region (Member attributes)
+    protected Context mContext;
     protected TextPaint mTextPaint;
     protected float mWidth;
     protected float mHeight;
@@ -20,8 +22,9 @@ abstract public class ViewElement {
     @Dimension protected float mMarginTop;
     //endregion
 
-    public ViewElement(TextPaint paint) {
+    public ViewElement(TextPaint paint, Context context) {
         mTextPaint = paint;
+        mContext = context;
     }
 
     abstract public ViewElement makeMeasurements();

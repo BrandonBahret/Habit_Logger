@@ -1,10 +1,13 @@
 package com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.CalendarView;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.text.TextPaint;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 
 import com.example.brandon.habitlogger.common.MyColorUtils;
 import com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.DateElementBase;
@@ -24,11 +27,15 @@ public class DateElement extends DateElementBase {
     protected Paint mStreakLinePaint;
     //endregion
 
-    public DateElement(TextPaint paint, @Nullable TextElement dateText) {
-        super(paint, dateText);
+    public DateElement(Context context, TextPaint paint, @Nullable TextElement dateText) {
+        super(context, paint, dateText);
 
         mStreakLinePaint = new Paint(paint);
-        mStreakLinePaint.setStrokeWidth(16);
+
+        float dpSize = 5.5f;
+        DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
+        float strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpSize, dm);
+        mStreakLinePaint.setStrokeWidth(strokeWidth);
     }
 
     @Override

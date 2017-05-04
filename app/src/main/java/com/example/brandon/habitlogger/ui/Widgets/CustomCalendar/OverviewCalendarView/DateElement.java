@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.ui.Widgets.CustomCalendar.OverviewCalendarView;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.support.annotation.Nullable;
 import android.text.TextPaint;
@@ -18,8 +19,8 @@ public class DateElement extends DateElementBase {
     private CalendarPieDataSet mPieData;
     //endregion
 
-    public DateElement(TextPaint paint, @Nullable TextElement dateText, @Nullable CalendarPieDataSet pieData) {
-        super(paint, dateText);
+    public DateElement(Context context, TextPaint paint, @Nullable TextElement dateText, @Nullable CalendarPieDataSet pieData) {
+        super(context, paint, dateText);
         mPieData = pieData;
     }
 

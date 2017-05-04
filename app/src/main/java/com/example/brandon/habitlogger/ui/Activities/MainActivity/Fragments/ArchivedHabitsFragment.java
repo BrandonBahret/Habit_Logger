@@ -91,7 +91,7 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
             updateNoResultsLayout(mData == null || mData.isEmpty());
         }
 
-        mHabitAdapter = new HabitViewAdapter(mData, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
+        mHabitAdapter = new HabitViewAdapter(getContext(), mData, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
         recyclerView.setAdapter(mHabitAdapter);
         applyGroupDecoration();
         applySpaceDecoration();
@@ -134,7 +134,7 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
     public void restartFragment() {
         mData = mHabitDatabase.getHabits();
         MyCollectionUtils.filter(mData, Habit.ICheckIfIsNotArchived);
-        mHabitAdapter = new HabitViewAdapter(mData, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
+        mHabitAdapter = new HabitViewAdapter(getContext(), mData, getHabitMenuItemClickListener(), getHabitButtonClickCallback());
         mRecyclerView.setAdapter(mHabitAdapter);
         mCallbackInterface.showCurrentSessionsCard(false);
         mRecyclerView.removeItemDecoration(mSpaceDecoration);

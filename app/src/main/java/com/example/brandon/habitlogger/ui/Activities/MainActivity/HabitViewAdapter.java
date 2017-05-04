@@ -1,13 +1,16 @@
 package com.example.brandon.habitlogger.ui.Activities.MainActivity;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
-import com.example.brandon.habitlogger.R;
 
 import java.util.List;
 
@@ -20,6 +23,7 @@ import java.util.List;
 public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
 
     //region (Member attributes)
+    private Context mContext;
     private List<Habit> mHabitsList;
     private static List<SessionEntry> mCurrentEntries;
     //endregion
@@ -51,13 +55,14 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
     }
     //endregion -- end --
 
-    public HabitViewAdapter(List<Habit> habitsList,
+    public HabitViewAdapter(Context context, List<Habit> habitsList,
                             MenuItemClickListener menuItemClickListener,
                             ButtonClickCallback buttonClickCallback) {
 
         mHabitsList = habitsList;
         mMenuItemClickListener = menuItemClickListener;
         mButtonClickCallback = buttonClickCallback;
+        mContext = context;
     }
 
     //region Methods responsible for creating and binding rootView holders
@@ -66,7 +71,11 @@ public class HabitViewAdapter extends RecyclerView.Adapter<HabitViewHolder> {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.habit_card, parent, false);
 
-        setMargins(itemView, 0, 12, 0, 12);
+        int dpSize = 4;
+        DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
+        int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpSize, dm);
+
+        setMargins(itemView, 0, margin, 0, margin);
 
         return new HabitViewHolder(itemView);
     }

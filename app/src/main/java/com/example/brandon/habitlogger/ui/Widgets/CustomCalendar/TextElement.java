@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.ui.Widgets.CustomCalendar;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.text.TextPaint;
@@ -15,8 +16,8 @@ public class TextElement extends ViewElement {
     private String mText;
     //endregion
 
-    public TextElement(String text, TextPaint paint) {
-        super(paint);
+    public TextElement(Context context, String text, TextPaint paint) {
+        super(paint, context);
         mText = text;
     }
 

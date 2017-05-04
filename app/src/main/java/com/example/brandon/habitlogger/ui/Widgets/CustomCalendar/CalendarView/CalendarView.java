@@ -48,7 +48,7 @@ public class CalendarView extends CalendarViewBase {
     //region Methods responsible for initializing the view
     @Override
     protected CalendarViewDataBase onCreateCalenderModel() {
-        CalendarViewData data = new CalendarViewData();
+        CalendarViewData data = new CalendarViewData(getContext());
         data.setTitle("January 2017", mTitlePaint);
         return data;
     }
@@ -106,7 +106,6 @@ public class CalendarView extends CalendarViewBase {
 
         boolean pastCurrentDate = false;
 
-
         for (int day = 0; day < 7; day++) {
             currentDayLabel = mCalendarData.getDayNameTextElements()[day];
 
@@ -139,7 +138,7 @@ public class CalendarView extends CalendarViewBase {
                 }
 
                 mDateElementPaint.setAlpha((thisDay > currentDate && isCurrentMonth) || isPastCurrentMonth ? 77 : 255);
-                TextElement text = new TextElement(String.valueOf(thisDay), mDateElementPaint);
+                TextElement text = new TextElement(getContext(), String.valueOf(thisDay), mDateElementPaint);
                 text.makeMeasurements();
                 currentElement.setDateText(text);
             }
@@ -186,7 +185,7 @@ public class CalendarView extends CalendarViewBase {
                         currentElement.setTextPaint(mCalendarBackgroundPaint);
 
                     mDateElementPaint.setAlpha((thisDay > currentDate && isCurrentMonth) || isPastCurrentMonth ? 77 : 255);
-                    TextElement text = new TextElement(String.valueOf(thisDay), mDateElementPaint);
+                    TextElement text = new TextElement(getContext(), String.valueOf(thisDay), mDateElementPaint);
                     text.makeMeasurements();
                     currentElement.setDateText(text);
 

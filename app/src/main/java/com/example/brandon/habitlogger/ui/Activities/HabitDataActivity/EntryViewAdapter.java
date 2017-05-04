@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +15,9 @@ import android.widget.TextView;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.ThemeColorPalette;
+import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.ui.Widgets.LayoutCheckableTextView;
 
 /**
@@ -86,7 +88,12 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.entry_card, parent, false);
-        setMargins(itemView, 0, 12, 0, 12);
+
+        int dpSize = 4;
+        DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
+        int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpSize, dm);
+
+        setMargins(itemView, 0, margin, 0, margin);
 
         return new ViewHolder(itemView);
     }
@@ -116,6 +123,7 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         }
 
         final int maxLines = mContext.getResources().getInteger(R.integer.entry_card_note_max_lines);
+
         holder.noteText.setOnLayoutListener(new LayoutCheckableTextView.OnLayoutListener() {
             @Override
             public void onLayoutCreated(TextView view) {

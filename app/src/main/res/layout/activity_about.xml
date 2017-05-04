@@ -59,6 +59,7 @@
         android:layout_above="@+id/link_layout"
         android:layout_alignParentStart="true"
         android:background="@drawable/background_simple_line"
+        android:paddingBottom="2dp"
         android:text="@string/links"
         android:textAlignment="center"
         android:textColor="@color/textColor1"
@@ -70,9 +71,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-
         android:layout_marginBottom="4dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="6dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:weightSum="10">

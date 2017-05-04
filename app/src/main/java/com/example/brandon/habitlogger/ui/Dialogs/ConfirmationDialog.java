@@ -33,8 +33,8 @@ public class ConfirmationDialog {
         mDialogBuilder
                 .setTitle(mTitle)
                 .setMessage(mMessage)
-                .setPositiveButton("Yes", this.onYesListener)
-                .setNegativeButton("No", this.onNoListener)
+                .setPositiveButton("Confirm", this.onYesListener)
+                .setNegativeButton("Cancel", this.onNoListener)
                 .setOnCancelListener(this.onCancelListener)
                 .setOnDismissListener(this.onDismissListener);
 

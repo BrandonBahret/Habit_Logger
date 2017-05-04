@@ -1,5 +1,6 @@
 package com.example.brandon.habitlogger.ui.Widgets.CustomCalendar;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
@@ -23,8 +24,8 @@ public abstract class DateElementBase extends ViewElement {
     protected Paint mCurrentDatePaint;
     //endregion
 
-    public DateElementBase(TextPaint paint, @Nullable TextElement dateText) {
-        super(paint);
+    public DateElementBase(Context context, TextPaint paint, @Nullable TextElement dateText) {
+        super(paint, context);
         mDateText = dateText;
         mCurrentDatePaint = new Paint(paint);
         mCurrentDatePaint.setFlags(Paint.ANTI_ALIAS_FLAG);
