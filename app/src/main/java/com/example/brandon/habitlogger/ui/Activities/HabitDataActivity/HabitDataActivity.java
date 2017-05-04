@@ -357,15 +357,25 @@ public class HabitDataActivity extends AppCompatActivity implements
     //region Scroll events
     @Override
     public void onScrollUp() {
-        dateRangeManager.showView(true);
-        if (mPreferenceChecker.hideFabOnScroll() && ui.tabs.getSelectedTabPosition() == 0)
+        boolean entriesFragmentShown = ui.tabs.getSelectedTabPosition() == 0;
+        boolean statisticsFragmentShown = ui.tabs.getSelectedTabPosition() == 2;
+
+        if(entriesFragmentShown || statisticsFragmentShown)
+            dateRangeManager.showView(true);
+
+        if (mPreferenceChecker.hideFabOnScroll() && entriesFragmentShown)
             ui.menuFab.showMenu(true);
     }
 
     @Override
     public void onScrollDown() {
-        dateRangeManager.hideView(true);
-        if (mPreferenceChecker.hideFabOnScroll() && ui.tabs.getSelectedTabPosition() == 0)
+        boolean entriesFragmentShown = ui.tabs.getSelectedTabPosition() == 0;
+        boolean statisticsFragmentShown = ui.tabs.getSelectedTabPosition() == 2;
+
+        if(entriesFragmentShown || statisticsFragmentShown)
+            dateRangeManager.hideView(true);
+
+        if (mPreferenceChecker.hideFabOnScroll() && entriesFragmentShown)
             ui.menuFab.hideMenu(true);
     }
     //endregion -- end --

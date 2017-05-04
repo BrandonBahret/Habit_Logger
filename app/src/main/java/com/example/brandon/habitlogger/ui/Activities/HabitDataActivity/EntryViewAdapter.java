@@ -124,7 +124,6 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
             }
         });
 
-
         holder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

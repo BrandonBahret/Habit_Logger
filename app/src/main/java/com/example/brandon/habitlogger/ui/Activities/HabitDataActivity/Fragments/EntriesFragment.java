@@ -141,19 +141,7 @@ public class EntriesFragment extends Fragment implements
         mEntriesContainer.setAdapter(mEntryAdapter);
 
         if (mScrollListener != null) {
-            mEntriesContainer.addOnScrollListener(
-                    new RecyclerViewScrollObserver() {
-                        @Override
-                        public void onScrollUp() {
-                            mScrollListener.onScrollUp();
-                        }
-
-                        @Override
-                        public void onScrollDown() {
-                            mScrollListener.onScrollDown();
-                        }
-                    }
-            );
+            mEntriesContainer.addOnScrollListener(mScrollObserver);
         }
 
         onUpdateEntries(mCallbackInterface.getSessionEntries());
@@ -161,6 +149,17 @@ public class EntriesFragment extends Fragment implements
         return mView;
     }
 
+    RecyclerViewScrollObserver mScrollObserver = new RecyclerViewScrollObserver() {
+        @Override
+        public void onScrollUp() {
+            mScrollListener.onScrollUp();
+        }
+
+        @Override
+        public void onScrollDown() {
+            mScrollListener.onScrollDown();
+        }
+    };
     //endregion
 
     //region Methods responsible for updating the ui
@@ -197,6 +196,9 @@ public class EntriesFragment extends Fragment implements
             mEntryAdapter = new EntryViewAdapter(dataCollection, getContext(), mColorPalette, mEntryAdapter.getListener());
             mEntriesContainer.setAdapter(mEntryAdapter);
             mEntriesContainer.invalidateItemDecorations();
+
+            mScrollObserver.onScrollUp();
+            mScrollObserver.setControlState(false);
         }
 
         showNoDataLayout(mSessionEntries == null || mSessionEntries.isEmpty());

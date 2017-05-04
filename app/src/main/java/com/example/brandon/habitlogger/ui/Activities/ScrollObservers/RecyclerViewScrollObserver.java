@@ -20,13 +20,24 @@ public abstract class RecyclerViewScrollObserver extends RecyclerView.OnScrollLi
     public void onScrolled(RecyclerView recyclerView, int dx, int current) {
         super.onScrolled(recyclerView, dx, current);
 
-        if (current > THRESHOLD && !mControl) {
-            onScrollDown();
-            mControl = true;
-        }
-        else if (current < -THRESHOLD && mControl) {
-            onScrollUp();
-            mControl = false;
-        }
+//        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+//        int visibleItemCount = layoutManager.getChildCount();
+//        int totalItemCount = layoutManager.getItemCount();
+
+//        if (totalItemCount > visibleItemCount) {
+            if (current > THRESHOLD && !mControl) {
+                onScrollDown();
+                mControl = true;
+            }
+            else if (current < -THRESHOLD && mControl) {
+                onScrollUp();
+                mControl = false;
+            }
+//        }
     }
+
+    public void setControlState(boolean state){
+        mControl = state;
+    }
+
 }
