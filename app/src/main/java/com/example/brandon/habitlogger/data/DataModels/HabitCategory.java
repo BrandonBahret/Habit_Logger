@@ -1,5 +1,7 @@
 package com.example.brandon.habitlogger.data.DataModels;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.example.brandon.habitlogger.common.MyColorUtils;
@@ -15,7 +17,7 @@ import static com.example.brandon.habitlogger.common.MyColorUtils.stringifyColor
  * This object is used to give habits categorical organization.
  */
 
-public class HabitCategory implements Serializable {
+public class HabitCategory implements Serializable, Parcelable {
 
     //region (Member attributes)
     @NonNull private String mColor = "#ff000000";
@@ -37,6 +39,35 @@ public class HabitCategory implements Serializable {
     public HabitCategory() {}
     //endregion
 
+    //region Methods responsible for making this object parcelable
+    public HabitCategory(Parcel in) {
+        HabitCategory category = (HabitCategory) in.readSerializable();
+        HabitCategory.copy(this, category);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeSerializable(this);
+    }
+
+    public static final Creator<HabitCategory> CREATOR = new Creator<HabitCategory>() {
+        @Override
+        public HabitCategory createFromParcel(Parcel in) {
+            return new HabitCategory(in);
+        }
+
+        @Override
+        public HabitCategory[] newArray(int size) {
+            return new HabitCategory[size];
+        }
+    };
+    //endregion -- end --
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof HabitCategory) {
@@ -45,6 +76,12 @@ public class HabitCategory implements Serializable {
                     compare.getColor().equals(getColor());
         }
         else return false;
+    }
+
+    public static void copy(HabitCategory dest, HabitCategory source){
+        dest.setName(source.getName());
+        dest.setColor(source.getColor());
+        dest.setDatabaseId(source.getDatabaseId());
     }
 
     @Override
@@ -93,6 +130,7 @@ public class HabitCategory implements Serializable {
     public long getDatabaseId() {
         return mDatabaseId;
     }
+
     //endregion -- end --
 
 }
