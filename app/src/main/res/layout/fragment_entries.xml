@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/AppTheme.ContrastBackground"
-    tools:context=".ui.Activities.HabitDataActivity.Fragments.EntriesFragment">
+    tools:context=".ui.Activities.HabitDataActivity.Fragments.EntriesFragment.EntriesFragment">
 
     <include
         android:id="@+id/no_results_layout"

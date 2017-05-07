@@ -1,5 +1,9 @@
-package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity;
+package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.EntriesFragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v7.widget.CardView;
@@ -47,7 +51,24 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
     }
     //endregion
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    //region Constructors {}
+    public EntryViewAdapter(SessionEntryCollection sessionEntries, Context context, OnClickListeners listener) {
+        mContext = context;
+        mSessionEntries = sessionEntries;
+        mHabitDatabase = new HabitDatabase(context);
+        mListener = listener;
+    }
+
+    public EntryViewAdapter(SessionEntryCollection sessionEntries, Context context, ThemeColorPalette colorPalette, OnClickListeners listener) {
+        mContext = context;
+        mSessionEntries = sessionEntries;
+        mHabitDatabase = new HabitDatabase(context);
+        mListener = listener;
+        mColorPalette = colorPalette;
+    }
+    //endregion -- end --
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         public LayoutCheckableTextView noteText;
         public TextView startTimeText, durationText;
         public ImageButton expandNote;
@@ -68,21 +89,6 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         }
     }
 
-    public EntryViewAdapter(SessionEntryCollection sessionEntries, Context context, OnClickListeners listener) {
-        mContext = context;
-        mSessionEntries = sessionEntries;
-        mHabitDatabase = new HabitDatabase(context);
-        mListener = listener;
-    }
-
-    public EntryViewAdapter(SessionEntryCollection sessionEntries, Context context, ThemeColorPalette colorPalette, OnClickListeners listener) {
-        mContext = context;
-        mSessionEntries = sessionEntries;
-        mHabitDatabase = new HabitDatabase(context);
-        mListener = listener;
-        mColorPalette = colorPalette;
-    }
-
     //region Methods responsible for creating and binding rootView holders
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -92,7 +98,6 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         int dpSize = 4;
         DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
         int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpSize, dm);
-
         setMargins(itemView, 0, margin, 0, margin);
 
         return new ViewHolder(itemView);
@@ -112,7 +117,6 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         else
             holder.accent.setBackgroundColor(mColorPalette.getBaseColor());
 
-
         if (!item.getNote().equals("")) {
             holder.noteText.setText(item.getNote());
             holder.noteText.setTypeface(Typeface.DEFAULT);
@@ -124,13 +128,15 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
 
         final int maxLines = mContext.getResources().getInteger(R.integer.entry_card_note_max_lines);
 
-        holder.noteText.setOnLayoutListener(new LayoutCheckableTextView.OnLayoutListener() {
-            @Override
-            public void onLayoutCreated(TextView view) {
-                if (view.getLineCount() >= maxLines)
-                    holder.expandNote.setVisibility(View.VISIBLE);
-            }
-        });
+        // This is replaced with ShowMoreDecoration
+//        holder.noteText.setOnLayoutListener(new LayoutCheckableTextView.OnLayoutListener() {
+//            @Override
+//            public void onLayoutCreated(TextView view) {
+//                if (view.getLineCount() >= maxLines) {
+//                    holder.expandNote.setVisibility(View.VISIBLE);
+//                }
+//            }
+//        });
 
         holder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,11 +149,48 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
         holder.expandNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                boolean expand = holder.noteText.getMaxLines() == maxLines;
-                holder.noteText.setMaxLines(expand ? 100 : maxLines);
 
-                holder.expandNote.setImageResource(expand ? R.drawable.ic_arrow_drop_up_24dp :
-                        R.drawable.ic_arrow_drop_down_24dp);
+                int noteMaxLines = holder.noteText.getMaxLines();
+                boolean expand = noteMaxLines == maxLines;
+
+                // todo : replace '50' with code that determines what the max lines should be for the given text
+                final int targetMaxLines = expand ? 50 : maxLines;
+//                holder.noteText.setMaxLines(targetMaxLines);
+
+                ObjectAnimator animation = ObjectAnimator.ofInt(
+                        holder.noteText,
+                        "maxLines",
+                        targetMaxLines
+                );
+
+                // This is a hack to ensure the full note is always shown.
+                // This assumes '50' lines will always go off screen
+                animation.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        if (targetMaxLines > maxLines)
+                            holder.noteText.setMaxLines(5000);
+                    }
+                });
+
+                animation.setDuration(150);
+                animation.start();
+
+                float rotation = holder.expandNote.getRotation();
+                ValueAnimator anim = ValueAnimator.ofFloat(rotation, rotation + 180);
+                anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                        float val = (Float) valueAnimator.getAnimatedValue();
+                        holder.expandNote.setRotation(val);
+                    }
+                });
+                anim.setDuration(150);
+                anim.start();
+
+//                holder.expandNote.setImageResource(expand ? R.drawable.ic_arrow_drop_up_24dp :
+//                        R.drawable.ic_arrow_drop_down_24dp);
             }
         });
     }

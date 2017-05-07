@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.graphics.PorterDuff;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
@@ -27,14 +28,21 @@ import com.example.brandon.habitlogger.databinding.DialogCategorySelectorBinding
 public class CategorySpinner extends AppCompatSpinner {
 
     //region (Member attributes)
+    public static final String TAG_DIALOG = "TAG_DIALOG";
+//    private SelectCategoryDialog mDialog;
     private AlertDialog mDialog;
     Context mContext;
+    FragmentManager mFragmentManager;
 
     private Integer mAccentColor = 0;
     //endregion
 
     public CategorySpinner(Context context, AttributeSet attrs) {
         super(context, attrs);
+    }
+
+    public void setFragmentManager(FragmentManager fragmentManager){
+        mFragmentManager = fragmentManager;
     }
 
     @Override
@@ -50,6 +58,12 @@ public class CategorySpinner extends AppCompatSpinner {
         ui.categoryList.setAdapter((ListAdapter) adapter);
         ui.categoryList.setOnItemClickListener(OnCategoryListItemClick);
         ui.newCategoryButton.setOnClickListener(OnNewCategoryButtonClicked);
+
+//        mDialog = new SelectCategoryDialog(adapter, OnCategoryListItemClick, OnNewCategoryButtonClicked);
+//        mDialog = new SelectCategoryDialog();
+//        List<HabitCategory> categoryList = ((CategorySpinnerAdapter) adapter).getItems();
+//        mDialog = SelectCategoryDialog.newInstance(categoryList);
+//        mDialog.setCallbackInterface(SelectCategoryDialogCallback);
 
         mDialog = new AlertDialog.Builder(mContext)
                 .setTitle(mContext.getString(R.string.spinner_prompt_categories))
@@ -76,9 +90,43 @@ public class CategorySpinner extends AppCompatSpinner {
     //region Methods responsible for handling events
     @Override
     public boolean performClick() {
+//        if (mFragmentManager != null) mDialog.show(mFragmentManager, TAG_DIALOG);
         mDialog.show();
         return false;
     }
+
+//    @Override
+//    public void onRestoreInstanceState(Parcelable state) {
+//        super.onRestoreInstanceState(state);
+//        if(mDialog == null)
+//            mDialog = (SelectCategoryDialog) mFragmentManager.findFragmentByTag(TAG_DIALOG);
+//
+//        if (mDialog != null)
+//            mDialog.setCallbackInterface(SelectCategoryDialogCallback);
+//    }
+
+    private SelectCategoryDialog.DialogCallback SelectCategoryDialogCallback =
+            new SelectCategoryDialog.DialogCallback() {
+                @Override
+                public void onCategoryListItemClick(int adapterPosition) {
+                    setSelection(adapterPosition);
+                }
+
+                @Override
+                public void onNewCategoryButtonClick() {
+                    NewCategoryDialog dialog = new NewCategoryDialog(mContext, OnCategoryDialogFinished);
+                    final AlertDialog categoryDialog = dialog.createBuilder().create();
+                    categoryDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                        @Override
+                        public void onShow(DialogInterface dialog) {
+                            int color = mAccentColor == 0 ? ContextCompat.getColor(getContext(), R.color.colorAccent) : mAccentColor;
+                            categoryDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(color);
+                            categoryDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(color);
+                        }
+                    });
+                    categoryDialog.show();
+                }
+            };
 
     private AdapterView.OnItemClickListener OnCategoryListItemClick =
             new OnItemClickListener() {

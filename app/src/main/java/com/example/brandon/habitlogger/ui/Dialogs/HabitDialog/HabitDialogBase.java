@@ -67,6 +67,7 @@ public abstract class HabitDialogBase extends DialogFragment {
         mAdapter = new CategorySpinnerAdapter(getContext(), categories);
         ui.spinnerCategorySelector.setAccentColor(mAccentColor);
         ui.spinnerCategorySelector.setAdapter(mAdapter);
+        ui.spinnerCategorySelector.setFragmentManager(getFragmentManager());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
                 .setCancelable(true)

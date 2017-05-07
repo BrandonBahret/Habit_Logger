@@ -69,6 +69,10 @@ public class CategorySpinnerAdapter extends BaseAdapter {
         return mCategories.size();
     }
 
+    public List<HabitCategory> getItems() {
+        return mCategories;
+    }
+
     public HabitCategory getItem(int position) {
         return mCategories.get(position);
     }

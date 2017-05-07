@@ -59,19 +59,17 @@
                 android:id="@+id/expand_note"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
+                android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
-                android:layout_below="@+id/entry_note"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/toggle_note_content_description"
-                android:src="@drawable/ic_arrow_drop_down_24dp"
-                android:visibility="gone"/>
+                android:src="@drawable/ic_arrow_drop_down_24dp"/>
 
             <com.example.brandon.habitlogger.ui.Widgets.LayoutCheckableTextView
                 android:id="@+id/entry_note"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/entry_duration"
-                android:layout_centerHorizontal="true"
                 android:layout_marginBottom="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"

@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments;
+package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.EntriesFragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -18,7 +18,6 @@ import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.CenterLinearLayoutManager;
-import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.EntryViewAdapter;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
@@ -110,6 +109,8 @@ public class EntriesFragment extends Fragment implements
         mEntriesContainer = (RecyclerView) mView.findViewById(R.id.entries_holder);
 
         // Add item decorations
+        mEntriesContainer.addItemDecoration(new ShowMoreDecoration());
+
         mEntriesContainer.addItemDecoration(new GroupDecoration(getContext(), R.dimen.entries_section_text_size, mMakeHeadersSticky, new GroupDecoration.Callback() {
             @Override
             public long getGroupId(int position) {

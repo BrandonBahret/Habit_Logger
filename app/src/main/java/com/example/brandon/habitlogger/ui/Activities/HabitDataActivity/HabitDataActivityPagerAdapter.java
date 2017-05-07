@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.CalendarFragment;
-import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.EntriesFragment;
+import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.EntriesFragment.EntriesFragment;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.StatisticsFragment;
 
 /**
