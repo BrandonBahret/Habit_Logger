@@ -1,7 +1,5 @@
 package com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.EntriesFragment;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -165,14 +163,14 @@ public class EntryViewAdapter extends RecyclerView.Adapter<EntryViewAdapter.View
 
                 // This is a hack to ensure the full note is always shown.
                 // This assumes '50' lines will always go off screen
-                animation.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        super.onAnimationEnd(animation);
-                        if (targetMaxLines > maxLines)
-                            holder.noteText.setMaxLines(5000);
-                    }
-                });
+//                animation.addListener(new AnimatorListenerAdapter() {
+//                    @Override
+//                    public void onAnimationEnd(Animator animation) {
+//                        super.onAnimationEnd(animation);
+//                        if (targetMaxLines > maxLines)
+//                            holder.noteText.setMaxLines(5000);
+//                    }
+//                });
 
                 animation.setDuration(150);
                 animation.start();

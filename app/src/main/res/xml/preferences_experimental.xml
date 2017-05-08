@@ -58,21 +58,21 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Sessions">
+    <!--<PreferenceCategory android:title="Sessions">-->
 
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="@string/pref_ask_finish"
-            android:summary="Ask for confirmation before completing sessions."
-            android:title="Confirm finish"/>
+        <!--<CheckBoxPreference-->
+            <!--android:defaultValue="true"-->
+            <!--android:key="@string/pref_ask_finish"-->
+            <!--android:summary="Ask for confirmation before completing sessions."-->
+            <!--android:title="Confirm finish"/>-->
 
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="@string/pref_ask_cancel"
-            android:summary="Ask for confirmation before canceling sessions."
-            android:title="Confirm cancel"/>
+        <!--<CheckBoxPreference-->
+            <!--android:defaultValue="true"-->
+            <!--android:key="@string/pref_ask_cancel"-->
+            <!--android:summary="Ask for confirmation before canceling sessions."-->
+            <!--android:title="Confirm cancel"/>-->
 
-    </PreferenceCategory>
+    <!--</PreferenceCategory>-->
 
     <PreferenceCategory android:title="Dates">
 

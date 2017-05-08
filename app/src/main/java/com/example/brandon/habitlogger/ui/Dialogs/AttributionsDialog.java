@@ -2,6 +2,8 @@ package com.example.brandon.habitlogger.ui.Dialogs;
 
 import android.content.Context;
 
+import com.example.brandon.habitlogger.R;
+
 import de.psdev.licensesdialog.LicensesDialog;
 import de.psdev.licensesdialog.licenses.ApacheSoftwareLicense20;
 import de.psdev.licensesdialog.licenses.License;
@@ -29,6 +31,7 @@ public class AttributionsDialog {
 
         new LicensesDialog.Builder(context)
                 .setNotices(notices)
+                .setNoticesCssStyle(R.string.notices_style)
                 .build()
                 .show();
     }

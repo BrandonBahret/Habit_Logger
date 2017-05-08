@@ -22,7 +22,6 @@ import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.databinding.ActivitySessionBinding;
-import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity.Fragments.TimerFragment;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
 
@@ -212,8 +211,8 @@ public class SessionActivity extends AppCompatActivity implements
     }
 
     private void onFinishSessionClicked() {
-        boolean shouldAsk = new PreferenceChecker(this).doAskBeforeFinish();
-        if (shouldAsk) {
+//        boolean shouldAsk = new PreferenceChecker(this).doAskBeforeFinish();
+//        if (shouldAsk) {
             boolean nightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
             int iconRes = R.drawable.ic_check_24dp;
 
@@ -227,13 +226,13 @@ public class SessionActivity extends AppCompatActivity implements
             );
 
             mDialogSettings.putBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG, false);
-        }
-        else finishSession();
+//        }
+//        else finishSession();
     }
 
     private void onCancelSessionClicked() {
-        boolean shouldAsk = new PreferenceChecker(this).doAskBeforeCancel();
-        if (shouldAsk) {
+//        boolean shouldAsk = new PreferenceChecker(this).doAskBeforeCancel();
+//        if (shouldAsk) {
             int iconRes = R.drawable.ic_close_24dp;
 
             askForConfirmation("Cancel session", "Cancel this session?", false, iconRes,
@@ -246,8 +245,8 @@ public class SessionActivity extends AppCompatActivity implements
             );
 
             mDialogSettings.putBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG, true);
-        }
-        else mSessionManager.cancelSession(mHabit.getDatabaseId());
+//        }
+//        else mSessionManager.cancelSession(mHabit.getDatabaseId());
     }
 
     private void finishSession() {

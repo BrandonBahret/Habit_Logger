@@ -2,6 +2,10 @@
 
     <string name="app_name">Habit Logger</string>
 
+    <string name="notices_style" translatable="false">
+        @string/notices_default_style
+    </string>
+
     <!--Activity Labels-->
     <string name="habit_session_activity_label">Habit Session</string>
     <string name="active_habits_activity_label">@string/active_sessions_upper</string>
@@ -44,7 +48,7 @@
     <string name="github_link_content_description">Link to the author\'s GitHub.</string>
     <string name="linkedin_link_content_description">Link to the author\'s LinkedIn.</string>
     <string name="freelancer_link_content_description">Link to the author\'s freelancer page.</string>
-    <string name="description_on_about_activity">Habit Logger is an application for people to monitor themselves, specifically when and how long they perform their activities.</string>
+    <string name="description_on_about_activity">Habit Logger is an application to help you monitor yourself. Specifically, how you spend your time.</string>
     <string name="active_session">active session</string>
     <string name="preference_checkbox_preference">checkbox_preference</string>
     <string name="cannot_open_active_sessions_activity">No active sessions</string>

@@ -94,19 +94,19 @@ public class PreferenceChecker {
     }
     //endregion
 
-    //region Methods related to session activity settings
-    public boolean doAskBeforeCancel(){
-        return preferences.getBoolean(
-                mContext.getString(R.string.pref_ask_cancel), true
-        );
-    }
-
-    public boolean doAskBeforeFinish(){
-        return preferences.getBoolean(
-                mContext.getString(R.string.pref_ask_finish), true
-        );
-    }
-    //endregion -- end --
+//    //region Methods related to session activity settings
+//    public boolean doAskBeforeCancel(){
+//        return preferences.getBoolean(
+//                mContext.getString(R.string.pref_ask_cancel), true
+//        );
+//    }
+//
+//    public boolean doAskBeforeFinish(){
+//        return preferences.getBoolean(
+//                mContext.getString(R.string.pref_ask_finish), true
+//        );
+//    }
+//    //endregion -- end --
 
     //region Methods related to notification settings
     public boolean doShowNotifications(){

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="notices_style" translatable="false">
+        ul {
+            color: #fff;
+        }
+
+        a {
+            color: #cccccc;
+        }
+
+        p.license {
+            color: #ffffff;
+            background: #424242;
+        }
+
+        body {
+            background-color: #303030;
+            font-family: sans-serif;
+            overflow-wrap: break-word;
+        }
+
+        pre {
+            background-color: #5c5c5c;
+            color: #ddd;
+            padding: 1em;
+            white-space: pre-wrap;
+        }
+    </string>
+
+</resources>
