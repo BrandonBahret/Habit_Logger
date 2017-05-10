@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -109,6 +110,8 @@ public class HabitDataActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        resetDialogListeners();
 
         boolean usesSavedInstance = savedInstanceState != null;
         if (usesSavedInstance) {
@@ -360,7 +363,7 @@ public class HabitDataActivity extends AppCompatActivity implements
         boolean entriesFragmentShown = ui.tabs.getSelectedTabPosition() == 0;
         boolean statisticsFragmentShown = ui.tabs.getSelectedTabPosition() == 2;
 
-        if(entriesFragmentShown || statisticsFragmentShown)
+        if (entriesFragmentShown || statisticsFragmentShown)
             dateRangeManager.showView(true);
 
         if (mPreferenceChecker.hideFabOnScroll() && entriesFragmentShown)
@@ -372,7 +375,7 @@ public class HabitDataActivity extends AppCompatActivity implements
         boolean entriesFragmentShown = ui.tabs.getSelectedTabPosition() == 0;
         boolean statisticsFragmentShown = ui.tabs.getSelectedTabPosition() == 2;
 
-        if(entriesFragmentShown || statisticsFragmentShown)
+        if (entriesFragmentShown || statisticsFragmentShown)
             dateRangeManager.hideView(true);
 
         if (mPreferenceChecker.hideFabOnScroll() && entriesFragmentShown)
@@ -396,7 +399,7 @@ public class HabitDataActivity extends AppCompatActivity implements
 
         switch (id) {
             case (android.R.id.home):
-                if(ui.menuFab.isOpened())
+                if (ui.menuFab.isOpened())
                     ui.menuFab.close(true);
                 else finish();
                 break;
@@ -429,6 +432,50 @@ public class HabitDataActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    private void resetDialogListeners() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        ConfirmationDialog dialog;
+
+        if ((dialog = (ConfirmationDialog) fragmentManager.findFragmentByTag("confirm-delete-habit")) != null)
+            setDialogListener(dialog);
+
+        else if ((dialog = (ConfirmationDialog) fragmentManager.findFragmentByTag("confirm-archive-habit")) != null)
+            setDialogListener(dialog);
+
+        else if ((dialog = (ConfirmationDialog) fragmentManager.findFragmentByTag("confirm-reset-habit")) != null)
+            setDialogListener(dialog);
+    }
+
+    private void setDialogListener(ConfirmationDialog dialog) {
+        switch (dialog.getTag()) {
+            case "confirm-delete-habit":
+                dialog.setOnYesClickListener(onYesDeleteHabitClicked);
+                break;
+
+            case "confirm-reset-habit":
+                dialog.setOnYesClickListener(onYesResetHabitClick);
+                break;
+
+            case "confirm-archive-habit":
+                dialog.setOnYesClickListener(onYesArchiveHabitClick);
+                break;
+        }
+    }
+
+    //region Code responsible for handling delete habit option clicks
+    DialogInterface.OnClickListener onYesDeleteHabitClicked = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (mSessionManager.getIsSessionActive(mHabit.getDatabaseId())) {
+                mSessionManager.cancelSession(mHabit.getDatabaseId());
+            }
+            mHabitDatabase.deleteHabit(mHabit.getDatabaseId());
+            setResult(ResultCodes.HABIT_CHANGED);
+            finish();
+        }
+    };
+
     private void onMenuDeleteHabitClicked() {
         String habitName = mHabitDatabase.getHabitName(mHabit.getDatabaseId());
 
@@ -436,20 +483,21 @@ public class HabitDataActivity extends AppCompatActivity implements
                 .setIcon(R.drawable.ic_delete_forever_24dp)
                 .setTitle(R.string.confirm_delete)
                 .setMessage("Do you really want to delete '" + habitName + "'?")
-                .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (mSessionManager.getIsSessionActive(mHabit.getDatabaseId())) {
-                            mSessionManager.cancelSession(mHabit.getDatabaseId());
-                        }
-                        mHabitDatabase.deleteHabit(mHabit.getDatabaseId());
-                        setResult(ResultCodes.HABIT_CHANGED);
-                        finish();
-                    }
-                })
+                .setOnYesClickListener(onYesDeleteHabitClicked)
                 .setAccentColor(ContextCompat.getColor(this, R.color.textColorContrastBackground))
-                .show(getSupportFragmentManager(), "confirm");
+                .show(getSupportFragmentManager(), "confirm-delete-habit");
     }
+    //endregion -- end --
+
+    //region Code responsible for handling reset-habit option clicks
+    DialogInterface.OnClickListener onYesResetHabitClick = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            mHabitDatabase.deleteEntriesForHabit(mHabit.getDatabaseId());
+            clearEntries();
+            Toast.makeText(HabitDataActivity.this, R.string.entries_deleted_message, Toast.LENGTH_SHORT).show();
+        }
+    };
 
     private void onMenuResetHabitClicked() {
         String habitName = mHabitDatabase.getHabitName(mHabit.getDatabaseId());
@@ -458,17 +506,23 @@ public class HabitDataActivity extends AppCompatActivity implements
                 .setIcon(R.drawable.ic_delete_sweep_24dp)
                 .setTitle(R.string.confirm_habit_data_reset_title)
                 .setMessage("Do you really want to delete all entries for '" + habitName + "'?")
-                .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mHabitDatabase.deleteEntriesForHabit(mHabit.getDatabaseId());
-                        clearEntries();
-                        Toast.makeText(HabitDataActivity.this, R.string.entries_deleted_message, Toast.LENGTH_SHORT).show();
-                    }
-                })
+                .setOnYesClickListener(onYesResetHabitClick)
                 .setAccentColor(ContextCompat.getColor(this, R.color.textColorContrastBackground))
-                .show(getSupportFragmentManager(), "confirm");
+                .show(getSupportFragmentManager(), "confirm-reset-habit");
     }
+    //endregion -- end --
+
+    //region Code responsible for handling archive-habit option clicks
+    DialogInterface.OnClickListener onYesArchiveHabitClick = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            final boolean archivedState = mHabitDatabase.getIsHabitArchived(mHabit.getDatabaseId());
+            mHabitDatabase.updateHabitIsArchived(mHabit.getDatabaseId(), !archivedState);
+            mHabit.setIsArchived(!archivedState);
+            setUpActivityWithHabit(mHabit);
+            setResult(ResultCodes.HABIT_CHANGED);
+        }
+    };
 
     private void onMenuToggleArchiveClicked() {
         String habitName = mHabitDatabase.getHabitName(mHabit.getDatabaseId());
@@ -482,23 +536,16 @@ public class HabitDataActivity extends AppCompatActivity implements
                 .setIcon(iconRes)
                 .setTitle("Confirm " + actionName)
                 .setMessage("Do you really want to " + actionNameLower + " '" + habitName + "'? ")
-                .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mHabitDatabase.updateHabitIsArchived(mHabit.getDatabaseId(), !archivedState);
-                        mHabit.setIsArchived(!archivedState);
-                        setUpActivityWithHabit(mHabit);
-                        setResult(ResultCodes.HABIT_CHANGED);
-                    }
-                })
+                .setOnYesClickListener(onYesArchiveHabitClick)
                 .setAccentColor(ContextCompat.getColor(this, R.color.textColorContrastBackground))
-                .show(getSupportFragmentManager(), "confirm");
+                .show(getSupportFragmentManager(), "confirm-archive-habit");
     }
+    //endregion -- end --
 
     private void onHabitEditClicked() {
         int accentColor = ContextCompat.getColor(this, R.color.textColorContrastBackground);
         EditHabitDialog dialog = EditHabitDialog.newInstance(accentColor, mHabit);
-        dialog.show(getSupportFragmentManager(), "edit-mHabit");
+        dialog.show(getSupportFragmentManager(), "edit-habit");
     }
 
     @Override
@@ -545,7 +592,7 @@ public class HabitDataActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-        if(ui.menuFab.isOpened())
+        if (ui.menuFab.isOpened())
             ui.menuFab.close(true);
         else super.onBackPressed();
     }

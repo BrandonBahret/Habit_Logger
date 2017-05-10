@@ -136,12 +136,12 @@ public class SessionActivity extends AppCompatActivity implements
 
         mDialogSettings = savedInstanceState.getBundle(DialogSettingKeys.DIALOG_SETTINGS_BUNDLE);
 
-        if (mDialogSettings != null && mDialogSettings.getBoolean(DialogSettingKeys.SHOW_DIALOG)) {
-            if (mDialogSettings.getBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG))
-                onCancelSessionClicked();
-            else
-                onFinishSessionClicked();
-        }
+//        if (mDialogSettings != null && mDialogSettings.getBoolean(DialogSettingKeys.SHOW_DIALOG)) {
+//            if (mDialogSettings.getBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG))
+//                onCancelSessionClicked();
+//            else
+//                onFinishSessionClicked();
+//        }
     }
     //endregion -- end --
 

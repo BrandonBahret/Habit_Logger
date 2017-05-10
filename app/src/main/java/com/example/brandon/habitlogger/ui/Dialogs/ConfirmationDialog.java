@@ -24,6 +24,7 @@ public class ConfirmationDialog extends DialogFragment {
         public String title, message;
         public Integer accentColor = 0;
         public int iconRes = -1;
+        public @StringRes Integer titleId = null;
     }
 
     DialogInterface.OnClickListener onYesListener;
@@ -47,6 +48,9 @@ public class ConfirmationDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         if (savedInstanceState != null)
             mDialogState = (DialogState) savedInstanceState.getSerializable("DIALOG_STATE");
+
+        if(mDialogState != null && mDialogState.title == null && mDialogState.titleId != null)
+            mDialogState.title = getContext().getString(mDialogState.titleId);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
                 .setTitle(mDialogState.title)
@@ -86,7 +90,7 @@ public class ConfirmationDialog extends DialogFragment {
     }
 
     public ConfirmationDialog setTitle(@StringRes int textId) {
-        mDialogState.title = getContext().getString(textId);
+        mDialogState.titleId = textId;
         return this;
     }
 
