@@ -476,7 +476,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void handleOnExportDatabase() {
-        new ConfirmationDialog(this)
+        new ConfirmationDialog()
                 .setIcon(R.drawable.ic_save_2_24dp)
                 .setTitle(getString(R.string.confirm_data_export))
                 .setMessage(getString(R.string.confirm_data_export_message))
@@ -489,11 +489,11 @@ public class MainActivity extends AppCompatActivity
                         makeText(MainActivity.this, R.string.backup_created, Toast.LENGTH_SHORT).show();
                     }
                 })
-                .show();
+                .show(getSupportFragmentManager(), "confirm");
     }
 
     private void handleOnDatabaseRestore() {
-        new ConfirmationDialog(this)
+        new ConfirmationDialog()
                 .setIcon(R.drawable.ic_data_restore_24dp)
                 .setTitle(getString(R.string.confirm_data_restore))
                 .setMessage(getString(R.string.confirm_data_restore_message))
@@ -505,7 +505,7 @@ public class MainActivity extends AppCompatActivity
                         makeText(MainActivity.this, R.string.data_restored, Toast.LENGTH_SHORT).show();
                     }
                 })
-                .show();
+                .show(getSupportFragmentManager(), "confirm");
     }
 
     @Override

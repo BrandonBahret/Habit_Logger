@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -213,7 +212,7 @@ public class SessionActivity extends AppCompatActivity implements
     private void onFinishSessionClicked() {
 //        boolean shouldAsk = new PreferenceChecker(this).doAskBeforeFinish();
 //        if (shouldAsk) {
-            boolean nightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
+//            boolean nightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
             int iconRes = R.drawable.ic_check_24dp;
 
             askForConfirmation("Finish session", "Finish this session?", true, iconRes,
@@ -231,6 +230,7 @@ public class SessionActivity extends AppCompatActivity implements
     }
 
     private void onCancelSessionClicked() {
+
 //        boolean shouldAsk = new PreferenceChecker(this).doAskBeforeCancel();
 //        if (shouldAsk) {
             int iconRes = R.drawable.ic_close_24dp;
@@ -287,31 +287,35 @@ public class SessionActivity extends AppCompatActivity implements
                 mSessionManager.setPauseState(habitId, true);
         }
 
-        ConfirmationDialog mConfirmationDialog = new ConfirmationDialog(this)
-                .setIcon(iconRes)
-                .setTitle(title)
-                .setMessage(message)
-                .setOnYesClickListener(onYesMethod)
-                .setOnNoClickListener(new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mDialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, false);
-                        boolean initialPauseState = mDialogSettings.getBoolean(DialogSettingKeys.INITIAL_PAUSE_STATE);
-                        if (mSessionManager.getIsPaused(mHabit.getDatabaseId()) != initialPauseState)
-                            mSessionManager.setPauseState(mHabit.getDatabaseId(), initialPauseState);
-                    }
-                })
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        mDialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, false);
-                        boolean initialPauseState = mDialogSettings.getBoolean(DialogSettingKeys.INITIAL_PAUSE_STATE);
-                        if (mSessionManager.getIsPaused(mHabit.getDatabaseId()) != initialPauseState)
-                            mSessionManager.setPauseState(mHabit.getDatabaseId(), initialPauseState);
-                    }
-                })
-                .setAccentColor(ContextCompat.getColor(this, R.color.contrastBackgroundAccent))
-                .show();
+        if(getSupportFragmentManager().findFragmentByTag("confirmation-dialog") == null) {
+
+            ConfirmationDialog mConfirmationDialog = new ConfirmationDialog()
+                    .setIcon(iconRes)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setOnYesClickListener(onYesMethod)
+                    .setOnNoClickListener(new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mDialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, false);
+                            boolean initialPauseState = mDialogSettings.getBoolean(DialogSettingKeys.INITIAL_PAUSE_STATE);
+                            if (mSessionManager.getIsPaused(mHabit.getDatabaseId()) != initialPauseState)
+                                mSessionManager.setPauseState(mHabit.getDatabaseId(), initialPauseState);
+                        }
+                    })
+                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            mDialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, false);
+                            boolean initialPauseState = mDialogSettings.getBoolean(DialogSettingKeys.INITIAL_PAUSE_STATE);
+                            if (mSessionManager.getIsPaused(mHabit.getDatabaseId()) != initialPauseState)
+                                mSessionManager.setPauseState(mHabit.getDatabaseId(), initialPauseState);
+                        }
+                    })
+                    .setAccentColor(ContextCompat.getColor(this, R.color.contrastBackgroundAccent));
+
+            mConfirmationDialog.show(getSupportFragmentManager(), "confirmation-dialog");
+        }
 
         mDialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, true);
     }

@@ -432,7 +432,7 @@ public class HabitDataActivity extends AppCompatActivity implements
     private void onMenuDeleteHabitClicked() {
         String habitName = mHabitDatabase.getHabitName(mHabit.getDatabaseId());
 
-        new ConfirmationDialog(HabitDataActivity.this)
+        new ConfirmationDialog()
                 .setIcon(R.drawable.ic_delete_forever_24dp)
                 .setTitle(R.string.confirm_delete)
                 .setMessage("Do you really want to delete '" + habitName + "'?")
@@ -448,13 +448,13 @@ public class HabitDataActivity extends AppCompatActivity implements
                     }
                 })
                 .setAccentColor(ContextCompat.getColor(this, R.color.textColorContrastBackground))
-                .show();
+                .show(getSupportFragmentManager(), "confirm");
     }
 
     private void onMenuResetHabitClicked() {
         String habitName = mHabitDatabase.getHabitName(mHabit.getDatabaseId());
 
-        new ConfirmationDialog(HabitDataActivity.this)
+        new ConfirmationDialog()
                 .setIcon(R.drawable.ic_delete_sweep_24dp)
                 .setTitle(R.string.confirm_habit_data_reset_title)
                 .setMessage("Do you really want to delete all entries for '" + habitName + "'?")
@@ -467,7 +467,7 @@ public class HabitDataActivity extends AppCompatActivity implements
                     }
                 })
                 .setAccentColor(ContextCompat.getColor(this, R.color.textColorContrastBackground))
-                .show();
+                .show(getSupportFragmentManager(), "confirm");
     }
 
     private void onMenuToggleArchiveClicked() {
@@ -478,7 +478,7 @@ public class HabitDataActivity extends AppCompatActivity implements
         String actionNameLower = archivedState ? "unarchive" : "archive";
         int iconRes = archivedState ? R.drawable.ic_unarchive_24dp : R.drawable.ic_archive_2_24dp;
 
-        new ConfirmationDialog(HabitDataActivity.this)
+        new ConfirmationDialog()
                 .setIcon(iconRes)
                 .setTitle("Confirm " + actionName)
                 .setMessage("Do you really want to " + actionNameLower + " '" + habitName + "'? ")
@@ -492,7 +492,7 @@ public class HabitDataActivity extends AppCompatActivity implements
                     }
                 })
                 .setAccentColor(ContextCompat.getColor(this, R.color.textColorContrastBackground))
-                .show();
+                .show(getSupportFragmentManager(), "confirm");
     }
 
     private void onHabitEditClicked() {

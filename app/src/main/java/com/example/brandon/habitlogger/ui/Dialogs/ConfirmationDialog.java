@@ -1,91 +1,102 @@
 package com.example.brandon.habitlogger.ui.Dialogs;
 
-import android.content.Context;
+import android.app.Dialog;
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
+import java.io.Serializable;
+
 /**
- * Created by Brandon on 3/13/2017.
+ * Created by Brandon on 5/9/2017.
  * Used for getting user confirmation with AlertDialog.
  */
 
-public class ConfirmationDialog {
+public class ConfirmationDialog extends DialogFragment {
 
-    private AlertDialog.Builder mDialogBuilder;
-    private Context mContext;
-    private String mTitle, mMessage;
-    private int mIconRes = -1;
-    private Integer mAccentColor = 0;
+    //region (Member attributes)
+
+    private class DialogState implements Serializable {
+        public String title, message;
+        public Integer accentColor = 0;
+        public int iconRes = -1;
+    }
 
     DialogInterface.OnClickListener onYesListener;
     DialogInterface.OnClickListener onNoListener;
     DialogInterface.OnCancelListener onCancelListener;
     DialogInterface.OnDismissListener onDismissListener;
 
-    public ConfirmationDialog(Context context) {
-        mDialogBuilder = new AlertDialog.Builder(context);
-        mContext = context;
+    DialogState mDialogState = new DialogState();
+
+    //endregion -- end --
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putSerializable("DIALOG_STATE", mDialogState);
     }
 
-    public ConfirmationDialog show() {
-        mDialogBuilder
-                .setTitle(mTitle)
-                .setMessage(mMessage)
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        if (savedInstanceState != null)
+            mDialogState = (DialogState) savedInstanceState.getSerializable("DIALOG_STATE");
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
+                .setTitle(mDialogState.title)
+                .setMessage(mDialogState.message)
                 .setPositiveButton("Yes", this.onYesListener)
                 .setNegativeButton("No", this.onNoListener)
                 .setOnCancelListener(this.onCancelListener)
                 .setOnDismissListener(this.onDismissListener);
 
-        if (mIconRes != -1)
-            mDialogBuilder.setIcon(mIconRes);
+        if (mDialogState.iconRes != -1)
+            builder.setIcon(mDialogState.iconRes);
 
-        final AlertDialog confirmDialog = mDialogBuilder.create();
+        final AlertDialog confirmDialog = builder.create();
 
-        if (mAccentColor != 0) {
+        if (mDialogState.accentColor != 0) {
             confirmDialog.setOnShowListener(
                     new DialogInterface.OnShowListener() {
                         @Override
                         public void onShow(DialogInterface dialog) {
-//                            int color = mAccentColor == null ?
-//                                    ContextCompat.getColor(mContext, R.color.textColorContrastBackground) :
-//                                    mAccentColor;
+                            confirmDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                                    .setTextColor(mDialogState.accentColor);
 
-                            confirmDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(mAccentColor);
-                            confirmDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(mAccentColor);
+                            confirmDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                                    .setTextColor(mDialogState.accentColor);
                         }
                     }
             );
         }
 
-        confirmDialog.show();
-
-        return this;
-    }
-
-    public AlertDialog create() {
-        return mDialogBuilder.create();
+        return confirmDialog;
     }
 
     //region Setters {}
     public ConfirmationDialog setTitle(String title) {
-        this.mTitle = title;
+        mDialogState.title = title;
         return this;
     }
 
     public ConfirmationDialog setTitle(@StringRes int textId) {
-        this.mTitle = mContext.getString(textId);
+        mDialogState.title = getContext().getString(textId);
         return this;
     }
 
     public ConfirmationDialog setMessage(String message) {
-        this.mMessage = message;
+        mDialogState.message = message;
         return this;
     }
 
     public ConfirmationDialog setIcon(@DrawableRes int iconRes) {
-        this.mIconRes = iconRes;
+        mDialogState.iconRes = iconRes;
         return this;
     }
     //endregion
@@ -112,8 +123,9 @@ public class ConfirmationDialog {
     }
 
     public ConfirmationDialog setAccentColor(int color) {
-        mAccentColor = color;
+        mDialogState.accentColor = color;
         return this;
     }
     //endregion
+
 }

@@ -318,7 +318,7 @@ public class AllHabitsFragment extends MyFragmentBase {
                 String habitName = mHabitDatabase.getHabitName(habitId);
                 String messageFormat = getString(R.string.confirm_habit_data_reset_message_format);
                 String message = String.format(Locale.getDefault(), messageFormat, habitName);
-                new ConfirmationDialog(getActivity())
+                new ConfirmationDialog()
                         .setIcon(R.drawable.ic_delete_sweep_24dp)
                         .setTitle(getString(R.string.confirm_habit_data_reset_title))
                         .setMessage(message)
@@ -329,13 +329,13 @@ public class AllHabitsFragment extends MyFragmentBase {
                                 Toast.makeText(getActivity(), R.string.entries_deleted_message, Toast.LENGTH_SHORT).show();
                             }
                         })
-                        .show();
+                        .show(getFragmentManager(), "confirm");
             }
 
             @Override
             public void onHabitDeleteClick(final long habitId, HabitViewHolder habitViewHolder) {
                 String habitName = mHabitDatabase.getHabitName(habitId);
-                new ConfirmationDialog(getActivity())
+                new ConfirmationDialog()
                         .setIcon(R.drawable.ic_delete_forever_24dp)
                         .setTitle("Confirm Delete")
                         .setMessage("Do you really want to delete '" + habitName + "'?")
@@ -352,7 +352,7 @@ public class AllHabitsFragment extends MyFragmentBase {
                                 removeHabitFromLayout(position);
                             }
                         })
-                        .show();
+                        .show(getFragmentManager(), "confirm");
             }
 
             @Override
@@ -365,7 +365,7 @@ public class AllHabitsFragment extends MyFragmentBase {
             public void onHabitArchiveClick(final long habitId, HabitViewHolder habitViewHolder) {
                 String habitName = mHabitDatabase.getHabitName(habitId);
 
-                new ConfirmationDialog(getContext())
+                new ConfirmationDialog()
                         .setIcon(R.drawable.ic_archive_2_24dp)
                         .setTitle("Confirm Archive")
                         .setMessage("Do you really want to archive '" + habitName + "'? ")
@@ -378,7 +378,7 @@ public class AllHabitsFragment extends MyFragmentBase {
                                 removeHabitFromLayout(position);
                             }
                         })
-                        .show();
+                        .show(getFragmentManager(), "confirm");
             }
 
             @Override
