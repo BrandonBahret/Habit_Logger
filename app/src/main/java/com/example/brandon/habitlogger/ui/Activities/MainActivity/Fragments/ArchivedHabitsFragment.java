@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
@@ -40,6 +41,20 @@ import java.util.Set;
 public class ArchivedHabitsFragment extends MyFragmentBase {
 
     //region (Member attributes)
+    public class DialogState {
+        public long habitId = -1;
+
+        public void saveState(Bundle outState) {
+            outState.putLong("habitId", habitId);
+        }
+
+        public void restoreState(Bundle savedInstanceState) {
+            habitId = savedInstanceState.getLong("habitId");
+        }
+    }
+
+    private DialogState mDialogState = new DialogState();
+
     private final String KEY_DATA = "KEY_DATA";
     private boolean mCreatedUsingSavedInstance = false;
     List<Habit> mData;
@@ -66,6 +81,12 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mDialogState.restoreState(savedInstanceState);
+            resetDialogListeners();
+        }
+
         mSessionManager = new SessionManager(getContext());
         mLocalExportManager = new LocalDataExportManager(getContext());
         mPreferenceChecker = new PreferenceChecker(getContext());
@@ -113,6 +134,7 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        mDialogState.saveState(outState);
         outState.putParcelableArrayList(KEY_DATA, (ArrayList<? extends Parcelable>) mData);
     }
 
@@ -287,6 +309,68 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
         mHabitAdapter.notifyDataSetChanged();
     }
 
+    private void resetDialogListeners() {
+        ConfirmationDialog dialog;
+        FragmentManager fragmentManager = getFragmentManager();
+
+        if ((dialog = (ConfirmationDialog) fragmentManager.findFragmentByTag("confirm-habit-archive")) != null)
+            setDialogListener(dialog);
+
+        else if ((dialog = (ConfirmationDialog) fragmentManager.findFragmentByTag("confirm-habit-reset")) != null)
+            setDialogListener(dialog);
+
+        else if ((dialog = (ConfirmationDialog) fragmentManager.findFragmentByTag("confirm-habit-delete")) != null)
+            setDialogListener(dialog);
+    }
+
+    private void setDialogListener(ConfirmationDialog dialog) {
+        switch (dialog.getTag()) {
+            case "confirm-habit-archive":
+                dialog.setOnYesClickListener(onYesUnarchiveHabitClicked);
+                break;
+            case "confirm-habit-reset":
+                dialog.setOnYesClickListener(onYesResetHabitClicked);
+                break;
+            case "confirm-habit-delete":
+                dialog.setOnYesClickListener(onYesDeleteHabitClicked);
+                break;
+        }
+    }
+
+    //region Habit view menu option listeners
+    DialogInterface.OnClickListener onYesResetHabitClicked = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            mHabitDatabase.deleteEntriesForHabit(mDialogState.habitId);
+            Toast.makeText(getActivity(), R.string.entries_deleted_message, Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    DialogInterface.OnClickListener onYesDeleteHabitClicked = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (mSessionManager.getIsSessionActive(mDialogState.habitId)) {
+                mSessionManager.cancelSession(mDialogState.habitId);
+            }
+
+            mHabitDatabase.deleteHabit(mDialogState.habitId);
+
+            int position = mHabitAdapter.getAdapterItemPosition(mDialogState.habitId);
+            removeHabitFromLayout(position);
+        }
+    };
+
+    DialogInterface.OnClickListener onYesUnarchiveHabitClicked = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            mHabitDatabase.updateHabitIsArchived(mDialogState.habitId, false);
+
+            int position = mHabitAdapter.getAdapterItemPosition(mDialogState.habitId);
+            removeHabitFromLayout(position);
+        }
+    };
+    //endregion -- end --
+
     private HabitViewAdapter.MenuItemClickListener getHabitMenuItemClickListener() {
         return new HabitViewAdapter.MenuItemClickListener() {
             @Override
@@ -301,41 +385,27 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
                 String habitName = mHabitDatabase.getHabitName(habitId);
                 String messageFormat = getString(R.string.confirm_habit_data_reset_message_format);
                 String message = String.format(Locale.getDefault(), messageFormat, habitName);
+                mDialogState.habitId = habitId;
+
                 new ConfirmationDialog()
                         .setIcon(R.drawable.ic_delete_sweep_24dp)
                         .setTitle(getString(R.string.confirm_habit_data_reset_title))
                         .setMessage(message)
-                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mHabitDatabase.deleteEntriesForHabit(habitId);
-                                Toast.makeText(getActivity(), R.string.entries_deleted_message, Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .show(getFragmentManager(), "confirm");
+                        .setOnYesClickListener(onYesResetHabitClicked)
+                        .show(getFragmentManager(), "confirm-habit-reset");
             }
 
             @Override
             public void onHabitDeleteClick(final long habitId, HabitViewHolder habitViewHolder) {
                 String habitName = mHabitDatabase.getHabitName(habitId);
+                mDialogState.habitId = habitId;
+
                 new ConfirmationDialog()
                         .setIcon(R.drawable.ic_delete_forever_24dp)
                         .setTitle("Confirm Delete")
                         .setMessage("Do you really want to delete '" + habitName + "'?")
-                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (mSessionManager.getIsSessionActive(habitId)) {
-                                    mSessionManager.cancelSession(habitId);
-                                }
-
-                                mHabitDatabase.deleteHabit(habitId);
-
-                                int position = mHabitAdapter.getAdapterItemPosition(habitId);
-                                removeHabitFromLayout(position);
-                            }
-                        })
-                        .show(getFragmentManager(), "confirm");
+                        .setOnYesClickListener(onYesDeleteHabitClicked)
+                        .show(getFragmentManager(), "confirm-habit-delete");
             }
 
             @Override
@@ -347,21 +417,14 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
             @Override
             public void onHabitArchiveClick(final long habitId, HabitViewHolder habitViewHolder) {
                 String habitName = mHabitDatabase.getHabitName(habitId);
+                mDialogState.habitId = habitId;
 
                 new ConfirmationDialog()
                         .setIcon(R.drawable.ic_unarchive_24dp)
                         .setTitle("Confirm Unarchive")
                         .setMessage("Do you really want to unarchive '" + habitName + "'? ")
-                        .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mHabitDatabase.updateHabitIsArchived(habitId, false);
-
-                                int position = mHabitAdapter.getAdapterItemPosition(habitId);
-                                removeHabitFromLayout(position);
-                            }
-                        })
-                        .show(getFragmentManager(), "confirm");
+                        .setOnYesClickListener(onYesUnarchiveHabitClicked)
+                        .show(getFragmentManager(), "confirm-habit-archive");
             }
 
             @Override

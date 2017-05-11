@@ -22,9 +22,25 @@ public class ConfirmationDialog extends DialogFragment {
 
     private class DialogState implements Serializable {
         public String title, message;
-        public Integer accentColor = 0;
-        public int iconRes = -1;
-        public @StringRes Integer titleId = null;
+        public int accentColor = 0;
+        public @DrawableRes int iconRes = -1;
+        public @StringRes int titleId = -1;
+
+        public void saveState(Bundle outState){
+            outState.putString("title", title);
+            outState.putString("message", message);
+            outState.putInt("accentColor", accentColor);
+            outState.putInt("iconRes", iconRes);
+            outState.putInt("titleId", titleId);
+        }
+
+        public void restoreState(Bundle savedInstanceState){
+            title = savedInstanceState.getString("title");
+            message = savedInstanceState.getString("message");
+            accentColor = savedInstanceState.getInt("accentColor");
+            iconRes = savedInstanceState.getInt("iconRes");
+            titleId = savedInstanceState.getInt("titleId");
+        }
     }
 
     DialogInterface.OnClickListener onYesListener;
@@ -40,16 +56,16 @@ public class ConfirmationDialog extends DialogFragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putSerializable("DIALOG_STATE", mDialogState);
+        mDialogState.saveState(outState);
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         if (savedInstanceState != null)
-            mDialogState = (DialogState) savedInstanceState.getSerializable("DIALOG_STATE");
+            mDialogState.restoreState(savedInstanceState);
 
-        if(mDialogState != null && mDialogState.title == null && mDialogState.titleId != null)
+        if(mDialogState != null && mDialogState.title == null && mDialogState.titleId != -1)
             mDialogState.title = getContext().getString(mDialogState.titleId);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext())

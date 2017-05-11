@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -36,17 +36,7 @@ public class SessionActivity extends AppCompatActivity implements
         public static final String SERIALIZED_HABIT = "SERIALIZED_HABIT_KEY";
     }
 
-    private static class DialogSettingKeys {
-        static final String DIALOG_SETTINGS_BUNDLE = "DIALOG_SETTINGS_BUNDLE";
-        static final String SHOW_DIALOG = "SHOW_DIALOG";
-        static final String SHOW_CANCEL_DIALOG = "IS_CANCEL";
-        static final String SHOULD_PAUSE = "SHOULD_PAUSE";
-        static final String INITIAL_PAUSE_STATE = "INITIAL_PAUSE_STATE";
-    }
-
     //region (Member attributes)
-    private Bundle mDialogSettings = new Bundle();
-
     private TimerFragment mTimerFragment;
 
     private SessionManager mSessionManager;
@@ -61,6 +51,9 @@ public class SessionActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        resetDialogListeners();
+
         ui = DataBindingUtil.setContentView(this, R.layout.activity_session);
         mHabit = (Habit) getIntent().getSerializableExtra(BundleKeys.SERIALIZED_HABIT);
         mTimerFragment = (TimerFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_timer);
@@ -121,36 +114,11 @@ public class SessionActivity extends AppCompatActivity implements
     }
     //endregion -- end --
 
-    //region Methods responsible for maintaining state
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        if (mDialogSettings != null)
-            outState.putBundle(DialogSettingKeys.DIALOG_SETTINGS_BUNDLE, mDialogSettings);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-
-        mDialogSettings = savedInstanceState.getBundle(DialogSettingKeys.DIALOG_SETTINGS_BUNDLE);
-
-//        if (mDialogSettings != null && mDialogSettings.getBoolean(DialogSettingKeys.SHOW_DIALOG)) {
-//            if (mDialogSettings.getBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG))
-//                onCancelSessionClicked();
-//            else
-//                onFinishSessionClicked();
-//        }
-    }
-    //endregion -- end --
-
     //endregion [ ---------------- end ---------------- ]
 
     //region [ ---- Methods responsible for updating the UI ---- ]
 
     //region Methods responsible for updating the timer
-
     @Override
     public Long getSessionDuration(boolean required) {
         boolean shouldUpdate = required || (mSessionManager.getIsSessionActive(mHabit.getDatabaseId()) &&
@@ -168,7 +136,6 @@ public class SessionActivity extends AppCompatActivity implements
     public boolean getSessionState() {
         return mSessionManager.getIsPaused(mHabit.getDatabaseId());
     }
-
     //endregion -- end --
 
     public void applyHabitColorToTheme() {
@@ -209,115 +176,84 @@ public class SessionActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    private void onFinishSessionClicked() {
-//        boolean shouldAsk = new PreferenceChecker(this).doAskBeforeFinish();
-//        if (shouldAsk) {
-//            boolean nightMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES;
-            int iconRes = R.drawable.ic_check_24dp;
+    private void resetDialogListeners() {
+        ConfirmationDialog dialog;
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
-            askForConfirmation("Finish session", "Finish this session?", true, iconRes,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finishSession();
-                        }
-                    }
-            );
+        if ((dialog = (ConfirmationDialog) fragmentManager.findFragmentByTag("cancel-session")) != null)
+            setDialogListener(dialog);
 
-            mDialogSettings.putBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG, false);
-//        }
-//        else finishSession();
+        else if ((dialog = (ConfirmationDialog) fragmentManager.findFragmentByTag("finish-session")) != null)
+            setDialogListener(dialog);
     }
+
+    private void setDialogListener(ConfirmationDialog dialog) {
+        switch (dialog.getTag()) {
+            case "cancel-session":
+                dialog.setOnYesClickListener(onYesCancelSessionClicked);
+                break;
+            case "finish-session":
+                dialog.setOnYesClickListener(onYesFinishSessionClickListener);
+                break;
+        }
+    }
+
+    //region Code responsible for handling finish session requests
+    DialogInterface.OnClickListener onYesFinishSessionClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            // Get the new SessionEntry
+            String note = ui.sessionNote.getText().toString();
+            SessionEntry entry = mSessionManager.finishSession(mHabit.getDatabaseId());
+            entry.setNote(note);
+
+            // Add the new SessionEntry to the database
+            HabitDatabase database = new HabitDatabase(SessionActivity.this);
+            database.addEntry(mHabit.getDatabaseId(), entry);
+
+            Intent data = new Intent().putExtra(SessionActivity.RESULT_NEW_ENTRY, (Serializable) entry);
+            setResult(ResultCodes.SESSION_FINISH, data);
+
+            finish();
+        }
+    };
+
+    private void onFinishSessionClicked() {
+        new ConfirmationDialog()
+                .setTitle("Finish session")
+                .setMessage("Finish this session?")
+                .setIcon(R.drawable.ic_check_24dp)
+                .setOnYesClickListener(onYesFinishSessionClickListener)
+                .show(getSupportFragmentManager(), "finish-session");
+    }
+    //endregion -- end --
+
+    //region Code responsible for handling cancel session requests
+    DialogInterface.OnClickListener onYesCancelSessionClicked = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            mSessionManager.cancelSession(mHabit.getDatabaseId());
+        }
+    };
 
     private void onCancelSessionClicked() {
 
-//        boolean shouldAsk = new PreferenceChecker(this).doAskBeforeCancel();
-//        if (shouldAsk) {
-            int iconRes = R.drawable.ic_close_24dp;
+        new ConfirmationDialog()
+                .setTitle("Cancel session")
+                .setMessage("Cancel this session?")
+                .setIcon(R.drawable.ic_close_24dp)
+                .setOnYesClickListener(onYesCancelSessionClicked)
+                .show(getSupportFragmentManager(), "cancel-session");
 
-            askForConfirmation("Cancel session", "Cancel this session?", false, iconRes,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            mSessionManager.cancelSession(mHabit.getDatabaseId());
-                        }
-                    }
-            );
-
-            mDialogSettings.putBoolean(DialogSettingKeys.SHOW_CANCEL_DIALOG, true);
-//        }
-//        else mSessionManager.cancelSession(mHabit.getDatabaseId());
     }
+    //endregion -- end --
 
-    private void finishSession() {
-        // Get the new SessionEntry
-        String note = ui.sessionNote.getText().toString();
-        SessionEntry entry = mSessionManager.finishSession(mHabit.getDatabaseId());
-        entry.setNote(note);
-
-        // Add the new SessionEntry to the database
-        HabitDatabase database = new HabitDatabase(SessionActivity.this);
-        database.addEntry(mHabit.getDatabaseId(), entry);
-
-        Intent data = new Intent().putExtra(SessionActivity.RESULT_NEW_ENTRY, (Serializable) entry);
-        setResult(ResultCodes.SESSION_FINISH, data);
-
-        finish();
-    }
     //endregion
 
     @Override
     public void onSessionToggleClick() {
         boolean isPaused = !mSessionManager.getIsPaused(mHabit.getDatabaseId());
         mSessionManager.setPauseState(mHabit.getDatabaseId(), isPaused);
-    }
-
-
-    private void askForConfirmation(String title, String message, final boolean shouldPause,
-                                    int iconRes, DialogInterface.OnClickListener onYesMethod) {
-
-        long habitId = mHabit.getDatabaseId();
-
-        if (!mDialogSettings.getBoolean(DialogSettingKeys.SHOW_DIALOG)) {
-            mDialogSettings.putBoolean(DialogSettingKeys.INITIAL_PAUSE_STATE, mSessionManager.getIsPaused(habitId));
-        }
-
-        if (shouldPause) {
-            if (!mSessionManager.getIsPaused(mHabit.getDatabaseId()))
-                mSessionManager.setPauseState(habitId, true);
-        }
-
-        if(getSupportFragmentManager().findFragmentByTag("confirmation-dialog") == null) {
-
-            ConfirmationDialog mConfirmationDialog = new ConfirmationDialog()
-                    .setIcon(iconRes)
-                    .setTitle(title)
-                    .setMessage(message)
-                    .setOnYesClickListener(onYesMethod)
-                    .setOnNoClickListener(new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            mDialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, false);
-                            boolean initialPauseState = mDialogSettings.getBoolean(DialogSettingKeys.INITIAL_PAUSE_STATE);
-                            if (mSessionManager.getIsPaused(mHabit.getDatabaseId()) != initialPauseState)
-                                mSessionManager.setPauseState(mHabit.getDatabaseId(), initialPauseState);
-                        }
-                    })
-                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            mDialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, false);
-                            boolean initialPauseState = mDialogSettings.getBoolean(DialogSettingKeys.INITIAL_PAUSE_STATE);
-                            if (mSessionManager.getIsPaused(mHabit.getDatabaseId()) != initialPauseState)
-                                mSessionManager.setPauseState(mHabit.getDatabaseId(), initialPauseState);
-                        }
-                    })
-                    .setAccentColor(ContextCompat.getColor(this, R.color.contrastBackgroundAccent));
-
-            mConfirmationDialog.show(getSupportFragmentManager(), "confirmation-dialog");
-        }
-
-        mDialogSettings.putBoolean(DialogSettingKeys.SHOW_DIALOG, true);
     }
 
     //endregion [ -- end -- ]

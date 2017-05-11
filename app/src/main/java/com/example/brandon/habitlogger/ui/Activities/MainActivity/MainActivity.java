@@ -80,6 +80,8 @@ public class MainActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
 
+        resetDialogListeners();
+
         if (savedInstanceState != null) {
             mSearchViewQuery = savedInstanceState.getString(KEY_QUERY, null);
         }
@@ -445,7 +447,7 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.menu_database_export:
-                handleOnExportDatabase();
+                handleOnBackupDatabase();
                 break;
 
             case R.id.menu_database_restore:
@@ -475,38 +477,69 @@ public class MainActivity extends AppCompatActivity
         makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
-    private void handleOnExportDatabase() {
+    private void resetDialogListeners() {
+        ConfirmationDialog dialog;
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        if ((dialog = (ConfirmationDialog) fragmentManager.findFragmentByTag("confirm-database-backup")) != null)
+            setDialogListener(dialog);
+
+        else if ((dialog = (ConfirmationDialog) fragmentManager.findFragmentByTag("confirm-database-restore")) != null)
+            setDialogListener(dialog);
+    }
+
+    private void setDialogListener(ConfirmationDialog dialog) {
+        switch (dialog.getTag()) {
+            case "confirm-database-backup":
+                dialog.setOnYesClickListener(onYesBackupDatabaseClicked);
+                break;
+            case "confirm-database-restore":
+                dialog.setOnYesClickListener(onYesRestoreDatabaseClicked);
+                break;
+        }
+    }
+
+    //region Code responsible for handling database backup requests.
+    DialogInterface.OnClickListener onYesBackupDatabaseClicked = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            mLocalExportManager.exportDatabase(true);
+            if (mGoogleDriveExportManager.isConnected())
+                mGoogleDriveExportManager.backupDatabase();
+            makeText(MainActivity.this, R.string.backup_created, Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    private void handleOnBackupDatabase() {
         new ConfirmationDialog()
                 .setIcon(R.drawable.ic_save_2_24dp)
                 .setTitle(getString(R.string.confirm_data_export))
                 .setMessage(getString(R.string.confirm_data_export_message))
-                .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mLocalExportManager.exportDatabase(true);
-                        if (mGoogleDriveExportManager.isConnected())
-                            mGoogleDriveExportManager.backupDatabase();
-                        makeText(MainActivity.this, R.string.backup_created, Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .show(getSupportFragmentManager(), "confirm");
+                .setOnYesClickListener(onYesBackupDatabaseClicked)
+                .show(getSupportFragmentManager(), "confirm-database-backup");
     }
+    //endregion -- end --
+
+    //region Code responsible for handling database restore requests.
+    DialogInterface.OnClickListener onYesRestoreDatabaseClicked = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            mLocalExportManager.importDatabase(true);
+            getContentFragment().restartFragment();
+            makeText(MainActivity.this, R.string.data_restored, Toast.LENGTH_SHORT).show();
+        }
+    };
 
     private void handleOnDatabaseRestore() {
+
         new ConfirmationDialog()
                 .setIcon(R.drawable.ic_data_restore_24dp)
                 .setTitle(getString(R.string.confirm_data_restore))
                 .setMessage(getString(R.string.confirm_data_restore_message))
-                .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mLocalExportManager.importDatabase(true);
-                        getContentFragment().restartFragment();
-                        makeText(MainActivity.this, R.string.data_restored, Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .show(getSupportFragmentManager(), "confirm");
+                .setOnYesClickListener(onYesRestoreDatabaseClicked)
+                .show(getSupportFragmentManager(), "confirm-database-restore");
     }
+    //endregion -- end --
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
