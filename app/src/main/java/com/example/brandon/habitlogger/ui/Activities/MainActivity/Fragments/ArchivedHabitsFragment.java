@@ -3,7 +3,9 @@ package com.example.brandon.habitlogger.ui.Activities.MainActivity.Fragments;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,7 +25,7 @@ import com.example.brandon.habitlogger.ui.Activities.MainActivity.HabitViewHolde
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity.SessionActivity;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
-import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;
+import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog2.HabitDialog;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.GroupDecoration;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 
@@ -310,17 +312,20 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
     }
 
     private void resetDialogListeners() {
-        ConfirmationDialog dialog;
+        DialogFragment dialog;
         FragmentManager fragmentManager = getFragmentManager();
 
-        if ((dialog = (ConfirmationDialog) fragmentManager.findFragmentByTag("confirm-habit-archive")) != null)
-            setDialogListener(dialog);
+        if ((dialog = (DialogFragment) fragmentManager.findFragmentByTag("confirm-habit-archive")) != null)
+            setDialogListener((ConfirmationDialog) dialog);
 
-        else if ((dialog = (ConfirmationDialog) fragmentManager.findFragmentByTag("confirm-habit-reset")) != null)
-            setDialogListener(dialog);
+        else if ((dialog = (DialogFragment) fragmentManager.findFragmentByTag("confirm-habit-reset")) != null)
+            setDialogListener((ConfirmationDialog) dialog);
 
-        else if ((dialog = (ConfirmationDialog) fragmentManager.findFragmentByTag("confirm-habit-delete")) != null)
-            setDialogListener(dialog);
+        else if ((dialog = (DialogFragment) fragmentManager.findFragmentByTag("confirm-habit-delete")) != null)
+            setDialogListener((ConfirmationDialog) dialog);
+
+        else if((dialog = (DialogFragment) fragmentManager.findFragmentByTag("edit-habit")) != null)
+            ((HabitDialog)dialog).setPositiveButton(null, onYesUpdateHabitClicked);
     }
 
     private void setDialogListener(ConfirmationDialog dialog) {
@@ -371,13 +376,26 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
     };
     //endregion -- end --
 
+    HabitDialog.DialogResult onYesUpdateHabitClicked = new HabitDialog.DialogResult() {
+        @Override
+        public void onResult(@Nullable Habit initHabit, Habit habit) {
+            onUpdateHabit(initHabit, habit);
+        }
+    };
+
     private HabitViewAdapter.MenuItemClickListener getHabitMenuItemClickListener() {
         return new HabitViewAdapter.MenuItemClickListener() {
             @Override
             public void onHabitEditClick(long habitId, HabitViewHolder habitViewHolder) {
                 Habit habit = mHabitDatabase.getHabit(habitId);
-                EditHabitDialog dialog = EditHabitDialog.newInstance(habit);
-                dialog.show(getActivity().getSupportFragmentManager(), "edit-habit");
+
+                HabitDialog dialog = new HabitDialog()
+                        .setTitle("Edit Habit")
+                        .setInitHabit(habit)
+                        .setPositiveButton("Update", onYesUpdateHabitClicked)
+                        .setNegativeButton("Cancel", null);
+
+                dialog.show(getFragmentManager(), "edit-habit");
             }
 
             @Override

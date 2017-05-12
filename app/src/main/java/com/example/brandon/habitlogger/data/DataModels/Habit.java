@@ -111,7 +111,7 @@ public class Habit implements Serializable, Parcelable {
     }
 
     public Habit() {
-        this("No name", new HabitCategory());
+        this("", new HabitCategory());
     }
     //endregion -- end --
 

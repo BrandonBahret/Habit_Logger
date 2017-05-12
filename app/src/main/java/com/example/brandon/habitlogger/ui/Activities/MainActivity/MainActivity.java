@@ -6,7 +6,9 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -41,6 +43,7 @@ import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEven
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.NewHabitDialog;
+import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog2.HabitDialog;
 import com.example.brandon.habitlogger.ui.Widgets.CurrentSessionCardManager;
 import com.github.clans.fab.FloatingActionButton;
 
@@ -335,31 +338,43 @@ public class MainActivity extends AppCompatActivity
         };
     }
 
-    private SessionManager.SessionChangeCallback onSessionChangeCallback = new SessionManager.SessionChangeCallback() {
-        @Override
-        public void onSessionPauseStateChanged(long habitId, boolean isPaused) {}
+    private SessionManager.SessionChangeCallback onSessionChangeCallback =
+            new SessionManager.SessionChangeCallback() {
+                @Override
+                public void onSessionPauseStateChanged(long habitId, boolean isPaused) {}
 
-        @Override
-        public void beforeSessionEnded(long habitId, boolean wasCanceled) {
-            mSessionNotificationManager.cancel((int) habitId);
-            getContentFragment().notifySessionEnded(habitId);
-        }
+                @Override
+                public void beforeSessionEnded(long habitId, boolean wasCanceled) {
+                    mSessionNotificationManager.cancel((int) habitId);
+                    getContentFragment().notifySessionEnded(habitId);
+                }
 
-        @Override
-        public void afterSessionEnded(long habitId, boolean wasCanceled) {
-            mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
-            getContentFragment().reapplySpaceDecoration();
-        }
+                @Override
+                public void afterSessionEnded(long habitId, boolean wasCanceled) {
+                    mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
+                    getContentFragment().reapplySpaceDecoration();
+                }
 
-        @Override
-        public void onSessionStarted(long habitId) {
-            if (mPreferenceChecker.doShowNotifications()) {
-                Habit habit = mHabitDatabase.getHabit(habitId);
-                mSessionNotificationManager.updateNotification(habit);
-            }
+                @Override
+                public void onSessionStarted(long habitId) {
+                    if (mPreferenceChecker.doShowNotifications()) {
+                        Habit habit = mHabitDatabase.getHabit(habitId);
+                        mSessionNotificationManager.updateNotification(habit);
+                    }
 
-            mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
-            getContentFragment().reapplySpaceDecoration();
+                    mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
+                    getContentFragment().reapplySpaceDecoration();
+                }
+            };
+
+    //region Code responsible for handling new Habit requests
+    HabitDialog.DialogResult onYesCreateHabit = new HabitDialog.DialogResult() {
+        @Override
+        public void onResult(@Nullable Habit initHabit, Habit habit) {
+            mHabitDatabase.addHabit(habit);
+            getContentFragment().addHabitToLayout(habit);
+            clearFocusFromSearchView();
+            findViewById(R.id.no_habits_available_layout).setVisibility(View.GONE);
         }
     };
 
@@ -367,11 +382,16 @@ public class MainActivity extends AppCompatActivity
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NewHabitDialog dialog = NewHabitDialog.newInstance();
-                dialog.show(getSupportFragmentManager(), "new-habit");
+                HabitDialog dialog = new HabitDialog()
+                        .setTitle("Create Habit")
+                        .setPositiveButton("Create", onYesCreateHabit)
+                        .setNegativeButton("Cancel", null);
+
+                dialog.show(getSupportFragmentManager(), "create-new-habit");
             }
         };
     }
+    //endregion -- end --
 
     @Override
     public void onNewHabitCreated(Habit newHabit) {
@@ -478,14 +498,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void resetDialogListeners() {
-        ConfirmationDialog dialog;
+        DialogFragment dialog;
+
         FragmentManager fragmentManager = getSupportFragmentManager();
 
-        if ((dialog = (ConfirmationDialog) fragmentManager.findFragmentByTag("confirm-database-backup")) != null)
-            setDialogListener(dialog);
+        if ((dialog = (DialogFragment) fragmentManager.findFragmentByTag("confirm-database-backup")) != null)
+            setDialogListener((ConfirmationDialog) dialog);
 
-        else if ((dialog = (ConfirmationDialog) fragmentManager.findFragmentByTag("confirm-database-restore")) != null)
-            setDialogListener(dialog);
+        else if ((dialog = (DialogFragment) fragmentManager.findFragmentByTag("confirm-database-restore")) != null)
+            setDialogListener((ConfirmationDialog) dialog);
+
+        else if ((dialog = (DialogFragment) fragmentManager.findFragmentByTag("create-new-habit")) != null)
+            ((HabitDialog)dialog).setPositiveButton(null, onYesCreateHabit);
     }
 
     private void setDialogListener(ConfirmationDialog dialog) {

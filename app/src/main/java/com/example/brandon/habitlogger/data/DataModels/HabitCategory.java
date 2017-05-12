@@ -21,7 +21,7 @@ public class HabitCategory implements Serializable, Parcelable {
 
     //region (Member attributes)
     @NonNull private String mColor = "#ff000000";
-    @NonNull private String mName = "NAME_NOT_SET";
+    @NonNull private String mName = "";
 
     private long mDatabaseId = -1;
     //endregion
