@@ -118,7 +118,15 @@ public class SessionEntry implements Serializable, Parcelable {
     }
 
     public SessionEntry(SessionEntry sessionEntry) {
-        this(sessionEntry.getStartingTime(), sessionEntry.getDuration(), sessionEntry.getNote());
+        mStartTime = sessionEntry.getStartingTime();
+        mDuration = sessionEntry.getDuration();
+        mNote = sessionEntry.getNote();
+        mHabitId = sessionEntry.getHabitId();
+        mDatabaseId = sessionEntry.getDatabaseId();
+        mHabit = sessionEntry.getHabit();
+        mTotalPauseTime = sessionEntry.getTotalPauseTime();
+        mLastTimePaused = sessionEntry.getLastTimePaused();
+        mIsPaused = sessionEntry.getIsPaused();
     }
     //endregion
 
