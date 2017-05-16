@@ -39,11 +39,9 @@ import com.example.brandon.habitlogger.ui.Activities.MainActivity.Fragments.Arch
 import com.example.brandon.habitlogger.ui.Activities.MainActivity.Fragments.MyFragmentBase;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.SettingsActivity;
-import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
+import com.example.brandon.habitlogger.ui.Events.ScrollObservers.IScrollEvents;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
-import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;
-import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.NewHabitDialog;
-import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog2.HabitDialog;
+import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.HabitDialog;
 import com.example.brandon.habitlogger.ui.Widgets.CurrentSessionCardManager;
 import com.github.clans.fab.FloatingActionButton;
 
@@ -51,14 +49,22 @@ import java.util.Locale;
 
 import static android.widget.Toast.makeText;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, MyFragmentBase.IMainActivity,
-        NewHabitDialog.OnFinishedListener, EditHabitDialog.OnFinishedListener {
+public class MainActivity extends AppCompatActivity implements
+        NavigationView.OnNavigationItemSelectedListener, MyFragmentBase.IMainActivity {
 
     //region (Member attributes)
-    private static final String KEY_QUERY = "KEY_QUERY";
+    public class ActivityState {
+        String query = "";
 
-    private Integer mLastThemeMode = null;
+        public void saveState(Bundle outState) {
+            outState.putString("query", query);
+        }
+
+        public void restoreState(Bundle savedInstanceState) {
+            query = savedInstanceState.getString("query");
+        }
+    }
+
     private HabitDatabase mHabitDatabase;
     private SessionManager mSessionManager;
     private SessionNotificationManager mSessionNotificationManager;
@@ -69,8 +75,8 @@ public class MainActivity extends AppCompatActivity
 
     ActivityMainBinding ui;
     private SearchView mSearchView;
-    private String mSearchViewQuery;
     private MyFragmentBase mFragment;
+    private ActivityState mActivityState = new ActivityState();
     //endregion
 
     //region [ ---- Methods responsible for handling the lifecycle of the activity ---- ]
@@ -86,7 +92,7 @@ public class MainActivity extends AppCompatActivity
         resetDialogListeners();
 
         if (savedInstanceState != null) {
-            mSearchViewQuery = savedInstanceState.getString(KEY_QUERY, null);
+            mActivityState.restoreState(savedInstanceState);
         }
 
         ui = DataBindingUtil.setContentView(this, R.layout.activity_main);
@@ -103,7 +109,6 @@ public class MainActivity extends AppCompatActivity
         mPreferenceChecker = new PreferenceChecker(this);
         int themeMode = mPreferenceChecker.getThemeMode();
         AppCompatDelegate.setDefaultNightMode(themeMode);
-        mLastThemeMode = themeMode;
     }
 
     private void setUpActivityUi(boolean hasSavedInstanceState) {
@@ -138,9 +143,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setListeners() {
-        ui.mainInclude.fab.setOnClickListener(getOnNewHabitButtonClicked());
+        ui.mainInclude.fab.setOnClickListener(onNewHabitButtonClicked);
+        mCurrentSessionCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ActiveSessionsActivity.startActivity(MainActivity.this);
+            }
+        });
         ui.navView.setNavigationItemSelectedListener(this);
-        mCurrentSessionCard.setOnClickListener(getOnSessionsCardClickListener());
     }
 
     private void gatherDependencies() {
@@ -158,16 +168,10 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
 
-        int themeMode = mPreferenceChecker.getThemeMode();
-        if ((mLastThemeMode != null && mLastThemeMode != themeMode) || AppCompatDelegate.getDefaultNightMode() != themeMode) {
-            recreate();
-        }
-
         prepareNavigationDrawer();
         mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
         getContentFragment().reapplySpaceDecoration();
         getContentFragment().callNotifyDataSetChanged();
-//        getContentFragment().restartFragment();
     }
     //endregion
 
@@ -193,9 +197,9 @@ public class MainActivity extends AppCompatActivity
         mSearchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
 
         //focus the SearchView
-        if (mSearchViewQuery != null && !mSearchViewQuery.isEmpty()) {
+        if (mActivityState.query != null && !mActivityState.query.isEmpty()) {
             searchMenuItem.expandActionView();
-            mSearchView.setQuery(mSearchViewQuery, false);
+            mSearchView.setQuery(mActivityState.query, false);
             mSearchView.clearFocus();
         }
 
@@ -207,17 +211,11 @@ public class MainActivity extends AppCompatActivity
 
     //endregion [ ---------------- end ---------------- ]
 
-    //region Methods responsible for maintaining state changes
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(KEY_QUERY, mSearchViewQuery);
-    }
-    //endregion -- end --
-
     //region [ ---- Code responsible for updating the ui ---- ]
 
-    //region Methods responsible for hiding/showing elements on the screen.
+    //region [ -- Methods responsible for hiding/showing elements on the screen. -- ]
+
+    //region Floating Action Button
     @Override
     public void hideFab(boolean animate) {
         ui.mainInclude.fab.hide(animate);
@@ -227,7 +225,9 @@ public class MainActivity extends AppCompatActivity
     public void showFab(boolean animate) {
         ui.mainInclude.fab.show(animate);
     }
+    //endregion
 
+    //region Current Sessions Card
     @Override
     public void hideCurrentSessionsCard(boolean animate) {
         mCurrentSessionCard.hideView(animate);
@@ -239,15 +239,13 @@ public class MainActivity extends AppCompatActivity
     }
     //endregion -- end --
 
+    //endregion [ ---- end ---- ]
+
     private void setFragmentForNavId(@IdRes int menuId) {
         // Create a new fragment and specify the planet to onSessionToggleClick based on position
         switch (menuId) {
             case R.id.home_nav:
-//                if (mPreferenceChecker.howToDisplayCategories() == PreferenceChecker.AS_CARDS)
-//                    mFragment = CategoryCardHabitsFragment.newInstance();
-//                else
                 mFragment = AllHabitsFragment.newInstance();
-
                 break;
 
             case R.id.archived_habits:
@@ -275,137 +273,6 @@ public class MainActivity extends AppCompatActivity
         ui.drawerLayout.closeDrawer(GravityCompat.START);
     }
 
-    public MyFragmentBase getContentFragment() {
-        if (mFragment == null) {
-            mFragment = (MyFragmentBase) getSupportFragmentManager().findFragmentById(R.id.content_frame);
-        }
-
-        return mFragment;
-    }
-    //endregion -- end --
-
-    //region [ ---- Methods responsible for handling events ---- ]
-
-    //region Methods responsible for handling search events
-    private SearchView.OnQueryTextListener getSearchListener() {
-        return new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                mSearchViewQuery = query.trim();
-                return getContentFragment().handleOnQuery(mSearchViewQuery);
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                mSearchViewQuery = newText.trim();
-                return getContentFragment().handleOnQuery(mSearchViewQuery);
-            }
-        };
-    }
-    //endregion -- end --
-
-    @Override
-    public IScrollEvents getScrollEventsListener() {
-        return new IScrollEvents() {
-            FloatingActionButton fab = ui.mainInclude.fab;
-
-            @Override
-            public void onScrollUp() {
-                if (mPreferenceChecker.hideFabOnScroll() && !fab.isShown())
-                    fab.show(true);
-
-                if (mPreferenceChecker.doHideCurrentSessionCard())
-                    mCurrentSessionCard.showView();
-            }
-
-            @Override
-            public void onScrollDown() {
-                if (mPreferenceChecker.hideFabOnScroll() && fab.isShown())
-                    fab.hide(true);
-
-                if (mPreferenceChecker.doHideCurrentSessionCard())
-                    mCurrentSessionCard.hideView();
-            }
-        };
-    }
-
-    private View.OnClickListener getOnSessionsCardClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ActiveSessionsActivity.startActivity(MainActivity.this);
-            }
-        };
-    }
-
-    private SessionManager.SessionChangeCallback onSessionChangeCallback =
-            new SessionManager.SessionChangeCallback() {
-                @Override
-                public void onSessionPauseStateChanged(long habitId, boolean isPaused) {}
-
-                @Override
-                public void beforeSessionEnded(long habitId, boolean wasCanceled) {
-                    mSessionNotificationManager.cancel((int) habitId);
-                    getContentFragment().notifySessionEnded(habitId);
-                }
-
-                @Override
-                public void afterSessionEnded(long habitId, boolean wasCanceled) {
-                    mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
-                    getContentFragment().reapplySpaceDecoration();
-                }
-
-                @Override
-                public void onSessionStarted(long habitId) {
-                    if (mPreferenceChecker.doShowNotifications()) {
-                        Habit habit = mHabitDatabase.getHabit(habitId);
-                        mSessionNotificationManager.updateNotification(habit);
-                    }
-
-                    mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
-                    getContentFragment().reapplySpaceDecoration();
-                }
-            };
-
-    //region Code responsible for handling new Habit requests
-    HabitDialog.DialogResult onYesCreateHabit = new HabitDialog.DialogResult() {
-        @Override
-        public void onResult(@Nullable Habit initHabit, Habit habit) {
-            mHabitDatabase.addHabit(habit);
-            getContentFragment().addHabitToLayout(habit);
-            clearFocusFromSearchView();
-            findViewById(R.id.no_habits_available_layout).setVisibility(View.GONE);
-        }
-    };
-
-    private View.OnClickListener getOnNewHabitButtonClicked() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                HabitDialog dialog = new HabitDialog()
-                        .setTitle("Create Habit")
-                        .setPositiveButton("Create", onYesCreateHabit)
-                        .setNegativeButton("Cancel", null);
-
-                dialog.show(getSupportFragmentManager(), "create-new-habit");
-            }
-        };
-    }
-    //endregion -- end --
-
-    @Override
-    public void onNewHabitCreated(Habit newHabit) {
-        mHabitDatabase.addHabit(newHabit);
-        getContentFragment().addHabitToLayout(newHabit);
-        clearFocusFromSearchView();
-        findViewById(R.id.no_habits_available_layout).setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onUpdateHabit(Habit oldHabit, Habit newHabit) {
-        getContentFragment().onUpdateHabit(oldHabit, newHabit);
-    }
-
     private void clearFocusFromSearchView() {
         if (mSearchView != null) {
             mSearchView.setQuery("", false);
@@ -414,53 +281,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
+    //endregion -- end --
 
-        switch (id) {
-            case R.id.home_nav:
-                setFragmentForNavId(id);
-                break;
+    //region [ ---- Methods responsible for handling events ---- ]
 
-            case R.id.running_habits_nav:
-                ActiveSessionsActivity.startActivity(this);
-                break;
-
-            case R.id.archived_habits:
-                setFragmentForNavId(id);
-                break;
-
-//            case (R.id.overall_stats_nav):
-//                DataOverviewActivity.startActivity(this);
-//                break;
-
-            case R.id.settings_nav:
-                SettingsActivity.startActivity(this);
-                break;
-
-            case R.id.about_nav:
-                AboutActivity.startActivity(this);
-                break;
-
-            case R.id.night_mode:
-                ((Switch) item.getActionView().findViewById(R.id.menu_switch)).toggle();
-                mPreferenceChecker.toggleNightMode();
-                recreate();
-                break;
-        }
-
-        ui.drawerLayout.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (ui.drawerLayout.isDrawerOpen(GravityCompat.START))
-            ui.drawerLayout.closeDrawer(GravityCompat.START);
-        else super.onBackPressed();
-    }
-
+    //region [ -- menu option events -- ]
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         final int id = item.getItemId();
@@ -497,33 +322,7 @@ public class MainActivity extends AppCompatActivity
         makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
-    private void resetDialogListeners() {
-        DialogFragment dialog;
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        if ((dialog = (DialogFragment) fragmentManager.findFragmentByTag("confirm-database-backup")) != null)
-            setDialogListener((ConfirmationDialog) dialog);
-
-        else if ((dialog = (DialogFragment) fragmentManager.findFragmentByTag("confirm-database-restore")) != null)
-            setDialogListener((ConfirmationDialog) dialog);
-
-        else if ((dialog = (DialogFragment) fragmentManager.findFragmentByTag("create-new-habit")) != null)
-            ((HabitDialog)dialog).setPositiveButton(null, onYesCreateHabit);
-    }
-
-    private void setDialogListener(ConfirmationDialog dialog) {
-        switch (dialog.getTag()) {
-            case "confirm-database-backup":
-                dialog.setOnYesClickListener(onYesBackupDatabaseClicked);
-                break;
-            case "confirm-database-restore":
-                dialog.setOnYesClickListener(onYesRestoreDatabaseClicked);
-                break;
-        }
-    }
-
-    //region Code responsible for handling database backup requests.
+    //region database backup requests.
     DialogInterface.OnClickListener onYesBackupDatabaseClicked = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
@@ -544,7 +343,7 @@ public class MainActivity extends AppCompatActivity
     }
     //endregion -- end --
 
-    //region Code responsible for handling database restore requests.
+    //region database restore requests.
     DialogInterface.OnClickListener onYesRestoreDatabaseClicked = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
@@ -565,6 +364,150 @@ public class MainActivity extends AppCompatActivity
     }
     //endregion -- end --
 
+    //endregion [ ---- end ---- ]
+
+    //region search events
+    private SearchView.OnQueryTextListener getSearchListener() {
+        return new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mActivityState.query = query.trim();
+                return getContentFragment().handleOnQuery(mActivityState.query);
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mActivityState.query = newText.trim();
+                return getContentFragment().handleOnQuery(mActivityState.query);
+            }
+        };
+    }
+    //endregion -- end --
+
+    //region Create Habit requests
+    HabitDialog.DialogResult onYesCreateHabit = new HabitDialog.DialogResult() {
+        @Override
+        public void onResult(@Nullable Habit initHabit, Habit habit) {
+            mHabitDatabase.addHabit(habit);
+            getContentFragment().addHabitToLayout(habit);
+            clearFocusFromSearchView();
+            findViewById(R.id.no_habits_available_layout).setVisibility(View.GONE);
+        }
+    };
+
+    View.OnClickListener onNewHabitButtonClicked = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            HabitDialog dialog = new HabitDialog()
+                    .setTitle("Create Habit")
+                    .setPositiveButton("Create", onYesCreateHabit)
+                    .setNegativeButton("Cancel", null);
+
+            dialog.show(getSupportFragmentManager(), "create-new-habit");
+        }
+    };
+
+    //endregion -- end --
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.home_nav:
+            case R.id.archived_habits:
+                setFragmentForNavId(id);
+                break;
+
+            case R.id.running_habits_nav:
+                ActiveSessionsActivity.startActivity(this);
+                break;
+
+            case R.id.settings_nav:
+                SettingsActivity.startActivity(this);
+                break;
+
+            case R.id.about_nav:
+                AboutActivity.startActivity(this);
+                break;
+
+            case R.id.night_mode:
+                ((Switch) item.getActionView().findViewById(R.id.menu_switch)).toggle();
+                mPreferenceChecker.toggleNightMode();
+                recreate();
+                break;
+        }
+
+        ui.drawerLayout.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
+    public IScrollEvents getScrollEventsListener() {
+        return new IScrollEvents() {
+            FloatingActionButton fab = ui.mainInclude.fab;
+
+            @Override
+            public void onScrollUp() {
+                if (mPreferenceChecker.hideFabOnScroll() && !fab.isShown())
+                    fab.show(true);
+
+                if (mPreferenceChecker.doHideCurrentSessionCard())
+                    mCurrentSessionCard.showView();
+            }
+
+            @Override
+            public void onScrollDown() {
+                if (mPreferenceChecker.hideFabOnScroll() && fab.isShown())
+                    fab.hide(true);
+
+                if (mPreferenceChecker.doHideCurrentSessionCard())
+                    mCurrentSessionCard.hideView();
+            }
+        };
+    }
+
+    private SessionManager.SessionChangeCallback onSessionChangeCallback = new SessionManager.SessionChangeCallback() {
+        @Override
+        public void beforeSessionEnded(long habitId, boolean wasCanceled) {
+            super.beforeSessionEnded(habitId, wasCanceled);
+            mSessionNotificationManager.cancel((int) habitId);
+            getContentFragment().notifySessionEnded(habitId);
+        }
+
+        @Override
+        public void afterSessionEnded(long habitId, boolean wasCanceled) {
+            super.afterSessionEnded(habitId, wasCanceled);
+            mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
+            getContentFragment().reapplySpaceDecoration();
+        }
+
+        @Override
+        public void onSessionStarted(long habitId) {
+            super.onSessionStarted(habitId);
+            if (mPreferenceChecker.doShowNotifications()) {
+                Habit habit = mHabitDatabase.getHabit(habitId);
+                mSessionNotificationManager.updateNotification(habit);
+            }
+
+            mCurrentSessionCard.updateCard(mSessionManager, mPreferenceChecker);
+            getContentFragment().reapplySpaceDecoration();
+        }
+    };
+
+    @Override
+    public void onBackPressed() {
+        if (ui.drawerLayout.isDrawerOpen(GravityCompat.START))
+            ui.drawerLayout.closeDrawer(GravityCompat.START);
+        else super.onBackPressed();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mActivityState.saveState(outState);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -579,8 +522,45 @@ public class MainActivity extends AppCompatActivity
                     getContentFragment().restartFragment();
                 break;
         }
-
     }
     //endregion [ ---------------- end ---------------- ]
+
+    //region Getters{}
+    public MyFragmentBase getContentFragment() {
+        if (mFragment == null) {
+            mFragment = (MyFragmentBase) getSupportFragmentManager().findFragmentById(R.id.content_frame);
+        }
+
+        return mFragment;
+    }
+    //endregion -- end --
+
+    //region Setters{}
+    private void resetDialogListeners() {
+        DialogFragment dialog;
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        if ((dialog = (DialogFragment) fragmentManager.findFragmentByTag("confirm-database-backup")) != null)
+            setDialogListener((ConfirmationDialog) dialog);
+
+        else if ((dialog = (DialogFragment) fragmentManager.findFragmentByTag("confirm-database-restore")) != null)
+            setDialogListener((ConfirmationDialog) dialog);
+
+        else if ((dialog = (DialogFragment) fragmentManager.findFragmentByTag("create-new-habit")) != null)
+            ((HabitDialog) dialog).setPositiveButton(null, onYesCreateHabit);
+    }
+
+    private void setDialogListener(ConfirmationDialog dialog) {
+        switch (dialog.getTag()) {
+            case "confirm-database-backup":
+                dialog.setOnYesClickListener(onYesBackupDatabaseClicked);
+                break;
+            case "confirm-database-restore":
+                dialog.setOnYesClickListener(onYesRestoreDatabaseClicked);
+                break;
+        }
+    }
+    //endregion -- end --
 
 }

@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ui.Dialogs.HabitDialog2;
+package com.example.brandon.habitlogger.ui.Dialogs.HabitDialog;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -7,15 +7,20 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
+import android.view.View;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.databinding.DialogHabitFormBinding;
+import com.example.brandon.habitlogger.ui.Events.IStateContainer;
+import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.CategoryDialog.CategoryDialog;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.CategoryDialog.CategorySpinnerAdapter;
+import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.CategoryDialog.SelectCategoryDialog;
 
 import java.io.Serializable;
 import java.util.List;
@@ -27,13 +32,14 @@ import java.util.List;
 
 public class HabitDialog extends DialogFragment {
 
-    private class DialogState {
+    private class DialogState implements IStateContainer {
         int accentColor = 0;
         String title = "Habit Dialog";
         String positiveText = "Confirm", negativeText = "Cancel";
         Habit habit = null;
         public Habit initHabit;
 
+        @Override
         public void saveState(@NonNull Bundle outState) {
             outState.putString("title", title);
             outState.putString("positiveText", positiveText);
@@ -43,6 +49,7 @@ public class HabitDialog extends DialogFragment {
             outState.putSerializable("initHabit", initHabit);
         }
 
+        @Override
         public void restoreState(@NonNull Bundle savedInstanceState) {
             title = savedInstanceState.getString("title");
             positiveText = savedInstanceState.getString("positiveText");
@@ -73,8 +80,17 @@ public class HabitDialog extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState != null)
+        resetDialogListeners();
+
+        if (savedInstanceState != null) {
             mDialogState.restoreState(savedInstanceState);
+        }
+
+        Fragment fragment = getFragmentManager().findFragmentByTag("category-selector");
+        if (fragment != null) {
+            SelectCategoryDialog dialog = (SelectCategoryDialog) fragment;
+            dialog.setCallbackInterface(spinnerCallback);
+        }
     }
 
     @NonNull
@@ -87,9 +103,11 @@ public class HabitDialog extends DialogFragment {
         List<HabitCategory> categories = new HabitDatabase(getContext()).getCategories();
         CategorySpinnerAdapter adapter = new CategorySpinnerAdapter(getContext(), categories);
 
-        ui.spinnerCategorySelector.setAccentColor(mDialogState.accentColor);
+//        ui.spinnerCategorySelector.setAccentColor(mDialogState.accentColor);
         ui.spinnerCategorySelector.setAdapter(adapter);
-        ui.spinnerCategorySelector.setFragmentManager(getFragmentManager());
+
+        ui.spinnerCategorySelector.setClickListener(onSpinnerClickListener);
+//        ui.spinnerCategorySelector.setFragmentManager(getFragmentManager());
 
         if (mDialogState.habit != null) {
             ui.habitName.setText(mDialogState.habit.getName());
@@ -126,6 +144,50 @@ public class HabitDialog extends DialogFragment {
     }
     //endregion -- end --
 
+    //region Methods responsible for handling events
+    private CategoryDialog.DialogResult onCategoryDialogFinished = new CategoryDialog.DialogResult() {
+        @Override
+        public void onResult(HabitCategory initCategory, HabitCategory category) {
+            new HabitDatabase(getContext()).addCategoryIfNotExists(category);
+            ((CategorySpinnerAdapter) ui.spinnerCategorySelector.getAdapter()).addCategory(category);
+            SelectCategoryDialog dialog = (SelectCategoryDialog) getFragmentManager().findFragmentByTag("category-selector");
+            dialog.addCategory(category);
+        }
+    };
+
+    SelectCategoryDialog.DialogCallback spinnerCallback = new SelectCategoryDialog.DialogCallback() {
+        @Override
+        public void onCategoryListItemClick(int adapterPosition) {
+            ui.spinnerCategorySelector.setSelection(adapterPosition);
+        }
+
+        @Override
+        public void onNewCategoryButtonClick() {
+            new CategoryDialog()
+                    .setTitle("New Category")
+                    .setAccentColor(mDialogState.accentColor)
+                    .setPositiveButton("Create", onCategoryDialogFinished)
+                    .show(getFragmentManager(), "create-category");
+        }
+    };
+
+    View.OnClickListener onSpinnerClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(final View v) {
+            List<HabitCategory> categories = new HabitDatabase(getContext()).getCategories();
+
+            SelectCategoryDialog dialog = new SelectCategoryDialog()
+                    .setCategories(categories);
+
+            if (mDialogState.accentColor != 0)
+                dialog.setAccentColor(mDialogState.accentColor);
+
+            dialog.setCallbackInterface(spinnerCallback);
+            dialog.show(getFragmentManager(), "category-selector");
+        }
+    };
+    //endregion -- end --
+
     //region Getters {}
     public Habit getHabit() {
         String name = ui.habitName.getText().toString();
@@ -146,7 +208,7 @@ public class HabitDialog extends DialogFragment {
         return this;
     }
 
-    public HabitDialog setInitHabit(Habit habit){
+    public HabitDialog setInitHabit(Habit habit) {
         mDialogState.initHabit = Habit.duplicate(habit);
         mDialogState.habit = habit;
         return this;
@@ -164,7 +226,8 @@ public class HabitDialog extends DialogFragment {
         onPositiveClicked = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                listener.onResult(mDialogState.initHabit, getHabit());
+                if (listener != null)
+                    listener.onResult(mDialogState.initHabit, getHabit());
             }
         };
         return this;
@@ -177,10 +240,20 @@ public class HabitDialog extends DialogFragment {
         onNegativeClicked = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                listener.onResult(mDialogState.initHabit, getHabit());
+                if (listener != null)
+                    listener.onResult(mDialogState.initHabit, getHabit());
             }
         };
         return this;
+    }
+
+    private void resetDialogListeners() {
+        Fragment dialog = getFragmentManager().findFragmentByTag("create-category");
+
+        if (dialog != null) {
+            CategoryDialog categoryDialog = (CategoryDialog) dialog;
+            categoryDialog.setPositiveButton(null, onCategoryDialogFinished);
+        }
     }
     //endregion -- end --
 

@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ui.Activities.ScrollObservers;
+package com.example.brandon.habitlogger.ui.Events.ScrollObservers;
 
 /**
  * Created by Brandon on 4/1/2017.

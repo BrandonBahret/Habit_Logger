@@ -27,8 +27,7 @@ import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
 import java.io.Serializable;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class SessionActivity extends AppCompatActivity implements
-        SessionManager.SessionChangeCallback, TimerFragment.ITimerFragment {
+public class SessionActivity extends AppCompatActivity implements TimerFragment.ITimerFragment {
 
     public static String RESULT_NEW_ENTRY = "RESULT_NEW_ENTRY";
 
@@ -80,7 +79,7 @@ public class SessionActivity extends AppCompatActivity implements
             getSupportActionBar().setTitle(mHabit.getName());
         }
 
-        mSessionManager.addSessionChangedCallback(this);
+        mSessionManager.addSessionChangedCallback(sessionChangeCallback);
 
         mTimerFragment.callOnUpdateTimer();
 
@@ -89,7 +88,7 @@ public class SessionActivity extends AppCompatActivity implements
     @Override
     protected void onStop() {
         super.onStop();
-        mSessionManager.removeSessionChangedCallback(this);
+        mSessionManager.removeSessionChangedCallback(sessionChangeCallback);
     }
     //endregion -- end --
 
@@ -259,23 +258,19 @@ public class SessionActivity extends AppCompatActivity implements
     //endregion [ -- end -- ]
 
     //region Handle SessionManager events
-    @Override
-    public void onSessionPauseStateChanged(long habitId, boolean isPaused) {
-        if (habitId == this.mHabit.getDatabaseId())
-            mTimerFragment.updateSessionPlayButton(isPaused);
-    }
+    SessionManager.SessionChangeCallback sessionChangeCallback = new SessionManager.SessionChangeCallback(){
+        @Override
+        public void onSessionPauseStateChanged(long habitId, boolean isPaused) {
+            if (habitId == mHabit.getDatabaseId())
+                mTimerFragment.updateSessionPlayButton(isPaused);
+        }
 
-    @Override
-    public void beforeSessionEnded(long habitId, boolean wasCanceled) {
-        if (habitId == this.mHabit.getDatabaseId() && wasCanceled)
-            finish();
-    }
-
-    @Override
-    public void afterSessionEnded(long habitId, boolean wasCanceled) {}
-
-    @Override
-    public void onSessionStarted(long habitId) {}
+        @Override
+        public void beforeSessionEnded(long habitId, boolean wasCanceled) {
+            if (habitId == mHabit.getDatabaseId() && wasCanceled)
+                finish();
+        }
+    };
     //endregion -- end --
 
     //endregion [ ---------------- end ---------------- ]

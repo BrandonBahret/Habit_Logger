@@ -17,7 +17,7 @@ import java.util.List;
  * This is a class to structure a sample of session entries on the categorical level.
  */
 
-public final class CategoryDataCollection extends MyDataCollectionBase<Habit> implements Parcelable {
+public class CategoryDataCollection extends MyDataCollectionBase<Habit> implements Parcelable {
 
     //region (Member Attributes)
     private final HabitCategory mCategory;

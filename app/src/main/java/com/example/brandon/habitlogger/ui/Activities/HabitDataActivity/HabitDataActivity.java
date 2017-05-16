@@ -31,14 +31,14 @@ import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.databinding.ActivityHabitDataBinding;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.EntriesFragment.EntriesFragment;
+import com.example.brandon.habitlogger.ui.Events.IStateContainer;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
-import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
+import com.example.brandon.habitlogger.ui.Events.ScrollObservers.IScrollEvents;
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity.SessionActivity;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
 import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EditEntryForm;
 import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.NewEntryForm;
-import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.EditHabitDialog;
-import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog2.HabitDialog;
+import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.HabitDialog;
 import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 
 import java.util.ArrayList;
@@ -49,16 +49,35 @@ import static com.example.brandon.habitlogger.R.string.menu_unarchive;
 
 public class HabitDataActivity extends AppCompatActivity implements
         IHabitDataCallback.IUpdateEntries, IHabitDataCallback.IUpdateCategoryData,
-        IHabitDataCallback, IScrollEvents, EntriesFragment.IEntriesEvents, EditHabitDialog.OnFinishedListener,
+        IHabitDataCallback, IScrollEvents, EntriesFragment.IEntriesEvents,
         EditEntryForm.OnFinishedListener, NewEntryForm.OnFinishedListener {
 
     //region (Member attributes)
+    public class ActivityState implements IStateContainer {
+        private Habit habit;
+        SessionEntryCollection entries = new SessionEntryCollection();
+        String query = "";
+        int tabPosition;
 
-    private static final String KEY_SEARCH_QUERY = "KEY_SEARCH_QUERY";
-    private static final String KEY_SESSION_ENTRIES = "KEY_SESSION_ENTRIES";
-    private static final String KEY_TABS_POSITION = "KEY_TABS_POSITION";
-    private String mSearchQuery = "";
+        @Override
+        public void saveState(Bundle outState) {
+            outState.putString("query", query);
+            outState.putParcelableArrayList("entries", entries);
+            outState.putInt("tabPosition", tabPosition);
+            outState.putSerializable("habit", habit);
+        }
 
+        @Override
+        public void restoreState(Bundle savedInstanceState) {
+            query = savedInstanceState.getString("query");
+            habit = (Habit) savedInstanceState.getSerializable("habit");
+
+            List<SessionEntry> restoredEntries = savedInstanceState.getParcelableArrayList("entries");
+            entries = new SessionEntryCollection(restoredEntries);
+            tabPosition = savedInstanceState.getInt("tabPosition");
+        }
+    }
+    
     // Dependencies
     private HabitDatabase mHabitDatabase;
     private LocalDataExportManager mExportManager;
@@ -66,15 +85,12 @@ public class HabitDataActivity extends AppCompatActivity implements
     private PreferenceChecker mPreferenceChecker;
 
     // Data
-    private Habit mHabit;
-    private SessionEntryCollection mSessionEntries = new SessionEntryCollection();
+    private ActivityState mActivityState = new ActivityState();
 
     // View related members
     FloatingDateRangeWidgetManager dateRangeManager;
     private SearchView mSearchView;
     ActivityHabitDataBinding ui;
-    private HabitDataActivityPagerAdapter mSectionsPagerAdapter;
-
     //endregion
 
     //region Code responsible for providing communication between child fragments and this activity
@@ -117,9 +133,7 @@ public class HabitDataActivity extends AppCompatActivity implements
 
         boolean usesSavedInstance = savedInstanceState != null;
         if (usesSavedInstance) {
-            mSearchQuery = savedInstanceState.getString(KEY_SEARCH_QUERY);
-            List<SessionEntry> entries = savedInstanceState.getParcelableArrayList(KEY_SESSION_ENTRIES);
-            mSessionEntries = new SessionEntryCollection(entries);
+            mActivityState.restoreState(savedInstanceState);
         }
 
         // Gather data from intent
@@ -133,9 +147,9 @@ public class HabitDataActivity extends AppCompatActivity implements
         mExportManager = new LocalDataExportManager(this);
 
         // Fetch data from database
-        mHabit = mHabitDatabase.getHabit(habitId);
+        mActivityState.habit = mHabitDatabase.getHabit(habitId);
         if (!usesSavedInstance) {
-            mSessionEntries = mHabitDatabase.getEntries(habitId);
+            mActivityState.entries = mHabitDatabase.getEntries(habitId);
         }
 
         // Set up activity
@@ -144,33 +158,30 @@ public class HabitDataActivity extends AppCompatActivity implements
         setSupportActionBar(ui.toolbar);
         if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mSectionsPagerAdapter = new HabitDataActivityPagerAdapter(getSupportFragmentManager(), this);
-        dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), mSessionEntries);
-        ui.container.setAdapter(mSectionsPagerAdapter);
+        HabitDataActivityPagerAdapter pagerAdapter = new HabitDataActivityPagerAdapter(getSupportFragmentManager(), this);
+        dateRangeManager = new FloatingDateRangeWidgetManager(this, findViewById(R.id.date_range), mActivityState.entries);
+        ui.container.setAdapter(pagerAdapter);
         ui.tabs.setupWithViewPager(ui.container);
         ui.menuFab.setClosedOnTouchOutside(true);
 
-
-        if (savedInstanceState == null || savedInstanceState.getInt(KEY_TABS_POSITION) == 1) {
+        if (savedInstanceState == null || mActivityState.tabPosition == 1) {
             ui.container.setCurrentItem(1);
             dateRangeManager.hideView(false);
             ui.menuFab.hideMenu(false);
         }
 
         if (!usesSavedInstance) {
-            mSessionEntries = fetchEntriesWithinTimeRange();
-            dateRangeManager.updateSessionEntries(mSessionEntries);
+            mActivityState.entries = fetchEntriesWithinTimeRange();
+            dateRangeManager.updateSessionEntries(mActivityState.entries);
         }
-        else {
-            dateRangeManager.restoreState(savedInstanceState);
-        }
+        else dateRangeManager.restoreState(savedInstanceState);
 
-        setUpActivityWithHabit(mHabit);
+        setUpActivityWithHabit(mActivityState.habit);
 
     }
 
     private void setUpActivityWithHabit(Habit habit) {
-        ui.toolbar.setTitle(mHabit.getName());
+        ui.toolbar.setTitle(mActivityState.habit.getName());
         setSupportActionBar(ui.toolbar);
 
         ThemeColorPalette palette = new ThemeColorPalette(habit.getColor());
@@ -224,9 +235,9 @@ public class HabitDataActivity extends AppCompatActivity implements
         mSearchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
 
         //focus the SearchView
-        if (mSearchQuery != null && !mSearchQuery.isEmpty()) {
+        if (mActivityState.query != null && !mActivityState.query.isEmpty()) {
             searchMenuItem.expandActionView();
-            mSearchView.setQuery(mSearchQuery, false);
+            mSearchView.setQuery(mActivityState.query, false);
             mSearchView.clearFocus();
         }
 
@@ -240,7 +251,7 @@ public class HabitDataActivity extends AppCompatActivity implements
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem archive = menu.findItem(R.id.menu_toggle_archive);
         if (archive != null) {
-            if (mHabit.getIsArchived()) archive.setTitle(menu_unarchive);
+            if (mActivityState.habit.getIsArchived()) archive.setTitle(menu_unarchive);
             else archive.setTitle(R.string.menu_archive);
         }
 
@@ -250,23 +261,14 @@ public class HabitDataActivity extends AppCompatActivity implements
 
     //endregion [ ---- end ---- ]
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(KEY_SEARCH_QUERY, mSearchQuery);
-        outState.putParcelableArrayList(KEY_SESSION_ENTRIES, mSessionEntries);
-        outState.putInt(KEY_TABS_POSITION, ui.tabs.getSelectedTabPosition());
-        dateRangeManager.onSaveInstanceState(outState);
-    }
-
     //region Methods responsible for manipulating entries
     private SessionEntryCollection fetchEntriesWithinConditions(String query) {
         Set<Long> queryIds = mHabitDatabase.findEntryIdsByComment(
-                mHabit.getDatabaseId(), query
+                mActivityState.habit.getDatabaseId(), query
         );
 
         Set<Long> dateRangeIds = mHabitDatabase.findEntriesWithinTimeRange(
-                mHabit.getDatabaseId(),
+                mActivityState.habit.getDatabaseId(),
                 dateRangeManager.getDateFrom(), dateRangeManager.getDateTo()
         );
 
@@ -277,7 +279,7 @@ public class HabitDataActivity extends AppCompatActivity implements
 
     private SessionEntryCollection fetchEntriesWithinTimeRange() {
         Set<Long> dateRangeIds = mHabitDatabase.findEntriesWithinTimeRange(
-                mHabit.getDatabaseId(),
+                mActivityState.habit.getDatabaseId(),
                 dateRangeManager.getDateFrom(), dateRangeManager.getDateTo()
         );
 
@@ -297,45 +299,45 @@ public class HabitDataActivity extends AppCompatActivity implements
     }
 
     private void addNewEntry(SessionEntry newEntry) {
-        int pos = mSessionEntries.addEntry(newEntry);
-        updateDateRangeManagerEntries(mSessionEntries);
+        int pos = mActivityState.entries.addEntry(newEntry);
+        updateDateRangeManagerEntries(mActivityState.entries);
         if (checkIfEntryFitsWithinConditions(newEntry)) {
             mEntriesCallback.onNotifyEntryAdded(pos);
-            mCalendarCallback.onUpdateEntries(mSessionEntries);
-            mStatisticsCallback.onUpdateEntries(mSessionEntries);
+            mCalendarCallback.onUpdateEntries(mActivityState.entries);
+            mStatisticsCallback.onUpdateEntries(mActivityState.entries);
         }
         else {
-            mSessionEntries.removeEntry(newEntry);
+            mActivityState.entries.removeEntry(newEntry);
         }
     }
 
     private void updateEntry(SessionEntry oldEntry, SessionEntry newEntry) {
-        int oldIndex = mSessionEntries.indexOf(oldEntry);
-        int newIndex = mSessionEntries.updateEntry(oldEntry, newEntry);
-        dateRangeManager.updateSessionEntries(mSessionEntries);
+        int oldIndex = mActivityState.entries.indexOf(oldEntry);
+        int newIndex = mActivityState.entries.updateEntry(oldEntry, newEntry);
+        dateRangeManager.updateSessionEntries(mActivityState.entries);
         mEntriesCallback.onNotifyEntryUpdated(oldIndex, newIndex);
-        mCalendarCallback.onUpdateEntries(mSessionEntries);
-        mStatisticsCallback.onUpdateEntries(mSessionEntries);
+        mCalendarCallback.onUpdateEntries(mActivityState.entries);
+        mStatisticsCallback.onUpdateEntries(mActivityState.entries);
     }
 
     private void removeEntry(SessionEntry oldEntry) {
-        int pos = mSessionEntries.removeEntry(oldEntry);
-        dateRangeManager.updateSessionEntries(mSessionEntries);
+        int pos = mActivityState.entries.removeEntry(oldEntry);
+        dateRangeManager.updateSessionEntries(mActivityState.entries);
         mEntriesCallback.onNotifyEntryRemoved(pos);
-        mCalendarCallback.onUpdateEntries(mSessionEntries);
-        mStatisticsCallback.onUpdateEntries(mSessionEntries);
+        mCalendarCallback.onUpdateEntries(mActivityState.entries);
+        mStatisticsCallback.onUpdateEntries(mActivityState.entries);
     }
 
     private void updateEntries(SessionEntryCollection sessionEntries) {
         updateDateRangeManagerEntries(sessionEntries);
         mEntriesCallback.onUpdateEntries(sessionEntries);
         mCalendarCallback.onUpdateEntries(sessionEntries);
-        mStatisticsCallback.onUpdateEntries(mSessionEntries);
+        mStatisticsCallback.onUpdateEntries(mActivityState.entries);
     }
 
     private void updateDateRangeManagerEntries(SessionEntryCollection sessionEntries) {
-        SessionEntry minEntry = mHabitDatabase.getMinEntry(mHabit.getDatabaseId());
-        SessionEntry maxEntry = mHabitDatabase.getMaxEntry(mHabit.getDatabaseId());
+        SessionEntry minEntry = mHabitDatabase.getMinEntry(mActivityState.habit.getDatabaseId());
+        SessionEntry maxEntry = mHabitDatabase.getMaxEntry(mActivityState.habit.getDatabaseId());
         if (minEntry != null && maxEntry != null) {
             long minTime = minEntry.getStartingTimeIgnoreTimeOfDay();
             long maxTime = maxEntry.getStartingTimeIgnoreTimeOfDay();
@@ -349,15 +351,45 @@ public class HabitDataActivity extends AppCompatActivity implements
     }
 
     private void clearEntries() {
-        mSessionEntries.clear();
-        dateRangeManager.updateSessionEntries(mSessionEntries);
-        mEntriesCallback.onUpdateEntries(mSessionEntries);
-        mCalendarCallback.onUpdateEntries(mSessionEntries);
-        mStatisticsCallback.onUpdateEntries(mSessionEntries);
+        mActivityState.entries.clear();
+        dateRangeManager.updateSessionEntries(mActivityState.entries);
+        mEntriesCallback.onUpdateEntries(mActivityState.entries);
+        mCalendarCallback.onUpdateEntries(mActivityState.entries);
+        mStatisticsCallback.onUpdateEntries(mActivityState.entries);
     }
     //endregion -- end --
 
     //region Methods responsible for handling/dispatching events
+
+    //region Filter events
+    FloatingDateRangeWidgetManager.DateRangeChangeListener onDateRangeChangeListener =
+            new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
+                @Override
+                public void onDateRangeChanged(long dateFrom, long dateTo) {
+                    mActivityState.entries = fetchEntriesWithinConditions(mActivityState.query);
+                    updateEntries(mActivityState.entries);
+                }
+            };
+
+    SearchView.OnQueryTextListener onSearchQueryListener = new SearchView.OnQueryTextListener() {
+        @Override
+        public boolean onQueryTextSubmit(String query) {
+            mActivityState.query = query.trim();
+            return false;
+        }
+
+        @Override
+        public boolean onQueryTextChange(String query) {
+            mActivityState.query = query.trim();
+            mActivityState.entries = query.length() > 0 ?
+                    fetchEntriesWithinConditions(query) : fetchEntriesWithinTimeRange();
+
+            updateEntries(mActivityState.entries);
+
+            return false;
+        }
+    };
+    //endregion -- end --
 
     //region Scroll events
     @Override
@@ -411,7 +443,7 @@ public class HabitDataActivity extends AppCompatActivity implements
                 break;
 
             case (R.id.menu_enter_session):
-                SessionActivity.startActivity(HabitDataActivity.this, mHabit);
+                SessionActivity.startActivity(HabitDataActivity.this, mActivityState.habit);
                 break;
 
             case (R.id.menu_toggle_archive):
@@ -419,7 +451,7 @@ public class HabitDataActivity extends AppCompatActivity implements
                 break;
 
             case (R.id.menu_export_habit):
-                mExportManager.shareExportHabit(mHabitDatabase.getHabit(mHabit.getDatabaseId()));
+                mExportManager.shareExportHabit(mHabitDatabase.getHabit(mActivityState.habit.getDatabaseId()));
                 break;
 
             case (R.id.menu_reset_habit):
@@ -472,17 +504,17 @@ public class HabitDataActivity extends AppCompatActivity implements
     DialogInterface.OnClickListener onYesDeleteHabitClicked = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            if (mSessionManager.getIsSessionActive(mHabit.getDatabaseId())) {
-                mSessionManager.cancelSession(mHabit.getDatabaseId());
+            if (mSessionManager.getIsSessionActive(mActivityState.habit.getDatabaseId())) {
+                mSessionManager.cancelSession(mActivityState.habit.getDatabaseId());
             }
-            mHabitDatabase.deleteHabit(mHabit.getDatabaseId());
+            mHabitDatabase.deleteHabit(mActivityState.habit.getDatabaseId());
             setResult(ResultCodes.HABIT_CHANGED);
             finish();
         }
     };
 
     private void onMenuDeleteHabitClicked() {
-        String habitName = mHabitDatabase.getHabitName(mHabit.getDatabaseId());
+        String habitName = mHabitDatabase.getHabitName(mActivityState.habit.getDatabaseId());
 
         new ConfirmationDialog()
                 .setIcon(R.drawable.ic_delete_forever_24dp)
@@ -498,14 +530,14 @@ public class HabitDataActivity extends AppCompatActivity implements
     DialogInterface.OnClickListener onYesResetHabitClick = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            mHabitDatabase.deleteEntriesForHabit(mHabit.getDatabaseId());
+            mHabitDatabase.deleteEntriesForHabit(mActivityState.habit.getDatabaseId());
             clearEntries();
             Toast.makeText(HabitDataActivity.this, R.string.entries_deleted_message, Toast.LENGTH_SHORT).show();
         }
     };
 
     private void onMenuResetHabitClicked() {
-        String habitName = mHabitDatabase.getHabitName(mHabit.getDatabaseId());
+        String habitName = mHabitDatabase.getHabitName(mActivityState.habit.getDatabaseId());
 
         new ConfirmationDialog()
                 .setIcon(R.drawable.ic_delete_sweep_24dp)
@@ -521,18 +553,18 @@ public class HabitDataActivity extends AppCompatActivity implements
     DialogInterface.OnClickListener onYesArchiveHabitClick = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            final boolean archivedState = mHabitDatabase.getIsHabitArchived(mHabit.getDatabaseId());
-            mHabitDatabase.updateHabitIsArchived(mHabit.getDatabaseId(), !archivedState);
-            mHabit.setIsArchived(!archivedState);
-            setUpActivityWithHabit(mHabit);
+            final boolean archivedState = mHabitDatabase.getIsHabitArchived(mActivityState.habit.getDatabaseId());
+            mHabitDatabase.updateHabitIsArchived(mActivityState.habit.getDatabaseId(), !archivedState);
+            mActivityState.habit.setIsArchived(!archivedState);
+            setUpActivityWithHabit(mActivityState.habit);
             setResult(ResultCodes.HABIT_CHANGED);
         }
     };
 
     private void onMenuToggleArchiveClicked() {
-        String habitName = mHabitDatabase.getHabitName(mHabit.getDatabaseId());
+        String habitName = mHabitDatabase.getHabitName(mActivityState.habit.getDatabaseId());
 
-        final boolean archivedState = mHabitDatabase.getIsHabitArchived(mHabit.getDatabaseId());
+        final boolean archivedState = mHabitDatabase.getIsHabitArchived(mActivityState.habit.getDatabaseId());
         String actionName = archivedState ? getString(R.string.menu_unarchive) : getString(R.string.menu_archive);
         String actionNameLower = archivedState ? "unarchive" : "archive";
         int iconRes = archivedState ? R.drawable.ic_unarchive_24dp : R.drawable.ic_archive_2_24dp;
@@ -550,9 +582,9 @@ public class HabitDataActivity extends AppCompatActivity implements
     HabitDialog.DialogResult onYesUpdateHabitClicked = new HabitDialog.DialogResult() {
         @Override
         public void onResult(Habit initHabit, Habit habit) {
-            mHabit = habit;
+            mActivityState.habit = habit;
             mHabitDatabase.updateHabit(initHabit.getDatabaseId(), habit);
-            setUpActivityWithHabit(mHabit);
+            setUpActivityWithHabit(mActivityState.habit);
 
             setResult(ResultCodes.HABIT_CHANGED);
         }
@@ -563,21 +595,12 @@ public class HabitDataActivity extends AppCompatActivity implements
 
         HabitDialog dialog = new HabitDialog()
                 .setTitle("Edit Habit")
-                .setInitHabit(mHabit)
+                .setInitHabit(mActivityState.habit)
                 .setAccentColor(accentColor)
                 .setPositiveButton("Update", onYesUpdateHabitClicked)
                 .setNegativeButton("Cancel", null);
 
         dialog.show(getSupportFragmentManager(), "edit-habit");
-    }
-
-    @Override
-    public void onUpdateHabit(Habit oldHabit, Habit newHabit) {
-        mHabit = newHabit;
-        mHabitDatabase.updateHabit(oldHabit.getDatabaseId(), newHabit);
-        setUpActivityWithHabit(mHabit);
-
-        setResult(ResultCodes.HABIT_CHANGED);
     }
 
     //endregion -- end --
@@ -606,7 +629,7 @@ public class HabitDataActivity extends AppCompatActivity implements
     @Override
     public void onNewEntryCreated(SessionEntry newEntry) {
         if (newEntry != null) {
-            mHabitDatabase.addEntry(mHabit.getDatabaseId(), newEntry);
+            mHabitDatabase.addEntry(mActivityState.habit.getDatabaseId(), newEntry);
             dateRangeManager.adjustDateRangeForEntry(newEntry);
             addNewEntry(newEntry);
         }
@@ -614,39 +637,18 @@ public class HabitDataActivity extends AppCompatActivity implements
     //endregion
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mActivityState.saveState(outState);
+        dateRangeManager.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void onBackPressed() {
         if (ui.menuFab.isOpened())
             ui.menuFab.close(true);
         else super.onBackPressed();
     }
-
-    FloatingDateRangeWidgetManager.DateRangeChangeListener onDateRangeChangeListener =
-            new FloatingDateRangeWidgetManager.DateRangeChangeListener() {
-                @Override
-                public void onDateRangeChanged(long dateFrom, long dateTo) {
-                    mSessionEntries = fetchEntriesWithinConditions(mSearchQuery);
-                    updateEntries(mSessionEntries);
-                }
-            };
-
-    SearchView.OnQueryTextListener onSearchQueryListener = new SearchView.OnQueryTextListener() {
-        @Override
-        public boolean onQueryTextSubmit(String query) {
-            mSearchQuery = query.trim();
-            return false;
-        }
-
-        @Override
-        public boolean onQueryTextChange(String query) {
-            mSearchQuery = query.trim();
-            mSessionEntries = query.length() > 0 ?
-                    fetchEntriesWithinConditions(query) : fetchEntriesWithinTimeRange();
-
-            updateEntries(mSessionEntries);
-
-            return false;
-        }
-    };
 
     TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
 
@@ -705,7 +707,7 @@ public class HabitDataActivity extends AppCompatActivity implements
         @Override
         public void onClick(View v) {
             ui.menuFab.close(true);
-            SessionActivity.startActivity(HabitDataActivity.this, mHabit);
+            SessionActivity.startActivity(HabitDataActivity.this, mActivityState.habit);
         }
     };
 
@@ -725,23 +727,23 @@ public class HabitDataActivity extends AppCompatActivity implements
     //region Getters {}
     @Override
     public Habit getHabit() {
-        return mHabit;
+        return mActivityState.habit;
     }
 
     @Override
     public ThemeColorPalette getColorPalette() {
-        return new ThemeColorPalette(mHabit.getColor());
+        return new ThemeColorPalette(mActivityState.habit.getColor());
     }
 
     @Override
     public SessionEntryCollection getSessionEntries() {
-        return mSessionEntries;
+        return mActivityState.entries;
     }
 
     @Override
     public CategoryDataCollection getCategoryDataSample() {
         return mHabitDatabase.getCategoryDataSample
-                (mHabit.getCategory(), dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
+                (mActivityState.habit.getCategory(), dateRangeManager.getDateFrom(), dateRangeManager.getDateTo());
     }
     //endregion -- end --
 

@@ -25,7 +25,7 @@ import com.example.brandon.habitlogger.ui.Activities.MainActivity.HabitViewHolde
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity.SessionActivity;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
-import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog2.HabitDialog;
+import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.HabitDialog;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.GroupDecoration;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 

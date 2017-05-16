@@ -20,8 +20,8 @@ import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.StatisticsFragments.PieGraphCompletion;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.StatisticsFragments.PieGraphDuration;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.IHabitDataCallback;
-import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
-import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.NestedScrollObserver;
+import com.example.brandon.habitlogger.ui.Events.ScrollObservers.IScrollEvents;
+import com.example.brandon.habitlogger.ui.Events.ScrollObservers.NestedScrollObserver;
 
 public class StatisticsFragment extends Fragment implements IHabitDataCallback.IStatisticsFragment{
 

@@ -34,14 +34,14 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
     //region Code responsible for providing an interface to the database
     private static ArrayList<SessionChangeCallback> sessionChangeCallbacks = new ArrayList<>();
 
-    public interface SessionChangeCallback {
-        void onSessionPauseStateChanged(long habitId, boolean isPaused);
+    public static class SessionChangeCallback {
+        public void onSessionPauseStateChanged(long habitId, boolean isPaused){};
 
-        void beforeSessionEnded(long habitId, boolean wasCanceled);
+        public void beforeSessionEnded(long habitId, boolean wasCanceled){};
 
-        void afterSessionEnded(long habitId, boolean wasCanceled);
+        public void afterSessionEnded(long habitId, boolean wasCanceled){};
 
-        void onSessionStarted(long habitId);
+        public void onSessionStarted(long habitId){};
     }
 
     public void addSessionChangedCallback(SessionChangeCallback callback) {
@@ -53,11 +53,13 @@ public class SessionManager implements MyDatabaseUtils.AccessAttributesMethods {
     }
     //endregion
 
+    //region Constructors{}
     public SessionManager(Context context) {
         databaseHelper = new DatabaseSchema(context);
         mWritableDatabase = databaseHelper.getWritableDatabase();
         mReadableDatabase = databaseHelper.getReadableDatabase();
     }
+    //endregion -- end --
 
     //region [ ---- Methods responsible for managing active sessions ---- ]
 

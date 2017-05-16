@@ -24,7 +24,7 @@ public class SettingsActivity extends SettingsActivityBase {
 
     @Override
     protected int getPreferenceResource() {
-        return R.xml.preferences_experimental;
+        return R.xml.preferences;
     }
 
     //region entire lifetime (onCreate - onDestroy)

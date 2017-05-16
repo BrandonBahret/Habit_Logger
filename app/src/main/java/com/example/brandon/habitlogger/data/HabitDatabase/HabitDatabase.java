@@ -87,11 +87,13 @@ public class HabitDatabase {
     }
     //endregion
 
+    //region Contstructors{}
     public HabitDatabase(Context context) {
         databaseHelper = new DatabaseSchema(context);
         mWritableDatabase = databaseHelper.getWritableDatabase();
         mReadableDatabase = databaseHelper.getReadableDatabase();
     }
+    //endregion -- end --
 
     //region Methods responsible for sampling data from the database
     public HabitDataCollection getAllData() {

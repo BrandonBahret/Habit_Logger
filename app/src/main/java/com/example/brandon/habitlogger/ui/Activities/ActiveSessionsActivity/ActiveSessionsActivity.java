@@ -42,8 +42,7 @@ import static android.widget.Toast.makeText;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class ActiveSessionsActivity extends AppCompatActivity implements
-        SessionManager.SessionChangeCallback, ActiveSessionViewAdapter.OnClickListeners,
-        SearchView.OnQueryTextListener {
+        ActiveSessionViewAdapter.OnClickListeners, SearchView.OnQueryTextListener {
 
     //region (Member attributes)
     private static final String KEY_ACTIVE_SESSIONS = "KEY_ACTIVE_SESSIONS";
@@ -51,15 +50,13 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
 
     private List<Pair<SessionEntry, Integer>> mUndoStack = new ArrayList<>();
     private List<SessionEntry> mActiveSessions;
+    private String mSearchQuery;
+
     private SessionManager mSessionManager;
     private PreferenceChecker mPreferenceChecker;
 
     private Handler mUpdateHandler = new Handler();
     private ActiveSessionViewAdapter mSessionViewAdapter;
-    private ActivityActiveSessionsBinding ui;
-
-    private String mSearchQuery;
-
     //endregion
 
     //region [ ---- Methods responsible for handling the lifecycle of the activity. ---- ]
@@ -68,7 +65,7 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ui = DataBindingUtil.setContentView(this, R.layout.activity_active_sessions);
+        ActivityActiveSessionsBinding ui = DataBindingUtil.setContentView(this, R.layout.activity_active_sessions);
 
         setSupportActionBar(ui.toolbar);
         if (getSupportActionBar() != null)
@@ -126,14 +123,14 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        mSessionManager.addSessionChangedCallback(this);
+        mSessionManager.addSessionChangedCallback(onSessionChangeCallback);
         startRepeatingTask();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mSessionManager.removeSessionChangedCallback(this);
+        mSessionManager.removeSessionChangedCallback(onSessionChangeCallback);
         stopRepeatingTask();
     }
     //endregion -- end --
@@ -349,25 +346,18 @@ public class ActiveSessionsActivity extends AppCompatActivity implements
     //endregion
 
     //region Methods responsible for handling SessionManager events
-    @Override
-    public void onSessionPauseStateChanged(long habitId, boolean isPaused) {
-        for (SessionEntry entry : mActiveSessions) {
-            if (entry.getHabit().getDatabaseId() == habitId) {
+    private SessionManager.SessionChangeCallback onSessionChangeCallback = new SessionManager.SessionChangeCallback() {
+        @Override
+        public void onSessionPauseStateChanged(long habitId, boolean isPaused) {
+            for (SessionEntry entry : mActiveSessions) {
+                if (entry.getHabit().getDatabaseId() != habitId) continue;
+
                 int position = mActiveSessions.indexOf(entry);
                 mSessionViewAdapter.notifyItemChanged(position);
                 break;
             }
         }
-    }
-
-    @Override
-    public void beforeSessionEnded(long habitId, boolean wasCanceled) {}
-
-    @Override
-    public void afterSessionEnded(long habitId, boolean wasCanceled) {}
-
-    @Override
-    public void onSessionStarted(long habitId) {}
+    };
     //endregion
 
     //endregion [ ---------------- end ---------------- ]

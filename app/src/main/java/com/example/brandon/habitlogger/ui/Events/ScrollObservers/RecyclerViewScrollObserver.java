@@ -1,4 +1,4 @@
-package com.example.brandon.habitlogger.ui.Activities.ScrollObservers;
+package com.example.brandon.habitlogger.ui.Events.ScrollObservers;
 
 import android.support.v7.widget.RecyclerView;
 

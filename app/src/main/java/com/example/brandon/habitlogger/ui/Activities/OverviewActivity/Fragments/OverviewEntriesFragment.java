@@ -18,8 +18,8 @@ import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.EntriesFragment.EntryViewAdapter;
 import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.IDataOverviewCallback;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
-import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
-import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.RecyclerViewScrollObserver;
+import com.example.brandon.habitlogger.ui.Events.ScrollObservers.IScrollEvents;
+import com.example.brandon.habitlogger.ui.Events.ScrollObservers.RecyclerViewScrollObserver;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.GroupDecoration;
 import com.example.brandon.habitlogger.ui.Widgets.RecyclerViewDecorations.SpaceOffsetDecoration;
 

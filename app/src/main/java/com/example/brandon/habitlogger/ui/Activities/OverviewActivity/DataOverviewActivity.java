@@ -17,7 +17,7 @@
 //import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 //import com.example.brandon.habitlogger.databinding.ActivityDataOverviewBinding;
 //import com.example.brandon.habitlogger.ui.Activities.OverviewActivity.Fragments.OverviewEntriesFragment;
-//import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
+//import com.example.brandon.habitlogger.ui.Events.ScrollObservers.IScrollEvents;
 //import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EditEntryForm;
 //import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 //

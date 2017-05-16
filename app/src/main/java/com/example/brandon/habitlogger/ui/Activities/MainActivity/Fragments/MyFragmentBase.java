@@ -17,8 +17,8 @@ import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
-import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.IScrollEvents;
-import com.example.brandon.habitlogger.ui.Activities.ScrollObservers.RecyclerViewScrollObserver;
+import com.example.brandon.habitlogger.ui.Events.ScrollObservers.IScrollEvents;
+import com.example.brandon.habitlogger.ui.Events.ScrollObservers.RecyclerViewScrollObserver;
 
 import java.util.List;
 
