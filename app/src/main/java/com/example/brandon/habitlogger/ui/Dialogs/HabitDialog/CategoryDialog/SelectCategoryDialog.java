@@ -13,11 +13,14 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Toast;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyColorUtils;
 import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.databinding.DialogCategorySelectorBinding;
+import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +36,12 @@ public class SelectCategoryDialog extends DialogFragment {
         List<HabitCategory> categories;
         int accentColor = 0;
 
-        public void saveState(Bundle outState){
+        public void saveState(Bundle outState) {
             outState.putParcelableArrayList("categories", (ArrayList<? extends Parcelable>) categories);
             outState.putInt("accentColor", accentColor);
         }
 
-        public void restoreState(Bundle savedInstanceState){
+        public void restoreState(Bundle savedInstanceState) {
             this.categories = savedInstanceState.getParcelableArrayList("categories");
             this.accentColor = savedInstanceState.getInt("accentColor");
         }
@@ -68,11 +71,38 @@ public class SelectCategoryDialog extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(savedInstanceState != null)
+        if (savedInstanceState != null)
             mDialogState.restoreState(savedInstanceState);
 
         mAdapter = new CategorySpinnerAdapter(getContext(), mDialogState.categories);
     }
+
+    CategorySpinnerAdapter.CategoryManipulationCallback mCallback = new CategorySpinnerAdapter.CategoryManipulationCallback() {
+        @Override
+        public void removeCategory(final HabitCategory category) {
+            new ConfirmationDialog()
+                    .setIcon(R.drawable.ic_delete_forever_24dp)
+                    .setTitle(R.string.remove_category)
+                    .setMessage(R.string.remove_category_message)
+                    .setOnYesClickListener(new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            HabitDatabase database = new HabitDatabase(getContext());
+                            database.deleteCategory(category.getDatabaseId());
+                            String message = category.getName() + " removed";
+                            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+
+                            mAdapter.removeCategory(category);
+                        }
+                    })
+                    .show(getFragmentManager(), "confirm-delete-category");
+        }
+
+        @Override
+        public void categoryChanged(HabitCategory category) {
+
+        }
+    };
 
     @NonNull
     @Override
@@ -83,8 +113,16 @@ public class SelectCategoryDialog extends DialogFragment {
                 null, false
         );
 
+        mAdapter.setCategoryManipulationCallback(mCallback);
         ui.categoryList.setAdapter(mAdapter);
         ui.categoryList.setOnItemClickListener(onCategoryListItemClick);
+        ui.categoryList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getContext(), "Long Click", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
         ui.newCategoryButton.setOnClickListener(onNewCategoryButtonClicked);
 
         AlertDialog dialog = new AlertDialog.Builder(getContext())
@@ -138,12 +176,12 @@ public class SelectCategoryDialog extends DialogFragment {
     //endregion -- end --
 
     //region Setters{}
-    public SelectCategoryDialog setAccentColor(int color){
+    public SelectCategoryDialog setAccentColor(int color) {
         mDialogState.accentColor = color;
         return this;
     }
 
-    public SelectCategoryDialog setCategories(List<HabitCategory> categories){
+    public SelectCategoryDialog setCategories(List<HabitCategory> categories) {
         mDialogState.categories = categories;
         return this;
     }

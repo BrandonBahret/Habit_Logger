@@ -5,11 +5,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.R;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 
 import java.util.List;
 
@@ -21,27 +22,57 @@ import java.util.List;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class CategorySpinnerAdapter extends BaseAdapter {
 
+    public interface CategoryManipulationCallback {
+        void removeCategory(final HabitCategory category);
+
+        void categoryChanged(final HabitCategory category);
+    }
+
     //region (Member attributes)
     private List<HabitCategory> mCategories;
     private LayoutInflater mInflater;
+
+    CategoryManipulationCallback mCallback;
+
+    public void setCategoryManipulationCallback(CategoryManipulationCallback callback){
+        this.mCallback = callback;
+    }
     //endregion
 
-    public static class ViewHolder {
+    public class ViewHolder {
         public TextView title;
         public ImageView color;
+        public ImageButton delete, edit;
         public View itemView;
 
         public ViewHolder(View view) {
             title = (TextView) view.findViewById(R.id.title);
             color = (ImageView) view.findViewById(R.id.color);
+            delete = (ImageButton) view.findViewById(R.id.delete_category);
+            edit = (ImageButton) view.findViewById(R.id.edit_category);
             itemView = view;
         }
 
-        public void bindObject(HabitCategory category){
+        public void bindObject(final HabitCategory category) {
             title.setText(category.getName());
             color.setColorFilter(category.getColorAsInt());
+
+            edit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mCallback.categoryChanged(category);
+                }
+            });
+
+            delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mCallback.removeCategory(category);
+                }
+            });
         }
     }
+
 
     public CategorySpinnerAdapter(Context context, List<HabitCategory> categories) {
         mCategories = categories;
@@ -50,8 +81,8 @@ public class CategorySpinnerAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View row, ViewGroup parent) {
-        if(row == null)
-            row = mInflater.inflate(R.layout.spinner_category_layout, parent, false);
+        if (row == null)
+            row = mInflater.inflate(R.layout.spinner_category_edit_layout, parent, false);
 
         ViewHolder viewHolder = new ViewHolder(row);
         HabitCategory category = getItem(position);
@@ -61,7 +92,7 @@ public class CategorySpinnerAdapter extends BaseAdapter {
     }
 
     //region Methods responsible for exposing the data set
-    public int getItemPosition(HabitCategory category){
+    public int getItemPosition(HabitCategory category) {
         return mCategories.indexOf(category);
     }
 
@@ -81,8 +112,13 @@ public class CategorySpinnerAdapter extends BaseAdapter {
         return getItem(position).getDatabaseId();
     }
 
-    public void addCategory(HabitCategory category){
+    public void addCategory(HabitCategory category) {
         mCategories.add(category);
+        notifyDataSetChanged();
+    }
+
+    public void removeCategory(HabitCategory category) {
+        mCategories.remove(category);
         notifyDataSetChanged();
     }
     //endregion -- end --

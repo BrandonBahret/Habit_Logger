@@ -25,6 +25,7 @@ public class ConfirmationDialog extends DialogFragment {
         public int accentColor = 0;
         public @DrawableRes int iconRes = -1;
         public @StringRes int titleId = -1;
+        public @StringRes int messageId = -1;
 
         public void saveState(Bundle outState){
             outState.putString("title", title);
@@ -32,6 +33,7 @@ public class ConfirmationDialog extends DialogFragment {
             outState.putInt("accentColor", accentColor);
             outState.putInt("iconRes", iconRes);
             outState.putInt("titleId", titleId);
+            outState.putInt("messageId", messageId);
         }
 
         public void restoreState(Bundle savedInstanceState){
@@ -40,6 +42,7 @@ public class ConfirmationDialog extends DialogFragment {
             accentColor = savedInstanceState.getInt("accentColor");
             iconRes = savedInstanceState.getInt("iconRes");
             titleId = savedInstanceState.getInt("titleId");
+            messageId = savedInstanceState.getInt("messageId");
         }
     }
 
@@ -65,8 +68,12 @@ public class ConfirmationDialog extends DialogFragment {
         if (savedInstanceState != null)
             mDialogState.restoreState(savedInstanceState);
 
-        if(mDialogState != null && mDialogState.title == null && mDialogState.titleId != -1)
-            mDialogState.title = getContext().getString(mDialogState.titleId);
+        if(mDialogState != null){
+            if(mDialogState.title == null && mDialogState.titleId != -1)
+                mDialogState.title = getContext().getString(mDialogState.titleId);
+            if(mDialogState.message == null && mDialogState.messageId != -1)
+                mDialogState.message = getContext().getString(mDialogState.messageId);
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
                 .setTitle(mDialogState.title)
@@ -112,6 +119,11 @@ public class ConfirmationDialog extends DialogFragment {
 
     public ConfirmationDialog setMessage(String message) {
         mDialogState.message = message;
+        return this;
+    }
+
+    public ConfirmationDialog setMessage(@StringRes int textId) {
+        mDialogState.messageId = textId;
         return this;
     }
 
