@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
+import com.example.brandon.habitlogger.ui.Widgets.MySpinner;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class CategorySpinnerAdapter extends BaseAdapter {
 
     CategoryManipulationCallback mCallback;
 
-    public void setCategoryManipulationCallback(CategoryManipulationCallback callback){
+    public void setCategoryManipulationCallback(CategoryManipulationCallback callback) {
         this.mCallback = callback;
     }
     //endregion
@@ -71,6 +72,16 @@ public class CategorySpinnerAdapter extends BaseAdapter {
                 }
             });
         }
+
+        public void hideEditButtons() {
+            delete.setVisibility(View.GONE);
+            edit.setVisibility(View.GONE);
+        }
+
+        public void showEditButtons() {
+            delete.setVisibility(View.VISIBLE);
+            edit.setVisibility(View.VISIBLE);
+        }
     }
 
 
@@ -79,12 +90,22 @@ public class CategorySpinnerAdapter extends BaseAdapter {
         mInflater = LayoutInflater.from(context);
     }
 
+
     @Override
     public View getView(int position, View row, ViewGroup parent) {
         if (row == null)
             row = mInflater.inflate(R.layout.spinner_category_edit_layout, parent, false);
 
+
         ViewHolder viewHolder = new ViewHolder(row);
+
+        if(parent instanceof MySpinner || position == 0){
+            viewHolder.hideEditButtons();
+        }
+        else {
+            viewHolder.showEditButtons();
+        }
+
         HabitCategory category = getItem(position);
         viewHolder.bindObject(category);
 

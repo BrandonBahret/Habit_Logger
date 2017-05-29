@@ -22,27 +22,27 @@ public class ConfirmationDialog extends DialogFragment {
 
     private class DialogState implements Serializable {
         public String title, message;
-        public int accentColor = 0;
-        public @DrawableRes int iconRes = -1;
         public @StringRes int titleId = -1;
         public @StringRes int messageId = -1;
+        public int accentColor = 0;
+        public @DrawableRes int iconRes = -1;
 
         public void saveState(Bundle outState){
             outState.putString("title", title);
+            outState.putInt("titleId", titleId);
             outState.putString("message", message);
+            outState.putInt("messageId", messageId);
             outState.putInt("accentColor", accentColor);
             outState.putInt("iconRes", iconRes);
-            outState.putInt("titleId", titleId);
-            outState.putInt("messageId", messageId);
         }
 
         public void restoreState(Bundle savedInstanceState){
             title = savedInstanceState.getString("title");
+            titleId = savedInstanceState.getInt("titleId");
             message = savedInstanceState.getString("message");
+            messageId = savedInstanceState.getInt("messageId");
             accentColor = savedInstanceState.getInt("accentColor");
             iconRes = savedInstanceState.getInt("iconRes");
-            titleId = savedInstanceState.getInt("titleId");
-            messageId = savedInstanceState.getInt("messageId");
         }
     }
 
@@ -58,7 +58,6 @@ public class ConfirmationDialog extends DialogFragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
         mDialogState.saveState(outState);
     }
 

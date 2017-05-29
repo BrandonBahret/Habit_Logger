@@ -9,6 +9,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,15 +35,18 @@ public class SelectCategoryDialog extends DialogFragment {
 
     public class DialogState {
         List<HabitCategory> categories;
+        HabitCategory confirmCategory = null;
         int accentColor = 0;
 
         public void saveState(Bundle outState) {
             outState.putParcelableArrayList("categories", (ArrayList<? extends Parcelable>) categories);
+            outState.putParcelable("confirmCategory", confirmCategory);
             outState.putInt("accentColor", accentColor);
         }
 
         public void restoreState(Bundle savedInstanceState) {
             this.categories = savedInstanceState.getParcelableArrayList("categories");
+            this.confirmCategory = savedInstanceState.getParcelable("confirmCategory");
             this.accentColor = savedInstanceState.getInt("accentColor");
         }
     }
@@ -74,27 +78,35 @@ public class SelectCategoryDialog extends DialogFragment {
         if (savedInstanceState != null)
             mDialogState.restoreState(savedInstanceState);
 
+        Fragment frag;
+        if((frag = getFragmentManager().findFragmentByTag("confirm-delete-category")) != null){
+            ((ConfirmationDialog)frag).setOnYesClickListener(onYesDeleteCategory);
+        }
+
         mAdapter = new CategorySpinnerAdapter(getContext(), mDialogState.categories);
     }
+
+    DialogInterface.OnClickListener onYesDeleteCategory = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            HabitDatabase database = new HabitDatabase(getContext());
+            database.deleteCategory(mDialogState.confirmCategory.getDatabaseId());
+            String message = mDialogState.confirmCategory.getName() + " removed";
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+
+            mAdapter.removeCategory(mDialogState.confirmCategory);
+        }
+    };
 
     CategorySpinnerAdapter.CategoryManipulationCallback mCallback = new CategorySpinnerAdapter.CategoryManipulationCallback() {
         @Override
         public void removeCategory(final HabitCategory category) {
+            mDialogState.confirmCategory = category;
             new ConfirmationDialog()
                     .setIcon(R.drawable.ic_delete_forever_24dp)
                     .setTitle(R.string.remove_category)
                     .setMessage(R.string.remove_category_message)
-                    .setOnYesClickListener(new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            HabitDatabase database = new HabitDatabase(getContext());
-                            database.deleteCategory(category.getDatabaseId());
-                            String message = category.getName() + " removed";
-                            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-
-                            mAdapter.removeCategory(category);
-                        }
-                    })
+                    .setOnYesClickListener(onYesDeleteCategory)
                     .show(getFragmentManager(), "confirm-delete-category");
         }
 
@@ -116,13 +128,6 @@ public class SelectCategoryDialog extends DialogFragment {
         mAdapter.setCategoryManipulationCallback(mCallback);
         ui.categoryList.setAdapter(mAdapter);
         ui.categoryList.setOnItemClickListener(onCategoryListItemClick);
-        ui.categoryList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getContext(), "Long Click", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        });
         ui.newCategoryButton.setOnClickListener(onNewCategoryButtonClicked);
 
         AlertDialog dialog = new AlertDialog.Builder(getContext())

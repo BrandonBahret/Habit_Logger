@@ -1,56 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="4dp">
+    android:layout_height="40dp"
+    android:descendantFocusability="blocksDescendants">
+
 
     <ImageView
         android:id="@+id/color"
         android:layout_width="12dp"
         android:layout_height="12dp"
-        android:layout_gravity="center"
         android:layout_margin="8dp"
         android:scaleType="fitXY"
-        android:src="@drawable/background_ripple_circle"/>
+        android:src="@drawable/background_ripple_circle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="250dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="8dp"
-        android:lines="1"
+        android:layout_marginStart="13dp"
         android:ellipsize="end"
+        android:lines="1"
         android:text="@string/value_placeholder"
-        android:textSize="12sp"/>
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/color"
+        app:layout_constraintTop_toTopOf="parent"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
 
-        <android.support.v4.widget.Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="10"/>
+    <ImageButton
+        android:id="@+id/edit_category"
+        android:layout_width="@dimen/link_button_size"
+        android:layout_height="@dimen/link_button_size"
+        android:layout_marginEnd="4dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toStartOf="@+id/delete_category"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_edit_24dp"
+        tools:layout_conversion_absoluteX="260dp"
+        tools:layout_conversion_absoluteY="4dp"/>
 
-        <ImageButton
-            android:id="@+id/edit_category"
-            android:layout_width="@dimen/link_button_size"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/transparent"
-            app:srcCompat="@drawable/ic_edit_24dp"/>
+    <ImageButton
+        android:id="@+id/delete_category"
+        android:layout_width="@dimen/link_button_size"
+        android:layout_height="@dimen/link_button_size"
+        android:layout_marginEnd="4dp"
+        android:layout_marginTop="0dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_delete_icon_1_24dp"
+        tools:layout_conversion_absoluteX="320dp"
+        tools:layout_conversion_absoluteY="4dp"/>
 
-        <ImageButton
-            android:id="@+id/delete_category"
-            android:layout_width="@dimen/link_button_size"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/transparent"
-            app:srcCompat="@drawable/ic_delete_icon_1_24dp"/>
-    </LinearLayout>
 
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>
