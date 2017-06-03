@@ -82,6 +82,9 @@ public class SelectCategoryDialog extends DialogFragment {
         if((frag = getFragmentManager().findFragmentByTag("confirm-delete-category")) != null){
             ((ConfirmationDialog)frag).setOnYesClickListener(onYesDeleteCategory);
         }
+        else if((frag = getFragmentManager().findFragmentByTag("confirm-edit-category")) != null){
+            ((CategoryDialog)frag).setPositiveButton("Update", onYesEditCategory);
+        }
 
         mAdapter = new CategorySpinnerAdapter(getContext(), mDialogState.categories);
     }
@@ -98,6 +101,17 @@ public class SelectCategoryDialog extends DialogFragment {
         }
     };
 
+    CategoryDialog.DialogResult onYesEditCategory = new CategoryDialog.DialogResult() {
+        @Override
+        public void onResult(HabitCategory initCategory, HabitCategory category) {
+            HabitDatabase database = new HabitDatabase(getContext());
+            database.updateCategory(initCategory.getDatabaseId(), category);
+            String message = initCategory.getName() + " changed";
+            mAdapter.updateCategory(initCategory, category);
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        }
+    };
+
     CategorySpinnerAdapter.CategoryManipulationCallback mCallback = new CategorySpinnerAdapter.CategoryManipulationCallback() {
         @Override
         public void removeCategory(final HabitCategory category) {
@@ -111,8 +125,14 @@ public class SelectCategoryDialog extends DialogFragment {
         }
 
         @Override
-        public void categoryChanged(HabitCategory category) {
+        public void editCategory(HabitCategory category) {
+            mDialogState.confirmCategory = category;
 
+            new CategoryDialog()
+                    .setTitle("Edit Category")
+                    .setCategory(category)
+                    .setPositiveButton("Update", onYesEditCategory)
+                    .show(getFragmentManager(), "confirm-edit-category");
         }
     };
 

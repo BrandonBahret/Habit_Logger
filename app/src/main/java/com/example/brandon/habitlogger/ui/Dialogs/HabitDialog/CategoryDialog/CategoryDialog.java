@@ -95,6 +95,12 @@ public class CategoryDialog extends DialogFragment {
             }
         });
 
+        if(mDialogState.initCategory != null){
+            setColorPreview(mDialogState.initCategory.getColor());
+            ui.categoryName.setText(mDialogState.initCategory.getName());
+            ui.categoryColor.setText(mDialogState.initCategory.getColor());
+        }
+
         final AlertDialog categoryDialog = new AlertDialog.Builder(getContext())
                 .setCancelable(true)
                 .setView(ui.getRoot())

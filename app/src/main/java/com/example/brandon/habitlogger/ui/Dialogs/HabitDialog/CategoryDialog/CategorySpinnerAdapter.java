@@ -26,7 +26,7 @@ public class CategorySpinnerAdapter extends BaseAdapter {
     public interface CategoryManipulationCallback {
         void removeCategory(final HabitCategory category);
 
-        void categoryChanged(final HabitCategory category);
+        void editCategory(final HabitCategory category);
     }
 
     //region (Member attributes)
@@ -61,7 +61,7 @@ public class CategorySpinnerAdapter extends BaseAdapter {
             edit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mCallback.categoryChanged(category);
+                    mCallback.editCategory(category);
                 }
             });
 
@@ -140,6 +140,12 @@ public class CategorySpinnerAdapter extends BaseAdapter {
 
     public void removeCategory(HabitCategory category) {
         mCategories.remove(category);
+        notifyDataSetChanged();
+    }
+
+    public void updateCategory(HabitCategory initCategory, HabitCategory category) {
+        int prevIndex = mCategories.indexOf(initCategory);
+        mCategories.set(prevIndex, category);
         notifyDataSetChanged();
     }
     //endregion -- end --
