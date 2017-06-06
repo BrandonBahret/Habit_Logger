@@ -686,6 +686,11 @@ public class HabitDatabase {
         String whereClause = CategoriesTableSchema.CATEGORY_ID + "=?";
         String whereArgs[] = {String.valueOf(categoryId)};
 
+        MyDatabaseUtils.setAttribute(
+                mWritableDatabase, HabitsTableSchema.TABLE_NAME, HabitsTableSchema.HABIT_CATEGORY_ID,
+                categoryId, HabitsTableSchema.HABIT_CATEGORY_ID, 1L
+        );
+
         return mWritableDatabase.delete(CategoriesTableSchema.TABLE_NAME,
                 whereClause, whereArgs);
     }

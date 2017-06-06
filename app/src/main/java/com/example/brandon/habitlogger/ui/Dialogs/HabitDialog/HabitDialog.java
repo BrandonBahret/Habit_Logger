@@ -162,6 +162,12 @@ public class HabitDialog extends DialogFragment {
         }
 
         @Override
+        public void onCategoryChanged(HabitCategory oldCategory, HabitCategory newCategory) {
+            ((CategorySpinnerAdapter) ui.spinnerCategorySelector.getAdapter())
+                    .updateCategory(oldCategory, newCategory);
+        }
+
+        @Override
         public void onNewCategoryButtonClick() {
             new CategoryDialog()
                     .setTitle("New Category")

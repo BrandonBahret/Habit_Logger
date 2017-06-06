@@ -144,23 +144,23 @@ public class MyDatabaseUtils {
      * @param tableName        The name of the table to update.
      * @param recordKey        The name of the column that holds your record ids.
      * @param recordId         The id of the record to select.
-     * @param columnKey        The key matching the attribute to update
+     * @param targetAttrKey    The key matching the attribute to update
      * @param object           The value to store under columnKey
      * @return The number of rows effected.
      */
     public static int setAttribute(SQLiteDatabase writableDatabase, String tableName,
-                                   String recordKey, long recordId, String columnKey, Object object) {
+                                   String recordKey, long recordId, String targetAttrKey, Object object) {
 
         ContentValues value = new ContentValues(1);
 
         if (object instanceof String) {
-            value.put(columnKey, (String) object);
+            value.put(targetAttrKey, (String) object);
         }
         else if (object instanceof Long) {
-            value.put(columnKey, (Long) object);
+            value.put(targetAttrKey, (Long) object);
         }
         else if (object instanceof Boolean) {
-            value.put(columnKey, (Boolean) object ? 1 : 0);
+            value.put(targetAttrKey, (Boolean) object ? 1 : 0);
         }
 
         return writableDatabase.update(tableName, value,

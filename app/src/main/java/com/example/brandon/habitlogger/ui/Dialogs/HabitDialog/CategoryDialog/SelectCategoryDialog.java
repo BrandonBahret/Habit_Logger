@@ -62,6 +62,8 @@ public class SelectCategoryDialog extends DialogFragment {
     public interface DialogCallback {
         void onCategoryListItemClick(int adapterPosition);
 
+        void onCategoryChanged(HabitCategory oldCategory, HabitCategory newCategory);
+
         void onNewCategoryButtonClick();
     }
 
@@ -108,6 +110,7 @@ public class SelectCategoryDialog extends DialogFragment {
             database.updateCategory(initCategory.getDatabaseId(), category);
             String message = initCategory.getName() + " changed";
             mAdapter.updateCategory(initCategory, category);
+            mCallbackInterface.onCategoryChanged(initCategory, category);
             Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
         }
     };
