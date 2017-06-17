@@ -25,6 +25,7 @@ import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportMan
 import com.example.brandon.habitlogger.data.DataModels.DataCollections.CategoryDataCollection;
 import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.EntriesTableSchema;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
@@ -204,6 +205,31 @@ public class HabitDataActivity extends AppCompatActivity implements
     }
     //endregion -- end --
 
+
+
+    HabitDatabase.OnCategoryChangedListener onCategoryChangedListener = new HabitDatabase.OnCategoryChangedListener() {
+        @Override
+        public void onCategoryDeleted(HabitCategory removedCategory) {
+            setResult(ResultCodes.HABIT_CHANGED);
+            if(removedCategory.getDatabaseId() == mActivityState.habit.getCategory().getDatabaseId()){
+                mActivityState.habit = mHabitDatabase.getHabit(mActivityState.habit.getDatabaseId());
+                setUpActivityWithHabit(mActivityState.habit);
+            }
+        }
+
+        @Override
+        public void onCategoryAdded(HabitCategory newCategory) { }
+
+        @Override
+        public void onCategoryUpdated(HabitCategory oldCategory, HabitCategory newCategory) {
+            setResult(ResultCodes.HABIT_CHANGED);
+            if(oldCategory.getDatabaseId() == mActivityState.habit.getCategory().getDatabaseId()){
+                mActivityState.habit = mHabitDatabase.getHabit(mActivityState.habit.getDatabaseId());
+                setUpActivityWithHabit(mActivityState.habit);
+            }
+        }
+    };
+
     //region visible lifetime (onStart - onStop)
     @Override
     protected void onStart() {
@@ -211,6 +237,7 @@ public class HabitDataActivity extends AppCompatActivity implements
 
         // Set/Add listeners
         ui.tabs.addOnTabSelectedListener(onTabSelectedListener);
+        HabitDatabase.addOnCategoryChangedListener(onCategoryChangedListener);
         ui.enterSessionFab.setOnClickListener(onEnterSessionFabClickedListener);
         ui.createEntryFab.setOnClickListener(onCreateEntryFabClickedListener);
         dateRangeManager.setDateRangeChangeListener(onDateRangeChangeListener);
@@ -221,6 +248,7 @@ public class HabitDataActivity extends AppCompatActivity implements
         super.onStop();
 
         // remove listeners
+        HabitDatabase.removeOnCategoryChangedListener(onCategoryChangedListener);
         ui.tabs.removeOnTabSelectedListener(onTabSelectedListener);
     }
     //endregion -- end --

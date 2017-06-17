@@ -301,12 +301,16 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
 
     @Override
     public void onCategoryRemoved(final HabitCategory categoryRemoved) {
-        MyCollectionUtils.filter(mData, new Predicate<Habit>() {
-            @Override
-            public boolean apply(Habit habit) {
-                return habit.getCategory().getDatabaseId() == categoryRemoved.getDatabaseId();
+        HabitCategory uncategorized = mHabitDatabase.getCategory(1L);
+        for(Habit eachHabit : mData){
+            if(eachHabit.getCategory().getDatabaseId() == categoryRemoved.getDatabaseId()){
+                eachHabit.setCategory(uncategorized);
             }
-        });
+        }
+
+        Collections.sort(mData, Habit.ICompareHabitName);
+        Collections.sort(mData, Habit.ICompareCategoryName);
+
         this.callNotifyDataSetChanged();
     }
 

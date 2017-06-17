@@ -144,8 +144,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void setListeners() {
-        HabitDatabase.addOnCategoryChangedListener(onCategoryChangedListener);
-
         ui.mainInclude.fab.setOnClickListener(onNewHabitButtonClicked);
         mCurrentSessionCard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
+        HabitDatabase.addOnCategoryChangedListener(onCategoryChangedListener);
         mSessionManager.addSessionChangedCallback(onSessionChangeCallback);
     }
 
