@@ -44,8 +44,7 @@ public class HabitDatabase {
     private SQLiteDatabase mReadableDatabase;
     //endregion
 
-    //region Code responsible for providing an interface to the database
-
+    //region Code responsible for providing an interface to the database (entries)
     public interface OnEntryChangedListener {
         void onEntryDeleted(SessionEntry removedEntry);
 
@@ -84,6 +83,41 @@ public class HabitDatabase {
 
     public static void removeOnEntryChangedListener(OnEntryChangedListener listener) {
         onEntryChangedListeners.remove(listener);
+    }
+    //endregion
+
+    //region Code responsible for providing an interface to the database (categories)
+    public interface OnCategoryChangedListener {
+        void onCategoryDeleted(HabitCategory removedCategory);
+
+        void onCategoryAdded(HabitCategory newCategory);
+
+        void onCategoryUpdated(HabitCategory oldCategory, HabitCategory newCategory);
+    }
+
+    private static List<OnCategoryChangedListener> onCategoryChangedListeners = new ArrayList<>();
+
+    private void notifyCategoryDeleted(HabitCategory removedCategory) {
+        for (OnCategoryChangedListener listener : onCategoryChangedListeners)
+            listener.onCategoryDeleted(removedCategory);
+    }
+
+    private void notifyCategoryAdded(HabitCategory newCategory) {
+        for (OnCategoryChangedListener listener : onCategoryChangedListeners)
+            listener.onCategoryAdded(newCategory);
+    }
+
+    private void notifyCategoryUpdated(HabitCategory oldCategory, HabitCategory newCategory) {
+        for (OnCategoryChangedListener listener : onCategoryChangedListeners)
+            listener.onCategoryUpdated(oldCategory, newCategory);
+    }
+
+    public static void addOnCategoryChangedListener(OnCategoryChangedListener listener) {
+        onCategoryChangedListeners.add(listener);
+    }
+
+    public static void removeOnCategoryChangedListener(OnCategoryChangedListener listener) {
+        onCategoryChangedListeners.remove(listener);
     }
     //endregion
 
@@ -616,6 +650,7 @@ public class HabitDatabase {
                 CategoriesTableSchema.getContentValuesFromObject(category)
         );
         category.setDatabaseId(categoryId);
+        notifyCategoryAdded(category);
 
         return categoryId;
     }
@@ -673,9 +708,11 @@ public class HabitDatabase {
     //endregion
 
     public long updateCategory(long categoryId, HabitCategory category) {
-        if (getCategory(categoryId) != null) {
+        HabitCategory oldCategory = getCategory(categoryId);
+        if (oldCategory != null) {
             updateCategoryName(categoryId, category.getName());
             updateCategoryColor(categoryId, category.getColor());
+            notifyCategoryUpdated(oldCategory, category);
             return 1;
         }
 
@@ -691,6 +728,7 @@ public class HabitDatabase {
                 categoryId, HabitsTableSchema.HABIT_CATEGORY_ID, 1L
         );
 
+        notifyCategoryDeleted(getCategory(categoryId));
         return mWritableDatabase.delete(CategoriesTableSchema.TABLE_NAME,
                 whereClause, whereArgs);
     }

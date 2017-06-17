@@ -16,6 +16,7 @@ import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.HabitDataActivity;
@@ -299,6 +300,36 @@ public class AllHabitsFragment extends MyFragmentBase {
     }
 
     @Override
+    public void onCategoryRemoved(final HabitCategory categoryRemoved) {
+        HabitCategory uncategorized = mHabitDatabase.getCategory(1L);
+        for(Habit eachHabit : mData){
+            if(eachHabit.getCategory().getDatabaseId() == categoryRemoved.getDatabaseId()){
+                eachHabit.setCategory(uncategorized);
+            }
+        }
+
+        Collections.sort(mData, Habit.ICompareHabitName);
+        Collections.sort(mData, Habit.ICompareCategoryName);
+
+        this.callNotifyDataSetChanged();
+    }
+
+    @Override
+    public void onUpdateCategory(HabitCategory oldCategory, HabitCategory newCategory) {
+
+        for(Habit habit : mData){
+            if(habit.getCategory().getDatabaseId() == oldCategory.getDatabaseId()){
+                habit.setCategory(newCategory);
+            }
+        }
+
+        Collections.sort(mData, Habit.ICompareHabitName);
+        Collections.sort(mData, Habit.ICompareCategoryName);
+
+        mHabitAdapter.notifyDataSetChanged();
+    }
+
+    @Override
     public void onUpdateHabit(Habit oldHabit, Habit newHabit) {
         mHabitDatabase.updateHabit(oldHabit.getDatabaseId(), newHabit);
 
@@ -394,7 +425,13 @@ public class AllHabitsFragment extends MyFragmentBase {
         public void onResult(Habit initHabit, Habit habit) {
             mHabitDatabase.updateHabit(initHabit.getDatabaseId(), habit);
 
-            int oldPos = mData.indexOf(initHabit);
+            int oldPos = -1;
+            for(Habit eachHabit : mData){
+                if(eachHabit.getDatabaseId() == initHabit.getDatabaseId()){
+                    oldPos = mData.indexOf(eachHabit);
+                    break;
+                }
+            }
             mData.set(oldPos, habit);
 
             Collections.sort(mData, Habit.ICompareHabitName);

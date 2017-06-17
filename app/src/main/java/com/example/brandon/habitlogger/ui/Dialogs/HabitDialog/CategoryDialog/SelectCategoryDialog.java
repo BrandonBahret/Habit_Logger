@@ -62,6 +62,8 @@ public class SelectCategoryDialog extends DialogFragment {
     public interface DialogCallback {
         void onCategoryListItemClick(int adapterPosition);
 
+        void onCategoryRemoved(HabitCategory categoryRemoved);
+
         void onCategoryChanged(HabitCategory oldCategory, HabitCategory newCategory);
 
         void onNewCategoryButtonClick();
@@ -99,6 +101,7 @@ public class SelectCategoryDialog extends DialogFragment {
             String message = mDialogState.confirmCategory.getName() + " removed";
             Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
 
+            mCallbackInterface.onCategoryRemoved(mDialogState.confirmCategory);
             mAdapter.removeCategory(mDialogState.confirmCategory);
         }
     };

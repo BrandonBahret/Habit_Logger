@@ -28,6 +28,7 @@ import com.example.brandon.habitlogger.common.ResultCodes;
 import com.example.brandon.habitlogger.data.DataExportHelpers.GoogleDriveDataExportManager;
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionNotificationManager;
@@ -143,6 +144,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void setListeners() {
+        HabitDatabase.addOnCategoryChangedListener(onCategoryChangedListener);
+
         ui.mainInclude.fab.setOnClickListener(onNewHabitButtonClicked);
         mCurrentSessionCard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -185,6 +188,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStop() {
         super.onStop();
+        HabitDatabase.removeOnCategoryChangedListener(onCategoryChangedListener);
         mSessionManager.removeSessionChangedCallback(onSessionChangeCallback);
     }
     //endregion -- end --
@@ -384,6 +388,23 @@ public class MainActivity extends AppCompatActivity implements
     }
     //endregion -- end --
 
+    HabitDatabase.OnCategoryChangedListener onCategoryChangedListener = new HabitDatabase.OnCategoryChangedListener() {
+        @Override
+        public void onCategoryDeleted(HabitCategory removedCategory) {
+            mFragment.onCategoryRemoved(removedCategory);
+        }
+
+        @Override
+        public void onCategoryAdded(HabitCategory newCategory) {
+
+        }
+
+        @Override
+        public void onCategoryUpdated(HabitCategory oldCategory, HabitCategory newCategory) {
+            mFragment.onUpdateCategory(oldCategory, newCategory);
+        }
+    };
+
     //region Create Habit requests
     HabitDialog.DialogResult onYesCreateHabit = new HabitDialog.DialogResult() {
         @Override
@@ -406,7 +427,6 @@ public class MainActivity extends AppCompatActivity implements
             dialog.show(getSupportFragmentManager(), "create-new-habit");
         }
     };
-
     //endregion -- end --
 
     @Override

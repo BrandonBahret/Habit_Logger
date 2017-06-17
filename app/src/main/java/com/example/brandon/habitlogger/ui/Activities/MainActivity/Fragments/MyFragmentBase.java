@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
@@ -176,6 +177,10 @@ public abstract class MyFragmentBase extends Fragment {
     //endregion -- end --
 
     abstract protected void checkIfHabitsAreAvailable();
+
+    public abstract void onCategoryRemoved(HabitCategory categoryRemoved);
+
+    public abstract void onUpdateCategory(HabitCategory oldCategory, HabitCategory newCategory);
 
     public abstract void onUpdateHabit(Habit oldHabit, Habit newHabit);
 

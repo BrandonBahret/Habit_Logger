@@ -17,6 +17,7 @@ import com.example.brandon.habitlogger.R;
 import com.example.brandon.habitlogger.common.MyCollectionUtils;
 import com.example.brandon.habitlogger.data.DataExportHelpers.LocalDataExportManager;
 import com.example.brandon.habitlogger.data.DataModels.Habit;
+import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.data.DataModels.SessionEntry;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.HabitDataActivity;
@@ -296,6 +297,32 @@ public class ArchivedHabitsFragment extends MyFragmentBase {
             mRecyclerView.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
             emptyResultsLayout.setVisibility(visibility);
         }
+    }
+
+    @Override
+    public void onCategoryRemoved(final HabitCategory categoryRemoved) {
+        MyCollectionUtils.filter(mData, new Predicate<Habit>() {
+            @Override
+            public boolean apply(Habit habit) {
+                return habit.getCategory().getDatabaseId() == categoryRemoved.getDatabaseId();
+            }
+        });
+        this.callNotifyDataSetChanged();
+    }
+
+    @Override
+    public void onUpdateCategory(HabitCategory oldCategory, HabitCategory newCategory) {
+
+        for(Habit habit : mData){
+            if(habit.getCategory().getDatabaseId() == oldCategory.getDatabaseId()){
+                habit.setCategory(newCategory);
+            }
+        }
+
+        Collections.sort(mData, Habit.ICompareHabitName);
+        Collections.sort(mData, Habit.ICompareCategoryName);
+
+        mHabitAdapter.notifyDataSetChanged();
     }
 
     @Override

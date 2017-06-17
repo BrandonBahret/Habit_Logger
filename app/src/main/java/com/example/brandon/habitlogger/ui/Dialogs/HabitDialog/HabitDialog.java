@@ -162,6 +162,14 @@ public class HabitDialog extends DialogFragment {
         }
 
         @Override
+        public void onCategoryRemoved(HabitCategory categoryRemoved) {
+            HabitCategory category = (HabitCategory) ui.spinnerCategorySelector.getSelectedItem();
+            if(categoryRemoved.getDatabaseId() == category.getDatabaseId()){
+                ui.spinnerCategorySelector.setSelection(0);
+            }
+        }
+
+        @Override
         public void onCategoryChanged(HabitCategory oldCategory, HabitCategory newCategory) {
             ((CategorySpinnerAdapter) ui.spinnerCategorySelector.getAdapter())
                     .updateCategory(oldCategory, newCategory);
