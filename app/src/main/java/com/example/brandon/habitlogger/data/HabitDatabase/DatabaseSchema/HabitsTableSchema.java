@@ -2,7 +2,6 @@ package com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema;
 
 import android.content.ContentValues;
 
-import com.example.brandon.habitlogger.data.DataModels.DataCollections.SessionEntryCollection;
 import com.example.brandon.habitlogger.data.DataModels.Habit;
 import com.example.brandon.habitlogger.data.DataModels.HabitCategory;
 import com.example.brandon.habitlogger.data.HabitDatabase.DatabaseSchema.DatabaseSchema.SQL_TYPES;
@@ -46,13 +45,12 @@ public class HabitsTableSchema {
         String description = contentValues.getAsString(HABIT_DESCRIPTION);
         long categoryId = contentValues.getAsLong(HABIT_CATEGORY_ID);
         String iconResId = contentValues.getAsString(HABIT_ICON_RES_ID);
-
         long habitId = contentValues.getAsLong(HABIT_ID);
 
         HabitCategory category = dao.getCategory(categoryId);
 
         if (category != null) {
-            return new Habit(name, description, category, iconResId, new SessionEntryCollection())
+            return new Habit(name, description, category, iconResId)
                     .setDatabaseId(habitId)
                     .setIsArchived(isArchived);
         }

@@ -218,14 +218,14 @@ public class HabitDatabase {
     //endregion
 
     //region Methods responsible for counting the number of rows in tables
-    public int getNumberOfHabits(long categoryId) {
+    public int getCountOfHabitsInCategory(long categoryId) {
         return (int) MyDatabaseUtils.getNumberOfRows(
                 mReadableDatabase, HabitsTableSchema.TABLE_NAME,
                 HabitsTableSchema.HABIT_CATEGORY_ID, categoryId
         );
     }
 
-    public int getNumberOfHabits() {
+    public int getCountOfAllHabits() {
         return (int) MyDatabaseUtils.getNumberOfRows(
                 mReadableDatabase, HabitsTableSchema.TABLE_NAME,
                 HabitsTableSchema.HABIT_IS_ARCHIVED, 0
@@ -456,7 +456,7 @@ public class HabitDatabase {
     }
 
     public List<Habit> getHabits(long categoryId) {
-        int numberOfHabits = getNumberOfHabits(categoryId);
+        int numberOfHabits = getCountOfHabitsInCategory(categoryId);
         List<Habit> habits = new ArrayList<>(numberOfHabits);
 
         Cursor c = mReadableDatabase.query(HabitsTableSchema.TABLE_NAME, null,
@@ -834,6 +834,60 @@ public class HabitDatabase {
 
         return searchTableForIds(SQL, values, EntriesTableSchema.ENTRY_ID);
     }
+
+    /**
+     * @return An array of entry ids found by the search, null if results were empty.
+     */
+    public SessionEntryCollection fetchEntriesWithinTimeRange(long habitId, long timeFrom, long timeTo) {
+        // SELECT ENTRY_ID FROM ENTRIES_TABLE WHERE HABIT_ID=habitId
+        // AND START_TIME >= BEGIN AND START_TIME <= END
+        String SQL = "SELECT * " +
+                " FROM " + EntriesTableSchema.TABLE_NAME + " WHERE " +
+                EntriesTableSchema.ENTRY_HABIT_ID + "=? AND " +
+                EntriesTableSchema.ENTRY_START_TIME + ">=? AND " +
+                EntriesTableSchema.ENTRY_START_TIME + "<=?";
+
+        String[] values = new String[]{
+                String.valueOf(habitId),
+                String.valueOf(timeFrom),
+                String.valueOf(timeTo)
+        };
+
+        Cursor c = mReadableDatabase.rawQuery(SQL, values);
+        SessionEntryCollection result = new SessionEntryCollection(
+                fetchEntriesAtCursor(c), timeFrom, timeTo
+        );
+        c.close();
+        return result;
+    }
+
+    public SessionEntryCollection fetchEntriesWithinTimeRangeAndMatchesComment
+            (long habitId, long timeFrom, long timeTo, String comment) {
+
+        // SELECT ENTRY_ID FROM ENTRIES_TABLE WHERE HABIT_ID=habitId
+        // AND START_TIME >= BEGIN AND START_TIME <= END
+        String SQL = "SELECT * " +
+                " FROM " + EntriesTableSchema.TABLE_NAME + " WHERE " +
+                EntriesTableSchema.ENTRY_HABIT_ID + "=? AND " +
+                EntriesTableSchema.ENTRY_START_TIME + ">=? AND " +
+                EntriesTableSchema.ENTRY_START_TIME + "<=? AND " +
+                EntriesTableSchema.ENTRY_NOTE + " LIKE ?";
+
+        String[] values = new String[]{
+                String.valueOf(habitId),
+                String.valueOf(timeFrom),
+                String.valueOf(timeTo),
+                "%" + comment + "%"
+        };
+
+        Cursor c = mReadableDatabase.rawQuery(SQL, values);
+        SessionEntryCollection result = new SessionEntryCollection(
+                fetchEntriesAtCursor(c), timeFrom, timeTo
+        );
+        c.close();
+        return result;
+    }
+
 
     /**
      * @return An array of entry ids found by the search, null if results were empty.

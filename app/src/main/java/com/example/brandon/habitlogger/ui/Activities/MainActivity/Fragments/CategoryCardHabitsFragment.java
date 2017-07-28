@@ -100,7 +100,7 @@
 //
 //    @Override
 //    protected void checkIfHabitsAreAvailable() {
-//        boolean habitsAvailable = mHabitDatabase.getNumberOfHabits() != 0;
+//        boolean habitsAvailable = mHabitDatabase.getCountOfAllHabits() != 0;
 //        mRecyclerView.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
 //        mNoDataLayout.setVisibility(habitsAvailable ? View.GONE : View.VISIBLE);
 //    }

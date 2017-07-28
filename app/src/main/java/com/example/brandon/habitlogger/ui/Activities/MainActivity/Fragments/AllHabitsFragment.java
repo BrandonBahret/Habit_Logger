@@ -128,7 +128,7 @@ public class AllHabitsFragment extends MyFragmentBase {
 
     @Override
     protected void checkIfHabitsAreAvailable() {
-        boolean habitsAvailable = mHabitDatabase.getNumberOfHabits() != 0;
+        boolean habitsAvailable = mHabitDatabase.getCountOfAllHabits() != 0;
         mRecyclerView.setVisibility(habitsAvailable ? View.VISIBLE : View.GONE);
         mNoDataLayout.setVisibility(habitsAvailable ? View.GONE : View.VISIBLE);
     }
@@ -289,7 +289,7 @@ public class AllHabitsFragment extends MyFragmentBase {
     }
 
     public void updateNoResultsLayout(boolean isEmpty) {
-        boolean habitsAvailable = mHabitDatabase.getNumberOfHabits() != 0;
+        boolean habitsAvailable = mHabitDatabase.getCountOfAllHabits() != 0;
         int visibility = isEmpty && habitsAvailable ? View.VISIBLE : View.GONE;
         View emptyResultsLayout = getActivity().findViewById(R.id.no_results_layout);
 

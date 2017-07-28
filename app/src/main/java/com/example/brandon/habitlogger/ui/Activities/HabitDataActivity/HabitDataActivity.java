@@ -32,19 +32,18 @@ import com.example.brandon.habitlogger.data.HabitDatabase.HabitDatabase;
 import com.example.brandon.habitlogger.data.HabitSessions.SessionManager;
 import com.example.brandon.habitlogger.databinding.ActivityHabitDataBinding;
 import com.example.brandon.habitlogger.ui.Activities.HabitDataActivity.Fragments.EntriesFragment.EntriesFragment;
-import com.example.brandon.habitlogger.ui.Events.IStateContainer;
 import com.example.brandon.habitlogger.ui.Activities.PreferencesActivity.PreferenceChecker;
-import com.example.brandon.habitlogger.ui.Events.ScrollObservers.IScrollEvents;
 import com.example.brandon.habitlogger.ui.Activities.SessionActivity.SessionActivity;
 import com.example.brandon.habitlogger.ui.Dialogs.ConfirmationDialog;
 import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.EditEntryForm;
 import com.example.brandon.habitlogger.ui.Dialogs.EntryFormDialog.NewEntryForm;
 import com.example.brandon.habitlogger.ui.Dialogs.HabitDialog.HabitDialog;
+import com.example.brandon.habitlogger.ui.Events.IStateContainer;
+import com.example.brandon.habitlogger.ui.Events.ScrollObservers.IScrollEvents;
 import com.example.brandon.habitlogger.ui.Widgets.FloatingDateRangeWidgetManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static com.example.brandon.habitlogger.R.string.menu_unarchive;
 
@@ -78,7 +77,7 @@ public class HabitDataActivity extends AppCompatActivity implements
             tabPosition = savedInstanceState.getInt("tabPosition");
         }
     }
-    
+
     // Dependencies
     private HabitDatabase mHabitDatabase;
     private LocalDataExportManager mExportManager;
@@ -205,31 +204,6 @@ public class HabitDataActivity extends AppCompatActivity implements
     }
     //endregion -- end --
 
-
-
-    HabitDatabase.OnCategoryChangedListener onCategoryChangedListener = new HabitDatabase.OnCategoryChangedListener() {
-        @Override
-        public void onCategoryDeleted(HabitCategory removedCategory) {
-            setResult(ResultCodes.HABIT_CHANGED);
-            if(removedCategory.getDatabaseId() == mActivityState.habit.getCategory().getDatabaseId()){
-                mActivityState.habit = mHabitDatabase.getHabit(mActivityState.habit.getDatabaseId());
-                setUpActivityWithHabit(mActivityState.habit);
-            }
-        }
-
-        @Override
-        public void onCategoryAdded(HabitCategory newCategory) { }
-
-        @Override
-        public void onCategoryUpdated(HabitCategory oldCategory, HabitCategory newCategory) {
-            setResult(ResultCodes.HABIT_CHANGED);
-            if(oldCategory.getDatabaseId() == mActivityState.habit.getCategory().getDatabaseId()){
-                mActivityState.habit = mHabitDatabase.getHabit(mActivityState.habit.getDatabaseId());
-                setUpActivityWithHabit(mActivityState.habit);
-            }
-        }
-    };
-
     //region visible lifetime (onStart - onStop)
     @Override
     protected void onStart() {
@@ -291,27 +265,36 @@ public class HabitDataActivity extends AppCompatActivity implements
 
     //region Methods responsible for manipulating entries
     private SessionEntryCollection fetchEntriesWithinConditions(String query) {
-        Set<Long> queryIds = mHabitDatabase.findEntryIdsByComment(
-                mActivityState.habit.getDatabaseId(), query
-        );
+//        Set<Long> queryIds = mHabitDatabase.findEntryIdsByComment(
+//                mActivityState.habit.getDatabaseId(), query
+//        );
+//
+//        Set<Long> dateRangeIds = mHabitDatabase.findEntriesWithinTimeRange(
+//                mActivityState.habit.getDatabaseId(),
+//                dateRangeManager.getDateFrom(), dateRangeManager.getDateTo()
+//        );
+//
+//        queryIds.retainAll(dateRangeIds);
+//
+//        return mHabitDatabase.lookUpEntries(queryIds);
 
-        Set<Long> dateRangeIds = mHabitDatabase.findEntriesWithinTimeRange(
+        return mHabitDatabase.fetchEntriesWithinTimeRangeAndMatchesComment(
                 mActivityState.habit.getDatabaseId(),
-                dateRangeManager.getDateFrom(), dateRangeManager.getDateTo()
+                dateRangeManager.getDateFrom(), dateRangeManager.getDateTo(), query
         );
-
-        queryIds.retainAll(dateRangeIds);
-
-        return mHabitDatabase.lookUpEntries(queryIds);
     }
 
     private SessionEntryCollection fetchEntriesWithinTimeRange() {
-        Set<Long> dateRangeIds = mHabitDatabase.findEntriesWithinTimeRange(
+        return mHabitDatabase.fetchEntriesWithinTimeRange(
                 mActivityState.habit.getDatabaseId(),
                 dateRangeManager.getDateFrom(), dateRangeManager.getDateTo()
         );
-
-        return mHabitDatabase.lookUpEntries(dateRangeIds);
+//        Set<Long> dateRangeIds = mHabitDatabase.findEntriesWithinTimeRange(
+//                mActivityState.habit.getDatabaseId(),
+//                dateRangeManager.getDateFrom(), dateRangeManager.getDateTo()
+//        );
+//
+//        return mHabitDatabase.lookUpEntries(dateRangeIds);
     }
 
     private boolean checkIfEntryFitsWithinConditions(SessionEntry entry) {
@@ -509,7 +492,7 @@ public class HabitDataActivity extends AppCompatActivity implements
             setDialogListener((ConfirmationDialog) dialog);
 
         else if ((dialog = (DialogFragment) fragmentManager.findFragmentByTag("edit-habit")) != null)
-            ((HabitDialog)dialog).setPositiveButton(null, onYesUpdateHabitClicked);
+            ((HabitDialog) dialog).setPositiveButton(null, onYesUpdateHabitClicked);
     }
 
     private void setDialogListener(ConfirmationDialog dialog) {
@@ -663,6 +646,29 @@ public class HabitDataActivity extends AppCompatActivity implements
         }
     }
     //endregion
+
+    HabitDatabase.OnCategoryChangedListener onCategoryChangedListener = new HabitDatabase.OnCategoryChangedListener() {
+        @Override
+        public void onCategoryDeleted(HabitCategory removedCategory) {
+            setResult(ResultCodes.HABIT_CHANGED);
+            if (removedCategory.getDatabaseId() == mActivityState.habit.getCategory().getDatabaseId()) {
+                mActivityState.habit = mHabitDatabase.getHabit(mActivityState.habit.getDatabaseId());
+                setUpActivityWithHabit(mActivityState.habit);
+            }
+        }
+
+        @Override
+        public void onCategoryAdded(HabitCategory newCategory) { }
+
+        @Override
+        public void onCategoryUpdated(HabitCategory oldCategory, HabitCategory newCategory) {
+            setResult(ResultCodes.HABIT_CHANGED);
+            if (oldCategory.getDatabaseId() == mActivityState.habit.getCategory().getDatabaseId()) {
+                mActivityState.habit = mHabitDatabase.getHabit(mActivityState.habit.getDatabaseId());
+                setUpActivityWithHabit(mActivityState.habit);
+            }
+        }
+    };
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

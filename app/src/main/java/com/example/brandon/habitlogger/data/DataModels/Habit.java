@@ -106,6 +106,10 @@ public class Habit implements Serializable, Parcelable {
         this(name, description, category, iconResId, entries, false, -1);
     }
 
+    public Habit(String name, String description, HabitCategory category, String iconResId) {
+        this(name, description, category, iconResId, new SessionEntryCollection());
+    }
+
     public Habit(@NonNull String name, @NonNull HabitCategory category) {
         this(name, "No Description", category, null, new SessionEntryCollection());
     }

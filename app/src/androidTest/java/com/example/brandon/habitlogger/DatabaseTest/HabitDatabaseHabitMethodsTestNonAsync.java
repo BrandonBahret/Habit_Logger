@@ -57,7 +57,7 @@ public class HabitDatabaseHabitMethodsTestNonAsync extends AndroidTestCase {
         Habit dummyHabit = getDummyHabit();
         db.addHabit(dummyHabit);
 
-        assertEquals(1, db.getNumberOfHabits(dummyHabit.getCategory().getDatabaseId()));
+        assertEquals(1, db.getCountOfAllHabits(dummyHabit.getCategory().getDatabaseId()));
     }
 
     public void testGetNumberOfEntries(){
